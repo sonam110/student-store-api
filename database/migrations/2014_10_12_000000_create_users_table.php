@@ -54,6 +54,8 @@ class CreateUsersTable extends Migration
             $table->boolean('is_agreed_on_terms')->default(false)->nullable();
             $table->boolean('is_prime_user')->default(false)->nullable();
             $table->boolean('is_deleted')->default(false)->nullable();
+            $table->boolean('show_email')->default(false)->nullable();
+            $table->boolean('show_contact_number')->default(false)->nullable();
             $table->string('social_security_number')->nullable();
             $table->bigInteger('status')->default('0')->nullable()->comment('0 for not active , 1 for active, 2 for blocked');
             $table->dateTime('last_login');

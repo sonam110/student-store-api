@@ -75,32 +75,44 @@ class FrontController extends Controller
 
 		
 
-    // foreach ($labels as $key => $label) {
-    //         if(LabelGroup::where('name',$key)->count() > 0)
-    //         {
-    //             $labelGroup = LabelGroup::where('name',$key)->first();
-    //         }
-    //         else
-    //         {
-    //             $labelGroup = new LabelGroup;
-    //             $labelGroup->name                = $key;
-    //             $labelGroup->status              = 1;
-    //             $labelGroup->save();
-    //         }
+		// foreach ($labels as $key => $label) {
+		// 	if(LabelGroup::where('name',$key)->count() > 0)
+		// 	{
+		// 		$labelGroup = LabelGroup::where('name',$key)->first();
+		// 	}
+		// 	else
+		// 	{
+		// 		$labelGroup = new LabelGroup;
+		// 		$labelGroup->name                = $key;
+		// 		$labelGroup->status              = 1;
+		// 		$labelGroup->save();
+		// 	}
 
-    //         foreach ($label as $key1 => $value) {
-    //             if(Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->count() == 0)
-    //             {
-    //                 $label = new Label;
-    //                 $label->label_group_id         = $labelGroup->id;
-    //                 $label->language_id            = 1;
-    //                 $label->label_name             = $key1;
-    //                 $label->label_value            = $value;
-    //                 $label->status                 = 1;
-    //                 $label->save(); 
-    //             }
-    //         }
-    //     }
+		// 	foreach ($label as $key1 => $value) {
+		// 		if(Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->count() == 0)
+		// 		{
+		// 			$label = new Label;
+		// 			$label->label_group_id         = $labelGroup->id;
+		// 			$label->language_id            = 1;
+		// 			$label->label_name             = $key1;
+		// 			$label->label_value            = $value;
+		// 			$label->status                 = 1;
+		// 			$label->save(); 
+		// 		}
+		// 		else
+		// 		{
+		// 			$label = Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->first();
+		// 			$label->label_group_id         = $labelGroup->id;
+		// 			$label->language_id            = 1;
+		// 			$label->label_name             = $key1;
+		// 			$label->label_value            = $value;
+		// 			$label->status                 = 1;
+		// 			$label->save(); 
+		// 		}
+		// 	}
+		// }
+
+		
 
 		$userTypes = UserType::where('id','!=', 1)->get();
 		return response()->json(prepareResult(false, $userTypes, getLangByLabelGroups('messages','message_user_type_list')), config('http_response.success'));		
@@ -109,23 +121,23 @@ class FrontController extends Controller
 	public function getServiceProviderType(Request $request)
 	{
 		$serviceProviderTypes = ServiceProviderTypeDetail::select('service_provider_type_details.*')
-                    ->join('service_provider_types', function ($join) {
-                        $join->on('service_provider_type_details.service_provider_type_id', '=', 'service_provider_types.id');
-                    })
-                    ->where('service_provider_types.registration_type_id',$request->registration_type_id)
-                    ->where('language_id',$request->language_id)
-                    ->get();
+		->join('service_provider_types', function ($join) {
+			$join->on('service_provider_type_details.service_provider_type_id', '=', 'service_provider_types.id');
+		})
+		->where('service_provider_types.registration_type_id',$request->registration_type_id)
+		->where('language_id',$request->language_id)
+		->get();
 		return response()->json(prepareResult(false, $serviceProviderTypes, "Service-Provider-Types retrieved successfully! "), config('http_response.success'));
 	}
 
 	public function getRegistrationType(Request $request)
 	{
-				$registrationTypes = RegistrationTypeDetail::select('registration_type_details.*')
-                    ->join('registration_types', function ($join) {
-                        $join->on('registration_type_details.registration_type_id', '=', 'registration_types.id');
-                    })
-                    ->where('language_id',$request->language_id)
-                    ->get();
+		$registrationTypes = RegistrationTypeDetail::select('registration_type_details.*')
+		->join('registration_types', function ($join) {
+			$join->on('registration_type_details.registration_type_id', '=', 'registration_types.id');
+		})
+		->where('language_id',$request->language_id)
+		->get();
 		return response()->json(prepareResult(false, $registrationTypes, "Registration-Types retrieved successfully! "), config('http_response.success'));
 	}
 
@@ -143,12 +155,12 @@ class FrontController extends Controller
 	{
 		$getLang = $request->language_id;
 		$labelGroups = LabelGroup::select('id','name')
-				->where('name', $request->group_name)
-				->with(['labels' => function($q) use ($getLang) {
-                        $q->select('id','label_group_id','language_id','label_name','label_value')
-                        ->where('language_id', $getLang);
-                    }])
-				->first();
+		->where('name', $request->group_name)
+		->with(['labels' => function($q) use ($getLang) {
+			$q->select('id','label_group_id','language_id','label_name','label_value')
+			->where('language_id', $getLang);
+		}])
+		->first();
 		if($labelGroups)
 		{
 			return response()->json(prepareResult(false, $labelGroups, getLangByLabelGroups('messages', 'messages_label_group_info')), config('http_response.success'));
@@ -162,13 +174,13 @@ class FrontController extends Controller
 		$getLang 	= $request->language_id;
 		$label_name = $request->label_name;
 		$getLabelGroup = LabelGroup::select('id')
-			->with(['returnLabelNames' => function($q) use ($getLang, $label_name) {
-	                $q->select('id','label_group_id', 'label_name','label_value')
-	                ->where('language_id', $getLang)
-					->where('label_name', $label_name);
-	            }])
-			->where('name', $group_name)
-			->first();
+		->with(['returnLabelNames' => function($q) use ($getLang, $label_name) {
+			$q->select('id','label_group_id', 'label_name','label_value')
+			->where('language_id', $getLang)
+			->where('label_name', $label_name);
+		}])
+		->where('name', $group_name)
+		->first();
 
 		if($getLabelGroup)
 		{
@@ -213,117 +225,117 @@ class FrontController extends Controller
 	
 
 	public function appSettings()
-    {
-        try
-        {
-            $appSetting = AppSetting::first();
-            return response(prepareResult(false, $appSetting, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
-        }
-        catch (\Throwable $exception) 
-        {
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-        }
-    }
+	{
+		try
+		{
+			$appSetting = AppSetting::first();
+			return response(prepareResult(false, $appSetting, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
 
 	public function getRewardPointCurrencyValue()
-    {
-        try
-        {
-            $customer_rewards_pt_value = AppSetting::first(['single_rewards_pt_value','customer_rewards_pt_value','vat']);
-            return response(prepareResult(false, $customer_rewards_pt_value, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
-        }
-        catch (\Throwable $exception) 
-        {
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-        }
-    }
+	{
+		try
+		{
+			$customer_rewards_pt_value = AppSetting::first(['single_rewards_pt_value','customer_rewards_pt_value','vat']);
+			return response(prepareResult(false, $customer_rewards_pt_value, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
 
-    public function page( Request $request,$slug)
-    {
-        try
-        {
-        	if(!empty($request->language_id))
-        	{
-        		$language_id = $request->language_id;
-        	}
-        	else
-        	{
-        		$language_id = 1;
-        	}
-            $page = Page::where('slug',$slug)->where('language_id',$language_id)->first();
-            return response(prepareResult(false, $page, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
-        }
-        catch (\Throwable $exception) 
-        {
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-        }
-    }
+	public function page( Request $request,$slug)
+	{
+		try
+		{
+			if(!empty($request->language_id))
+			{
+				$language_id = $request->language_id;
+			}
+			else
+			{
+				$language_id = 1;
+			}
+			$page = Page::where('slug',$slug)->where('language_id',$language_id)->first();
+			return response(prepareResult(false, $page, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
 
-    public function getFaqs(Request $request)
-    {
-        try
-        {
-        	if(!empty($request->language_id))
-        	{
-        		$language_id = $request->language_id;
-        	}
-        	else
-        	{
-        		$language_id = 1;
-        	}
+	public function getFaqs(Request $request)
+	{
+		try
+		{
+			if(!empty($request->language_id))
+			{
+				$language_id = $request->language_id;
+			}
+			else
+			{
+				$language_id = 1;
+			}
 
-            $faq = Faq::where('language_id',$language_id)->get();
-            return response(prepareResult(false, $faq, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
-        }
-        catch (\Throwable $exception) 
-        {
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-        }
-    }
+			$faq = Faq::where('language_id',$language_id)->get();
+			return response(prepareResult(false, $faq, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
 
-    public function getSliders(Request $request)
-    {
-        try
-        {
-        	if(!empty($request->language_id))
-        	{
-        		$language_id = $request->language_id;
-        	}
-        	else
-        	{
-        		$language_id = 1;
-        	}
+	public function getSliders(Request $request)
+	{
+		try
+		{
+			if(!empty($request->language_id))
+			{
+				$language_id = $request->language_id;
+			}
+			else
+			{
+				$language_id = 1;
+			}
 
-            $faq = Slider::where('language_id',$language_id)->get();
-            return response(prepareResult(false, $faq, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
-        }
-        catch (\Throwable $exception) 
-        {
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-        }
-    }
+			$faq = Slider::where('language_id',$language_id)->get();
+			return response(prepareResult(false, $faq, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
 
-    
+	
 
-    public function getLabels(Request $request)
-    {
-        try
-        {
-        	$getLang = $request->language_id;
-            $labelGroups = LabelGroup::select('id','name')
-				->with(['labels' => function($q) use ($getLang) {
-                        $q->select('id','label_group_id','language_id','label_name','label_value')
-                        ->where('language_id', $getLang);
-                    }])->orderBy('auto_id','ASC')->get();
-            return response(prepareResult(false, $labelGroups, getLangByLabelGroups('messages','message_label_group_list')), config('http_response.success'));
-        }
-        catch (\Throwable $exception) 
-        {
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-        }
-    }
+	public function getLabels(Request $request)
+	{
+		try
+		{
+			$getLang = $request->language_id;
+			$labelGroups = LabelGroup::select('id','name')
+			->with(['labels' => function($q) use ($getLang) {
+				$q->select('id','label_group_id','language_id','label_name','label_value')
+				->where('language_id', $getLang);
+			}])->orderBy('auto_id','ASC')->get();
+			return response(prepareResult(false, $labelGroups, getLangByLabelGroups('messages','message_label_group_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
 
-    public function getLanguageListForDDL()
+	public function getLanguageListForDDL()
 	{
 		$languages = LangForDDL::orderBy('name', 'ASC')->get();
 		return response()->json(prepareResult(false, $languages, getLangByLabelGroups('messages','message_user_type_list')), config('http_response.success'));
@@ -336,21 +348,21 @@ class FrontController extends Controller
 	}
 
 	public function getEducationInstitutes(Request $request) {
-	    $educationInstitutes = StudentDetail::groupBy('institute_name')->get(['institute_name']);
-	    return response()->json(prepareResult(false, $educationInstitutes, getLangByLabelGroups('messages','message_products_services_book_list')), config('http_response.success'));
+		$educationInstitutes = StudentDetail::groupBy('institute_name')->get(['institute_name']);
+		return response()->json(prepareResult(false, $educationInstitutes, getLangByLabelGroups('messages','message_products_services_book_list')), config('http_response.success'));
 	}
 
 
 	public function getJobTags()
 	{
-	    try
-	    {
-	        $jobTags = JobTag::where('title', '!=', null)->select('title')->groupBy('title')->get();
-	        return response(prepareResult(false, $jobTags, getLangByLabelGroups('messages','messages_job_tags_list')), config('http_response.success'));
-	    }
-	    catch (\Throwable $exception) 
-	    {
-	        return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-	    }
+		try
+		{
+			$jobTags = JobTag::where('title', '!=', null)->select('title')->groupBy('title')->get();
+			return response(prepareResult(false, $jobTags, getLangByLabelGroups('messages','messages_job_tags_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
 	}
 }
