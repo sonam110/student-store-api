@@ -385,6 +385,8 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/abuse-status-update/{id}', [App\Http\Controllers\API\Admin\AbuseController::class,'statusUpdate']);
 	Route::post('/abuse-multiple-status-update', [App\Http\Controllers\API\Admin\AbuseController::class,'multipleStatusUpdate']);
 
+	Route::apiResource('/slider', 'App\Http\Controllers\API\Admin\SliderController')->only('index','store','destroy');
+
 
 
 
@@ -396,5 +398,6 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 Route::get('/get-appSettings', 'App\Http\Controllers\API\FrontController@appSettings');
 Route::get('/get-reward-point-currency-value', 'App\Http\Controllers\API\FrontController@getRewardPointCurrencyValue');
+Route::get('/get-sliders', 'App\Http\Controllers\API\FrontController@getSliders');
 Route::get('/get-faqs', 'App\Http\Controllers\API\FrontController@getFaqs');
 Route::get('/{slug}', 'App\Http\Controllers\API\FrontController@page');

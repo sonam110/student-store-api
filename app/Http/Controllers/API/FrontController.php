@@ -23,6 +23,7 @@ use Edujugon\PushNotification\PushNotification;
 use App\Models\StudentDetail;
 use App\Models\JobTag;
 use App\Models\Label;
+use App\Models\Slider;
 use Stripe;
 
 
@@ -237,11 +238,19 @@ class FrontController extends Controller
         }
     }
 
-    public function page($slug)
+    public function page( Request $request,$slug)
     {
         try
         {
-            $page = Page::where('slug',$slug)->first();
+        	if(!empty($request->language_id))
+        	{
+        		$language_id = $request->language_id;
+        	}
+        	else
+        	{
+        		$language_id = 1;
+        	}
+            $page = Page::where('slug',$slug)->where('language_id',$language_id)->first();
             return response(prepareResult(false, $page, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
         }
         catch (\Throwable $exception) 
@@ -250,11 +259,20 @@ class FrontController extends Controller
         }
     }
 
-    public function getFaqs()
+    public function getFaqs(Request $request)
     {
         try
         {
-            $faq = Faq::get();
+        	if(!empty($request->language_id))
+        	{
+        		$language_id = $request->language_id;
+        	}
+        	else
+        	{
+        		$language_id = 1;
+        	}
+
+            $faq = Faq::where('language_id',$language_id)->get();
             return response(prepareResult(false, $faq, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
         }
         catch (\Throwable $exception) 
@@ -262,6 +280,30 @@ class FrontController extends Controller
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
     }
+
+    public function getSliders(Request $request)
+    {
+        try
+        {
+        	if(!empty($request->language_id))
+        	{
+        		$language_id = $request->language_id;
+        	}
+        	else
+        	{
+        		$language_id = 1;
+        	}
+
+            $faq = Slider::where('language_id',$language_id)->get();
+            return response(prepareResult(false, $faq, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
+        }
+        catch (\Throwable $exception) 
+        {
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
+    
 
     public function getLabels(Request $request)
     {
