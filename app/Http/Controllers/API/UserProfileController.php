@@ -1,0 +1,311 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Models\StudentDetail;
+use App\Models\ServiceProviderDetail;
+use Str;
+use DB;
+use Auth;
+use Hash;
+use App\Models\User;
+use App\Http\Resources\UserResource;
+use App\Models\Package;
+use App\Models\UserPackageSubscription;
+use App\Models\AppSetting;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\CvsViewLog;
+
+class UserProfileController extends Controller
+{
+	
+	public function passwordUpdate(Request $request)
+	{
+		$validation = \Validator::make($request->all(),[ 
+			'old_password'	=> 'required',
+			'new_password'  => 'required|max:55',
+		]);
+
+		if ($validation->fails()) {
+			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+		}
+
+		try
+		{
+			$user = Auth::user();
+			if(($user->is_minor == true) && ($request->login_with_parent_data == false))
+			{
+				if(Hash::check($request->old_password,$user->guardian_password)) {
+					$user->guardian_password           = bcrypt($request->new_password);
+					if($user->save())
+					{
+						return response(prepareResult(false, $user, getLangByLabelGroups('messages','message_password_updated')), config('http_response.created'));
+					}
+					else
+					{
+						return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+					}
+				}
+				else
+				{
+					return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_old_password_error')),config('http_response.not_found'));
+				}
+			}
+			else
+			{
+				if(Hash::check($request->old_password,$user->password)) 
+				{
+					$user->password           = bcrypt($request->new_password);
+					if($user->save())
+					{
+						return response(prepareResult(false, $user, getLangByLabelGroups('messages','message_password_updated')), config('http_response.created'));
+					}
+					else
+					{
+						return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+					}
+				}
+				else
+				{
+					return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_old_password_error')),config('http_response.not_found'));
+				}
+			}
+			
+		}
+		catch (\Throwable $exception)
+		{
+			DB::rollback();
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+	
+	public function basicDetailUpdate(Request $request)
+	{
+		$validation = \Validator::make($request->all(),[ 
+			'first_name'        => 'required|max:55',
+		]);
+
+		if ($validation->fails()) {
+			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+		}
+
+		$user = Auth::user();
+		if($request->dob)
+		{
+			$dob = date("Y-m-d", strtotime($request->dob));
+		}
+		else
+		{
+			$dob = $user->dob;
+		}
+
+		$user->first_name           				= $request->first_name;
+		$user->last_name            				= $request->last_name;
+		$user->gender               				= $request->gender;
+		$user->short_intro          				= $request->short_intro;
+		$user->dob                  				= $dob;
+		$user->profile_pic_path     				= $request->profile_pic_path;
+		$user->is_email_verified 					= $request->is_email_verified;
+		$user->is_contact_number_verified 			= $request->is_contact_number_verified;
+		$user->cp_first_name 						= $request->cp_first_name;
+		$user->cp_last_name 						= $request->cp_last_name;
+		$user->cp_email 							= $request->cp_email;
+		$user->cp_contact_number 					= $request->cp_contact_number;
+		$user->cp_gender 							= $request->cp_gender;
+		$user->is_minor 							= $request->is_minor;
+		$user->social_security_number 				= $request->social_security_number;
+		$user->guardian_first_name 					= $request->guardian_first_name;
+		$user->guardian_last_name 					= $request->guardian_last_name;
+		// $user->guardian_email 						= $request->guardian_email;
+		// $user->guardian_contact_number 				= $request->guardian_contact_number;
+		// $user->is_guardian_email_verified 			= $request->is_guardian_email_verified;
+		// $user->is_guardian_contact_number_verified 	= $request->is_guardian_contact_number_verified;
+		
+		if($user->save())
+		{
+			return response(prepareResult(false, $user, getLangByLabelGroups('messages','message_basic_detail_updated')), config('http_response.created'));
+		}
+		else
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function extraDetailUpdate(Request $request)
+	{
+		$validation = \Validator::make($request->all(),[ 
+		]);
+
+		if ($validation->fails()) {
+			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+		}
+
+		$user = Auth::user();
+		if($user->userType->title == 'Student')
+		{
+			$userDetail = StudentDetail::where('user_id',$user->id)->first();
+			$userDetail->user_id 					= Auth::id();
+			$userDetail->enrollment_no 				= $request->enrollment_no;
+			$userDetail->education_level 			= $request->education_level;
+			$userDetail->board_university 			= $request->board_university;
+			$userDetail->institute_name 			= $request->institute_name;
+			$userDetail->no_of_years_of_study 		= $request->no_of_years_of_study;
+			$userDetail->student_id_card_img_path	= $request->student_id_card_img_path;
+			$userDetail->completion_year			= $request->completion_year;
+			$userDetail->status						= $request->status;
+		}
+		elseif($user->userType->title == 'Service Provider')
+		{
+
+			$userDetail = ServiceProviderDetail::where('user_id',$user->id)->first();
+			$userDetail->user_id 					= Auth::id();
+			$userDetail->registration_type_id 		= $request->registration_type_id;
+			$userDetail->service_provider_type_id 	= $request->service_provider_type_id;
+			$userDetail->company_name 				= $request->company_name;
+			$userDetail->organization_number 		= $request->organization_number;
+			$userDetail->about_company 				= $request->about_company;
+			$userDetail->company_website_url 		= $request->company_website_url;
+			$userDetail->company_logo_path 			= $request->company_logo_path;
+			$userDetail->vat_number 				= $request->vat_number;
+			$userDetail->vat_registration_file_path = $request->vat_registration_file_path;
+			$userDetail->year_of_establishment 		= $request->year_of_establishment;
+			$userDetail->status						= $request->status;
+		}
+
+		if($userDetail->save())
+		{
+			$user['userDetail'] = $userDetail;
+			return response(prepareResult(false, $user, getLangByLabelGroups('messages','message_extra_detail_updated')), config('http_response.created'));
+		}
+		else
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function addPackage(Request $request)
+	{
+		$validation = \Validator::make($request->all(),[ 
+			'user_packages'        => 'required'
+		]);
+
+		foreach ($request->user_packages as $key => $user_package) 
+		{
+			$package = Package::find($user_package);
+			$userPackageSubscription 						= new UserPackageSubscription;
+			$userPackageSubscription->user_id 				= Auth::id();
+			$userPackageSubscription->package_id 			= $user_package;
+			$userPackageSubscription->package_valid_till	= date('Y-m-d',strtotime('+'.$package->duration .'days'));
+			$userPackageSubscription->subscription_status 	= 1;
+			$userPackageSubscription->module               	= $package->module;
+			$userPackageSubscription->type_of_package       = $package->type_of_package;
+			$userPackageSubscription->job_ads               = $package->job_ads;
+			$userPackageSubscription->publications_day      = $package->publications_day;
+			$userPackageSubscription->duration              = $package->duration;
+			$userPackageSubscription->cvs_view              = $package->cvs_view;
+			$userPackageSubscription->employees_per_job_ad  = $package->employees_per_job_ad;
+			$userPackageSubscription->no_of_boost           = $package->no_of_boost;
+			$userPackageSubscription->boost_no_of_days      = $package->boost_no_of_days;
+			$userPackageSubscription->most_popular          = $package->most_popular;
+			$userPackageSubscription->most_popular_no_of_days= $package->most_popular_no_of_days;
+			$userPackageSubscription->top_selling          	= $package->top_selling;
+			$userPackageSubscription->top_selling_no_of_days= $package->top_selling_no_of_days;
+			$userPackageSubscription->price               	= $package->price;
+			$userPackageSubscription->start_up_fee          = $package->start_up_fee;
+			$userPackageSubscription->subscription          = $package->subscription;
+			$userPackageSubscription->commission_per_sale   = $package->commission_per_sale;
+			$userPackageSubscription->number_of_product     = $package->number_of_product;
+			$userPackageSubscription->number_of_service     = $package->number_of_service;
+			$userPackageSubscription->number_of_book		= $package->number_of_book;
+			$userPackageSubscription->number_of_contest		= $package->number_of_contest;
+			$userPackageSubscription->number_of_event		= $package->number_of_event;
+			$userPackageSubscription->notice_month          = $package->notice_month;
+			$userPackageSubscription->locations             = $package->locations;
+			$userPackageSubscription->organization          = $package->organization;
+			$userPackageSubscription->attendees             = $package->attendees;
+			$userPackageSubscription->range_of_age          = $package->range_of_age;
+			$userPackageSubscription->cost_for_each_attendee= $package->cost_for_each_attendee;
+			$userPackageSubscription->top_up_fee            = $package->top_up_fee;
+			$userPackageSubscription->save();
+		}
+
+		$user = Auth::user();
+		if($user)
+		{
+			return response(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_updated')), config('http_response.created'));
+		}
+		else
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function rewardPointDetails()
+	{
+		$data = [];
+		$data['available_reward_pts'] 		= Auth::user()->reward_points;
+		$data['pending_reward_pts'] 		= Auth::user()->orderItems->where('reward_point_status','pending')->count();
+		$data['used_reward_pts'] 			= Auth::user()->orders->where('reward_point_status','used')->count();
+		$data['reward_pt_policy'] 			= AppSetting::first()->reward_points_policy;
+		$data['customer_reward_pt_value'] 	= AppSetting::first()->customer_rewards_pt_value;
+		$data['reward_pts_used_on_orders'] 	= Order::where('user_id',Auth::id())->where('used_reward_points','>','0')->get(['order_number','grand_total','created_at','order_status','used_reward_points']);
+		$data['reward_pts_earned_on_items'] = OrderItem::join('orders', function ($join) {
+                $join->on('order_items.order_id', '=', 'orders.id');
+            })
+		->where('order_items.user_id',Auth::id())
+		->get(['orders.order_number','order_items.created_at','order_items.title','order_items.product_type','order_items.cover_image','order_items.item_status','order_items.price','order_items.quantity','order_items.earned_reward_points','order_items.reward_point_status']);
+
+		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
+	}
+
+	public function cvsView($user_cv_detail_id)
+	{
+		$user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module','job')->orderBy('created_at','desc')->first();
+
+		if(empty($user_package))
+		{
+		    return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+		}
+
+		$cvsViewLog = CvsViewLog::where('user_id',Auth::id())->where('user_cv_detail_id',$user_cv_detail_id)->where('user_package_subscription_id',$user_package->id)->where('valid_till','<=',$user_package->package_valid_till)->count();
+
+		if($cvsViewLog <= 0)
+		{
+			if($user_package->cvs_view == $user_package->used_cvs_view)
+			{
+			    return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
+			}
+
+			$cvsViewLog = new CvsViewLog;
+			$cvsViewLog->user_id 						= Auth::id();
+			$cvsViewLog->user_cv_detail_id 				= $user_cv_detail_id;
+			$cvsViewLog->valid_till 					= $user_package->package_valid_till;
+			$cvsViewLog->user_package_subscription_id 	= $user_package->id;
+			$cvsViewLog->save();
+
+			$user_package->update(['used_cvs_view'=>($user_package->used_cvs_view + 1)]);
+		}
+
+		$user = Auth::user();
+		if($user)
+		{
+			return response(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_updated')), config('http_response.created'));
+		}
+		else
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function languageUpdate(Request $request)
+	{
+		$user = Auth::user();
+		$user->language_id   = $request->language_id;
+		$user->save();
+		return response(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_updated')), config('http_response.created'));
+	}
+}

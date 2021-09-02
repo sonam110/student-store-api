@@ -1,0 +1,140 @@
+<?php
+
+namespace App\Http\Controllers\API\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Brand;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Str;
+use DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\BrandsImport;
+use Auth;
+
+class BrandController extends Controller
+{
+	public function index(Request $request)
+	{
+		try
+		{
+			if(!empty($request->per_page_record))
+			{
+				$brands = Brand::simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			}
+			else
+			{
+				$brands = Brand::get();
+			}
+			return response(prepareResult(false, $brands, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+
+    public function store(Request $request)
+    {        
+    	$validation = Validator::make($request->all(), [
+    		'name'  => 'required'
+    	]);
+
+    	if ($validation->fails()) {
+    		return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+    	}
+
+    	DB::beginTransaction();
+    	try
+    	{
+    		$brand = new Brand;
+    		$brand->category_master_id  = $request->category_master_id;
+    		$brand->user_id             = Auth::id();
+    		$brand->name                = $request->name;
+    		$brand->status              = 1;
+    		$brand->save();
+    		DB::commit();
+    		return response()->json(prepareResult(false, $brand, getLangByLabelGroups('messages','message_brand_created')), config('http_response.created'));
+    	}
+    	catch (\Throwable $exception)
+    	{
+    		DB::rollback();
+    		return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    	}
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Brand  $brand
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Brand $brand)
+    {
+    	return response()->json(prepareResult(false, $brand, getLangByLabelGroups('messages','message_brand_list')), config('http_response.success'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Brand  $brand
+     * @return \Illuminate\Http\Response
+     */
+    
+    public function update(Request $request,Brand $brand)
+    {
+    	$validation = Validator::make($request->all(), [
+    		'name' => 'required'
+    	]);
+
+    	if ($validation->fails()) {
+    		return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+    	}
+
+    	DB::beginTransaction();
+    	try
+    	{
+    		$brand->category_master_id  = $request->category_master_id;
+    		$brand->user_id             = Auth::id();
+    		$brand->name                = $request->name;
+    		$brand->status              = 1;
+    		$brand->save();
+    		DB::commit();
+    		return response()->json(prepareResult(false, $brand, getLangByLabelGroups('messages','message_brand_updated')), config('http_response.success'));
+    	}
+    	catch (\Throwable $exception)
+    	{
+    		DB::rollback();
+    		return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    	}
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param \App\Brand $brand
+     * @return \Illuminate\Http\Response
+     * @throws \Exception
+     */
+    public function destroy(Brand $brand)
+    {
+    	$brand->delete();
+    	return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_brand_deleted')), config('http_response.success'));
+    }
+
+    public function brandsImport(Request $request)
+    {
+    	$data = ['category_master_id' => $request->category_master_id, 'user_id' => $request->user_id];
+    	$import = Excel::import(new BrandsImport($data),request()->file('file'));
+
+    	return response(prepareResult(false, [], getLangByLabelGroups('messages','messages_products_services_book_imported')), config('http_response.success'));
+    }
+}

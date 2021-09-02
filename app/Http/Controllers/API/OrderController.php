@@ -1,0 +1,1023 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\TransactionDetail;
+use Illuminate\Support\Facades\Validator;
+use Str;
+use DB;
+use Auth;
+use App\Models\ProductsServicesBook;
+use App\Models\AddressDetail;
+use App\Models\OrderTracking;
+use App\Models\OrderItemReplacement;
+use App\Models\OrderItemReturn;
+use App\Models\OrderItemDispute;
+use App\Models\PaymentCardDetail;
+use App\Models\AppSetting;
+use App\Models\EmailTemplate;
+use App\Mail\OrderPlacedMail;
+use App\Mail\OrderConfirmedMail;
+use Mail;
+use App\Models\ReasonForAction;
+use App\Models\Contest;
+use App\Models\ContestApplication;
+use Session;
+use App\Models\Package;
+use App\Models\ShippingCondition;
+
+
+
+class OrderController extends Controller
+{
+	public function index(Request $request)
+	{
+		try
+		{
+			$orders = Order::orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback');
+			if(!empty($request->per_page_record))
+			{
+				$orders = $orders->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			}
+			else
+			{
+				$orders = $orders->get();
+			}
+			return response(prepareResult(false, $orders, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function allOrdersByUser(Request $request)
+	{
+		try
+		{
+			if(!empty($request->per_page_record))
+			{
+				$orders = Order::where('user_id', Auth::id())->where('order_for', 'product')->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			}
+			else
+			{
+				$orders = Order::where('user_id', Auth::id())->where('order_for', 'product')->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction')->get();
+			}
+			return response(prepareResult(false, $orders, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function allOrdersForUser(Request $request)
+	{
+		try
+		{
+			$orderItems = OrderItem::select('order_items.*')
+			->join('products_services_books', function ($join) {
+				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+			})
+			->orderBy('order_items.created_at','DESC')
+			->where('products_services_books.user_id',Auth::id())
+			->with('productsServicesBook.user.serviceProviderDetail','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','user','orderTrackings','return','replacement','dispute','ratingAndFeedback','order:id,order_number,first_name,last_name,email,contact_number,latitude,longitude,country,state,city,full_address');
+			if(!empty($request->per_page_record))
+			{
+				$orders = $orderItems->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			}
+			else
+			{
+				$orders = $orderItems->get();
+			}
+			return response(prepareResult(false, $orders, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function store(Request $request)
+	{
+		$validation = Validator::make($request->all(), [
+			'address_detail_id'     => 'required',
+            // 'grand_total'           => 'required'
+		]);
+
+		if ($validation->fails()) {
+			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+		}
+		DB::beginTransaction();
+		try
+		{
+
+			$shipping_charge = 0;
+
+			$getLastOrder = Order::select('order_number')->orderBy('created_at','DESC')->first();
+			if(!empty($getLastOrder))
+			{
+				$order_number = $getLastOrder->order_number + 1;
+
+			}
+			else
+			{
+				$order_number = env('ORDER_START_NUMBER');
+			}
+			$order                      = new Order;
+			$order->order_number        = $order_number;
+			$order->user_id        		= Auth::id();
+			$order->address_detail_id   = $request->address_detail_id;
+			$order->order_status        = $request->order_status;
+			$order->sub_total           = $request->sub_total;
+			$order->item_discount       = $request->item_discount;
+			$order->shipping_charge     = $shipping_charge;
+			$order->total               = $request->total;
+			$order->promo_code          = $request->promo_code;
+			$order->promo_code_discount = $request->promo_code_discount;
+			$order->grand_total         = $request->grand_total;
+			$order->remark              = $request->remark;
+			$order->first_name          = Auth::user()->first_name;
+			$order->last_name           = Auth::user()->last_name;
+			$order->email               = Auth::user()->email;
+			$order->contact_number      = Auth::user()->contact_number;
+			$order->latitude            = AddressDetail::find($request->address_detail_id)->latitude;
+			$order->longitude           = AddressDetail::find($request->address_detail_id)->longitude;
+			$order->country             = AddressDetail::find($request->address_detail_id)->country;
+			$order->state               = AddressDetail::find($request->address_detail_id)->state;
+			$order->city                = AddressDetail::find($request->address_detail_id)->city;
+			$order->full_address        = AddressDetail::find($request->address_detail_id)->full_address;
+			$order->used_reward_points 	= $request->used_reward_points;
+			$order->order_for 			= $request->order_for;
+			$order->reward_point_status = 'used';
+
+
+			if($order->save())
+			{ 
+				Auth::user()->update(['reward_points'=>(Auth::user()->reward_points - $request->used_reward_points)]);
+				$sub_total = 0;
+				foreach ($request->items as $key => $orderedItem) {
+					if(!empty($orderedItem['product_id']))
+					{
+						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
+						if($productsServicesBook->is_on_offer == 1)
+						{
+							$price = $productsServicesBook->discounted_price;
+						}
+						else
+						{
+							$price = $productsServicesBook->price;
+						}
+						$title = $productsServicesBook->title;
+
+						if($productsServicesBook->delivery_type == 'deliver_to_location')
+						{
+							$shipping_package = ShippingCondition::where('user_id',$productsServicesBook->user_id)->where('order_amount_from','<=', $price*$orderedItem['quantity'])->where('order_amount_to','>=',$price*$orderedItem['quantity'])->orderBy('created_at','desc')->first();
+							if($shipping_package)
+							{
+								$shipping_charge = $shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']) * (100 - $shipping_package->discount_percent) / 100;
+							}
+							else
+							{
+								$shipping_charge = $shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']);
+							}
+						}
+						
+					}
+					elseif(!empty($orderedItem['contest_application_id']))
+					{
+						$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
+						$productsServicesBook = Contest::find($contest_id);
+						if($productsServicesBook->is_on_offer == 1)
+						{
+							$price = $productsServicesBook->discounted_price;
+						}
+						else
+						{
+							$price = $productsServicesBook->subscription_fees;
+						}
+						$title = $productsServicesBook->title;
+					}
+					else
+					{
+						$productsServicesBook = Package::find($orderedItem['package_id']);
+						if($productsServicesBook->price == 0)
+						{
+							$price = $productsServicesBook->subscription;
+						}
+						else
+						{
+							$price = $productsServicesBook->price;
+						}
+						$title = $productsServicesBook->type_of_package;
+					}
+					
+
+					if($productsServicesBook->is_reward_point_applicable == 1)
+					{
+						$earned_reward_points = $productsServicesBook->reward_points * $orderedItem['quantity'];
+					}
+					else
+					{
+						$earned_reward_points = '0';
+					}
+
+					if($productsServicesBook->discount_type == 1)
+					{
+						$discount = $productsServicesBook->discount_value.'%';
+					}
+					else
+					{
+						$discount = $productsServicesBook->discount_value.'Rupees';
+					}
+
+					$sub_total = $sub_total + ($price*$orderedItem['quantity']);
+
+					$orderItem = new OrderItem;
+					$orderItem->user_id							= Auth::id();
+					$orderItem->order_id						= $order->id;
+					if(!empty($orderedItem['product_id']))
+					{
+						$orderItem->products_services_book_id		= $orderedItem['product_id'];
+						$orderItem->product_type					= $productsServicesBook->type;
+						$orderItem->note_to_seller                   = $orderedItem['note_to_seller'];
+
+						ProductsServicesBook::where('id',$orderedItem['product_id'])->update(['quantity' => $productsServicesBook->quantity - $orderedItem['quantity']]);
+					}
+					elseif(!empty($orderedItem['contest_application_id']))
+					{
+						$orderItem->contest_application_id			= $orderedItem['contest_application_id'];
+						$orderItem->contest_type					= $productsServicesBook->type;
+					}
+					else
+					{
+						$orderItem->package_id						= $orderedItem['package_id'];
+					}
+					
+                    
+					$orderItem->title							= $title;
+					$orderItem->sku							    = $productsServicesBook->sku;
+					$orderItem->price                           = $price;
+					$orderItem->earned_reward_points            = $earned_reward_points;
+					$orderItem->quantity						= $orderedItem['quantity'];
+					$orderItem->discount						= $discount;
+					$orderItem->cover_image                     = $orderedItem['cover_image'];
+					$orderItem->sell_type						= $productsServicesBook->sell_type;
+					$orderItem->rent_duration					= $productsServicesBook->rent_duration;
+					$orderItem->item_status						= $request->order_status;
+					$orderItem->item_payment_status				= true;
+					$orderItem->save();
+
+
+					if(!empty($orderedItem['product_id']))
+					{
+
+						$orderTracking                  = new OrderTracking;
+						$orderTracking->order_item_id   = $orderItem->id;
+						$orderTracking->status          = $request->order_status;
+						$orderTracking->comment         = '';
+						$orderTracking->type         	= 'delivery';
+						$orderTracking->save();
+
+
+	                    // Notification Start
+
+						$title = 'New Order Received';
+						$body =  'New Order Received for product '.$productsServicesBook->title;
+						$user = $productsServicesBook->user;
+						$type = 'Order Received';
+						$user_type = 'seller';
+						if($productsServicesBook->type == 'book')
+						{
+							$module = 'book';
+						}
+						else
+						{
+							$module = 'product_service';
+						}
+						pushNotification($title,$body,$user,$type,true,$user_type,$module,$order->id,'market-place-request');
+
+	                    // Notification End
+
+	                    //Mail Start
+
+	                    $emailTemplate = EmailTemplate::where('template_for','order placed')->first();
+	                    $details = [
+	                        'title' => $emailTemplate->subject,
+	                        'body' => $emailTemplate->body
+	                    ];
+	                    
+	                    Mail::to(Auth::user()->email)->send(new OrderPlacedMail($details));
+
+                    //Mail End
+	                }
+				}
+
+
+				$paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);
+				$transactionDetail = new TransactionDetail;
+				$transactionDetail->order_id                 	= $order->id;
+				$transactionDetail->payment_card_detail_id   	= $request->transaction_detail['payment_card_detail_id'];
+                $transactionDetail->transaction_id           	= $request->transaction_detail['transaction_id'];
+
+                $transactionDetail->description              	= $request->transaction_detail['description'];
+                $transactionDetail->receipt_email            	= $request->transaction_detail['receipt_email'];
+                $transactionDetail->receipt_number           	= $request->transaction_detail['receipt_number'];
+                $transactionDetail->receipt_url              	= $request->transaction_detail['receipt_url'];
+                $transactionDetail->refund_url               	= $request->transaction_detail['refund_url'];
+
+                $transactionDetail->transaction_status       	= $request->transaction_detail['transaction_status'];
+                $transactionDetail->transaction_reference_no 	= $request->transaction_detail['transaction_reference_no'];
+                $transactionDetail->transaction_amount       	= $request->transaction_detail['transaction_amount'];
+                $transactionDetail->transaction_type         	= $request->transaction_detail['transaction_type'];
+                $transactionDetail->transaction_mode         	= $request->transaction_detail['transaction_mode'];
+                $transactionDetail->gateway_detail           	= $request->transaction_detail['gateway_detail'];
+
+                $transactionDetail->transaction_timestamp    	= $request->transaction_detail['transaction_timestamp'];
+                $transactionDetail->currency       		     	= $request->transaction_detail['currency'];
+                
+				$transactionDetail->card_number              	= $paymentCardDetail->card_number;
+				$transactionDetail->card_type                	= $paymentCardDetail->card_type;
+				$transactionDetail->card_cvv                 	= $paymentCardDetail->card_cvv;
+				$transactionDetail->card_expiry              	= $paymentCardDetail->card_expiry;
+				$transactionDetail->card_holder_name         	= $paymentCardDetail->card_holder_name;
+				$transactionDetail->save();
+			}
+
+
+
+			$reward_point_value = AppSetting::first()->customer_rewards_pt_value * $request->used_reward_points;
+
+			$total = $sub_total - $reward_point_value;
+
+
+			$vat = (AppSetting::first()->vat) * $total / 100;
+
+			$total = $total + $vat + $shipping_charge;
+
+			$order->update([
+				'sub_total' => $sub_total,
+				'total'  => $total,
+				'shipping_charge'  => $shipping_charge,
+				'vat' => $vat,
+				'grand_total' => $total -  $request->promo_code_discount,
+				'payable_amount' => $total -  $request->promo_code_discount,
+			]);
+
+			DB::commit();
+			$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')->find($order->id);
+			return response()->json(prepareResult(false, $order, getLangByLabelGroups('messages','messages_order_created')), config('http_response.created'));
+		}
+		catch (\Throwable $exception)
+		{
+			DB::rollback();
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_validation')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function show(Order $order)
+	{
+		$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')->find($order->id);
+		return response()->json(prepareResult(false, $order, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
+	} 
+
+	public function destroy(Order $order)
+	{
+		$order->delete();
+		return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','messages_order_deleted')), config('http_response.success'));
+	}
+
+	public function orderStatusUpdate(Request $request, $id)
+	{
+
+		$order = Order::find($id);
+		$order->update(['order_status'=> $request->order_status]);
+		return response()->json(prepareResult(false, $order, getLangByLabelGroups('messages','messages_order_stock_updated')), config('http_response.success'));
+	}
+
+	public function orderItemStatusUpdate(Request $request, $id)
+	{
+		
+        // pending->confirmed->shipped->delivered->completed->replacement_initiated->replacement_acccepted->replacement_completed->return_initiated->return_confirmed->return_declined->return_completed
+		$orderItem = OrderItem::find($id);
+		$expected_delivery_date = $orderItem->expected_delivery_date;
+		$tracking_number = $orderItem->tracking_number;
+		$shipment_company_name = $orderItem->shipment_company_name;
+		$reason_id_for_cancellation = $orderItem->reason_id_for_cancellation;
+		$reason_for_cancellation = $orderItem->reason_for_cancellation;
+		$return_applicable_date = $orderItem->return_applicable_date;
+		$is_returned = $orderItem->is_returned;
+		$is_replaced = $orderItem->is_replaced;
+		$is_disputed = $orderItem->is_disputed;
+		$delivery_completed_date = $orderItem->delivery_completed_date;
+		$reason_for_cancellation_request = $orderItem->reason_for_cancellation_request;
+		$reason_for_cancellation_request_decline = $orderItem->reason_for_cancellation_request_decline;
+		$ask_for_cancellation = $orderItem->ask_for_cancellation;
+		$reason_id_for_cancellation_request = $orderItem->reason_id_for_cancellation_request;
+		$reason_id_for_cancellation_request_decline = $orderItem->reason_id_for_cancellation_request_decline;
+
+
+		if($request->item_status == 'resolved_to_customer')
+		{
+			$item_status = 'canceled';
+		}
+		else
+		{
+			$item_status = $request->item_status;
+		}
+
+		if($request->item_status == 'canceled')
+		{
+			$reason_id_for_cancellation = $request->reason_id;
+		}
+
+		
+
+		$type = 'delivery';
+
+		$comment = $request->comment;
+		if(!empty($request->reason_for_cancellation))
+		{
+			$reason_for_cancellation = $request->reason_for_cancellation;
+			$comment = $request->reason_for_cancellation;
+		}
+		if($request->item_status == 'completed')
+		{
+			$return_applicable_date = date('Y-m-d',strtotime('+14 days'));
+			$delivery_completed_date = date('Y-m-d');
+
+			OrderItem::where('id',$id)->update(['reward_point_status'=>'credited']);
+			$user = $orderItem->user;
+			$user->update(['reward_points'=>($user->reward_points + $orderItem->earned_reward_points)]);
+		}
+		if(!empty($request->expected_delivery_date))
+		{
+			$expected_delivery_date = date('Y-m-d',strtotime($request->expected_delivery_date));
+		}
+		if(!empty($request->tracking_number))
+		{
+			$tracking_number = $request->tracking_number;
+		}
+		if(!empty($request->shipment_company_name) && ($request->item_status == 'shipped'))
+		{
+			$shipment_company_name = $request->shipment_company_name;
+		}
+
+
+		if($request->item_status == 'replacement_initiated')
+		{
+			$comment = $request->reason_of_replacement;
+			$type = 'replacement';
+			$is_replaced = true;
+
+			if($request->replacement_type == 'by_hand')
+			{
+				$replacement_code = rand(100000,999999);
+			}
+			else
+			{
+				$replacement_code = null;
+			}
+
+			$orderItemReplacement = new OrderItemReplacement;
+			$orderItemReplacement->user_id                   	= Auth::id();
+			$orderItemReplacement->replacement_address_id       = $request->address_id;
+			$orderItemReplacement->order_item_id             	= $id;
+			$orderItemReplacement->products_services_book_id 	= $orderItem->products_services_book_id;
+			$orderItemReplacement->quantity                  	= $request->quantity;
+			$orderItemReplacement->replacement_type             = $request->replacement_type;
+			$orderItemReplacement->shipment_company_name     	= $request->shipment_company_name;
+			$orderItemReplacement->reason_id_for_replacement    = $request->reason_id;
+			$orderItemReplacement->reason_of_replacement        = $request->reason_of_replacement;
+			$orderItemReplacement->date_of_replacement_initiated = date('Y-m-d');
+			$orderItemReplacement->images                    	= $request->images;
+			$orderItemReplacement->replacement_tracking_number  = $request->replacement_tracking_number;
+			$orderItemReplacement->expected_replacement_date = date('Y-m-d',strtotime($request->expected_replacement_date));
+			$orderItemReplacement->first_name					= $orderItem->productsServicesBook->user->first_name;
+			$orderItemReplacement->last_name					= $orderItem->productsServicesBook->user->last_name;
+			$orderItemReplacement->email						= $orderItem->productsServicesBook->user->email;
+			$orderItemReplacement->contact_number				= $orderItem->productsServicesBook->user->contact_number;
+			$orderItemReplacement->latitude           	= AddressDetail::find($request->address_id)->latitude;
+			$orderItemReplacement->longitude           	= AddressDetail::find($request->address_id)->longitude;
+			$orderItemReplacement->country             	= AddressDetail::find($request->address_id)->country;
+			$orderItemReplacement->state               	= AddressDetail::find($request->address_id)->state;
+			$orderItemReplacement->city                	= AddressDetail::find($request->address_id)->city;
+			$orderItemReplacement->full_address        	= AddressDetail::find($request->address_id)->full_address;
+			$orderItemReplacement->replacement_status             = $request->item_status;
+			$orderItemReplacement->replacement_code             = $replacement_code;
+			$orderItemReplacement->save();
+
+			$title = 'Replacement Request';
+			$body =  'Order for '.$orderItem->title.' has Replacement Request.';
+		}
+
+		if($request->item_status == 'replaced')
+		{
+			$type = 'replacement';
+
+			$orderItemReplacement = OrderItemReplacement::where('order_item_id',$id)->first();
+			if($orderItemReplacement->replacement_type == 'by_hand' && $request->replacement_code != $orderItemReplacement->replacement_code)
+			{
+				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_replacement_code_error')), config('http_response.internal_server_error'));
+			}
+			$orderItemReplacement->date_of_replacement_completed   	= date('Y-m-d');
+			$orderItemReplacement->replacement_status             	= $request->item_status;
+			$orderItemReplacement->save();
+
+			if(empty($request->replacement_code))
+			{
+				$orderItem = OrderItem::find($orderItemReplacement->order_item_id);
+				$replaceOrderItem = new OrderItem;
+				$replaceOrderItem->user_id						= $orderItem->user_id;
+				$replaceOrderItem->order_id						= $orderItem->order_id;
+				$replaceOrderItem->order_item_id				= $orderItem->id;
+				$replaceOrderItem->products_services_book_id	= $orderItem->products_services_book_id;
+				$replaceOrderItem->product_type					= $orderItem->product_type;
+				$replaceOrderItem->title						= $orderItem->title;
+				$replaceOrderItem->sku							= $orderItem->sku;
+				$replaceOrderItem->price                        = $orderItem->price;
+				$replaceOrderItem->quantity						= $orderItemReplacement->quantity;
+				$replaceOrderItem->discount						= $orderItem->discount;
+				$replaceOrderItem->cover_image                  = $orderItem->cover_image;
+				$replaceOrderItem->sell_type					= $orderItem->sell_type;
+				$replaceOrderItem->rent_duration				= $orderItem->rent_duration;
+				$replaceOrderItem->item_status					= 'processing';
+				$replaceOrderItem->item_payment_status			= true;
+				$replaceOrderItem->note_to_seller               = $orderItem->note_to_seller;
+				$replaceOrderItem->order_type               	= '1';
+				$replaceOrderItem->save();
+
+				$orderTracking                  = new OrderTracking;
+				$orderTracking->order_item_id   = $replaceOrderItem->id;
+				$orderTracking->status          ='processing';
+				$orderTracking->comment         = '';
+				$orderTracking->type         	= 'delivery';
+				$orderTracking->save();
+			}
+
+			$title = 'Replacement Request Accepted';
+			$body =  'Request for replacement of ordered product '.$orderItem->title.' has Accepted.';
+		}
+
+		if($request->item_status == 'return_initiated')
+		{
+			$is_returned = true;
+			$comment = $request->reason_of_return;
+			$type = 'return';
+			if($request->return_type == 'by_hand')
+			{
+				$return_code = rand(100000,999999);
+			}
+			else
+			{
+				$return_code = null;
+			} 
+
+			$orderItemReturn = new OrderItemReturn;
+			$orderItemReturn->user_id                  	= Auth::id();
+			$orderItemReturn->return_address_id        	= $request->address_id;
+			$orderItemReturn->order_item_id            	= $id;
+			$orderItemReturn->products_services_book_id	= $orderItem->products_services_book_id;
+			$orderItemReturn->quantity                 	= $request->quantity;
+			$orderItemReturn->return_type              	= $request->return_type;
+			$orderItemReturn->shipment_company_name    	= $request->shipment_company_name;
+			$orderItemReturn->reason_id_for_return      = $request->reason_id;
+			$orderItemReturn->reason_of_return         	= $request->reason_of_return;
+			$orderItemReturn->date_of_return_initiated 	= date('Y-m-d');
+			$orderItemReturn->images                   	= $request->images;
+			$orderItemReturn->amount_to_be_returned    	= $orderItem->price * $request->quantity;
+			$orderItemReturn->return_card_number       	= $request->return_card_number;
+			$orderItemReturn->return_card_holder_name  	= $request->return_card_holder_name;
+			$orderItemReturn->return_tracking_number   	= $request->return_tracking_number;
+			$orderItemReturn->expected_return_date     	= date('Y-m-d',strtotime($request->expected_return_date));
+			$orderItemReturn->first_name				= $orderItem->productsServicesBook->user->first_name;
+			$orderItemReturn->last_name					= $orderItem->productsServicesBook->user->last_name;
+			$orderItemReturn->email						= $orderItem->productsServicesBook->user->email;
+			$orderItemReturn->contact_number			= $orderItem->productsServicesBook->user->contact_number;
+			$orderItemReturn->latitude            		= AddressDetail::find($request->address_id)->latitude;
+			$orderItemReturn->longitude           		= AddressDetail::find($request->address_id)->longitude;
+			$orderItemReturn->country             		= AddressDetail::find($request->address_id)->country;
+			$orderItemReturn->state               		= AddressDetail::find($request->address_id)->state;
+			$orderItemReturn->city                		= AddressDetail::find($request->address_id)->city;
+			$orderItemReturn->full_address        		= AddressDetail::find($request->address_id)->full_address;
+			$orderItemReturn->return_status				= $request->item_status;
+			$orderItemReturn->return_code               = $return_code;
+			$orderItemReturn->save();
+
+			$title = 'Return Request';
+			$body =  'Order for '.$orderItem->title.' has Return Request.';
+		}
+
+		if($request->item_status == 'returned')
+		{
+			$type = 'return';
+			$orderItemReturn = OrderItemReturn::where('order_item_id',$id)->first();
+			if($orderItemReturn->return_type == 'by_hand' && $request->return_code != $orderItemReturn->return_code)
+			{
+				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
+			}
+			$orderItemReturn->date_of_return_completed      = date('Y-m-d');
+			$orderItemReturn->return_status                 = $request->item_status;
+			$orderItemReturn->save();
+
+			$title = 'Return Request Accepted';
+			$body =  'Request for return of ordered product '.$orderItem->title.' has Accepted.';
+
+			$add_qty = ProductsServicesBook::where('id',$orderItemReturn->products_services_book_id)->first()->quantity +
+			$orderItemReturn->quantity;
+
+			ProductsServicesBook::where('id',$orderItemReturn->products_services_book_id)->update(['quantity' => $add_qty]);
+		}
+
+		if($request->item_status == 'dispute_initiated')
+		{
+			$is_disputed = true;
+			$comment = $request->dispute;
+			$type = 'dispute';
+			if($orderItem->user_id == Auth::id())
+			{
+				$dispute_raised_against = $orderItem->productsServicesBook->user_id;
+			}
+			else
+			{
+				$dispute_raised_against = $orderItem->user_id;
+			}
+
+			$orderItemDispute = new OrderItemDispute;
+			$orderItemDispute->dispute_raised_by          	= Auth::id();
+			$orderItemDispute->dispute_raised_against     	= $dispute_raised_against;
+			$orderItemDispute->order_item_id              	= $id;
+			$orderItemDispute->products_services_book_id 	= $orderItem->products_services_book_id;
+			$orderItemDispute->quantity                  	= $request->quantity;
+			$orderItemDispute->amount_to_be_returned        = $orderItem->price * $request->quantity;
+			$orderItemDispute->reason_id_for_dispute        = $request->reason_id;
+			$orderItemDispute->dispute                  	= $request->dispute;
+			$orderItemDispute->dispute_status             	= $request->item_status;
+			$orderItemDispute->dispute_images               = $request->dispute_images;
+			$orderItemDispute->save();
+
+			$title = 'Dispute Raised';
+			$body =  'Dispute raised on Ordered product '.$orderItem->title.'.';
+		}
+
+		if($request->item_status == 'resolved_to_customer')
+		{
+			$type = 'dispute';
+			$reason_for_cancellation = $request->reply;
+			$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
+			$orderItemDispute->date_of_dispute_completed     = date('Y-m-d');
+			$orderItemDispute->reply                 		= $request->reply;
+			$orderItemDispute->dispute_status                = $request->item_status;
+			$orderItemDispute->save();
+
+			$title = 'Dispute Resolved';
+			$body =  'Dispute raised on Ordered product '.$orderItem->title.' has been resolved.';
+		}
+
+		if($request->item_status == 'reviewed_by_seller')
+		{
+			$type = 'dispute';
+
+			$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
+			$orderItemDispute->dispute_status                = $request->item_status;
+			$orderItemDispute->reason_id_for_review          = $request->reason_id;
+			$orderItemDispute->review_by_seller              = $request->review_by_seller;
+			$orderItemDispute->review_images                 = $request->review_images;
+			$orderItemDispute->save();
+
+			$title = 'Dispute Reviewed';
+			$body =  'Dispute raised on Ordered product '.$orderItem->title.' has been reviewed by seller.';
+		}
+
+		if($request->item_status == 'review_accepted')
+		{
+			$type = 'dispute';
+
+			$item_status = 'completed';
+
+			$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
+			$orderItemDispute->dispute_status                = $request->item_status;
+			$orderItemDispute->date_of_dispute_completed     = date('Y-m-d');
+			$orderItemDispute->save();
+
+			$title = 'Dispute Review Accepted';
+			$body =  'Dispute reviewed by seller on Ordered product '.$orderItem->title.' has been Accepted by user.';
+		}
+
+		if($request->item_status == 'review_declined')
+		{
+			$type = 'dispute';
+
+			$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
+			$orderItemDispute->dispute_status                = $request->item_status;
+			$orderItemDispute->reason_id_for_review_decline  = $request->reason_id;
+			$orderItemDispute->reason_for_review_decline     = $request->reason_for_review_decline;
+			$orderItemDispute->review_decline_images         = $request->review_decline_images;
+			$orderItemDispute->save();
+
+			$title = 'Dispute Review Declined';
+			$body =  'Dispute reviewed by seller on Ordered product '.$orderItem->title.' has been Declined by user.';
+		}
+
+		if($request->item_status == 'declined')
+		{
+			if(!empty($request->reason_for_return_decline))
+			{
+				$type = 'return';
+				$comment = $request->reason_for_return_decline;
+
+				$orderItemReturn = OrderItemReturn::where('order_item_id',$id)->first();
+				$orderItemReturn->reason_id_for_return_decline  = $request->reason_id;
+				$orderItemReturn->reason_for_return_decline     = $request->reason_for_return_decline;
+				$orderItemReturn->return_status                 = $request->item_status;
+				$orderItemReturn->save();
+
+				$title = 'Return request Declined';
+				$body =  'Return request of ordered product '.$orderItem->title.' has been Declined.';
+			}
+			elseif(!empty($request->reason_for_dispute_decline))
+			{
+				$type = 'dispute';
+				$comment = $request->reason_for_dispute_decline;
+
+				$orderItemReturn = OrderItemDispute::where('order_item_id',$id)->first();
+				$orderItemReturn->reason_id_for_dispute_decline  = $request->reason_id;
+				$orderItemReturn->reason_for_dispute_decline     = $request->reason_for_dispute_decline;
+				$orderItemReturn->dispute_status                 = $request->item_status;
+				$orderItemReturn->save();
+
+				$title = 'Raised Dispute Declined';
+				$body =  'Raised Dispute on  ordered product '.$orderItem->title.' has been Declined.';
+			}
+			elseif(!empty($request->reason_for_replacement_decline))
+			{
+				$type = 'replacement';
+				$comment = $request->reason_for_replacement_decline;
+
+				$orderItemReplacement = OrderItemReplacement::where('order_item_id',$id)->first();
+				$orderItemReplacement->reason_id_for_replacement_decline  	= $request->reason_id;
+				$orderItemReplacement->reason_for_replacement_decline   = $request->reason_for_replacement_decline;
+				$orderItemReplacement->replacement_status               = $request->item_status;
+				$orderItemReplacement->save();
+
+				$title = 'Replacement request Declined';
+				$body =  'Replacement request of ordered product '.$orderItem->title.' has been Declined.';
+			}
+			// elseif(!empty($request->reason_for_review_decline))
+			// {
+			// 	$type = 'dispute';
+
+			// 	$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
+			// 	$orderItemDispute->dispute_status                = $request->item_status;
+			// 	$orderItemDispute->reason_id_for_review_decline  = $request->reason_id;
+			// 	$orderItemDispute->reason_for_review_decline     = $request->reason_for_review_decline;
+			// 	$orderItemDispute->review_images                 = $request->review_images;
+			// 	$orderItemDispute->save();
+
+			// 	$title = 'Dispute Review Declined';
+			// 	$body =  'Dispute reviewed by seller on Ordered product '.$orderItem->title.' has been Declined by user.';
+			// }
+		}
+
+		if($request->item_status == 'ask_to_cancel')
+		{
+			$type = 'no_tracking';
+			$item_status = $orderItem->status;
+			$reason_id_for_cancellation_request = $request->reason_id;
+			$reason_for_cancellation_request = $request->reason_for_cancellation_request;
+			$title = 'Order Cancellation Request from seller.';
+			$body =  'Order for '.$orderItem->title.' has been requested for cancellation by the seller.';
+			$ask_for_cancellation = '1';
+		}
+
+		if($request->item_status == 'cancelation_request_accepted')
+		{
+			$type = 'delivery';
+			$item_status = 'canceled';
+			$reason_for_cancellation = $orderItem->reason_for_cancellation_request;
+			$title = 'Order Cancellation Request accepted by the buyer.';
+			$body =  'Cancellation request for  '.$orderItem->title.' has been accepted  by the user.';
+			$ask_for_cancellation = '2';
+		}
+
+		if($request->item_status == 'cancelation_request_declined')
+		{
+			$type = 'no_tracking';
+			$item_status = 'processing';
+			$reason_id_for_cancellation_request_decline = $request->reason_id;
+			$reason_for_cancellation_request_decline = $request->reason_for_cancellation_request_decline;
+			$title = 'Order Cancellation Request declined by the buyer.';
+			$body =  'Cancellation request for  '.$orderItem->title.' has been declined  by the user.';
+			$ask_for_cancellation = '3';
+		}
+
+		$orderItem->item_status                     			= $item_status;
+		$orderItem->tracking_number 		        			= $tracking_number;
+		$orderItem->shipment_company_name 	        			= $shipment_company_name;
+		$orderItem->return_applicable_date 	        			= $return_applicable_date;
+		$orderItem->expected_delivery_date 	        			= $expected_delivery_date;
+		$orderItem->delivery_completed_date         			= $delivery_completed_date;
+		$orderItem->ask_for_cancellation 						= $ask_for_cancellation;
+		$orderItem->reason_id_for_cancellation      			= $reason_id_for_cancellation;
+		$orderItem->reason_for_cancellation         			= $reason_for_cancellation;
+		$orderItem->reason_id_for_cancellation_request 			= $reason_id_for_cancellation_request;
+		$orderItem->reason_for_cancellation_request 			= $reason_for_cancellation_request;
+		$orderItem->reason_id_for_cancellation_request_decline 	= $reason_id_for_cancellation_request_decline;
+		$orderItem->reason_for_cancellation_request_decline 	= $reason_for_cancellation_request_decline;
+		$orderItem->is_returned 								= $is_returned;
+		$orderItem->is_replaced 								= $is_replaced;
+		$orderItem->is_disputed 								= $is_disputed;
+		$orderItem->save();
+
+		if($item_status == 'canceled')
+		{
+			$refundOrderItemId = $orderItem->id;
+			$refundOrderItemPrice = $orderItem->price;
+			$refundOrderItemQuantity = $orderItem->quantity;
+			$refundOrderItemReason = 'cancellation';
+			refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+		}
+		if($item_status == 'returned')
+		{
+			$refundOrderItemId = $orderItem->id;
+			$refundOrderItemPrice = $orderItem->price;
+			$refundOrderItemQuantity = $orderItemReturn->quantity;
+			$refundOrderItemReason = 'return';
+			refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+		}
+
+		if($type == 'no_tracking')
+		{
+
+		}
+		else
+		{
+			$orderTracking = new OrderTracking;
+			$orderTracking->order_item_id = $id;
+			$orderTracking->status = $request->item_status; 
+			$orderTracking->comment = $comment;
+			$orderTracking->type = $type;
+			$orderTracking->save();
+		}
+		
+
+        // Notification Start
+
+		if(Auth::id() == $orderItem->user_id)
+		{
+			$user = $orderItem->productsServicesBook->user;
+			$user_type = 'seller';
+			$screen = 'market-place-request';
+		}
+		else
+		{
+			$user = $orderItem->user;
+			$user_type = 'buyer';
+			$screen = 'my_orders';
+		}
+
+		if($request->item_status == 'confirmed')
+		{
+			$title = 'Order Confirmed';
+			$body =  'Order for '.$orderItem->title.' has been Confirmed.';
+
+			//Mail Start
+
+			$emailTemplate = EmailTemplate::where('template_for','order confirmed')->first();
+			$details = [
+			    'title' => $emailTemplate->subject,
+			    'body' => $emailTemplate->body
+			];
+			
+			Mail::to($user->email)->send(new OrderConfirmedMail($details));
+
+			//Mail End
+		}
+		elseif($request->item_status == 'shipped')
+		{
+			$title = 'Order Shipped';
+			$body =  'Order for '.$orderItem->title.' has been Shipped.';
+		}
+		elseif($request->item_status == 'delivered')
+		{
+			$title = 'Order Delivered';
+			$body =  'Order for '.$orderItem->title.' has been Delivered.';
+		}
+		elseif($request->item_status == 'completed')
+		{
+			$title = 'Order Completed';
+			$body =  'Order for '.$orderItem->title.' has been Completed.';
+		}
+		elseif($request->item_status == 'canceled')
+		{
+			$title = 'Order canceled';
+			$body =  'Order for '.$orderItem->title.' has been canceled.';
+		}
+
+		$type = 'Order Status';
+
+		if($orderItem->productsServicesBook->type == 'book')
+		{
+			$module = 'book';
+		}
+		else
+		{
+			$module = 'product_service';
+		}
+
+		pushNotification($title,$body,$user,$type,true,$user_type,$module,$orderItem->id,$screen);
+
+		$orderItem = OrderItem::with('orderTrackings','return','replacement','dispute')->find($id);
+		return response()->json(prepareResult(false, $orderItem, getLangByLabelGroups('messages','messages_order_stock_updated')), config('http_response.success'));
+	}
+
+	public function ordersCount(Request $request)
+	{
+		try
+		{
+			$orders = [];
+			$orders['all'] = OrderItem::select('order_items.*')
+			->join('products_services_books', function ($join) {
+				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+			})
+			->where('products_services_books.user_id',Auth::id())
+			->count();
+
+			$orders['under_process'] = OrderItem::select('order_items.*')
+			->join('products_services_books', function ($join) {
+				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+			})
+			->where('products_services_books.user_id',Auth::id())
+			->where('order_items.item_status','processing')
+			->count();
+
+			$orders['delivered'] = OrderItem::select('order_items.*')
+			->join('products_services_books', function ($join) {
+				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+			})
+			->where('products_services_books.user_id',Auth::id())
+			->where('order_items.item_status','delivered')
+			->count();
+
+			$orders['earnings'] = OrderItem::select('order_items.*')
+			->join('products_services_books', function ($join) {
+				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+			})
+			->where('products_services_books.user_id',Auth::id())
+			->sum('order_items.price');
+
+			$orders['amount_refunded'] = OrderItem::select('order_items.*')
+			->join('products_services_books', function ($join) {
+				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+			})
+			->where('products_services_books.user_id',Auth::id())
+			->sum('amount_returned');
+
+			$orders['returned_items'] = OrderItem::select('order_items.*')
+			->join('products_services_books', function ($join) {
+				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+			})
+			->where('products_services_books.user_id',Auth::id())
+			->where('order_items.item_status','returned')
+			->count();
+			return response(prepareResult(false, $orders, getLangByLabelGroups('messages','messages_order_count_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function reasonForAction(Request $request)
+	{
+		try
+		{
+			$reasons = ReasonForAction::orderBy('created_at','DESC');
+
+			if(!empty($request->action))
+			{
+				$reasons = $reasons->where('action',$request->action);
+			}
+
+			if(!empty($request->language_id))
+			{
+				$reasons = $reasons->where('language_id',$request->language_id);
+			}
+
+			if(!empty($request->module_type_id))
+			{
+				$reasons = $reasons->where('module_type_id',$request->module_type_id);
+			}
+			$reasons = $reasons->get();
+			return response(prepareResult(false, $reasons, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+}

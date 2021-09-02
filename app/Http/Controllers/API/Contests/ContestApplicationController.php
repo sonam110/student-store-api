@@ -1,0 +1,194 @@
+<?php
+
+namespace App\Http\Controllers\API\Contests;
+
+use App\Http\Controllers\Controller;
+use App\Models\ContestApplication;
+use App\Models\Contest;
+use App\Models\OrderItem;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Str;
+use DB;
+use Auth;
+use Event;
+
+class ContestApplicationController extends Controller
+{
+    /**
+         * Display a listing of the resource.
+         *
+         * @return \Illuminate\Http\Response
+         */
+
+    public function index(Request $request)
+    {
+    	try
+    	{
+            if(!empty($request->per_page_record))
+            {
+                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+            }
+            else
+            {
+                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->get();
+            }
+    		return response(prepareResult(false, $contestApplications, getLangByLabelGroups('messages','message_contest_application_list')), config('http_response.success'));
+    	}
+    	catch (\Throwable $exception) 
+    	{
+    		return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    	}
+    }
+
+    public function store(Request $request)
+    {        
+    	$validation = Validator::make($request->all(), [
+    		'contest_id'  => 'required'
+    	]);
+
+    	if ($validation->fails()) {
+    		return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+    	}
+
+    	DB::beginTransaction();
+    	try
+    	{
+            $contest_start_date = date("Y-m-d", strtotime($request->contest_start_date));
+            $contest_end_date = date("Y-m-d", strtotime($request->contest_end_date));
+
+            $contest = Contest::find($request->contest_id);
+
+            if($contestApplication = ContestApplication::where('user_id',Auth::id())->where('contest_id',$contest->id)->first())
+            {
+                $contestApplication->document= $request->document;
+                $contestApplication->application_status = $request->application_status;
+                $contestApplication->save();
+
+                // Notification Start
+
+                $title = 'Document Updated';
+                $body =  'New Documen uploaded by '.Auth::user()->name.'for Application Received on Contest '.$contest->title;
+                $user = $contest->user;
+                $type = 'Contest Application';
+                pushNotification($title,$body,$user,$type,true,'seller','contest',$contestApplication->id,'created');
+
+                // Notification End
+            }
+            else
+            {
+                $contestApplication = new ContestApplication;
+                $contestApplication->user_id            = Auth::id();
+                $contestApplication->contest_id         = $request->contest_id;
+                $contestApplication->contest_type       = $request->contest_type;
+                $contestApplication->contest_title      = $request->contest_title;
+                $contestApplication->application_status = $request->application_status;
+                $contestApplication->subscription_status= $request->subscription_status;
+                $contestApplication->subscription_remark= $request->subscription_remark;
+                $contestApplication->document= $request->document;
+                $contestApplication->save();
+
+                // Notification Start
+
+                $title = 'New Contest Application';
+                $body =  'New Application Received for Contest '.$contest->title;
+                $user = $contest->user;
+                $type = 'Contest Application';
+                pushNotification($title,$body,$user,$type,true,'seller','contest',$contestApplication->id,'created');
+
+                // Notification End
+            }
+    		
+    		
+            
+    		DB::commit();
+    		return response()->json(prepareResult(false, $contestApplication, getLangByLabelGroups('messages','message_contest_application_created')), config('http_response.created'));
+    	}
+    	catch (\Throwable $exception)
+    	{
+    		DB::rollback();
+    		return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    	}
+    }
+
+    public function show(ContestApplication $contestApplication)
+    {
+    	$contestApplication = ContestApplication::where('id',$contestApplication->id)->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->first();
+    	return response()->json(prepareResult(false, $contestApplication, getLangByLabelGroups('messages','message_contest_application_list')), config('http_response.success'));
+    }
+
+    public function destroy(ContestApplication $contestApplication)
+    {
+    	$contestApplication->delete();
+    	return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_contest_application_deleted')), config('http_response.success'));
+    }
+    
+
+    public function statusUpdate(Request $request, $id)
+    {
+    	try
+    	{
+    		$contestApplication = ContestApplication::find($id);
+            if($request->application_status == 'canceled')
+            {
+                $contestApplication->reason_for_cancellation = $request->reason_for_cancellation;
+                $contestApplication->reason_id_for_cancellation = $request->reason_id_for_cancellation;
+                $contestApplication->cancelled_by = Auth::id();
+
+                $contest = $contestApplication->contest;
+                $remainingHours = \Carbon\Carbon::parse($contest->start_time)->diffInHours(now());
+                if($contest->use_cancellation_policy == true)
+                {
+                    $cancellationRanges = $contest->cancellationRanges;
+                    foreach ($cancellationRanges as $key => $value) {
+                        if($remainingHours >= $value->from && $remainingHours < $value->to)
+                        {
+                            $orderedItem = OrderItem::where('contest_application_id',$id)->get();
+                            $refundOrderItemId = $orderItem->id;
+                            $refundOrderItemPrice = ($orderItem->price)*($value->deduct_percentage_value)/100;
+                            $refundOrderItemQuantity = $orderItem->quantity;
+                            $refundOrderItemReason = 'cancellation';
+                            refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+                        }
+                    }
+                }
+
+            }
+            elseif($request->application_status == 'rejected')
+            {
+                $contestApplication->reason_for_rejection = $request->reason_for_rejection;
+                $contestApplication->reason_id_for_rejection = $request->reason_id_for_rejection;
+            }
+            $contestApplication->application_status = $request->application_status;
+            $contestApplication->save();
+    		// Notification Start
+
+            $title = 'Status Updated';
+            
+            if(Auth::id() == $contestApplication->user_id)
+            {
+                $user = $contestApplication->contest->user;
+                $user_type = 'seller';
+                $screen = 'created';
+            }
+            else
+            {
+                $user = $contestApplication->user;
+                $user_type = 'buyer';
+                $screen = 'joined';
+            }
+            $body =  'Status updated to '.$request->application_status.' by '.$user->name.'for Application on Contest '.$contestApplication->contest->title;
+            $type = 'Contest Application';
+            pushNotification($title,$body,$user,$type,true,$user_type,'contest',$contestApplication->id,$screen);
+
+            // Notification End
+
+    		return response()->json(prepareResult(false, $contestApplication, getLangByLabelGroups('contest_application_status','contest_application_status'.$request->application_status)), config('http_response.success'));
+    	}
+    	catch (\Throwable $exception)
+    	{
+    		DB::rollback();
+    		return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    	}
+    }
+}
