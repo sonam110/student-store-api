@@ -119,14 +119,14 @@ class JobApplicationController extends Controller
             if(Auth::id() == $jobApplication->user_id)
             {
                 $user = $jobApplication->job->user;
-                $user_type = 'applicant';
-                $screen = 'my-jobs';
+                $user_type = 'creator';
+                $screen = 'posted-jobs';
             }
             else
             {
                 $user = $jobApplication->user;
-                $user_type = 'creator';
-                $screen = 'posted-jobs';
+                $user_type = 'applicant';
+                $screen = 'my-jobs';
             }
             $body =  'Status updated to '.$request->application_status.' by '.$user->name.'for Application on Job '.$jobApplication->job->title;
             $type = 'Job Application';

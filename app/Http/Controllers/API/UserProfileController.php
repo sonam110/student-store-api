@@ -103,23 +103,23 @@ class UserProfileController extends Controller
 			$dob = $user->dob;
 		}
 
-		if(!empty($request->show_email))
-		{
-			$show_email = $request->show_email;
-		}
-		else
-		{
-			$show_email = $user->show_email;
-		}
+		// if(!empty($request->show_email))
+		// {
+		// 	$show_email = $request->show_email;
+		// }
+		// else
+		// {
+		// 	$show_email = $user->show_email;
+		// }
 
-		if(!empty($request->show_contact_number))
-		{
-			$show_contact_number = $request->show_contact_number;
-		}
-		else
-		{
-			$show_contact_number = $user->show_contact_number;
-		}
+		// if(!empty($request->show_contact_number))
+		// {
+		// 	$show_contact_number = $request->show_contact_number;
+		// }
+		// else
+		// {
+		// 	$show_contact_number = $user->show_contact_number;
+		// }
 
 		$user->first_name           				= $request->first_name;
 		$user->last_name            				= $request->last_name;
@@ -142,8 +142,8 @@ class UserProfileController extends Controller
 		// $user->guardian_contact_number 				= $request->guardian_contact_number;
 		// $user->is_guardian_email_verified 			= $request->is_guardian_email_verified;
 		// $user->is_guardian_contact_number_verified 	= $request->is_guardian_contact_number_verified;
-		$user->show_email 						= $show_email;
-		$user->show_contact_number 				= $show_contact_number;
+		$user->show_email 						= $request->show_email;
+		$user->show_contact_number 				= $request->show_contact_number;
 		
 		if($user->save())
 		{

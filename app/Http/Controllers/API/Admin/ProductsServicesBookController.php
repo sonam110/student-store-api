@@ -226,7 +226,7 @@ class ProductsServicesBookController extends Controller
 
     public function show(Request $request,ProductsServicesBook $productsServicesBook)
     {
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,show_email,show_contact_number','user.serviceProviderDetail','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
                 $query->take(3);
             }])->withCount('ratings')->find($productsServicesBook->id);
         $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();

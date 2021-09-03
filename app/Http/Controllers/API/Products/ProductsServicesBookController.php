@@ -357,7 +357,7 @@ class ProductsServicesBookController extends Controller
         {
             $is_abuse_reported = false;
         }
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,show_email,show_contact_number','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
                 $query->take(3);
             }])->withCount('ratings')->find($productsServicesBook->id);
         $productsServicesBook['favourite_products_services_book'] = $favouriteProductsServicesBook;
@@ -627,6 +627,10 @@ class ProductsServicesBookController extends Controller
                 {
                 	$getProductsServicesBook->promotion_start_at = date('Y-m-d');
                 	$user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                    if(empty($user_package))
+                    {
+                        return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+                    }
                 	if($user_package->no_of_boost == $user_package->used_no_of_boost)
                 	{
                 	    DB::rollback();
@@ -651,6 +655,10 @@ class ProductsServicesBookController extends Controller
                 {
 	                $getProductsServicesBook->most_popular_start_at = date('Y-m-d');
 	                $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                    if(empty($user_package))
+                    {
+                        return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+                    }
 	                if($user_package->most_popular == $user_package->used_most_popular)
 	                {
 	                    DB::rollback();
@@ -677,6 +685,10 @@ class ProductsServicesBookController extends Controller
 
 	                $getProductsServicesBook->top_selling_start_at = date('Y-m-d');
 	                $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                    if(empty($user_package))
+                    {
+                        return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+                    }
 	                if($user_package->top_selling == $user_package->used_top_selling)
 	                {
 	                    DB::rollback();

@@ -572,6 +572,7 @@ class ContestController extends Controller
             			->where('users.user_type_id', $user_type_id);
 
             		})
+                    ->orderBy('contests.created_at','DESC')
                     ->where('contests.user_id', '!=', Auth::id())
             		->where('contests.type', $request->type)
                     ->where('contests.is_published', '1')

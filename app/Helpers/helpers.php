@@ -73,27 +73,25 @@ function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,
 			->setDevicesToken($userDeviceInfo->fcm_token)
 			->send();
 		}
-
-		if($save_to_database == true)
-		{
-			$notification = new Notification;
-			$notification->user_id          = $user->id;
-			$notification->sender_id        = Auth::id();
-			$notification->device_uuid      = $userDeviceInfo->device_uuid;
-			$notification->device_platform  = $userDeviceInfo->platform;
-			$notification->type             = $type;
-			$notification->user_type        = $user_type;
-			$notification->module           = $module;
-			$notification->title            = $title;
-			$notification->sub_title        = $title;
-			$notification->message          = $body;
-			$notification->image_url        = '';
-			$notification->screen        	= $screen;
-			$notification->data_id        	= $id;
-			$notification->read_status      = false;
-			$notification->save();
-		}
-		
+	}
+	if($save_to_database == true)
+	{
+		$notification = new Notification;
+		$notification->user_id          = $user->id;
+		$notification->sender_id        = Auth::id();
+		$notification->device_uuid      = $userDeviceInfo ? $userDeviceInfo->device_uuid : null;
+		$notification->device_platform  = $userDeviceInfo ? $userDeviceInfo->platform : null;
+		$notification->type             = $type;
+		$notification->user_type        = $user_type;
+		$notification->module           = $module;
+		$notification->title            = $title;
+		$notification->sub_title        = $title;
+		$notification->message          = $body;
+		$notification->image_url        = '';
+		$notification->screen        	= $screen;
+		$notification->data_id        	= $id;
+		$notification->read_status      = false;
+		$notification->save();
 	}
 }
 
@@ -124,29 +122,25 @@ function pushMultipleNotification($title,$body,$users,$type,$save_to_database,$u
 			->setApiKey(env('FIREBASE_KEY'))
 			->setDevicesToken($userDeviceInfo->fcm_token)
 			->send();
-			
-			if($save_to_database == true)
-			{
-				if($userDeviceInfo)
-				{
-					$notification = new Notification;
-					$notification->user_id          = $user->id;
-					$notification->sender_id        = Auth::id();
-					$notification->device_uuid      = $userDeviceInfo->device_uuid;
-					$notification->device_platform  = $userDeviceInfo->platform;
-					$notification->type             = '';
-					$notification->user_type        = $user_type;
-					$notification->module           = $module;
-					$notification->title            = $title;
-					$notification->sub_title        = $title;
-					$notification->message          = $body;
-					$notification->image_url        = '';
-					$notification->screen        	= $screen;
-					$notification->data_id        	= $id;
-					$notification->read_status      = false;
-					$notification->save();
-				}
-			}
+		}
+		if($save_to_database == true)
+		{
+			$notification = new Notification;
+			$notification->user_id          = $user->id;
+			$notification->sender_id        = Auth::id();
+			$notification->device_uuid      = $userDeviceInfo ? $userDeviceInfo->device_uuid : null;
+			$notification->device_platform  = $userDeviceInfo ? $userDeviceInfo->platform : null;
+			$notification->type             = '';
+			$notification->user_type        = $user_type;
+			$notification->module           = $module;
+			$notification->title            = $title;
+			$notification->sub_title        = $title;
+			$notification->message          = $body;
+			$notification->image_url        = '';
+			$notification->screen        	= $screen;
+			$notification->data_id        	= $id;
+			$notification->read_status      = false;
+			$notification->save();
 		}
 	}
 

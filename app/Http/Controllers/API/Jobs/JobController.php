@@ -331,6 +331,7 @@ class JobController extends Controller
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria job
             $jobs = Job::select('sp_jobs.*')
                     ->where('is_published', '1')
+                    ->orderBy('created_at','DESC')
                     ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
             if($searchType=='filter')
             {
@@ -814,6 +815,7 @@ class JobController extends Controller
                     // ->join('users', function ($join) {
                     //     $join->on('job_applications.user_id', '=', 'users.id');
                     // })
+                    ->orderBy('job_applications.created_at','DESC')
                     ->join('user_cv_details', function ($join) {
                         $join->on('job_applications.user_id', '=', 'user_cv_details.user_id');
                     })
@@ -1064,7 +1066,7 @@ class JobController extends Controller
         }
         catch (\Throwable $exception) 
         {
-            dd($exception);
+            // dd($exception);
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
     }

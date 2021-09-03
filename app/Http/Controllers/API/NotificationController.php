@@ -37,7 +37,12 @@ class NotificationController extends Controller
             {
                 $notifications = $notifications->get();
             }
-            Notification::where('user_id',Auth::id())->update(['read_status' => '1']);
+            
+            if($request->mark_all_as_read == true)
+            {
+                Notification::where('user_id',Auth::id())->update(['read_status' => '1']);
+            }
+            
     		return response(prepareResult(false, NotificationResource::collection($notifications), getLangByLabelGroups('messages','message_notification_list')), config('http_response.success'));
     	}
     	catch (\Throwable $exception) 

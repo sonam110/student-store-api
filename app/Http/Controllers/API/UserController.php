@@ -135,6 +135,7 @@ class UserController extends Controller
 	        $searchType = $request->searchType; 
 	        $users = User::where('id', '!=', Auth::id())
 	                        ->where('user_type_id','3')
+	                        ->orderBy('created_at','DESC')
 	                        ->with('serviceProviderDetail','addressDetail');
 	        
 	        if($searchType=='latest')

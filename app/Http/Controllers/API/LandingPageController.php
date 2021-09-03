@@ -171,7 +171,7 @@ class LandingPageController extends Controller
             $is_chat_initiated = false;
             $contactListId = null;
         }
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','productImages','productTags')->with(['ratings.customer' => function($query){
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,profile_pic_path,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','productImages','productTags')->with(['ratings.customer' => function($query){
                 $query->take(3);
             }])->withCount('ratings')->find($id);
         $productsServicesBook['favourite_products_services_book'] = $favouriteProductsServicesBook;
