@@ -782,7 +782,7 @@ class ProductsServicesBookController extends Controller
             }
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::select('products_services_books.*')
-            ->where('products_services_books.user_id', '!=', Auth::id())
+            //->where('products_services_books.user_id', '!=', Auth::id())
             ->where('products_services_books.status', '2')
             ->where('products_services_books.is_used_item', $is_used_item)
             ->where('products_services_books.type', $type)
@@ -921,7 +921,7 @@ class ProductsServicesBookController extends Controller
                 if($products->count() <= 0)
                 {
                 	 $products = ProductsServicesBook::select('products_services_books.*')
-					            ->where('products_services_books.user_id', '!=', Auth::id())
+					            //->where('products_services_books.user_id', '!=', Auth::id())
 					            ->where('products_services_books.status', '2')
 					            ->where('products_services_books.is_used_item', $is_used_item)
 					            ->where('products_services_books.type', $type)
@@ -971,7 +971,7 @@ class ProductsServicesBookController extends Controller
             })
             ->where('products_services_books.status', '2')
             ->where('products_services_books.is_published', '1')
-            ->where('products_services_books.user_id', '!=', Auth::id())
+            //->where('products_services_books.user_id', '!=', Auth::id())
             ->where('users.user_type_id','3')
             ->where('products_services_books.type','service')
             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
@@ -999,7 +999,7 @@ class ProductsServicesBookController extends Controller
                     })
                     ->where('products_services_books.status', '2')
                     ->where('products_services_books.is_published', '1')
-                    ->where('products_services_books.user_id', '!=', Auth::id())
+                    //->where('products_services_books.user_id', '!=', Auth::id())
                     ->where('users.user_type_id','3')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
                     ->where('products_services_books.type','service')
@@ -1042,7 +1042,7 @@ class ProductsServicesBookController extends Controller
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::where('is_used_item', '1')
                                 ->where('type','product')
-                                ->where('user_id', '!=', Auth::id())
+                                //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
                                 ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
@@ -1069,7 +1069,7 @@ class ProductsServicesBookController extends Controller
                 {
                 	$products = ProductsServicesBook::where('is_used_item', '1')
                                 ->where('type','product')
-                                ->where('user_id', '!=', Auth::id())
+                                //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
                 	 			->withCount('orderItems')->orderBy('order_items_count','desc')
@@ -1115,7 +1115,7 @@ class ProductsServicesBookController extends Controller
             ->join('users', function ($join) {
                 $join->on('products_services_books.user_id', '=', 'users.id');
             })
-            ->where('products_services_books.user_id', '!=', Auth::id())
+            //->where('products_services_books.user_id', '!=', Auth::id())
             ->where('products_services_books.status', '2')
             ->where('products_services_books.is_published', '1')
             ->where('users.user_type_id','2')
@@ -1257,7 +1257,7 @@ class ProductsServicesBookController extends Controller
                     ->join('users', function ($join) {
                         $join->on('products_services_books.user_id', '=', 'users.id');
                     })
-                    ->where('products_services_books.user_id', '!=', Auth::id())
+                    //->where('products_services_books.user_id', '!=', Auth::id())
                     ->where('products_services_books.status', '2')
                     ->where('products_services_books.is_published', '1')
                     ->where('users.user_type_id','2')
@@ -1614,7 +1614,7 @@ class ProductsServicesBookController extends Controller
             $type = 'book';
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::select('products_services_books.*')
-            ->where('products_services_books.user_id', '!=', Auth::id())
+            //->where('products_services_books.user_id', '!=', Auth::id())
             ->where('products_services_books.status', '2')
             ->where('products_services_books.is_used_item', $is_used_item)
             ->where('products_services_books.type', $type)
@@ -1753,7 +1753,7 @@ class ProductsServicesBookController extends Controller
                 if($products->count() <= 0)
                 {
                      $products = ProductsServicesBook::select('products_services_books.*')
-                                ->where('products_services_books.user_id', '!=', Auth::id())
+                                //->where('products_services_books.user_id', '!=', Auth::id())
                                 ->where('products_services_books.status', '2')
                                 ->where('products_services_books.is_used_item', $is_used_item)
                                 ->where('products_services_books.type', $type)
@@ -1855,7 +1855,7 @@ class ProductsServicesBookController extends Controller
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::where('is_used_item', '1')
                                 ->where('type','book')
-                                ->where('user_id', '!=', Auth::id())
+                                //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
                                 ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
@@ -1882,7 +1882,7 @@ class ProductsServicesBookController extends Controller
                 {
                     $products = ProductsServicesBook::where('is_used_item', '1')
                                 ->where('type','book')
-                                ->where('user_id', '!=', Auth::id())
+                                //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
