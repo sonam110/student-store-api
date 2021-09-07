@@ -186,6 +186,11 @@ class OrderController extends Controller
 								$shipping_charge = $shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']);
 							}
 						}
+
+						if(($orderedItem['quantity'] > $productsServicesBook->quantity) && ($productsServicesBook->type != 'service'))
+						{
+							return response()->json(prepareResult(true, ['quantity exceeded.Only '.$productsServicesBook->quantity.' left.'], getLangByLabelGroups('messages','message_quantity_exceeded')), config('http_response.bad_request'));
+						}
 						
 					}
 					elseif(!empty($orderedItem['contest_application_id']))

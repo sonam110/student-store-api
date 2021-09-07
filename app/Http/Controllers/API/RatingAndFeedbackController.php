@@ -108,6 +108,25 @@ class RatingAndFeedbackController extends Controller
                 ServiceProviderDetail::where('user_id',$ratingAndFeedback->to_user)->update(['avg_rating' => $userRating]);
             }
             
+            // Notification Start
+
+            $productsServicesBook = ProductsServicesBook::find($ratingAndFeedback->products_services_book_id);
+
+            $title = 'New Rating And Feedback';
+            $body = 'Your order for product '.$productsServicesBook->title.' has been rated.';
+            $type = 'Rating And Feedback';
+            $user_type = 'seller';
+            if($productsServicesBook->type == 'book')
+            {
+                $module = 'book';
+            }
+            else
+            {
+                $module = 'product_service';
+            }
+            pushNotification($title,$body,$user,$type,true,$user_type,$module,$request->order_item_id,'my-orders');
+
+            // Notification End
 
             DB::commit();
             return response()->json(prepareResult(false, $ratingAndFeedback, getLangByLabelGroups('messages','message_rating_and_feedback_created')), config('http_response.created'));

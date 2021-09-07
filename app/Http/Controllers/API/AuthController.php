@@ -208,7 +208,7 @@ class AuthController extends Controller
 		$user->is_agreed_on_terms 					= true;
 		$user->is_prime_user 						= true;
 		$user->is_deleted 							= false;
-		$user->status 								= true;
+		$user->status 								= 0;
 		$user->last_login 				= now();
 		if($user->save())
 		{
@@ -229,21 +229,26 @@ class AuthController extends Controller
 				$addressDetail->save();
 			}
 
-			foreach ($request->user_device_info as $key => $deviceInfo) 
+			if($request->is_minor != "true" || $request->is_minor != 1)
 			{
-				$userDeviceInfo 					= new UserDeviceInfo;
-				$userDeviceInfo->user_id 			= $user->id;
-				$userDeviceInfo->fcm_token 			= $deviceInfo['fcm_token'];
-				$userDeviceInfo->device_uuid 		= $deviceInfo['device_uuid'];
-				$userDeviceInfo->platform 			= $deviceInfo['platform'];
-				$userDeviceInfo->model 				= $deviceInfo['model'];
-				$userDeviceInfo->os_version 		= $deviceInfo['os_version'];
-				$userDeviceInfo->manufacturer 		= $deviceInfo['manufacturer'];
-				$userDeviceInfo->serial_number 		= $deviceInfo['serial_number'];
-				$userDeviceInfo->system_ip_address 	= $request->ip();
-				$userDeviceInfo->status 			= 1;
-				$userDeviceInfo->save();
+				foreach ($request->user_device_info as $key => $deviceInfo) 
+				{
+					$userDeviceInfo 					= new UserDeviceInfo;
+					$userDeviceInfo->user_id 			= $user->id;
+					$userDeviceInfo->fcm_token 			= $deviceInfo['fcm_token'];
+					$userDeviceInfo->device_uuid 		= $deviceInfo['device_uuid'];
+					$userDeviceInfo->platform 			= $deviceInfo['platform'];
+					$userDeviceInfo->model 				= $deviceInfo['model'];
+					$userDeviceInfo->os_version 		= $deviceInfo['os_version'];
+					$userDeviceInfo->manufacturer 		= $deviceInfo['manufacturer'];
+					$userDeviceInfo->serial_number 		= $deviceInfo['serial_number'];
+					$userDeviceInfo->system_ip_address 	= $request->ip();
+					$userDeviceInfo->status 			= 1;
+					$userDeviceInfo->save();
+				}
 			}
+
+			
 
 			// $stripe = new \Stripe\StripeClient(
 			// 			  env('STRIPE_SECRET')
@@ -419,29 +424,69 @@ class AuthController extends Controller
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_not_exists')), config('http_response.not_found'));
 			}
 
-			if(Hash::check($request->password,$user->password) || Hash::check($request->password,$user->guardian_password)) {
+			if(Hash::check($request->password,$user->password) || Hash::check($request->password,$user->guardian_password)) 
+			{
 
-				foreach ($request->user_device_info as $key => $deviceInfo) {
-					UserDeviceInfo::where('user_id',Auth::id())->delete();
+				$user['login_with_guardian_data'] = false;
 
-					// Auth::user()->userDeviceInfos->delete();
-					// if($oldDeviceInfo = UserDeviceInfo::where('user_id',Auth::id())->where('device_uuid',$deviceInfo['device_uuid'])->orWhere('system_ip_address',$request->ip())->first())
-					// {
-					// 	$oldDeviceInfo->delete();
-					// }
 
-					$userDeviceInfo 					= new UserDeviceInfo;
-					$userDeviceInfo->user_id 			= $user->id;
-					$userDeviceInfo->fcm_token 			= $deviceInfo['fcm_token'];
-					$userDeviceInfo->device_uuid 		= $deviceInfo['device_uuid'];
-					$userDeviceInfo->platform 			= $deviceInfo['platform'];
-					$userDeviceInfo->model 				= $deviceInfo['model'];
-					$userDeviceInfo->os_version 		= $deviceInfo['os_version'];
-					$userDeviceInfo->manufacturer 		= $deviceInfo['manufacturer'];
-					$userDeviceInfo->serial_number 		= $deviceInfo['serial_number'];
-					$userDeviceInfo->system_ip_address 	= $request->ip();
-					$userDeviceInfo->status 			= 1;
-					$userDeviceInfo->save();
+				if(($user->is_minor == true) && (($request->contact_number == $user->email) or ($request->contact_number == $user->contact_number)))
+				{
+					$user['login_with_guardian_data'] = true;
+				}
+
+				if(($user->is_minor == true || $user->is_minor == 1) && ($user->login_with_guardian_data == false))
+				{
+				}
+				else
+				{
+					foreach ($request->user_device_info as $key => $deviceInfo) {
+						// UserDeviceInfo::where('user_id',Auth::id())->delete();
+
+						// Auth::user()->userDeviceInfos->delete();
+						// if($oldDeviceInfo = UserDeviceInfo::where('user_id',Auth::id())->where('device_uuid',$deviceInfo['device_uuid'])->orWhere('system_ip_address',$request->ip())->first())
+						// {
+						// 	$oldDeviceInfo->delete();
+						// }
+
+						$userDeviceInfo 					= new UserDeviceInfo;
+						$userDeviceInfo->user_id 			= $user->id;
+						$userDeviceInfo->fcm_token 			= $deviceInfo['fcm_token'];
+						$userDeviceInfo->device_uuid 		= $deviceInfo['device_uuid'];
+						$userDeviceInfo->platform 			= $deviceInfo['platform'];
+						$userDeviceInfo->model 				= $deviceInfo['model'];
+						$userDeviceInfo->os_version 		= $deviceInfo['os_version'];
+						$userDeviceInfo->manufacturer 		= $deviceInfo['manufacturer'];
+						$userDeviceInfo->serial_number 		= $deviceInfo['serial_number'];
+						$userDeviceInfo->system_ip_address 	= $request->ip();
+						$userDeviceInfo->status 			= 1;
+						$userDeviceInfo->save();
+					}
+				}
+
+				if($user->user_type_id == 2)
+				{
+					$count = StudentDetail::where('user_id',$user->id)->count();
+					if($count > 0)
+					{
+						$user['student_detail'] = true;
+					}
+					else
+					{
+						$user['student_detail'] = false;
+					}
+				}
+				elseif($user->user_type_id == 3)
+				{
+					$count = ServiceProviderDetail::where('user_id',$user->id)->count();
+					if($count > 0)
+					{
+						$user['service_provider_detail'] = true;
+					}
+					else
+					{
+						$user['service_provider_detail'] = false;
+					}
 				}
 
 				$accessToken = $user->createToken('authToken')->accessToken;
@@ -451,13 +496,7 @@ class AuthController extends Controller
 					$user['company_logo'] = $spDetail->company_logo_path;
 				}
 
-				$user['login_with_guardian_data'] = false;
-
-
-				if(($user->is_minor == true) && (($request->contact_number == $user->email) or ($request->contact_number == $user->contact_number)))
-				{
-					$user['login_with_guardian_data'] = true;
-				}
+				
 
 				return response()->json(prepareResult(false, $user, getLangByLabelGroups('messages','message_user_login_success')),config('http_response.success'));
 			} else {

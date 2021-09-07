@@ -363,14 +363,18 @@ class ContestController extends Controller
                 }
             }
 
-            ContestTag::where('contest_id',$contest->id)->delete();
-            foreach ($request->tags as $key => $tag) {
-                $allTypeTag = new ContestTag;
-                $allTypeTag->contest_id                 = $contest->id;
-                $allTypeTag->user_id                  = $user_id;
-                $allTypeTag->title                    = $tag;
-                $allTypeTag->type                     = $request->type;
-                $allTypeTag->save();
+            if(!empty($request->tags) && is_array($request->tags))
+           {
+
+                ContestTag::where('contest_id',$contest->id)->delete();
+                foreach ($request->tags as $key => $tag) {
+                    $allTypeTag = new ContestTag;
+                    $allTypeTag->contest_id                 = $contest->id;
+                    $allTypeTag->user_id                  = $user_id;
+                    $allTypeTag->title                    = $tag;
+                    $allTypeTag->type                     = $request->type;
+                    $allTypeTag->save();
+                }
             }
 
             DB::commit();

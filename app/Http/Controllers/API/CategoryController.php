@@ -80,15 +80,20 @@ class CategoryController extends Controller
         }
     }
 
-    public function brands($catId)
+    public function brands(Request $request,$catId)
     {
         try
         {
             $brands = Brand::select('id', 'name')
                 ->where('status', '1')
                 ->where('category_master_id', $catId)
-                ->orderBy('created_at','DESC')
-                ->get();
+                ->orderBy('created_at','DESC');
+
+            if(!empty($request->brand))
+            {
+                $brands = $brands->where('name', 'like', '%'.$request->brand.'%');
+            }
+            $brands = $brands->get();
             return response(prepareResult(false, $brands, getLangByLabelGroups('messages','message_success_title')), config('http_response.success'));
         }
         catch (\Throwable $exception) 

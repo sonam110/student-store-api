@@ -242,6 +242,20 @@ class UserController extends Controller
 		$user->status = $request->status;
 		if($user->save())
 		{
+
+			if($user->user_type_id == 2)
+			{
+				$studentDetail = StudentDetail::where('user_id',$request->user_id)->first();
+				$studentDetail->status = $request->status;
+				$studentDetail->save();
+			}
+			elseif($user->user_type_id == 3)
+			{
+				$servceProviderDetail = ServiceProviderDetail::where('user_id',$request->user_id)->first();
+				$servceProviderDetail->status = $request->status;
+				$servceProviderDetail->save();
+			}
+
 			return response()->json(prepareResult(false, $user, getLangByLabelGroups('messages','message_user_status_updated')), config('http_response.success'));
 		}
 		else
@@ -268,6 +282,20 @@ class UserController extends Controller
 	        foreach ($users as $key => $user) {
 	            $user->status = $request->status;
 	            $user->save();
+
+
+	            if($user->user_type_id == 2)
+	            {
+	            	$studentDetail = StudentDetail::where('user_id',$request->user_id)->first();
+	            	$studentDetail->status = $request->status;
+	            	$studentDetail->save();
+	            }
+	            elseif($user->user_type_id == 2)
+	            {
+	            	$servceProviderDetail = ServiceProviderDetail::where('user_id',$request->user_id)->first();
+	            	$servceProviderDetail->status = $request->status;
+	            	$servceProviderDetail->save();
+	            }
 	            
 	            // $title = 'User Status Updated';
 	            // $body =  'User '.$user->title.' status has been successfully updated.';

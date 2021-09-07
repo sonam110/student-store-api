@@ -128,7 +128,7 @@ class JobController extends Controller
                 $job->published_at                  = $published_at;
                 $job->meta_title                    = $request->meta_title;
                 $job->meta_keywords                 = $request->meta_keywords;
-                $job->job_status                    = '1';
+                $job->job_status                    = '0';
                 $job->save();
                 if($job)
                 {
@@ -203,7 +203,7 @@ class JobController extends Controller
         {
             $is_abuse_reported = false;
         }
-        $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->withCount('jobApplications','acceptedJobApplications')->find($job->id);
+        $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,show_email,show_contact_number','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->withCount('jobApplications','acceptedJobApplications')->find($job->id);
         $job['favourite_job'] = $favouriteJob;
         $job['favourite_id'] = $favouriteId;
         $job['is_applied'] = $applied;

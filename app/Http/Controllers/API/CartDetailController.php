@@ -77,10 +77,25 @@ class CartDetailController extends Controller
 
             $quantity = $request->quantity;
 
+
+            if($productsServicesBook->quantity < $quantity)
+            {
+                return response()->json(prepareResult(true, ['quantity exceeded.Only '.$quantity.' left.'], getLangByLabelGroups('messages','message_quantity_exceeded')), config('http_response.bad_request'));
+            }
+
             if(CartDetail::where('user_id',Auth::id())->where('products_services_book_id',$request->products_services_book_id)->count() > 0)
             {
                 $cartDetail = CartDetail::where('user_id',Auth::id())->where('products_services_book_id',$request->products_services_book_id)->first();
                 $quantity = $quantity + $cartDetail->quantity;
+
+                $left_quantity = $productsServicesBook->quantity - $cartDetail->quantity;
+
+
+                if($productsServicesBook->quantity < $quantity)
+                {
+                    return response()->json(prepareResult(true, ['quantity exceeded.Only '.$left_quantity.' left.'], getLangByLabelGroups('messages','message_quantity_exceeded')), config('http_response.bad_request'));
+                }
+
                 $cartDetail->user_id                    = Auth::id();
                 $cartDetail->products_services_book_id  = $productsServicesBook->id;
                 $cartDetail->sku                        = $productsServicesBook->sku;
@@ -107,6 +122,26 @@ class CartDetailController extends Controller
                 $cartDetail->save();
             }
             $cartDetail =CartDetail::where('id', $cartDetail->id)->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')->first();
+
+            // Notification Start
+
+            $title = 'Product added to cart';
+            $body =  'product '.$productsServicesBook->title.' is added to cart';
+            $user = Auth::user();
+            $type = 'Cart';
+            $user_type = 'buyer';
+            if($productsServicesBook->type == 'book')
+            {
+                $module = 'book';
+            }
+            else
+            {
+                $module = 'product_service';
+            }
+            pushNotification($title,$body,$user,$type,true,$user_type,$module,$cartDetail->id,'my-cart');
+
+            // Notification End
+            
             DB::commit();
             return response()->json(prepareResult(false, $cartDetail, getLangByLabelGroups('messages','message_cart_created')), config('http_response.created'));
         }
