@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CategoryMaster;
 use App\Models\CategoryDetail;
+use App\Models\Language;
+
 use App\Http\Resources\CategoryMasterResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -21,11 +23,11 @@ class CategoryMasterController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $categoryMasters = CategoryMaster::where('category_master_id',null)->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $categoryMasters = CategoryMaster::with('categoryDetails','subCategories.categoryDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $categoryMasters = CategoryMaster::where('category_master_id',null)->orderBy('created_at','DESC')->get();
+                $categoryMasters = CategoryMaster::with('categoryDetails','subCategories.categoryDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->get();
             }
             return response(prepareResult(false, $categoryMasters, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
         }
@@ -43,6 +45,111 @@ class CategoryMasterController extends Controller
      */
 
     public function store(Request $request)
+    {        
+        $validation = Validator::make($request->all(), [
+            'module_type_id'  => 'required'
+        ]);
+
+        if ($validation->fails()) {
+            return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
+
+        DB::beginTransaction();
+        try
+        {
+            $category = $request->category;
+            $cat_slug_prefix = (string) \Uuid::generate(4);
+            $sub_cat_slug_prefix = (string) \Uuid::generate(4);
+            foreach ($category as $key => $value) {
+                if($key == 0)
+                {
+                    $categoryMaster = new CategoryMaster;
+                    $categoryMaster->module_type_id     = $request->module_type_id;
+                    $categoryMaster->category_master_id = null;
+                    $categoryMaster->title              = $value['category_title'];
+                    $categoryMaster->slug               = $cat_slug_prefix.'-'.Str::slug($value['category_title']);
+                    $categoryMaster->status             = 1;
+                    $categoryMaster->save();
+                }
+                $cat_parent_id = $categoryMaster->id;
+                if($key > 0)
+                {
+                    $categoryMaster = CategoryMaster::find($cat_parent_id);
+                }
+
+                if($categoryMaster)
+                {
+                    if(Language::where('title',$value['language_title'])->count() > 0)
+                    {
+                        $language = Language::where('title',$value['language_title'])->first();
+                    }
+                    else
+                    {
+                        $language = new Language;
+                        $language->title                = $value['language_title'];
+                        $language->value                = $value['language_value'];
+                        $language->status               = 1;
+                        $language->save();
+                    }
+
+                    $categoryDetail = new CategoryDetail;
+                    $categoryDetail->category_master_id = $categoryMaster->id;
+                    $categoryDetail->language_id        = $language->id;
+                    $categoryDetail->is_parent          = 1;
+                    $categoryDetail->title              = $value['category_title'];
+                    $categoryDetail->slug               = $cat_slug_prefix.'-'.Str::slug($categoryMaster->title);
+                    $categoryDetail->description        = $request->description;
+                    $categoryDetail->status             = 1;
+                    $categoryDetail->save();
+                }
+
+                $subCategory = $value['subcategories'];
+
+                foreach ($subCategory as $subkey => $subvalue) {
+                    if($key == 0)
+                    {
+                        $subCategoryMaster = new CategoryMaster;
+                        $subCategoryMaster->module_type_id     = $request->module_type_id;
+                        $subCategoryMaster->category_master_id = $categoryMaster->id;
+                        $subCategoryMaster->title              = $subvalue;
+                        $subCategoryMaster->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subvalue);
+                        $subCategoryMaster->status             = 1;
+                        $subCategoryMaster->save();
+
+                        $sub_cat_parent_id[$subkey] = $subCategoryMaster->id;
+                    }
+                    $parent_id = $sub_cat_parent_id;
+                    
+                    if($key > 0)
+                    {
+                        $subCategoryMaster = CategoryMaster::find($sub_cat_parent_id[$subkey]);
+                    }
+
+                    if($subCategoryMaster)
+                    {
+                        $categoryDetail = new CategoryDetail;
+                        $categoryDetail->category_master_id = $subCategoryMaster->id;
+                        $categoryDetail->language_id        = $language->id;
+                        $categoryDetail->is_parent          = 0;
+                        $categoryDetail->title              = $subvalue;
+                        $categoryDetail->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subCategoryMaster->title);
+                        $categoryDetail->description        = $request->description;
+                        $categoryDetail->status             = 1;
+                        $categoryDetail->save();
+                    }
+                }
+            }
+            DB::commit();
+            return response()->json(prepareResult(false, new CategoryMasterResource($categoryMaster), getLangByLabelGroups('messages','message_category_master_created')), config('http_response.created'));
+        }
+        catch (\Throwable $exception)
+        {
+            DB::rollback();
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
+    public function storeOld(Request $request)
     {        
         $validation = Validator::make($request->all(), [
             'title'  => 'required'
@@ -102,7 +209,8 @@ class CategoryMasterController extends Controller
      */
     public function show(CategoryMaster $categoryMaster)
     {
-        return response()->json(prepareResult(false, new CategoryMasterResource($categoryMaster), getLangByLabelGroups('messages','message_category_master_list')), config('http_response.success'));
+        $categoryMaster = CategoryMaster::with('categoryDetails','subCategories.categoryDetails')->find($categoryMaster->id);
+        return response()->json(prepareResult(false, $categoryMaster, getLangByLabelGroups('messages','message_category_master_list')), config('http_response.success'));
     }
 
     /**
@@ -112,8 +220,119 @@ class CategoryMasterController extends Controller
      * @param  \App\CategoryMaster  $categoryMaster
      * @return \Illuminate\Http\Response
      */
+
+    public function update(Request $request)
+    {        
+        $validation = Validator::make($request->all(), [
+            'category_master_id'  => 'required'
+        ]);
+
+        if ($validation->fails()) {
+            return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
+
+        DB::beginTransaction();
+        try
+        {
+            $category = $request->category;
+            $sub_cat_slug_prefix = (string) \Uuid::generate(4);
+            CategoryDetail::where('category_master_id',$request->category_master_id)->delete();
+            foreach ($category as $key => $value) {
+                if($key == 0)
+                {
+                    $categoryMaster = CategoryMaster::find($request->category_master_id);
+                    $categoryMaster->category_master_id = null;
+                    $categoryMaster->title              = $value['category_title'];
+                    $categoryMaster->save();
+                }
+                $cat_parent_id = $categoryMaster->id;
+                if($key > 0)
+                {
+                    $categoryMaster = CategoryMaster::find($cat_parent_id);
+                }
+
+                if($categoryMaster)
+                {
+                    if(Language::where('title',$value['language_title'])->count() > 0)
+                    {
+                        $language = Language::where('title',$value['language_title'])->first();
+                    }
+                    else
+                    {
+                        $language = new Language;
+                        $language->title                = $value['language_title'];
+                        $language->value                = $value['language_value'];
+                        $language->status               = 1;
+                        $language->save();
+                    }
+
+                    $categoryDetail = new CategoryDetail;
+                    $categoryDetail->category_master_id = $categoryMaster->id;
+                    $categoryDetail->language_id        = $language->id;
+                    $categoryDetail->is_parent          = 1;
+                    $categoryDetail->title              = $value['category_title'];
+                    $categoryDetail->slug               = $categoryMaster->slug;
+                    $categoryDetail->status             = 1;
+                    $categoryDetail->save();
+                }
+
+                $subCategory = $value['subcategories'];
+
+                foreach ($subCategory as $subkey => $subvalue) {
+                    if($key == 0)
+                    {
+                        if(!empty($subvalue['subcategory_id']))
+                        {
+                            CategoryDetail::where('category_master_id',$subvalue['subcategory_id'])->delete();
+
+                            $subCategoryMaster = CategoryMaster::find($subvalue['subcategory_id']);
+                            $subCategoryMaster->title              = $subvalue['subcategory_title'];
+                            $subCategoryMaster->save();
+                        }
+                        else
+                        {
+                            $subCategoryMaster = new CategoryMaster;
+                            $subCategoryMaster->module_type_id     = $categoryMaster->module_type_id;
+                            $subCategoryMaster->category_master_id = $categoryMaster->id;
+                            $subCategoryMaster->title              = $subvalue['subcategory_title'];
+                            $subCategoryMaster->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subCategoryMaster->title);
+                            $subCategoryMaster->status             = 1;
+                            $subCategoryMaster->save();
+                        }
+
+                        $sub_cat_parent_id[$subkey] = $subCategoryMaster->id;
+                    }
+                    $parent_id = $sub_cat_parent_id;
+                    
+                    if($key > 0)
+                    {
+                        $subCategoryMaster = CategoryMaster::find($sub_cat_parent_id[$subkey]);
+                    }
+
+                    if($subCategoryMaster)
+                    {
+                        $categoryDetail = new CategoryDetail;
+                        $categoryDetail->category_master_id = $subCategoryMaster->id;
+                        $categoryDetail->language_id        = $language->id;
+                        $categoryDetail->is_parent          = 0;
+                        $categoryDetail->title              = $subvalue['subcategory_title'];
+                        $categoryDetail->slug               = $subCategoryMaster->slug;
+                        $categoryDetail->status             = 1;
+                        $categoryDetail->save();
+                    }
+                }
+            }
+            DB::commit();
+            return response()->json(prepareResult(false, new CategoryMasterResource($categoryMaster), getLangByLabelGroups('messages','message_category_master_updated')), config('http_response.created'));
+        }
+        catch (\Throwable $exception)
+        {
+            DB::rollback();
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
     
-    public function update(Request $request,CategoryMaster $categoryMaster)
+    public function updateOld(Request $request,CategoryMaster $categoryMaster)
     {
         $validation = Validator::make($request->all(), [
             'title' => 'required'

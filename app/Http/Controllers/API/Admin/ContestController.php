@@ -604,14 +604,20 @@ class ContestController extends Controller
                 {
                     $contests->where('start_date', '<=', $request->end_date);
                 }
-                if(!empty($request->free_subscription))
-                {
-                    $contests->where('is_free', $request->free_subscription);
-                }
-                if(!empty($request->free_cancellation))
-                {
-                    $contests->where('use_cancellation_policy', $request->free_cancellation);
-                }
+                // if(!empty($request->free_subscription))
+                // {
+                //     $contests->where('is_free', $request->free_subscription);
+                // }
+                // if(!empty($request->free_cancellation))
+                // {
+                //     $contests->where('use_cancellation_policy','!=', $request->free_cancellation);
+                // }
+
+                ($request->free_subscription) ? 
+                    $contests->where('is_free', 1) : $contests->where('is_free' , 0);
+
+                ($request->free_cancellation) ? 
+                    $contests->where('use_cancellation_policy', 0) : $contests->where('use_cancellation_policy' , 1);
 
                 if(!empty($request->available_for))
                 {
@@ -630,7 +636,7 @@ class ContestController extends Controller
                 }
                 if(!empty($request->city))
                 {
-                    $contests->where('city', $request->city);
+                    $contests->where('city','LIKE', '%'.$request->city.'%');
                 }
                 if(!empty($request->status))
                 {

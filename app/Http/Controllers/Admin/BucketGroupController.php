@@ -108,7 +108,7 @@ class BucketGroupController extends Controller
     {
         try
         {
-            $bucketGroup = BucketGroup::with('bucketGroupAttributes')->first();
+            $bucketGroup = BucketGroup::with('bucketGroupAttributes')->find($id);
             return response(prepareResult(false, $bucketGroup, getLangByLabelGroups('messages','message_success_title')), config('http_response.success'));
         }
         catch (\Throwable $exception) 

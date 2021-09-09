@@ -279,6 +279,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 	Route::apiResource('/reward-point-setting', 'App\Http\Controllers\API\Admin\RewardPointSettingController');
 	Route::apiResource('/language', 'App\Http\Controllers\API\Admin\LanguageController');
+	Route::post('/languages-import', [App\Http\Controllers\API\Admin\LanguageController::class, 'languagesImport']);
 	Route::apiResource('/user-type', 'App\Http\Controllers\API\Admin\UserTypeController');
 	Route::apiResource('/module-type', 'App\Http\Controllers\API\Admin\ModuleTypeController');
 	Route::apiResource('/category-master', 'App\Http\Controllers\API\Admin\CategoryMasterController');
@@ -375,6 +376,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/orders-export', [App\Http\Controllers\API\Admin\ExportController::class, 'ordersExport']);
 	Route::post('/languages-export', [App\Http\Controllers\API\Admin\ExportController::class, 'languagesExport']);
 	Route::post('/categories-export', [App\Http\Controllers\API\Admin\ExportController::class, 'categoriesExport']);
+	Route::post('/labels-export', [App\Http\Controllers\API\Admin\ExportController::class, 'labelsExport']);
 
 
 	Route::apiResource('/brand', 'App\Http\Controllers\API\Admin\BrandController');

@@ -826,9 +826,8 @@ class ProductsServicesBookController extends Controller
                 if(!empty($request->city))
                 {
                     $products->join('address_details', function ($join) {
-                        $join->on('products_services_books.address_detail_id', '=', 'address_details.id')
-                        ->whereIn('city', $request->city);
-                    });
+                        $join->on('products_services_books.address_detail_id', '=', 'address_details.id');
+                    })->whereIn('address_details.city', $request->city);
                 }
                 if(!empty($request->author))
                 {
@@ -1158,7 +1157,7 @@ class ProductsServicesBookController extends Controller
                 }
                 if(!empty($request->city))
                 {
-                    $products->join('address_details', function ($join) {
+                    $products->join('address_details', function ($join)  use ($request){
                         $join->on('products_services_books.address_detail_id', '=', 'address_details.id')
                         ->whereIn('city', $request->city);
                     });
@@ -1657,7 +1656,7 @@ class ProductsServicesBookController extends Controller
                 }
                 if(!empty($request->city))
                 {
-                    $products->join('address_details', function ($join) {
+                    $products->join('address_details', function ($join)  use ($request){
                         $join->on('products_services_books.address_detail_id', '=', 'address_details.id')
                         ->whereIn('city', $request->city);
                     });

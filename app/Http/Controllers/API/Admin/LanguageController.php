@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
 use DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\LanguagesImport;
+use Auth;
 
 class LanguageController extends Controller
 {
@@ -130,5 +133,12 @@ class LanguageController extends Controller
     {
         $language->delete();
         return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_language_deleted')), config('http_response.success'));
+    }
+
+    public function languagesImport(Request $request)
+    {
+        $import = Excel::import(new LanguagesImport(),request()->file('file'));
+
+        return response(prepareResult(false, [], getLangByLabelGroups('messages','messages_languages_imported')), config('http_response.success'));
     }
 }

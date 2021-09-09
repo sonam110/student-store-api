@@ -176,7 +176,7 @@ class UserProfileController extends Controller
 			$userDetail->no_of_years_of_study 		= $request->no_of_years_of_study;
 			$userDetail->student_id_card_img_path	= $request->student_id_card_img_path;
 			$userDetail->completion_year			= $request->completion_year;
-			$userDetail->status						= $request->status;
+			$userDetail->status						= $user->status;
 		}
 		elseif($user->userType->title == 'Service Provider')
 		{
@@ -193,7 +193,7 @@ class UserProfileController extends Controller
 			$userDetail->vat_number 				= $request->vat_number;
 			$userDetail->vat_registration_file_path = $request->vat_registration_file_path;
 			$userDetail->year_of_establishment 		= $request->year_of_establishment;
-			$userDetail->status						= $request->status;
+			$userDetail->status						= $user->status;
 		}
 
 		if($userDetail->save())

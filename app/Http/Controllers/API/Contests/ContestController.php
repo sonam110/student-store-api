@@ -570,6 +570,8 @@ class ContestController extends Controller
             	$user_type_id = '2';
             }
 
+            // return $request->all();
+
             $contests = Contest::select('contests.*')
             		->join('users', function ($join) use ($user_type_id) {
             		    $join->on('contests.user_id', 'users.id')
@@ -611,14 +613,26 @@ class ContestController extends Controller
                 {
                     $contests->where('start_date', '<=', $request->end_date);
                 }
-                if(!empty($request->free_subscription))
-                {
-                    $contests->where('is_free', $request->free_subscription);
-                }
-                if(!empty($request->free_cancellation))
-                {
-                    $contests->where('use_cancellation_policy', $request->free_cancellation);
-                }
+                // if(!empty($request->free_subscription))
+                // {
+                //     $contests->where('is_free', $request->free_subscription);
+                // }
+                ($request->free_subscription) ? 
+                    $contests->where('is_free', 1) : $contests->where('is_free' , 0);
+
+                ($request->free_cancellation) ? 
+                    $contests->where('use_cancellation_policy', 0) : $contests->where('use_cancellation_policy' , 1);
+                
+
+                // if($request->free_cancellation)
+                // {
+                //     // return "dffg";
+                //     $contests->where('use_cancellation_policy', 0);
+                // }
+                // if(!$request->free_cancellation)
+                // {
+                //     $contests->where('use_cancellation_policy' , 1);
+                // }
 
                 if(!empty($request->available_for))
                 {
@@ -635,10 +649,14 @@ class ContestController extends Controller
                 {
                     $contests->where('distance', $request->distance);
                 }*/
-                /*if(!empty($request->city))
+                if(!empty($request->city))
                 {
-                    $contests->where('city', $request->city);
-                }*/
+                    $contests->where('city','LIKE', '%'.$request->city.'%');
+                }
+                if(!empty($request->user_id))
+                {
+                    $contests->where('user_id', $request->user_id);
+                }
                 // $contests->where('application_start_date','<=', date('Y-m-d'))
                 //     ->where('application_end_date','>=', date('Y-m-d'));
             }
