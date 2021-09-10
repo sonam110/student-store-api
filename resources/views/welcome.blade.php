@@ -167,9 +167,9 @@
 <!-- partial:index.partial.html -->
 <section class="home">
   <div class="slider">
-    <div class="slide active" style="background-image: url('{{asset('ss1.jpg')}}')">
+    <div class="slide active" style="background-image: url('{{asset('ss1.png')}}')">
     </div>
-    <div class="slide" style="background-image: url('{{asset('ss2.jpg')}}')">
+    <div class="slide" style="background-image: url('{{asset('ss2.png')}}')">
     </div>
   </div>
 
