@@ -49,7 +49,11 @@ class UserController extends Controller
 	}
 
 	public function show(User $user)
-	{		
+	{
+		// if(!$user)
+		// {
+		// 	return response()->json(prepareResult(true, ['user doesnt exist.'], getLangByLabelGroups('messages','message_user_doesnt_exist')), config('http_response.internal_server_error'));
+		// }		
 		return response()->json(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
 	}
 

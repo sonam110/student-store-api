@@ -290,7 +290,7 @@ class UserController extends Controller
 	            	$studentDetail->status = $request->status;
 	            	$studentDetail->save();
 	            }
-	            elseif($user->user_type_id == 2)
+	            elseif($user->user_type_id == 3)
 	            {
 	            	$servceProviderDetail = ServiceProviderDetail::where('user_id',$user->id)->first();
 	            	$servceProviderDetail->status = $request->status;
