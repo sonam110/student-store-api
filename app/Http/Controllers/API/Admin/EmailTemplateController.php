@@ -61,9 +61,6 @@ class EmailTemplateController extends Controller
             $emailTemplate = new EmailTemplate;
             $emailTemplate->language_id         = $request->language_id;
             $emailTemplate->template_for        = $request->template_for;
-            $emailTemplate->to    				= $request->to;
-			$emailTemplate->cc    				= $request->cc;
-			$emailTemplate->bcc    				= $request->bcc;
 			$emailTemplate->from    			= $request->from;
 			$emailTemplate->subject    			= $request->subject;
 			$emailTemplate->body    			= $request->body;
@@ -113,10 +110,7 @@ class EmailTemplateController extends Controller
         try
         {
             $emailTemplate->language_id         = $request->language_id;
-            $emailTemplate->template_for                  = $request->template_for;
-			$emailTemplate->to    				= $request->to;
-			$emailTemplate->cc    				= $request->cc;
-			$emailTemplate->bcc    				= $request->bcc;
+            $emailTemplate->template_for        = $request->template_for;
 			$emailTemplate->from    			= $request->from;
 			$emailTemplate->subject    			= $request->subject;
 			$emailTemplate->body    			= $request->body;

@@ -11,5 +11,5 @@ class EmailTemplate extends Model
     use HasFactory, Uuid;
 
 
-    protected $fillable = ['language_id','to','cc','bcc','template_for','from','subject','body','attachment_path','status'];
+    protected $fillable = ['language_id','template_for','from','subject','body','attachment_path','status'];
 }

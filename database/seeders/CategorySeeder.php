@@ -170,7 +170,8 @@ class CategorySeeder extends Seeder
                             if($childCat)
                             {
                                 $childCatDetail = new CategoryDetail;
-                                $childCatDetail->category_master_id = $cat->id;
+                                // $childCatDetail->category_master_id = $cat->id;
+                                $childCatDetail->category_master_id = $childCat->id;
                                 $childCatDetail->language_id = 1;
                                 $childCatDetail->title = $subCat;
                                 $childCatDetail->slug = $newUuid.'-'.Str::slug($subCat);

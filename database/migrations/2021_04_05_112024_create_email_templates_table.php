@@ -19,9 +19,9 @@ class CreateEmailTemplatesTable extends Migration
 
             $table->foreignId('language_id')->constrained()->onDelete('cascade');
             $table->string('template_for')->nullable();
-            $table->string('to')->nullable();
-            $table->string('cc')->nullable();
-            $table->string('bcc')->nullable();
+            // $table->string('to')->nullable();
+            // $table->string('cc')->nullable();
+            // $table->string('bcc')->nullable();
             $table->string('from')->nullable();
             $table->string('subject')->nullable();
             $table->text('body')->nullable();
