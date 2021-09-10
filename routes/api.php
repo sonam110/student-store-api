@@ -273,6 +273,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::apiResource('/bucket-group', 'App\Http\Controllers\Admin\BucketGroupController')->only('index','store','show','update','destroy');
 	Route::get('attribute-list-by-bucket-group/{bucketGroupId}/{language_id}', [App\Http\Controllers\Admin\BucketGroupController::class, 'attributeListByBucketGroup']);
 	Route::post('bucket-attribute-create', [App\Http\Controllers\Admin\BucketGroupController::class, 'bucketAttributeCreate']);
+	Route::post('bucket-attribute-update', [App\Http\Controllers\Admin\BucketGroupController::class, 'bucketAttributeUpdate']);
 	Route::delete('bucket-attribute-delete/{id}', [App\Http\Controllers\Admin\BucketGroupController::class, 'bucketAttributeDestroy']);
 	Route::post('create-bucket-group-attribute-category-relation', [App\Http\Controllers\Admin\BucketGroupController::class, 'createBucketGroupAttributeCategoryRelation']);
 	Route::post('update-bucket-group-attribute-category-relation', [App\Http\Controllers\Admin\BucketGroupController::class, 'updateBucketGroupAttributeCategoryRelation']);

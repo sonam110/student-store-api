@@ -227,6 +227,50 @@ class BucketGroupController extends Controller
         }
     }
 
+    public function bucketAttributeUpdate(Request $request)
+    {
+        $validation = Validator::make($request->all(), [
+            'bucket_group_id'   => 'required|exists:bucket_groups,id',
+            'language_id'       => 'required'
+        ]);
+
+        if ($validation->fails()) {
+            return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
+
+        DB::beginTransaction();
+        try
+        {
+            BucketGroupAttribute::where('bucket_group_id',$request->bucket_group_id)->delete();
+            foreach ($request->attributes_list as $key => $attribute) 
+            {
+                if(!empty($attribute))
+                {
+                    
+                        $attr = new BucketGroupAttribute;
+                        $attr->bucket_group_id = $request->bucket_group_id;
+                        $attr->name = $attribute;
+                        $attr->save();
+
+                        $attrDetail = new BucketGroupAttributeDetail;
+                        $attrDetail->bucket_group_attribute_id = $attr->id;
+                        $attrDetail->language_id = $request->language_id;
+                        $attrDetail->name = $attribute;
+                        $attrDetail->save();
+                    
+                } 
+            }
+            DB::commit();
+            
+            return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','messages_bucket_attributes_updated')), config('http_response.created'));
+        }
+        catch (\Throwable $exception)
+        {
+            DB::rollback();
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
     public function bucketAttributeDestroy($id)
     {
         BucketGroupAttribute::find($id)->delete();
