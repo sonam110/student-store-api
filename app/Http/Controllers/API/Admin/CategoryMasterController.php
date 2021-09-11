@@ -23,11 +23,11 @@ class CategoryMasterController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $categoryMasters = CategoryMaster::with('categoryDetails','subCategories.categoryDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $categoryMasters = CategoryMaster::with('categoryDetails','subcategories.categoryDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $categoryMasters = CategoryMaster::with('categoryDetails','subCategories.categoryDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->get();
+                $categoryMasters = CategoryMaster::with('categoryDetails','subcategories.categoryDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->get();
             }
             return response(prepareResult(false, $categoryMasters, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
         }
@@ -209,7 +209,7 @@ class CategoryMasterController extends Controller
      */
     public function show(CategoryMaster $categoryMaster)
     {
-        $categoryMaster = CategoryMaster::with('categoryDetails','subCategories.categoryDetails')->find($categoryMaster->id);
+        $categoryMaster = CategoryMaster::with('categoryDetails','subcategories.categoryDetails')->find($categoryMaster->id);
         return response()->json(prepareResult(false, $categoryMaster, getLangByLabelGroups('messages','message_category_master_list')), config('http_response.success'));
     }
 

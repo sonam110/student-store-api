@@ -54,7 +54,7 @@ class CategoryController extends Controller
         try
         {
             // $subcategory = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id')
-            // 	->with(['categoryDetails' => function($q) use ($language_id) {
+            // 	->with(['subCategories.categoryDetails' => function($q) use ($language_id) {
             //             $q->select('id','category_master_id','title','description','slug')
             //             ->where('language_id', $language_id)
             //             ->where('is_parent', 0);
