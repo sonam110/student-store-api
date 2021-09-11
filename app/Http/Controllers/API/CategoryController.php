@@ -18,29 +18,29 @@ class CategoryController extends Controller
     {
         try
         {
-            // $categories = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id')
-            // 	->with(['categoryParent' => function($q) use ($language_id) {
-            //             $q->select('id','category_master_id','title','description')
-            //             ->where('language_id', $language_id)
-            //             ->where('is_parent', 1);
-            //         }])
-            // 	->where('status', '1')
-            //     ->orderBy('created_at','DESC')
-            // 	->where('category_master_id', null)
-            // 	->where('module_type_id', $moduleId)
-            // 	->get();
-
-            $categories = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id','slug')
-                ->with(['categoryDetails' => function($q) use ($language_id) {
-                        $q->select('id','category_master_id','title','description','slug')
+            $categories = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id')
+            	->with(['categoryParent' => function($q) use ($language_id) {
+                        $q->select('id','category_master_id','title','description')
                         ->where('language_id', $language_id)
                         ->where('is_parent', 1);
                     }])
-                ->where('status', '1')
+            	->where('status', '1')
                 ->orderBy('created_at','DESC')
-                ->where('category_master_id', null)
-                ->where('module_type_id', $moduleId)
-                ->get();
+            	->where('category_master_id', null)
+            	->where('module_type_id', $moduleId)
+            	->get();
+
+            // $categories = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id','slug')
+            //     ->with(['categoryDetails' => function($q) use ($language_id) {
+            //             $q->select('id','category_master_id','title','description','slug')
+            //             ->where('language_id', $language_id)
+            //             ->where('is_parent', 1);
+            //         }])
+            //     ->where('status', '1')
+            //     ->orderBy('created_at','DESC')
+            //     ->where('category_master_id', null)
+            //     ->where('module_type_id', $moduleId)
+            //     ->get();
             return response(prepareResult(false, $categories, getLangByLabelGroups('messages','message_success_title')), config('http_response.success'));
         }
         catch (\Throwable $exception) 
