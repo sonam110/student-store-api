@@ -38,9 +38,20 @@ class CategoryMaster extends Model
     //     return $this->hasMany(CategoryMaster::class, 'category_master_id', 'id');
     // }
 
+
+    //----old function--------------///
+
+    // public function categoryDetails()
+    // {
+    //     return $this->hasMany(CategoryDetail::class, 'category_master_id', 'id');
+    // }
+
+
+    //----new function--------------///
+
     public function categoryDetails()
     {
-        return $this->hasMany(CategoryDetail::class, 'category_master_id', 'id');
+        return $this->hasMany(CategoryDetail::class, 'slug', 'slug');
     }
 
     // public function categoryDetail()

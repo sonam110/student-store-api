@@ -309,14 +309,26 @@ class AuthController extends Controller
 
 			if($request->user_type_id == '4')
 			{
+				//------------------------Mail start-------------------------//
+
+
 				$emailTemplate = EmailTemplate::where('template_for','registration')->first();
+
+				$body = $emailTemplate->body;
+
+				$arrayVal = [
+					'{{user_name}}' => $user->first_name.' '.$user->last_name,
+				];
+				$body = $this->strReplaceAssoc($arrayVal, $body);
+				
 				$details = [
 					'title' => $emailTemplate->subject,
-					'body' => $emailTemplate->body
-				    // 'url' => url('/password/reset/'.$token.'?email='.$myEmail)
+					'body' => $body
 				];
 				
 				Mail::to($user->email)->send(new RegistrationMail($details));
+
+				//------------------------Mail End-------------------------//
 			}
 
 			
@@ -383,13 +395,25 @@ class AuthController extends Controller
 		
 		if($userDetail->save())
 		{
+			//------------------------Mail start-------------------------//
+
 			$emailTemplate = EmailTemplate::where('template_for','registration')->first();
+
+			$body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => $user->first_name.' '.$user->last_name,
+			];
+			$body = $this->strReplaceAssoc($arrayVal, $body);
+			
 			$details = [
 				'title' => $emailTemplate->subject,
-				'body' => $emailTemplate->body
+				'body' => $body
 			];
 			
 			Mail::to($user->email)->send(new RegistrationMail($details));
+
+			//------------------------Mail End-------------------------//
 
 			$user['userDetail'] = $userDetail;
 			if($spDetail = ServiceProviderDetail::where('user_id',$request->user_id)->first())
@@ -533,7 +557,29 @@ class AuthController extends Controller
 					return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_not_exists')), config('http_response.internal_server_error'));
 				}
 
+				
+
+
+				//------------------------Mail start-------------------------//
+
+				$emailTemplate = EmailTemplate::where('template_for','forgot_password')->first();
+
+				$body = $emailTemplate->body;
+
+				$arrayVal = [
+					'{{user_name}}' => $user->first_name.' '.$user->last_name,
+					'{{otp}}'		=> $otp,
+				];
+				$body = $this->strReplaceAssoc($arrayVal, $body);
+				
+				$details = [
+					'title' => $emailTemplate->subject,
+					'body' => $body
+				];
+				
 				$mail = Mail::to($email)->send(new ForgotPasswordMail($otp));
+
+				//------------------------Mail End-------------------------//
 
 				return response()->json(prepareResult(false, ['otp'=>$otp,'user_id'=>$user->id], getLangByLabelGroups('messages','message_otp_sent')), config('http_response.success'));
 			}
