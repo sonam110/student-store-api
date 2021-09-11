@@ -14,6 +14,10 @@ use Str;
 use DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\CategoriesImport;
+use App\Models\ProductsServicesBook;
+use App\Models\Contest;
+use App\Models\Job;
+
 
 class CategoryMasterController extends Controller
 {
@@ -23,11 +27,11 @@ class CategoryMasterController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $categoryMasters = CategoryMaster::with('categoryDetails','subcategories.categoryDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $categoryMasters = CategoryMaster::with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $categoryMasters = CategoryMaster::with('categoryDetails','subcategories.categoryDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->get();
+                $categoryMasters = CategoryMaster::with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->get();
             }
             return response(prepareResult(false, $categoryMasters, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
         }
@@ -128,7 +132,7 @@ class CategoryMasterController extends Controller
                     if($subCategoryMaster)
                     {
                         $categoryDetail = new CategoryDetail;
-                        $categoryDetail->category_master_id = $subCategoryMaster->id;
+                        $categoryDetail->category_master_id = $subCategoryMaster->category_master_id;
                         $categoryDetail->language_id        = $language->id;
                         $categoryDetail->is_parent          = 0;
                         $categoryDetail->title              = $subvalue;
@@ -209,7 +213,7 @@ class CategoryMasterController extends Controller
      */
     public function show(CategoryMaster $categoryMaster)
     {
-        $categoryMaster = CategoryMaster::with('categoryDetails','subcategories.categoryDetails')->find($categoryMaster->id);
+        $categoryMaster = CategoryMaster::with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->find($categoryMaster->id);
         return response()->json(prepareResult(false, $categoryMaster, getLangByLabelGroups('messages','message_category_master_list')), config('http_response.success'));
     }
 
@@ -283,7 +287,8 @@ class CategoryMasterController extends Controller
                     {
                         if(!empty($subvalue['subcategory_id']))
                         {
-                            CategoryDetail::where('category_master_id',$subvalue['subcategory_id'])->delete();
+                            $subcat_slug = CategoryMaster::find($subvalue['subcategory_id'])->slug;
+                            CategoryDetail::where('slug',$subcat_slug)->delete();
 
                             $subCategoryMaster = CategoryMaster::find($subvalue['subcategory_id']);
                             $subCategoryMaster->title              = $subvalue['subcategory_title'];
@@ -312,7 +317,7 @@ class CategoryMasterController extends Controller
                     if($subCategoryMaster)
                     {
                         $categoryDetail = new CategoryDetail;
-                        $categoryDetail->category_master_id = $subCategoryMaster->id;
+                        $categoryDetail->category_master_id = $subCategoryMaster->category_master_id;
                         $categoryDetail->language_id        = $language->id;
                         $categoryDetail->is_parent          = 0;
                         $categoryDetail->title              = $subvalue['subcategory_title'];
@@ -324,6 +329,42 @@ class CategoryMasterController extends Controller
             }
             DB::commit();
             return response()->json(prepareResult(false, new CategoryMasterResource($categoryMaster), getLangByLabelGroups('messages','message_category_master_updated')), config('http_response.created'));
+        }
+        catch (\Throwable $exception)
+        {
+            DB::rollback();
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
+    public function singleSubCategoryUpdate(Request $request)
+    {
+        $validation = Validator::make($request->all(), [
+            'sub_category_id'  => 'required'
+        ]);
+
+        if ($validation->fails()) {
+            return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
+        DB::beginTransaction();
+        try
+        {
+            $subCategoryMaster = CategoryMaster::find($request->sub_category_id);
+            CategoryDetail::where('slug',$subCategoryMaster->slug)->delete();
+            foreach ($request->titles as $key => $title) {
+                $language = Language::where('value',$key)->first();
+
+                $categoryDetail = new CategoryDetail;
+                $categoryDetail->category_master_id = $subCategoryMaster->category_master_id;
+                $categoryDetail->language_id        = $language->id;
+                $categoryDetail->is_parent          = 0;
+                $categoryDetail->title              = $title;
+                $categoryDetail->slug               = $subCategoryMaster->slug;
+                $categoryDetail->status             = 1;
+                $categoryDetail->save();
+            }
+            DB::commit();
+            return response()->json(prepareResult(false, $subCategoryMaster, getLangByLabelGroups('messages','message_category_master_updated')), config('http_response.created'));
         }
         catch (\Throwable $exception)
         {
@@ -379,7 +420,35 @@ class CategoryMasterController extends Controller
      */
     public function destroy(CategoryMaster $categoryMaster)
     {
-        $categoryMaster->delete();
+        if($categoryMaster->category_master_id == null)
+        {
+            if($categoryMaster->subcategories->count() > 0)
+            {
+                return response(prepareResult(true, ['can not be deleted. subcategory exists. delete subcategories.'], getLangByLabelGroups('messages','messages_subcategory_exists')), config('http_response.bad_request'));
+            }
+            elseif(ProductsServicesBook::where('category_master_id',$categoryMaster->id)->count() > 0 || Contest::where('category_master_id',$categoryMaster->id)->count() > 0 || Job::where('category_master_id',$categoryMaster->id)->count() > 0)
+            {
+                return response(prepareResult(true, ['can not be deleted. Category in use.'], getLangByLabelGroups('messages','messages_category_in_use')), config('http_response.bad_request'));
+            }
+            else
+            {
+                CategoryDetail::where('category_master_id',$categoryMaster->id)->delete();
+                $categoryMaster->delete();
+            }
+        }
+        else
+        {
+            if(ProductsServicesBook::where('sub_category_slug',$categoryMaster->slug)->count() > 0 || Contest::where('sub_category_slug',$categoryMaster->slug)->count() > 0 || Job::where('sub_category_slug',$categoryMaster->slug)->count() > 0)
+            {
+                return response(prepareResult(true, ['can not be deleted. Category in use.'], getLangByLabelGroups('messages','messages_category_in_use')), config('http_response.bad_request'));
+            }
+            else
+            {
+                CategoryDetail::where('slug',$categoryMaster->slug)->delete();
+                $categoryMaster->delete();
+            }
+        }
+        
         return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_category_master_deleted')), config('http_response.success'));
     }
 
@@ -392,11 +461,11 @@ class CategoryMasterController extends Controller
     }
 
 
-    public function subCategorydelete($id)
-    {
-        $subCat = CategoryDetail::find($id);
-        CategoryMaster::where('category_master_id',$subCat->category_master_id)->where('title',$subCat->title)->delete();
-        $subCat->delete();
-        return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_category_master_deleted')), config('http_response.success'));
-    }
+    // public function subCategorydelete($id)
+    // {
+    //     $subCat = CategoryDetail::find($id);
+    //     CategoryMaster::where('category_master_id',$subCat->category_master_id)->where('title',$subCat->title)->delete();
+    //     $subCat->delete();
+    //     return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_category_master_deleted')), config('http_response.success'));
+    // }
 }

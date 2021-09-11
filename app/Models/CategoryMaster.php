@@ -33,31 +33,16 @@ class CategoryMaster extends Model
         return $this->belongsTo(CategoryMaster::class, 'category_master_id', 'id');
     }
 
-    // public function childCategories()
-    // {
-    //     return $this->hasMany(CategoryMaster::class, 'category_master_id', 'id');
-    // }
-
-
-    //----old function--------------///
-
-    // public function categoryDetails()
-    // {
-    //     return $this->hasMany(CategoryDetail::class, 'category_master_id', 'id');
-    // }
-
-
-    //----new function--------------///
 
     public function categoryDetails()
     {
-        return $this->hasMany(CategoryDetail::class, 'slug', 'slug');
+        return $this->hasMany(CategoryDetail::class, 'category_master_id', 'id');
     }
 
-    // public function categoryDetail()
-    // {
-    //     return $this->hasOne(CategoryDetail::class, 'category_master_id', 'id');
-    // }
+    public function categoryDetail()
+    {
+        return $this->hasOne(CategoryDetail::class, 'category_master_id', 'id');
+    }
 
     public function categoryParent()
     {
@@ -78,4 +63,14 @@ class CategoryMaster extends Model
     {
         return $this->hasMany(CategoryMaster::class, 'category_master_id','id');
     }
+
+
+
+
+    public function categoryLanguageDetails()
+    {
+        return $this->hasMany(CategoryDetail::class, 'slug', 'slug');
+    }
+
+    
 }

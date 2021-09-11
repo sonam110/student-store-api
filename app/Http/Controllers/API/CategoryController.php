@@ -18,7 +18,7 @@ class CategoryController extends Controller
     {
         try
         {
-            $categories = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id')
+            $categories = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id','slug')
             	->with(['categoryParent' => function($q) use ($language_id) {
                         $q->select('id','category_master_id','title','description')
                         ->where('language_id', $language_id)
@@ -53,29 +53,29 @@ class CategoryController extends Controller
     {
         try
         {
-            // $subcategory = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id')
-            // 	->with(['subCategories.categoryDetails' => function($q) use ($language_id) {
-            //             $q->select('id','category_master_id','title','description','slug')
-            //             ->where('language_id', $language_id)
-            //             ->where('is_parent', 0);
-            //         }])
-            // 	->where('status', '1')
-            //     ->orderBy('created_at','DESC')
-            // 	->where('category_master_id', null)
-            // 	->where('id', $catId)
-            // 	->first();
-
-
             $subcategory = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id','slug')
-                ->with(['categoryDetails' => function($q) use ($language_id) {
+            	->with(['categoryDetails' => function($q) use ($language_id) {
                         $q->select('id','category_master_id','title','description','slug')
                         ->where('language_id', $language_id)
                         ->where('is_parent', 0);
                     }])
-                ->where('status', '1')
+            	->where('status', '1')
                 ->orderBy('created_at','DESC')
-                ->where('category_master_id', $catId)
-                ->get();
+            	->where('category_master_id', null)
+            	->where('id', $catId)
+            	->first();
+
+
+            // $subcategory = CategoryMaster::select('id', 'title', 'category_master_id', 'module_type_id','slug')
+            //     ->with(['categoryDetails' => function($q) use ($language_id) {
+            //             $q->select('id','category_master_id','title','description','slug')
+            //             ->where('language_id', $language_id)
+            //             ->where('is_parent', 0);
+            //         }])
+            //     ->where('status', '1')
+            //     ->orderBy('created_at','DESC')
+            //     ->where('category_master_id', $catId)
+            //     ->get();
             return response(prepareResult(false, $subcategory, getLangByLabelGroups('messages','message_success_title')), config('http_response.success'));
         }
         catch (\Throwable $exception) 

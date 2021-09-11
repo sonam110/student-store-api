@@ -284,6 +284,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::apiResource('/user-type', 'App\Http\Controllers\API\Admin\UserTypeController');
 	Route::apiResource('/module-type', 'App\Http\Controllers\API\Admin\ModuleTypeController');
 	Route::apiResource('/category-master', 'App\Http\Controllers\API\Admin\CategoryMasterController');
+	Route::post('/single-sub-category-update', [App\Http\Controllers\API\Admin\CategoryMasterController::class, 'singleSubCategoryUpdate']);
 	Route::get('/sub-category-delete/{id}', [App\Http\Controllers\API\Admin\CategoryMasterController::class, 'subCategorydelete']);
 	Route::post('/categories-import', [App\Http\Controllers\API\Admin\CategoryMasterController::class, 'categoriesImport']);
 	Route::apiResource('/label-group', 'App\Http\Controllers\API\Admin\LabelGroupController');
