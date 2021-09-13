@@ -384,6 +384,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 	Route::apiResource('/brand', 'App\Http\Controllers\API\Admin\BrandController');
 	Route::post('/brands-import', [App\Http\Controllers\API\Admin\BrandController::class, 'brandsImport']);
+	Route::post('/brand-multiple-status-update', [App\Http\Controllers\API\Admin\BrandController::class,'multipleStatusUpdate']);
 
 
 	Route::apiResource('/abuse', 'App\Http\Controllers\API\Admin\AbuseController')->only('index','show','destroy');
