@@ -280,7 +280,7 @@ class BucketGroupController extends Controller
     public function createBucketGroupAttributeCategoryRelation(Request $request)
     {
         $validation = Validator::make($request->all(), [
-            'category_id'   => 'required|exists:category_masters,id',
+            // 'category_id'   => 'required|exists:category_masters,id',
             'bucket_groups' => 'required|array',
         ]);
 
@@ -291,13 +291,13 @@ class BucketGroupController extends Controller
         try
         {
             foreach ($request->bucket_groups as $key => $grpId) {
-                if(AttributeMaster::where('category_master_id', $request->category_id)->where('bucket_group_id', $grpId)->count()>0)
+                if(AttributeMaster::where('category_master_slug', $request->category_master_slug)->where('bucket_group_id', $grpId)->count()>0)
                 { }
                 else
                 {
                     $attr = new AttributeMaster;
-                    $attr->category_master_id    = $request->category_id;
-                    $attr->bucket_group_id       = $grpId;
+                    $attr->category_master_slug     = $request->category_master_slug;
+                    $attr->bucket_group_id          = $grpId;
                     $attr->save();
                 }
             }
@@ -314,7 +314,7 @@ class BucketGroupController extends Controller
     public function updateBucketGroupAttributeCategoryRelation(Request $request)
     {
         $validation = Validator::make($request->all(), [
-            'category_id'   => 'required|exists:category_masters,id',
+            // 'category_id'   => 'required|exists:category_masters,id',
             'bucket_groups' => 'required|array',
         ]);
 
@@ -324,11 +324,11 @@ class BucketGroupController extends Controller
         DB::beginTransaction();
         try
         {
-            AttributeMaster::where('category_master_id', $request->category_id)->delete();
+            AttributeMaster::where('category_master_slug', $request->category_master_slug)->delete();
             foreach ($request->bucket_groups as $key => $grpId) {
                 $attr = new AttributeMaster;
-                $attr->category_master_id    = $request->category_id;
-                $attr->bucket_group_id       = $grpId;
+                $attr->category_master_slug     = $request->category_master_slug;
+                $attr->bucket_group_id          = $grpId;
                 $attr->save();
             }
             DB::commit();
