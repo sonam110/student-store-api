@@ -13,13 +13,19 @@ class AttributeMaster extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'category_master_id',
+        // 'category_master_id',
+        'category_master_slug',
         'bucket_group_id'
     ];
 
+    // public function categoryMaster()
+    // {
+    //     return $this->belongsTo(CategoryMaster::class, 'category_master_id', 'id');
+    // }
+
     public function categoryMaster()
     {
-        return $this->belongsTo(CategoryMaster::class, 'category_master_id', 'id');
+        return $this->belongsTo(CategoryMaster::class, 'category_master_slug', 'slug');
     }
 
     public function bucketGroup()

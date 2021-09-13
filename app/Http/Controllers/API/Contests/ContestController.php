@@ -579,7 +579,7 @@ class ContestController extends Controller
 
             		})
                     ->orderBy('contests.created_at','DESC')
-                    ->where('contests.user_id', '!=', Auth::id())
+                    // ->where('contests.user_id', '!=', Auth::id())
             		->where('contests.type', $request->type)
                     ->where('contests.is_published', '1')
                     ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path','isApplied','contestWinners');
