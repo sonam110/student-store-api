@@ -137,4 +137,35 @@ class BrandController extends Controller
 
     	return response(prepareResult(false, [], getLangByLabelGroups('messages','messages_products_services_book_imported')), config('http_response.success'));
     }
+
+
+    public function multipleStatusUpdate(Request $request)
+    {
+        $validation = Validator::make($request->all(), [
+                'status'    => 'required',
+                'brand_id'    => 'required'
+            ]);
+
+        if ($validation->fails()) {
+            return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
+
+        DB::beginTransaction();
+        try
+        {
+            $brands = Brand::whereIn('id',$request->brand_id)->get();
+            foreach ($brands as $key => $brand) {
+                $brand->status = $request->status;
+                $brand->save();
+            }
+
+            DB::commit();
+            return response()->json(prepareResult(false, $brands, getLangByLabelGroups('messages','messages_brand_status_updated')), config('http_response.created'));
+        }
+        catch (\Throwable $exception)
+        {
+            DB::rollback();
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_validation')), config('http_response.internal_server_error'));
+        }
+    }
 }

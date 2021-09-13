@@ -23,13 +23,18 @@ class LabelController extends Controller
     {
         try
         {
+            $labels = Label::orderBy('created_at','asc');
+            if(!empty($request->language_id))
+            {
+                $labels = $labels->where('language_id',$request->language_id);
+            }
             if(!empty($request->per_page_record))
             {
-                $labels = Label::simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $labels = $labels->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $labels = Label::get();
+                $labels = $labels->get();
             }
             return response(prepareResult(false, $labels, getLangByLabelGroups('messages','message_label_list')), config('http_response.success'));
         }

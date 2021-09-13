@@ -88,12 +88,12 @@ class CategoryController extends Controller
     {
         try
         {
-            $attributes = AttributeMaster::select('id', 'bucket_group_id', 'category_master_id')
+            $attributes = AttributeMaster::select('id', 'bucket_group_id', 'category_master_slug')
                 ->with(['bucketGroup:id,group_name,type,text_type,is_multiple','bucketGroup.bucketGroupAttributes:id,bucket_group_id,name','bucketGroup.bucketGroupAttributes.attributeDetails' => function($q) use ($language_id) {
                         $q->select('id','bucket_group_attribute_id','name')
                         ->where('language_id', $language_id);
                     }])
-                ->where('category_master_id', $catId)
+                ->where('category_master_slug', $catId)
                 ->orderBy('created_at','DESC')
                 ->get();
             return response(prepareResult(false, $attributes, getLangByLabelGroups('messages','message_success_title')), config('http_response.success'));

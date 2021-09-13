@@ -17,8 +17,11 @@ class CreateAttributeMastersTable extends Migration
             $table->bigInteger('auto_id');
             $table->uuid('id')->primary();
 
-            $table->string('category_master_id', 50);
-            $table->foreign('category_master_id')->references('id')->on('category_masters')->onDelete('cascade');
+            // $table->string('category_master_id', 50);
+            // $table->foreign('category_master_id')->references('id')->on('category_masters')->onDelete('cascade');
+
+            $table->string('category_master_slug', 255);
+
             $table->string('bucket_group_id', 50);
             $table->foreign('bucket_group_id')->references('id')->on('bucket_groups')->onDelete('cascade');
             

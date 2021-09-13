@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
 use DB;
-use DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\RatingAndFeedbacksImport;
 use Auth;
@@ -131,7 +130,7 @@ class RatingAndFeedbackController extends Controller
 
     public function import(Request $request)
     {
-        $data = ['category_master_id' => $request->category_master_id, 'user_id' => $request->user_id];
+        $data = ['products_services_book_id' => $request->products_services_book_id, 'user_id' => $request->user_id];
         $import = Excel::import(new RatingAndFeedbacksImport($data),request()->file('file'));
 
         return response(prepareResult(false, [], getLangByLabelGroups('messages','messages_products_services_book_imported')), config('http_response.success'));
