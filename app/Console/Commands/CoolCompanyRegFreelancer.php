@@ -86,11 +86,10 @@ class CoolCompanyRegFreelancer extends Command
 
             //Update Record
             $resDecode = json_decode($createdFreelancerInfo, true);
-            $studentInfo = StudentDetail::select('id','cool_company_id')->find($student->id);
+            $studentInfo = StudentDetail::select('id','cool_company_id')->where('user_id', $student->id)->first();
             $studentInfo->cool_company_id = $resDecode['id'];
             $studentInfo->save();
             Log::channel('customlog')->info($student->id.' :Student successfully registered. cool company id: '.$studentInfo->cool_company_id);
-            break;
         }
     }
 
