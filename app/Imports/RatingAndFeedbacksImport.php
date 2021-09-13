@@ -13,6 +13,8 @@ use Str;
 use App\Models\Language;
 use App\Models\ProductsServicesBook;
 use App\Models\User;
+use App\Models\StudentDetail;
+use App\Models\ServiceProviderDetail;
 
 
 class RatingAndFeedbacksImport implements ToModel,WithHeadingRow
@@ -37,10 +39,10 @@ class RatingAndFeedbacksImport implements ToModel,WithHeadingRow
         $brand->to_user            	        = $user_id;
         $brand->products_services_book_id 	= $product_id;
         $brand->user_name              	    = $row['user_name'];
-        $brand->product_rating              = $row['product_rating'];
-        $brand->user_rating                 = $row['user_rating'];
-        $brand->product_feedback            = $row['product_feedback'];
-        $brand->user_feedback               = $row['user_feedback'];
+        $brand->product_rating              = $row['product_rating'] ? $row['product_rating'] : "";
+        $brand->user_rating                 = $row['user_rating'] ? $row['user_rating'] : "";
+        $brand->product_feedback            = $row['product_feedback'] ? $row['product_feedback'] : "";
+        $brand->user_feedback               = $row['user_feedback'] ? $row['user_feedback'] : "";
         $brand->is_feedback_approved        = 1;
         $brand->save();
 
