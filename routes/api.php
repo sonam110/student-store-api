@@ -366,6 +366,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/rating-and-feedback-status-update/{id}', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'statusUpdate']);
 	Route::post('/rating-and-feedback-multiple-status-update', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'multipleStatusUpdate']);
 	Route::post('/rating-and-feedback-filter', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'filter']);
+	Route::post('/rating-and-feedback-import/', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'import']);
 
 	Route::get('/countries', [App\Http\Controllers\API\Admin\CountryStateCityController::class, 'countries']);
 	Route::get('/states/{countryID}', [App\Http\Controllers\API\Admin\CountryStateCityController::class, 'states']);

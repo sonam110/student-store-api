@@ -15,7 +15,7 @@ class RatingAndFeedback extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'order_item_id','products_services_book_id','from_user','to_user','product_rating','user_rating','product_feedback','user_feedback','is_feedback_approved'
+        'order_item_id','products_services_book_id','from_user','to_user','product_rating','user_rating','product_feedback','user_feedback','is_feedback_approved','user_name'
     ];
 
 

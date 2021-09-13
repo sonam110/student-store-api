@@ -27,18 +27,18 @@ class LabelsImport implements ToModel,WithHeadingRow
     */
     public function model(array $row)
     {
-        if(Language::where('title',$this->data['language_title'])->count() > 0)
-        {
-            $language = Language::where('title',$this->data['language_title'])->first();
-        }
-        else
-        {
-            $language = new Language;
-            $language->title                = $this->data['language_title'];
-            $language->value                = $this->data['language_value'];
-            $language->status               = 1;
-            $language->save();
-        }
+        // if(Language::where('title',$this->data['language_title'])->count() > 0)
+        // {
+        //     $language = Language::where('title',$this->data['language_title'])->first();
+        // }
+        // else
+        // {
+        //     $language = new Language;
+        //     $language->title                = $this->data['language_title'];
+        //     $language->value                = $this->data['language_value'];
+        //     $language->status               = 1;
+        //     $language->save();
+        // }
 
         if(LabelGroup::where('name',$row['label_group_name'])->count() > 0)
         {
@@ -51,17 +51,17 @@ class LabelsImport implements ToModel,WithHeadingRow
             $labelGroup->status              = 1;
             $labelGroup->save();
         }
-
         
-
-        $label = new Label;
-        $label->label_group_id         = $labelGroup->id;
-        $label->language_id            = $language->id;
-        $label->label_name             = $row['label_name'];
-        $label->label_value            = $row['label_value'];
-        $label->status                 = 1;
-        $label->save();
-        
+        if(!empty($row['label_value_in_entered_language']))
+        {
+            $label = new Label;
+            $label->label_group_id         = $labelGroup->id;
+            $label->language_id            = $this->data['language_id'];
+            $label->label_name             = $row['label_name'];
+            $label->label_value            = $row['label_value_in_entered_language'];
+            $label->status                 = 1;
+            $label->save();
+        }
         return;
     }
 }

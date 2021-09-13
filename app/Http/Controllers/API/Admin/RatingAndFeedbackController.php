@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
 use DB;
+use DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\RatingAndFeedbacksImport;
+use Auth;
 
 class RatingAndFeedbackController extends Controller
 {
@@ -123,5 +127,13 @@ class RatingAndFeedbackController extends Controller
         {
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
+    }
+
+    public function import(Request $request)
+    {
+        $data = ['category_master_id' => $request->category_master_id, 'user_id' => $request->user_id];
+        $import = Excel::import(new RatingAndFeedbacksImport($data),request()->file('file'));
+
+        return response(prepareResult(false, [], getLangByLabelGroups('messages','messages_products_services_book_imported')), config('http_response.success'));
     }
 }

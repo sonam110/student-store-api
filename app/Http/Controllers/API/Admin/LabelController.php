@@ -139,7 +139,8 @@ class LabelController extends Controller
 
     public function labelsImport(Request $request)
     {
-        $data = ['language_title' => $request->language_title, 'language_value' => $request->language_value];
+        $data = ['language_id' => $request->language_id];
+        Label::where('language_id',$request->language_id)->delete();
         $import = Excel::import(new LabelsImport($data),request()->file('file'));
 
         return response(prepareResult(false, [], getLangByLabelGroups('messages','messages_products_services_book_imported')), config('http_response.success'));

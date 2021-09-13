@@ -55,7 +55,7 @@ class LandingPageController extends Controller
         $contests = Contest::where('is_published', '1')
                             ->where('application_start_date','<=', date('Y-m-d'))
                             ->where('application_end_date','>=', date('Y-m-d'))
-                            ->where('user_id','!=', Auth::id())
+                            // ->where('user_id','!=', Auth::id())
                             ->limit(2)
                             ->inRandomOrder()
                             ->get(['id','title','subscription_fees','start_date','cover_image_path']);
