@@ -20,7 +20,8 @@ class StudentDetail extends Model
         'no_of_years_of_study',
         'student_id_card_img_path',
         'avg_rating',
-        'status'
+        'status',
+        'cool_company_id'
     ];
 
     public function user()

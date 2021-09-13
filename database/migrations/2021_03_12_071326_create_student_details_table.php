@@ -29,6 +29,7 @@ class CreateStudentDetailsTable extends Migration
             $table->bigInteger('completion_year')->nullable();
             $table->float('avg_rating')->nullable();
             $table->boolean('status')->default(false)->nullable();
+            $table->string('cool_company_id', 50)->nullable();
             $table->timestamps();
         });
     }

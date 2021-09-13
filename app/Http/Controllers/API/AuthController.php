@@ -450,6 +450,10 @@ class AuthController extends Controller
 
 			if(Hash::check($request->password,$user->password) || Hash::check($request->password,$user->guardian_password)) 
 			{
+				if($user->status==2)
+				{
+					return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','account_is_blocked')), config('http_response.unauthorized'));
+				}
 
 				$user['login_with_guardian_data'] = false;
 

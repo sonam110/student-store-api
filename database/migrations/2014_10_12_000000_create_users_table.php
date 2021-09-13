@@ -59,6 +59,11 @@ class CreateUsersTable extends Migration
             $table->string('social_security_number')->nullable();
             $table->bigInteger('status')->default('0')->nullable()->comment('0 for not active , 1 for active, 2 for blocked');
             $table->dateTime('last_login');
+
+            $table->enum('bank_account_type',['1','2','3'])->default('1')->nullable()->comment('1:Local, 2:International, 3:Paypal');
+            $table->string('bank_name')->nullable();
+            $table->string('bank_account_num')->nullable();
+            $table->string('bank_identifier_code')->nullable();
             $table->timestamps();
         });
     }
