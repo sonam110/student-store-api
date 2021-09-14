@@ -46,7 +46,7 @@ class LandingPageController extends Controller
         }
         $productSps = ServiceProviderDetail::whereIn('user_id',$pspids)->with('user:id')->get(['id','user_id','company_name','company_logo_path']);
 
-        $jobsSpIds = Job::where('user_id','!=', Auth::id())->distinct()->inRandomOrder()->limit(6)->get(['user_id']);
+        $jobsSpIds = Job::where('user_id','!=', Auth::id())->where('job_status', '1')->distinct()->inRandomOrder()->limit(6)->get(['user_id']);
         foreach ($jobsSpIds as $key => $value) {
             $jspids[] = $value->user_id;
         }
@@ -1306,6 +1306,7 @@ class LandingPageController extends Controller
     public function getJobs(Request $request)
     {
         $jobs = Job::where('is_published', '1')
+                        ->where('job_status', '1')
                         ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title','addressDetail','isApplied','isFavourite','categoryMaster','subCategory')
                         ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'))
@@ -1359,6 +1360,7 @@ class LandingPageController extends Controller
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria job
             $jobs = Job::select('sp_jobs.id','sp_jobs.user_id', 'sp_jobs.address_detail_id', 'sp_jobs.title', 'sp_jobs.slug', 'sp_jobs.short_summary', 'sp_jobs.job_type', 'sp_jobs.job_nature', 'sp_jobs.years_of_experience', 'sp_jobs.job_environment', 'sp_jobs.category_master_id','sp_jobs.sub_category_slug')
                     ->where('sp_jobs.is_published', '1')
+                    ->where('sp_jobs.job_status', '1')
                     ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title','isApplied','isFavourite','addressDetail','categoryMaster','subCategory');
             if($searchType=='filter')
             {

@@ -28,7 +28,7 @@ class JobController extends Controller
     {
         try
         {
-            $jobs = Job::where('is_published', '1')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
+            $jobs = Job::where('is_published', '1')->where('job_status', '1')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
 
             if($request->category_master_id)
             {
@@ -331,6 +331,7 @@ class JobController extends Controller
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria job
             $jobs = Job::select('sp_jobs.*')
                     ->where('is_published', '1')
+                    ->where('job_status', '1')
                     ->orderBy('created_at','DESC')
                     ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
             if($searchType=='filter')
