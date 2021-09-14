@@ -16,11 +16,13 @@ class CreateSharedRewardPointsTable extends Migration
         Schema::create('shared_reward_points', function (Blueprint $table) {
             $table->bigInteger('auto_id');
             $table->uuid('id')->primary();
-            $table->string('sender_id', 50)->nullable();
+
+            $table->string('sender_id', 50);
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('receiver_id', 50)->nullable();
+            $table->string('receiver_id', 50);
             $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
-            $table->bigInteger('reward_points', 10);
+
+            $table->bigInteger('reward_points');
             $table->timestamps();
         });
     }
