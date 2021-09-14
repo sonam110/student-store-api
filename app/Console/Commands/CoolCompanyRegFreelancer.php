@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\StudentDetail;
 use App\Models\OrderItem;
 use App\Models\AppSetting;
+use App\Models\CoolCompanyFreelancer;
 use Log;
 use \mervick\aesEverywhere\AES256;
 
@@ -87,10 +88,24 @@ class CoolCompanyRegFreelancer extends Command
             if(!empty($createdFreelancerInfo)) {
                 //Update Record
                 $resDecode = json_decode($createdFreelancerInfo, true);
-                $studentInfo = StudentDetail::select('id','cool_company_id')->where('user_id', $student->id)->first();
-                $studentInfo->cool_company_id = $resDecode['id'];
-                $studentInfo->save();
-                Log::channel('customlog')->info($student->id.' :Student successfully registered. cool company id: '.$studentInfo->cool_company_id);
+
+                //Create freelancer
+                $createdFreelancer = new CoolCompanyFreelancer;
+                $createdFreelancer->user_id = $student->id;
+                $createdFreelancer->cool_company_id = $resDecode['id'];
+                $createdFreelancer->paymentAccountTypeId = $paymentAccountTypeId;
+                $createdFreelancer->bankName = $student->bank_name;
+                $createdFreelancer->bankAccountNo = $student->bank_account_num;
+                $createdFreelancer->bankIdentifierCode = $student->bank_identifier_code;
+                $createdFreelancer->response = $createdFreelancerInfo;
+                $createdFreelancer->save();
+                if($createdFreelancer)
+                {
+                    $studentInfo = StudentDetail::select('id','cool_company_id')->where('user_id', $student->id)->first();
+                    $studentInfo->cool_company_id = $resDecode['id'];
+                    $studentInfo->save();
+                    Log::channel('customlog')->info($student->id.' :Student successfully registered. cool company id: '.$studentInfo->cool_company_id);
+                }
             } else {
                 //Lock Error
                 Log::channel('customlog')->info($student->id.' :Student registration failed. Please Check');

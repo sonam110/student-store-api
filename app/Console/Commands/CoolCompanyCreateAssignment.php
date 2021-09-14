@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use App\Models\StudentDetail;
 use App\Models\OrderItem;
 use App\Models\AppSetting;
+use App\Models\CoolCompanyAssignment;
+use App\Models\CoolCompanyFreelancer;
 use Log;
 use \mervick\aesEverywhere\AES256;
 
@@ -44,40 +46,44 @@ class CoolCompanyCreateAssignment extends Command
     {
         $access_token = null;
         $tokenExpired = time();
-        die;
+
         $today          = new \DateTime();
         $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
 
         $vatRateId = AppSetting::select('coolCompanyVatRateId')->first()->coolCompanyVatRateId;
 
-        $getUserIds = OrderItem::select('order_items.user_id')
+        $getUserIds = OrderItem::select('products_services_books.user_id')
             ->where('order_items.is_returned', '0')
             ->where('order_items.is_replaced', '0')
             ->where('order_items.is_disputed', '0')
             ->where('order_items.product_type', 'service')
-            ->where('order_items.is_sent_to_cool_company', '0')
-            ->where('order_items.delivery_completed_date', '<=', $before15Days)
+            ->where('order_items.is_sent_to_cool_company', '!=', '1')
+            ->whereDate('order_items.delivery_completed_date', $before15Days)
             ->where('order_items.item_status', 'completed')
-            ->orderBy('order_items.user_id', 'ASC')
-            ->groupBy('order_items.user_id')
+            ->orderBy('order_items.products_services_book_id', 'ASC')
+            ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
+            ->groupBy('products_services_books.user_id')
             ->get();
         foreach($getUserIds as $user)
         {
             $reportArray = [];
-            $createBatchUserWise = OrderItem::select('order_items.user_id','order_items.order_id','order_items.products_services_book_id','order_items.price','order_items.quantity')
+            $orderItemId = [];
+            $createBatchUserWise = OrderItem::select('products_services_books.user_id','order_items.id','order_items.order_id','order_items.products_services_book_id','order_items.price','order_items.quantity','student_details.cool_company_id')
             ->where('order_items.is_returned', '0')
             ->where('order_items.is_replaced', '0')
             ->where('order_items.is_disputed', '0')
             ->where('order_items.product_type', 'service')
-            ->where('order_items.is_sent_to_cool_company', '0')
-            ->where('order_items.delivery_completed_date','<=', $before15Days)
+            ->where('order_items.is_sent_to_cool_company', '!=', '1')
+            ->whereDate('order_items.delivery_completed_date', $before15Days)
             ->where('order_items.item_status', 'completed')
-            ->join('student_details', 'student_details.user_id','=','order_items.user_id')
+            ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
+            ->where('products_services_books.user_id', $user->user_id)
+            ->join('student_details', 'student_details.user_id','=','products_services_books.user_id')
             ->where('student_details.cool_company_id', '!=', null)
-            ->where('order_items.user_id', $user->id)
             ->get();
-
             foreach ($createBatchUserWise as $key => $batchInfo) {
+                $teamMemberId = $batchInfo->cool_company_id;
+                $orderItemId[] = $batchInfo->id;
                 $reportArray[] = [
                     'dateFrom'    => $before15Days.'T00:00:01Z',
                     'dateTo'      => $before15Days.'T23:59:59Z',
@@ -89,8 +95,8 @@ class CoolCompanyCreateAssignment extends Command
 
                 ];
             }
-
-            dd($reportArray);
+            //Log::channel('customlog')->info($reportArray);
+            
             if(empty($access_token) || time() > $tokenExpired)
             {
                 $getToken = $this->getAccessToken();
@@ -99,35 +105,47 @@ class CoolCompanyCreateAssignment extends Command
             }
 
             $data = [
-                'name'          => 'Assignment Name',
+                'name'          => $user->user_id.' :Assignment, Date:'.date('Y-m-d'),
                 'workTypeId'    => 2,
                 'teamMembers'   => [
                   [
-                  'teamMemberId'  =>  'd711d7bd-7f10-4116-a565-d92478952a18',
+                  'teamMemberId'  =>  $teamMemberId,
                     'unitCurrencyId'  => 'SEK',
-                    'vatRateId'       => 7,
-                    'reports'         => [
-                      [
-                        'dateFrom'    => '2021-09-01T00:00:00Z',
-                        'dateTo'      => '2021-09-04T00:00:00Z',
-                        'paymentType' => 0,
-                        'unitQuantity'=> 32,
-                        'unitRate'    => 600,
-                        'totalHours'  => 32
-                      ]
-                    ]
+                    'vatRateId'       => $vatRateId,
+                    'reports'         => $reportArray
                   ]
                 ]
               ];
+            $createdAssignmentInfo = $this->createAssignments($access_token, $data);
 
-            $createdFreelancerInfo = $this->createAssignments($access_token, $data);
+            //Create Assignment Record
+            $resDecode = json_decode($createdAssignmentInfo, true);
+            if(!empty($createdAssignmentInfo)) {
+                $cool_company_freelancer_id = CoolCompanyFreelancer::select('id')->where('cool_company_id', $teamMemberId)->first()->id;
+                $createAssignment = new CoolCompanyAssignment;
+                $createAssignment->user_id = $user->user_id;
+                $createAssignment->cool_company_freelancer_id  = $teamMemberId;
+                $createAssignment->assignment_name = $resDecode['name'];
+                $createAssignment->send_object = json_encode($data);
+                $createAssignment->assignmentId = $resDecode['id'];
+                $createAssignment->agreementId = $resDecode['agreementId'];
+                $createAssignment->totalBudget = $resDecode['totalBudget'];
+                $createAssignment->bdaId = $resDecode['bdaId'];
+                $createAssignment->status = $resDecode['status'];
+                $createAssignment->response = $createdAssignmentInfo;
+                $createAssignment->save();
 
-            //Update Record
-            $resDecode = json_decode($createdFreelancerInfo, true);
-            $studentInfo = StudentDetail::select('id','cool_company_id')->where('user_id', $student->id)->first();
-            $studentInfo->cool_company_id = $resDecode['id'];
-            $studentInfo->save();
-            Log::channel('customlog')->info($student->id.' :Student successfully registered. cool company id: '.$studentInfo->cool_company_id);
+                if($createAssignment) {
+                    //Update Record
+                    $updateOrderInfo = OrderItem::select('id','is_sent_to_cool_company','send_to_cool_company_date')->whereIn('id', $orderItemId)->update([
+                        'is_sent_to_cool_company'   => '1',
+                        'send_to_cool_company_date' => date('Y-m-d')
+                    ]);
+                }
+                Log::channel('customlog')->info('Assignment Created.');
+            } else {
+                Log::channel('customlog')->Error('Assignment Not Created.');
+            }
         }
     }
 
@@ -200,7 +218,7 @@ class CoolCompanyCreateAssignment extends Command
 
         $response = curl_exec($curl);
         if ($response === false) {
-            Log::channel('customlog')->error('Getting error while create a assignments.');
+            Log::channel('customlog')->error('Getting error while create an assignments.');
             $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
             Log::channel('customlog')->error($error);
             die;
