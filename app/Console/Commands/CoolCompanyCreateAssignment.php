@@ -42,19 +42,19 @@ class CoolCompanyCreateAssignment extends Command
      */
     public function handle()
     {
-        Log::channel('customlog')->info('cron run.'. date('Y-m- H:i:s'));
-        die;
         $access_token = null;
         $tokenExpired = time();
-
+        die;
         $today          = new \DateTime();
         $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
 
         $vatRateId = AppSetting::select('coolCompanyVatRateId')->first()->coolCompanyVatRateId;
-        $getUserIds = OrderItem::select('order_items.*')
+
+        $getUserIds = OrderItem::select('order_items.user_id')
             ->where('order_items.is_returned', '0')
             ->where('order_items.is_replaced', '0')
             ->where('order_items.is_disputed', '0')
+            ->where('order_items.product_type', 'service')
             ->where('order_items.is_sent_to_cool_company', '0')
             ->where('order_items.delivery_completed_date', '<=', $before15Days)
             ->where('order_items.item_status', 'completed')
@@ -63,6 +63,31 @@ class CoolCompanyCreateAssignment extends Command
             ->get();
         foreach($getUserIds as $user)
         {
+            $reportArray = [];
+            $createBatchUserWise = OrderItem::select('order_items.user_id','order_items.order_id','order_items.products_services_book_id','order_items.price','order_items.quantity')
+            ->where('order_items.is_returned', '0')
+            ->where('order_items.is_replaced', '0')
+            ->where('order_items.is_disputed', '0')
+            ->where('order_items.product_type', 'service')
+            ->where('order_items.is_sent_to_cool_company', '0')
+            ->where('order_items.delivery_completed_date', $before15Days)
+            ->where('order_items.item_status', 'completed')
+            ->join('student_details', 'student_details.user_id','=','order_items.user_id')
+            ->where('student_details.cool_company_id', '!=', null)
+            ->where('order_items.user_id', $user->id)
+            ->get();
+
+            foreach ($createBatchUserWise as $key => $batchInfo) {
+                $reportArray = [
+                    'dateFrom'    => $before15Days.'T00:00:01Z',
+                    'dateTo'      => $before15Days.'T23:59:59Z',
+                    'paymentType' => 0,
+                    'unitQuantity'=> 32,
+                    'unitRate'    => 600,
+                    'totalHours'  => 32
+                ];
+            }
+
             dd($user);
             if(empty($access_token) || time() > $tokenExpired)
             {
