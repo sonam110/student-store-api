@@ -49,6 +49,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('contest:expire')->dailyAt('00:01');
         $schedule->command('job:expire')->dailyAt('00:01');
         $schedule->command('rewardPoints:credit')->dailyAt('00:01');
+        $schedule->command('create:freelancer')->hourly();
+        $schedule->command('create:assignment')->everyMinute();
         
     }
 

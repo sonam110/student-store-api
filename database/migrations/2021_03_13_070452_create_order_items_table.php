@@ -63,6 +63,8 @@ class CreateOrderItemsTable extends Migration
             $table->text('reason_for_cancellation_request')->nullable();
             $table->text('reason_id_for_cancellation_request_decline')->nullable();
             $table->text('reason_for_cancellation_request_decline')->nullable();
+            $table->boolean('is_sent_to_cool_company')->nullable()->default(0);
+            $table->date('sent_to_cool_company_date')->nullable();
             $table->timestamps();
         });
     }

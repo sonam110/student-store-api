@@ -9,14 +9,14 @@ use App\Models\AppSetting;
 use Log;
 use \mervick\aesEverywhere\AES256;
 
-class CoolCompanyRegFreelancer extends Command
+class CoolCompanyCreateAssignment extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'create:freelancer';
+    protected $signature = 'create:assignment';
 
     /**
      * The console command description.
@@ -42,19 +42,28 @@ class CoolCompanyRegFreelancer extends Command
      */
     public function handle()
     {
+        Log::channel('customlog')->info('cron run.'. date('Y-m- H:i:s'));
+        die;
         $access_token = null;
         $tokenExpired = time();
-        
-        $getStudentList = StudentDetail::select('users.id','users.first_name','users.last_name','users.email','users.qr_code_number','users.social_security_number','users.bank_account_num','users.bank_identifier_code','users.bank_name','users.bank_account_type')
-            ->where('student_details.cool_company_id', null)
-            ->where('users.user_type_id', '2')
-            ->where('users.status', '1')
-            ->where('users.is_email_verified', 1)
-            ->where('users.is_contact_number_verified', 1)
-            ->join('users', 'users.id','=','student_details.user_id')
+
+        $today          = new \DateTime();
+        $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
+
+        $vatRateId = AppSetting::select('coolCompanyVatRateId')->first()->coolCompanyVatRateId;
+        $getUserIds = OrderItem::select('order_items.*')
+            ->where('order_items.is_returned', '0')
+            ->where('order_items.is_replaced', '0')
+            ->where('order_items.is_disputed', '0')
+            ->where('order_items.is_sent_to_cool_company', '0')
+            ->where('order_items.delivery_completed_date', '<=', $before15Days)
+            ->where('order_items.item_status', 'completed')
+            ->orderBy('order_items.user_id', 'ASC')
+            ->groupBy('order_items.user_id')
             ->get();
-        foreach($getStudentList as $student)
+        foreach($getUserIds as $user)
         {
+            dd($user);
             if(empty($access_token) || time() > $tokenExpired)
             {
                 $getToken = $this->getAccessToken();
@@ -62,28 +71,29 @@ class CoolCompanyRegFreelancer extends Command
                 $tokenExpired   = $getToken['expire_time'];
             }
 
-            if($student->bank_account_type==1) {
-                $paymentAccountTypeId = 'Local';
-            } elseif($student->bank_account_type==2) {
-                $paymentAccountTypeId = 'International';
-            } else {
-                $paymentAccountTypeId = 'PayPal';
-            }
             $data = [
-                'firstName'   => $student->first_name,
-                'lastName'    => $student->last_name,
-                'email'       => $student->email,
-                'externalId'  => $student->qr_code_number,
-                'workerTypeId'=> 0,
-                'icInfo'      => [      
-                    'socialNo'              => $student->social_security_number,
-                    'paymentAccountTypeId'  => $paymentAccountTypeId,
-                    'bankAccountNo'         => $student->bank_account_num,
-                    'bankIdentifierCode'    => $student->bank_identifier_code,
-                    'bankName'              => $student->bank_name
+                'name'          => 'Assignment Name',
+                'workTypeId'    => 2,
+                'teamMembers'   => [
+                  [
+                  'teamMemberId'  =>  'd711d7bd-7f10-4116-a565-d92478952a18',
+                    'unitCurrencyId'  => 'SEK',
+                    'vatRateId'       => 7,
+                    'reports'         => [
+                      [
+                        'dateFrom'    => '2021-09-01T00:00:00Z',
+                        'dateTo'      => '2021-09-04T00:00:00Z',
+                        'paymentType' => 0,
+                        'unitQuantity'=> 32,
+                        'unitRate'    => 600,
+                        'totalHours'  => 32
+                      ]
+                    ]
                   ]
+                ]
               ];
-            $createdFreelancerInfo = $this->createFreelancer($access_token, $data);
+
+            $createdFreelancerInfo = $this->createAssignments($access_token, $data);
 
             //Update Record
             $resDecode = json_decode($createdFreelancerInfo, true);
@@ -138,9 +148,9 @@ class CoolCompanyRegFreelancer extends Command
         return false;
     }
 
-    private function createFreelancer($accessToken, $data)
+    private function createAssignments($accessToken, $data)
     {
-        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Teammembers';
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Assignments';
         $postData = json_encode($data);
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -163,7 +173,7 @@ class CoolCompanyRegFreelancer extends Command
 
         $response = curl_exec($curl);
         if ($response === false) {
-            Log::channel('customlog')->error('Getting error while create a freelancer.');
+            Log::channel('customlog')->error('Getting error while create a assignments.');
             $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
             Log::channel('customlog')->error($error);
             die;
