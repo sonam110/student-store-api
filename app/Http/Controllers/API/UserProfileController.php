@@ -285,12 +285,12 @@ class UserProfileController extends Controller
 
 		if(!$receiver)
 		{
-			return response()->json(prepareResult(true, ['User Not Exist'], getLangByLabelGroups('messages','message_message_user_not_exists')), config('http_response.internal_server_error'));
+			return response()->json(prepareResult(true, ['User Not Exist'], getLangByLabelGroups('messages','message_user_not_exists')), config('http_response.internal_server_error'));
 		}
 
 		if($receiver->user_type_id != 2)
 		{
-			return response()->json(prepareResult(true, ['Not Student'], getLangByLabelGroups('messages','message_message_user_is_not_student')), config('http_response.internal_server_error'));
+			return response()->json(prepareResult(true, ['Not Student'], getLangByLabelGroups('messages','message_user_not_student')), config('http_response.internal_server_error'));
 		}
 
 		DB::beginTransaction();
