@@ -11,6 +11,7 @@ use App\Console\Commands\ResumePdfGenerate;
 use App\Console\Commands\SubscribedPackageExpire;
 use App\Console\Commands\ContestExpire;
 use App\Console\Commands\JobExpire;
+use App\Console\Commands\RewardPointsCredit;
 
 
 class Kernel extends ConsoleKernel
@@ -27,6 +28,7 @@ class Kernel extends ConsoleKernel
         SubscribedPackageExpire::class,
         ContestExpire::class,
         JobExpire::class,
+        RewardPointsCredit::class,
 
     ];
 
@@ -46,6 +48,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('subscribedPackage:expire')->dailyAt('00:01');
         $schedule->command('contest:expire')->dailyAt('00:01');
         $schedule->command('job:expire')->dailyAt('00:01');
+        $schedule->command('rewardPoints:credit')->dailyAt('00:01');
         
     }
 
