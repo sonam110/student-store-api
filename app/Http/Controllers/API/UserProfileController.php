@@ -19,6 +19,7 @@ use App\Models\AppSetting;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\CvsViewLog;
+use App\Models\SharedRewardPoint;
 
 class UserProfileController extends Controller
 {
@@ -269,6 +270,63 @@ class UserProfileController extends Controller
 		}
 	}
 
+	public function shareRewardPoints(Request $request)
+	{
+		$validation = \Validator::make($request->all(),[ 
+			'contact_number'       => 'required',
+			'reward_points'		=> 'required'
+		]);
+
+		if($request->reward_points > Auth::user()->reward_points)
+		{
+			return response()->json(prepareResult(true, ['yoh have only '.Auth::user()->reward_points.' reward points to share.'], getLangByLabelGroups('messages','message_less_reward_points')), config('http_response.internal_server_error'));
+		}
+		$receiver = User::where('contact_number',$request->contact_number)->first();
+
+		if(!$receiver)
+		{
+			return response()->json(prepareResult(true, ['User Not Exist'], getLangByLabelGroups('messages','message_message_user_not_exists')), config('http_response.internal_server_error'));
+		}
+
+		if($receiver->user_type_id != 2)
+		{
+			return response()->json(prepareResult(true, ['Not Student'], getLangByLabelGroups('messages','message_message_user_is_not_student')), config('http_response.internal_server_error'));
+		}
+
+		DB::beginTransaction();
+        try
+        {
+			$sharedRewardPoint 						= new SharedRewardPoint;
+			$sharedRewardPoint->sender_id 			= Auth::id();
+			$sharedRewardPoint->receiver_id 		= $receiver->id;
+			$sharedRewardPoint->reward_points 		= $request->reward_points;
+			$sharedRewardPoint->save();
+
+
+			
+			User::find($receiver->id)->update(['reward_points' => $receiver->reward_points + $request->reward_points]);
+
+			$sender = Auth::user();
+			User::find(Auth::id())->update(['reward_points' => $sender->reward_points - $request->reward_points]);
+
+			// Notification Start
+
+			$title = 'Reward Points Shared';
+			$body =  $sender->name.' has shared '.$request->reward_points.' reward points for you.';
+			$user = $receiver;
+			$type = 'Reward Points';
+			pushNotification($title,$body,$user,$type,true,'user','Reward Point',$sharedRewardPoint->id,'reward-points');
+
+			DB::commit();
+			return response(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_created')), config('http_response.created'));
+		}
+		catch (\Throwable $exception)
+        {
+            DB::rollback();
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_validation')), config('http_response.internal_server_error'));
+        }
+	}
+
 	public function rewardPointDetails()
 	{
 		$data = [];
@@ -283,6 +341,7 @@ class UserProfileController extends Controller
             })
 		->where('order_items.user_id',Auth::id())
 		->get(['orders.order_number','order_items.created_at','order_items.title','order_items.product_type','order_items.cover_image','order_items.item_status','order_items.price','order_items.quantity','order_items.earned_reward_points','order_items.reward_point_status']);
+		$data['reward_points_sharing_history'] 		= SharedRewardPoint::where('sender_id',Auth::id())->orWhere('receiver_id',Auth::id())->with('receiver:id,first_name,last_name,profile_pic_path','sender:id,first_name,last_name,profile_pic_path')->orderBy('created_at','desc')->get();
 
 		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
 	}

@@ -126,6 +126,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::apiResource('/user-education-detail', 'App\Http\Controllers\API\UserEducationDetailController');
 	Route::get('/reward-points-detail', 'App\Http\Controllers\API\UserProfileController@rewardPointDetails');
 	Route::post('/language-update', 'App\Http\Controllers\API\UserProfileController@languageUpdate');
+	Route::post('/share-reward-points', 'App\Http\Controllers\API\UserProfileController@shareRewardPoints');
 	// Route::get('/create-resume', 'App\Http\Controllers\API\UserCvDetailController@createResume');
 
 	Route::apiResource('/shipping-condition', 'App\Http\Controllers\API\ShippingConditionController');
