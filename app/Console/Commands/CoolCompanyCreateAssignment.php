@@ -95,56 +95,57 @@ class CoolCompanyCreateAssignment extends Command
 
                 ];
             }
-            //Log::channel('customlog')->info($reportArray);
-            
-            if(empty($access_token) || time() > $tokenExpired)
+            if(sizeof($reportArray)>0)
             {
-                $getToken = $this->getAccessToken();
-                $access_token   = $getToken['access_token'];
-                $tokenExpired   = $getToken['expire_time'];
-            }
-
-            $data = [
-                'name'          => $user->user_id.' :Assignment, Date:'.date('Y-m-d'),
-                'workTypeId'    => 2,
-                'teamMembers'   => [
-                  [
-                  'teamMemberId'  =>  $teamMemberId,
-                    'unitCurrencyId'  => 'SEK',
-                    'vatRateId'       => $vatRateId,
-                    'reports'         => $reportArray
-                  ]
-                ]
-              ];
-            $createdAssignmentInfo = $this->createAssignments($access_token, $data);
-
-            //Create Assignment Record
-            $resDecode = json_decode($createdAssignmentInfo, true);
-            if(!empty($createdAssignmentInfo)) {
-                $cool_company_freelancer_id = CoolCompanyFreelancer::select('id')->where('cool_company_id', $teamMemberId)->first()->id;
-                $createAssignment = new CoolCompanyAssignment;
-                $createAssignment->user_id = $user->user_id;
-                $createAssignment->cool_company_freelancer_id  = $teamMemberId;
-                $createAssignment->assignment_name = $resDecode['name'];
-                $createAssignment->send_object = json_encode($data);
-                $createAssignment->assignmentId = $resDecode['id'];
-                $createAssignment->agreementId = $resDecode['agreementId'];
-                $createAssignment->totalBudget = $resDecode['totalBudget'];
-                $createAssignment->bdaId = $resDecode['bdaId'];
-                $createAssignment->status = $resDecode['status'];
-                $createAssignment->response = $createdAssignmentInfo;
-                $createAssignment->save();
-
-                if($createAssignment) {
-                    //Update Record
-                    $updateOrderInfo = OrderItem::select('id','is_sent_to_cool_company','send_to_cool_company_date')->whereIn('id', $orderItemId)->update([
-                        'is_sent_to_cool_company'   => '1',
-                        'send_to_cool_company_date' => date('Y-m-d')
-                    ]);
+                if(empty($access_token) || time() > $tokenExpired)
+                {
+                    $getToken = $this->getAccessToken();
+                    $access_token   = $getToken['access_token'];
+                    $tokenExpired   = $getToken['expire_time'];
                 }
-                Log::channel('customlog')->info('Assignment Created.');
-            } else {
-                Log::channel('customlog')->Error('Assignment Not Created.');
+
+                $data = [
+                    'name'          => $user->user_id.' :Assignment, Date:'.date('Y-m-d'),
+                    'workTypeId'    => 2,
+                    'teamMembers'   => [
+                      [
+                      'teamMemberId'  =>  $teamMemberId,
+                        'unitCurrencyId'  => 'SEK',
+                        'vatRateId'       => $vatRateId,
+                        'reports'         => $reportArray
+                      ]
+                    ]
+                  ];
+                $createdAssignmentInfo = $this->createAssignments($access_token, $data);
+
+                //Create Assignment Record
+                $resDecode = json_decode($createdAssignmentInfo, true);
+                if(!empty($createdAssignmentInfo)) {
+                    $cool_company_freelancer_id = CoolCompanyFreelancer::select('id')->where('cool_company_id', $teamMemberId)->first()->id;
+                    $createAssignment = new CoolCompanyAssignment;
+                    $createAssignment->user_id = $user->user_id;
+                    $createAssignment->cool_company_freelancer_id  = $cool_company_freelancer_id;
+                    $createAssignment->assignment_name = $resDecode['name'];
+                    $createAssignment->send_object = json_encode($data);
+                    $createAssignment->assignmentId = $resDecode['id'];
+                    $createAssignment->agreementId = $resDecode['agreementId'];
+                    $createAssignment->totalBudget = $resDecode['totalBudget'];
+                    $createAssignment->bdaId = $resDecode['bdaId'];
+                    $createAssignment->status = $resDecode['status'];
+                    $createAssignment->response = $createdAssignmentInfo;
+                    $createAssignment->save();
+
+                    if($createAssignment) {
+                        //Update Record
+                        $updateOrderInfo = OrderItem::select('id','is_sent_to_cool_company','sent_to_cool_company_date')->whereIn('id', $orderItemId)->update([
+                            'is_sent_to_cool_company'   => '1',
+                            'sent_to_cool_company_date' => date('Y-m-d')
+                        ]);
+                    }
+                    Log::channel('customlog')->info('Assignment Created.');
+                } else {
+                    Log::channel('customlog')->Error('Assignment Not Created.');
+                }
             }
         }
     }
