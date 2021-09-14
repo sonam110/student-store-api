@@ -70,7 +70,7 @@ class CoolCompanyCreateAssignment extends Command
             ->where('order_items.is_disputed', '0')
             ->where('order_items.product_type', 'service')
             ->where('order_items.is_sent_to_cool_company', '0')
-            ->where('order_items.delivery_completed_date', $before15Days)
+            ->where('order_items.delivery_completed_date','<=', $before15Days)
             ->where('order_items.item_status', 'completed')
             ->join('student_details', 'student_details.user_id','=','order_items.user_id')
             ->where('student_details.cool_company_id', '!=', null)
@@ -78,17 +78,19 @@ class CoolCompanyCreateAssignment extends Command
             ->get();
 
             foreach ($createBatchUserWise as $key => $batchInfo) {
-                $reportArray = [
+                $reportArray[] = [
                     'dateFrom'    => $before15Days.'T00:00:01Z',
                     'dateTo'      => $before15Days.'T23:59:59Z',
-                    'paymentType' => 0,
-                    'unitQuantity'=> 32,
-                    'unitRate'    => 600,
-                    'totalHours'  => 32
+                    'paymentType' => 2,
+                    'customUnitType'    => 'days',
+                    'unitQuantity'=> $batchInfo->quantity,
+                    'unitRate'    => $batchInfo->price,
+                    'totalHours'  => 24
+
                 ];
             }
 
-            dd($user);
+            dd($reportArray);
             if(empty($access_token) || time() > $tokenExpired)
             {
                 $getToken = $this->getAccessToken();
