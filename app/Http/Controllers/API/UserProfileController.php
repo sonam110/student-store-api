@@ -312,7 +312,7 @@ class UserProfileController extends Controller
 			// Notification Start
 
 			$title = 'Reward Points Shared';
-			$body =  $sender->name.' has shared '.$request->reward_points.' reward points for you.';
+			$body =  $sender->first_name.' '.$sender->last_name.' has shared '.$request->reward_points.' reward points for you.';
 			$user = $receiver;
 			$type = 'Reward Points';
 			pushNotification($title,$body,$user,$type,true,'user','Reward Point',$sharedRewardPoint->id,'reward-points');
