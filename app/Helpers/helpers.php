@@ -156,7 +156,7 @@ function createResume($fileName,$user)
 		'user' => $user,
 	];
 	$pdf = PDF::loadView('pdf', $data);
-	return $pdf->save('public/uploads/'.$fileName);
+	return $pdf->save('uploads/'.$fileName);
 }
 
 

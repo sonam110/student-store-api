@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\UserCvDetail;
 use Str;
+use PDF;
 
 class ResumePdfGenerate extends Command
 {
@@ -46,7 +47,7 @@ class ResumePdfGenerate extends Command
             
             if($cvDetail->user->userWorkExperiences->count() > 0 && $cvDetail->user->userEducationDetails->count() > 0)
             {
-                createResume($cv_name,$cvDetail->user);
+                $this->createResume($cv_name,$cvDetail->user);
                 $cvDetail->generated_cv_file = env('CDN_DOC_URL').$destinationPath.$cv_name;
                 $cvDetail->cv_update_status = 0;
                 $cvDetail->save();
@@ -54,5 +55,17 @@ class ResumePdfGenerate extends Command
             
         }
         return 0;
+    }
+
+    private function createResume($fileName,$user)
+    {
+        if(file_exists('public/uploads/'.$fileName)){ 
+            unlink('public/uploads/'.$fileName);
+        }
+        $data = [
+            'user' => $user,
+        ];
+        $pdf = PDF::loadView('pdf', $data);
+        return $pdf->save('public/uploads/'.$fileName);
     }
 }

@@ -32,6 +32,8 @@ use App\Models\OauthAccessToken;
 use App\Models\ShippingCondition;
 use App\Models\ProductsServicesBook;
 use App\Models\Contest;
+use App\Models\CoolCompanyAssignment;
+use App\Models\CoolCompanyFreelancer;
 
 
 
@@ -247,5 +249,14 @@ class User extends Authenticatable
     public function jobs()
     {
         return $this->hasMany(Job::class, 'user_id', 'id');
+    }
+
+    public function coolCompanyFreelancer()
+    {
+        return $this->hasOne(CoolCompanyFreelancer::class,'user_id','id')->with('coolCompanyAssignment');
+    }
+    public function coolCompanyAssignment()
+    {
+        return $this->hasMany(CoolCompanyAssignment::class,'user_id','id');
     }
 }

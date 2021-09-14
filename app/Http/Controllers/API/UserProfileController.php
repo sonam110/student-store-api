@@ -392,4 +392,10 @@ class UserProfileController extends Controller
 		$user->save();
 		return response(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_updated')), config('http_response.created'));
 	}
+
+	public function coolCompanyFreelancer()
+	{
+		$data = Auth::user()->coolCompanyFreelancer;
+		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_cool_company_freelancer_list')), config('http_response.created'));
+	}
 }

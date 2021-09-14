@@ -54,14 +54,14 @@ class UserCvDetailController extends Controller
 		if($userCvDetail->save())
 		{
 			//Create CV pdf
-			// if(Auth::user()->userWorkExperiences->count() > 0 && Auth::user()->userEducationDetails->count() > 0)
-			// {
-			// 	createResume($cv_name,Auth::user());
-			// 	$cvDetail = Auth::user()->userCvDetail;
-			// 	$cvDetail->generated_cv_file = env('CDN_DOC_URL').$destinationPath.$cv_name;
-			// 	$cvDetail->cv_update_status = 0;
-			// 	$cvDetail->save();
-			// }
+			if(Auth::user()->userWorkExperiences->count() > 0 && Auth::user()->userEducationDetails->count() > 0)
+			{
+				createResume($cv_name,Auth::user());
+				$cvDetail = Auth::user()->userCvDetail;
+				$cvDetail->generated_cv_file = env('CDN_DOC_URL').$destinationPath.$cv_name;
+				$cvDetail->cv_update_status = 0;
+				$cvDetail->save();
+			}
 			
 
 			if(JobTag::where('cv_id', $userCvDetail->id)->count()>0)
