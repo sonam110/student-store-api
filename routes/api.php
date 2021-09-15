@@ -273,6 +273,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	//master
 
 	Route::apiResource('/packages', 'App\Http\Controllers\Admin\PackageController');
+	Route::get('/purchased-package/{id}', [App\Http\Controllers\Admin\PackageController::class, 'purchasedPackage']);
 	Route::apiResource('/bucket-group', 'App\Http\Controllers\Admin\BucketGroupController')->only('index','store','show','update','destroy');
 	Route::get('attribute-list-by-bucket-group/{bucketGroupId}/{language_id}', [App\Http\Controllers\Admin\BucketGroupController::class, 'attributeListByBucketGroup']);
 	Route::post('bucket-attribute-create', [App\Http\Controllers\Admin\BucketGroupController::class, 'bucketAttributeCreate']);
