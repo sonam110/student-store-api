@@ -236,7 +236,7 @@ class DashboardController extends Controller
 				$data[$i-1]['total_sales_event']    = $eventOrders->count();
 				$data[$i-1]['total_amount_event']   = $eventOrders->get()[0]['total_amount'];
 				
-				$date_arr[] = $data[$i-1]['date'];
+				$date_arr[] = date('d M', strtotime($data[$i-1]['date']));
 				$total_sales_book_arr[] = $data[$i-1]['total_sales_book'];
 				$total_amount_book_arr[] = ($data[$i-1]['total_amount_book']>0) ? $data[$i-1]['total_amount_book'] : 0;
 				
