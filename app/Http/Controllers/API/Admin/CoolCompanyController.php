@@ -147,7 +147,7 @@ class CoolCompanyController extends Controller
                 $response = $this->groupInvoiceById($access_token, $jsonDecode['groupInvoiceId']);
                 if(!empty($response))
                 {
-                    return response(prepareResult(false, $response, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+                    return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
                 }
             }
         }
