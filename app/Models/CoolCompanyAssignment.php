@@ -12,7 +12,7 @@ class CoolCompanyAssignment extends Model
 {
     use HasFactory, Uuid;
 
-    protected $fillable = ['auto_id', 'user_id', 'cool_company_freelancer_id', 'paymentAccountTypeId', 'bankName', 'bankAccountNo', 'bankIdentifierCode', 'response'];
+    protected $fillable = ['auto_id', 'user_id', 'cool_company_freelancer_id', 'paymentAccountTypeId', 'bankName', 'bankAccountNo', 'bankIdentifierCode', 'response','is_start_assignment','start_assignment_date','start_assignment_response'];
 
     public function user()
     {

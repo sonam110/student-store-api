@@ -398,6 +398,11 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 	Route::get('/cool-company-assignment-list', [App\Http\Controllers\API\Admin\CoolCompanyController::class,'index']);
 
+	Route::post('/get-freelancer-info', [App\Http\Controllers\API\Admin\CoolCompanyController::class,'getFreelancerInfo']);
+	Route::post('/start-and-approve-assignment', [App\Http\Controllers\API\Admin\CoolCompanyController::class,'startAndApproveAssignment']);
+	Route::post('/payment-current-status', [App\Http\Controllers\API\Admin\CoolCompanyController::class,'paymentCurrentStatus']);
+	Route::post('/get-group-invoice-by-id', [App\Http\Controllers\API\Admin\CoolCompanyController::class,'getGroupInvoiceById']);
+
 
 
 
