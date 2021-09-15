@@ -87,6 +87,7 @@ Route::post('/get-contests-filter', [App\Http\Controllers\API\LandingPageControl
 Route::post('/job-search', [App\Http\Controllers\API\SearchController::class,'jobSearch']);
 Route::post('/product-search', [App\Http\Controllers\API\SearchController::class,'productSearch']);
 Route::post('/contest-search', [App\Http\Controllers\API\SearchController::class,'contestSearch']);
+Route::post('/common-search', [App\Http\Controllers\API\SearchController::class,'commonSearch']);
 
 
 //category & subcategory

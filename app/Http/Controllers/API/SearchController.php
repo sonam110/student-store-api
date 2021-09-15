@@ -400,4 +400,69 @@ class SearchController extends Controller
 		}
 		return response()->json(prepareResult(false, $contests, getLangByLabelGroups('messages','message_jobs_list')), config('http_response.success'));
 	}
+
+	public function commonSearch(Request $request)
+	{
+		$data = [];
+
+		$data['products'] = ProductsServicesBook::select('id','title','slug','type','category_master_id','sub_category_slug')
+		->orderBy('created_at','desc')
+		->with('categoryMaster:id,title','subCategory:title,slug')
+		->where('title','like', '%'.$request->search.'%')
+		->get();
+
+		$data['jobs'] = Job::select('id','title','slug','category_master_id','sub_category_slug')
+		->orderBy('created_at','desc')
+		->with('categoryMaster:id,title','subCategory:title,slug')
+		->where('title','like', '%'.$request->search.'%')
+		->get();
+
+
+		$data['contests'] = Contest::select('id','title','slug','type','category_master_id','sub_category_slug')
+		->orderBy('created_at','desc')
+		->with('categoryMaster:id,title','subCategory:title,slug')
+		->where('title','like', '%'.$request->search.'%')
+		->get();
+
+		if(!empty($request->type))
+		{
+			$data['products'] = ProductsServicesBook::select('id','title','slug','type','category_master_id','sub_category_slug')
+			->orderBy('created_at','desc')
+			->with('categoryMaster:id,title','subCategory:title,slug')
+			->where('title','like', '%'.$request->search.'%')
+			->where('type',$request->type)
+			->get();
+
+
+			if($request->type == 'job')
+			{
+				$data['jobs'] = Job::select('id','title','slug','category_master_id','sub_category_slug')
+				->orderBy('created_at','desc')
+				->with('categoryMaster:id,title','subCategory:title,slug')
+				->where('title','like', '%'.$request->search.'%')
+				->get();
+			}
+			else
+			{
+				$data['jobs'] = Job::select('id','title','slug','category_master_id','sub_category_slug')
+				->orderBy('created_at','desc')
+				->with('categoryMaster:id,title','subCategory:title,slug')
+				->where('title','like', '%'.$request->search.'%')
+				->where('id',null)
+				->get();
+			}
+
+			
+
+
+			$data['contests'] = Contest::select('id','title','slug','type','category_master_id','sub_category_slug')
+			->orderBy('created_at','desc')
+			->with('categoryMaster:id,title','subCategory:title,slug')
+			->where('title','like', '%'.$request->search.'%')
+			->where('type',$request->type)
+			->get();
+		}
+
+		return response()->json(prepareResult(false, $data, getLangByLabelGroups('messages','message_jobs_list')), config('http_response.success'));
+	}
 }
