@@ -409,12 +409,14 @@ class SearchController extends Controller
 		->orderBy('created_at','desc')
 		->with('categoryMaster:id,title','subCategory:title,slug')
 		->where('title','like', '%'.$request->search.'%')
+		->limit(10)
 		->get();
 
 		$data['jobs'] = Job::select('id','title','slug','category_master_id','sub_category_slug')
 		->orderBy('created_at','desc')
 		->with('categoryMaster:id,title','subCategory:title,slug')
 		->where('title','like', '%'.$request->search.'%')
+		->limit(10)
 		->get();
 
 
@@ -422,6 +424,7 @@ class SearchController extends Controller
 		->orderBy('created_at','desc')
 		->with('categoryMaster:id,title','subCategory:title,slug')
 		->where('title','like', '%'.$request->search.'%')
+		->limit(10)
 		->get();
 
 		if(!empty($request->type))
@@ -431,6 +434,7 @@ class SearchController extends Controller
 			->with('categoryMaster:id,title','subCategory:title,slug')
 			->where('title','like', '%'.$request->search.'%')
 			->where('type',$request->type)
+			->limit(10)
 			->get();
 
 
@@ -440,6 +444,7 @@ class SearchController extends Controller
 				->orderBy('created_at','desc')
 				->with('categoryMaster:id,title','subCategory:title,slug')
 				->where('title','like', '%'.$request->search.'%')
+				->limit(10)
 				->get();
 			}
 			else
@@ -449,6 +454,7 @@ class SearchController extends Controller
 				->with('categoryMaster:id,title','subCategory:title,slug')
 				->where('title','like', '%'.$request->search.'%')
 				->where('id',null)
+				->limit(10)
 				->get();
 			}
 
@@ -460,6 +466,7 @@ class SearchController extends Controller
 			->with('categoryMaster:id,title','subCategory:title,slug')
 			->where('title','like', '%'.$request->search.'%')
 			->where('type',$request->type)
+			->limit(10)
 			->get();
 		}
 
