@@ -396,6 +396,8 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 	Route::apiResource('/slider', 'App\Http\Controllers\API\Admin\SliderController')->only('index','store','destroy');
 
+	Route::get('/cool-company-assignment-list', [App\Http\Controllers\API\Admin\CoolCompanyController::class,'index']);
+
 
 
 

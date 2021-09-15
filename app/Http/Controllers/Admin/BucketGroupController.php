@@ -241,6 +241,35 @@ class BucketGroupController extends Controller
         DB::beginTransaction();
         try
         {
+            $bucketGroup = BucketGroup::find($request->bucket_group_id);
+            $bucketGroup->group_name    = $request->group_name;
+            $bucketGroup->slug          = Str::slug($request->group_name);
+            $bucketGroup->type          = $request->type;
+            if($request->type=='text')
+            {
+                $bucketGroup->text_type          = $request->text_type;
+            }
+            $bucketGroup->is_multiple   = $request->is_multiple;
+            $bucketGroup->save();
+
+            if(BucketGroupDetail::where('bucket_group_id',$request->bucket_group_id)->where('language_id',$request->language_id)->count() > 0)
+            {
+                $bucketGroupDetail = BucketGroupDetail::where('bucket_group_id',$request->bucket_group_id)->where('language_id',$request->language_id)->first();
+                $bucketGroupDetail->bucket_group_id = $bucketGroup->id;
+                $bucketGroupDetail->language_id     = $request->language_id;
+                $bucketGroupDetail->name            = $request->group_name;
+                $bucketGroupDetail->save();
+            }
+            else
+            {
+                $bucketGroupDetail = new BucketGroupDetail;
+                $bucketGroupDetail->bucket_group_id = $bucketGroup->id; 
+                $bucketGroupDetail->language_id     = $request->language_id;
+                $bucketGroupDetail->name            = $request->group_name;
+                $bucketGroupDetail->save();
+            }
+            
+
             BucketGroupAttribute::where('bucket_group_id',$request->bucket_group_id)->delete();
             foreach ($request->attributes_list as $key => $attribute) 
             {
