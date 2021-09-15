@@ -270,22 +270,26 @@ class BucketGroupController extends Controller
             }
             
 
-            BucketGroupAttribute::where('bucket_group_id',$request->bucket_group_id)->delete();
+            BucketGroupAttribute::join('bucket_group_attribute_details', function ($join) {
+                                        $join->on('bucket_group_attributes.id', '=', 'bucket_group_attribute_details.bucket_group_attribute_id');
+                                    })
+                                    ->where('bucket_group_attributes.bucket_group_id',$request->bucket_group_id)
+                                    ->where('bucket_group_attribute_details.language_id',$request->language_id)
+                                    ->delete();
             foreach ($request->attributes_list as $key => $attribute) 
             {
                 if(!empty($attribute))
-                {
-                    
-                        $attr = new BucketGroupAttribute;
-                        $attr->bucket_group_id = $request->bucket_group_id;
-                        $attr->name = $attribute;
-                        $attr->save();
+                { 
+                    $attr = new BucketGroupAttribute;
+                    $attr->bucket_group_id = $request->bucket_group_id;
+                    $attr->name = $attribute;
+                    $attr->save();
 
-                        $attrDetail = new BucketGroupAttributeDetail;
-                        $attrDetail->bucket_group_attribute_id = $attr->id;
-                        $attrDetail->language_id = $request->language_id;
-                        $attrDetail->name = $attribute;
-                        $attrDetail->save();
+                    $attrDetail = new BucketGroupAttributeDetail;
+                    $attrDetail->bucket_group_attribute_id = $attr->id;
+                    $attrDetail->language_id = $request->language_id;
+                    $attrDetail->name = $attribute;
+                    $attrDetail->save();
                     
                 } 
             }
