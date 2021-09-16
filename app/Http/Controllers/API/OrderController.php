@@ -310,15 +310,24 @@ class OrderController extends Controller
 
 	                    //Mail Start
 
-	                    $emailTemplate = EmailTemplate::where('template_for','order placed')->first();
-	                    $details = [
-	                        'title' => $emailTemplate->subject,
-	                        'body' => $emailTemplate->body
-	                    ];
-	                    
-	                    Mail::to(Auth::user()->email)->send(new OrderPlacedMail($details));
+		                    $emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
 
-                    //Mail End
+		                    $body = $emailTemplate->body;
+
+		                    $arrayVal = [
+		                    	'{{user_name}}' => $order->user->first_name.' '.$order->user->last_name,
+		                    	'{{order_number}}' => $order->order_number,
+		                    ];
+		                    $body = $this->strReplaceAssoc($arrayVal, $body);
+		                    
+		                    $details = [
+		                    	'title' => $emailTemplate->subject,
+		                    	'body' => $body
+		                    ];
+		                    
+		                    Mail::to(Auth::user())->send(new OrderMail($details));
+
+	                    //Mail End
 	                }
 				}
 
