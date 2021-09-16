@@ -248,7 +248,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/dashboard-jobs-list', [App\Http\Controllers\API\DashboardController::class, 'jobsList']);
 
 
-
+	Route::get('/cool-company-assignment-list', [App\Http\Controllers\API\Admin\CoolCompanyController::class,'index']);
 
 });
 
@@ -397,7 +397,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 	Route::apiResource('/slider', 'App\Http\Controllers\API\Admin\SliderController')->only('index','store','destroy');
 
-	Route::get('/cool-company-assignment-list', [App\Http\Controllers\API\Admin\CoolCompanyController::class,'index']);
+	
 
 });
 Route::post('/get-freelancer-info', [App\Http\Controllers\API\CoolCompanyController::class,'getFreelancerInfo']);

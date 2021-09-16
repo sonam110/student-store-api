@@ -9,6 +9,7 @@ use Str;
 use DB;
 use App\Models\CoolCompanyAssignment;
 use App\Models\CoolCompanyFreelancer;
+use Auth;
 
 class CoolCompanyController extends Controller
 {
