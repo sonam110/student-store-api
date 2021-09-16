@@ -21,19 +21,19 @@ class Order extends Model
 
     public function getFirstNameAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getLastNameAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getEmailAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getContactNumberAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
 
     public function user()

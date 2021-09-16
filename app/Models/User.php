@@ -61,67 +61,67 @@ class User extends Authenticatable
 
     public function getFirstNameAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getLastNameAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getGenderAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getDobAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getEmailAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getContactNumberAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getCpFirstNameAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getCpLastNameAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getCpEmailAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getCpContactNumberAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getCpGenderAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getGuardianFirstNameAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getGuardianLastNameAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getGuardianEmailAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getGuardianContactNumberAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
     public function getSocialSecurityNumberAttribute($value)
     {
-        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+        return (!empty($value)) ? AES256::encrypt($value, env('ENCRYPTION_KEY')) : NULL;
     }
 
     public function language()
