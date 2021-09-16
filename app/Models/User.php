@@ -34,7 +34,7 @@ use App\Models\ProductsServicesBook;
 use App\Models\Contest;
 use App\Models\CoolCompanyAssignment;
 use App\Models\CoolCompanyFreelancer;
-use \mervick\aesEverywhere\AES256;
+use mervick\aesEverywhere\AES256;
 
 class User extends Authenticatable
 {

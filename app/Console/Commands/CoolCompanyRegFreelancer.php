@@ -8,7 +8,7 @@ use App\Models\OrderItem;
 use App\Models\AppSetting;
 use App\Models\CoolCompanyFreelancer;
 use Log;
-use \mervick\aesEverywhere\AES256;
+use mervick\aesEverywhere\AES256;
 
 class CoolCompanyRegFreelancer extends Command
 {

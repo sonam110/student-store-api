@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\AddressDetail;
 use App\Models\OrderItem;
 use App\Models\TransactionDetail;
-
+use mervick\aesEverywhere\AES256;
 
 class Order extends Model
 {

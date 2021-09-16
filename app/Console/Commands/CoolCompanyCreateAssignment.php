@@ -9,7 +9,7 @@ use App\Models\AppSetting;
 use App\Models\CoolCompanyAssignment;
 use App\Models\CoolCompanyFreelancer;
 use Log;
-use \mervick\aesEverywhere\AES256;
+use mervick\aesEverywhere\AES256;
 
 class CoolCompanyCreateAssignment extends Command
 {
