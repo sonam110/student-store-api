@@ -16,15 +16,26 @@ class CoolCompanyController extends Controller
     {
         try
         {
+
             if(!empty($request->per_page_record))
             {
-                $categoryMasters = CoolCompanyAssignment::with('user:id,first_name,last_name,profile_pic_path','user.studentDetail:user_id,cool_company_id')->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $assignments = CoolCompanyAssignment::with('user:id,first_name,last_name,profile_pic_path','user.studentDetail:user_id,cool_company_id')
+                if(Auth::user()->user_type_id != 1) 
+                {
+                    $assignmentsList = $assignments->where('user_id', Auth::id());
+                }
+                $assignmentsList = $assignments->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $categoryMasters = CoolCompanyAssignment::with('user:id,first_name,last_name,profile_pic_path','user.studentDetail:user_id,cool_company_id')->orderBy('created_at','DESC')->get();
+                $assignments = CoolCompanyAssignment::with('user:id,first_name,last_name,profile_pic_path','user.studentDetail:user_id,cool_company_id')
+                if(Auth::user()->user_type_id != 1) 
+                {
+                    $assignmentsList = $assignments->where('user_id', Auth::id());
+                }
+                $assignmentsList = $assignments->orderBy('created_at','DESC')->get();
             }
-            return response(prepareResult(false, $categoryMasters, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+            return response(prepareResult(false, $assignmentsList, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
         }
         catch (\Throwable $exception) 
         {
