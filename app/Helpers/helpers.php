@@ -205,3 +205,8 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	$refund->reason_for_refund   		= $refundOrderItemReason;
 	$refund->save();
 }
+
+function strReplaceAssoc(array $replace, $subject) 
+{ 
+	return str_replace(array_keys($replace), array_values($replace), $subject);
+}

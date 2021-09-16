@@ -20,7 +20,7 @@ use App\Models\OrderItemDispute;
 use App\Models\PaymentCardDetail;
 use App\Models\AppSetting;
 use App\Models\EmailTemplate;
-use App\Mail\OrderPlacedMail;
+use App\Mail\OrderMail;
 use App\Mail\OrderConfirmedMail;
 use Mail;
 use App\Models\ReasonForAction;
@@ -29,6 +29,7 @@ use App\Models\ContestApplication;
 use Session;
 use App\Models\Package;
 use App\Models\ShippingCondition;
+use \mervick\aesEverywhere\AES256;
 
 
 
@@ -315,10 +316,11 @@ class OrderController extends Controller
 		                    $body = $emailTemplate->body;
 
 		                    $arrayVal = [
-		                    	'{{user_name}}' => $order->user->first_name.' '.$order->user->last_name,
+		                    	'{{user_name}}' => AES256::decrypt($order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($order->last_name, env('ENCRYPTION_KEY')),
+		                    	// '{{user_name}}' => $order->user->first_name.' '.$order->user->last_name,
 		                    	'{{order_number}}' => $order->order_number,
 		                    ];
-		                    $body = $this->strReplaceAssoc($arrayVal, $body);
+		                    $body = strReplaceAssoc($arrayVal, $body);
 		                    
 		                    $details = [
 		                    	'title' => $emailTemplate->subject,
@@ -901,13 +903,22 @@ class OrderController extends Controller
 
 			//Mail Start
 
-			$emailTemplate = EmailTemplate::where('template_for','order confirmed')->first();
+			$emailTemplate = EmailTemplate::where('template_for','order_confirmed')->first();
+
+			$body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+			];
+			$body = strReplaceAssoc($arrayVal, $body);
+			
 			$details = [
-			    'title' => $emailTemplate->subject,
-			    'body' => $emailTemplate->body
+				'title' => $emailTemplate->subject,
+				'body' => $body
 			];
 			
-			Mail::to($user->email)->send(new OrderConfirmedMail($details));
+			Mail::to($orderItem->order->email)->send(new OrderMail($details));
 
 			//Mail End
 		}
