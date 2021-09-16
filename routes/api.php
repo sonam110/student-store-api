@@ -401,8 +401,11 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 });
 Route::post('/get-freelancer-info', [App\Http\Controllers\API\CoolCompanyController::class,'getFreelancerInfo']);
+Route::get('/get-team-member', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMember']);
+Route::get('/get-team-member/{teamMemberId}', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMemberInfo']);
 Route::post('/payment-current-status', [App\Http\Controllers\API\CoolCompanyController::class,'paymentCurrentStatus']);
-Route::post('/get-group-invoice-by-id', [App\Http\Controllers\API\CoolCompanyController::class,'getGroupInvoiceById']);
+Route::get('/get-group-invoices', [App\Http\Controllers\API\CoolCompanyController::class,'getGroupInvoices']);
+Route::get('/get-group-invoice-by-id/{groupInvoiceId}', [App\Http\Controllers\API\CoolCompanyController::class,'getGroupInvoiceById']);
 // Route::get('/orders-export', [App\Http\Controllers\API\Admin\ExportController::class, 'ordersExport']);
 
 

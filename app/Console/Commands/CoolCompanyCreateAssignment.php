@@ -141,6 +141,29 @@ class CoolCompanyCreateAssignment extends Command
                             'is_sent_to_cool_company'   => '1',
                             'sent_to_cool_company_date' => date('Y-m-d')
                         ]);
+
+                        // Start Assignment
+                        $startData = [
+                            'action'   => 'Start'
+                        ];                        
+                        $getAssignmentInfo = CoolCompanyAssignment::select('cool_company_freelancer_id','assignmentId','is_start_assignment','start_assignment_date','start_assignment_response')->find($createAssignment->id);
+                        $startAssignment = $this->startAssignment($access_token, $getAssignmentInfo->assignmentId, $startData);
+                        if(!empty($startAssignment))
+                        {
+                            $dataReport = json_decode($startAssignment, true);
+                            foreach ($dataReport['teamMembers'] as $value) {
+                                foreach ($value['reports'] as $report) {
+                                    $approveAssignment = $this->approveAssignment($access_token, $getAssignmentInfo->assignmentId, $report['id']);
+                                }
+                            }
+                        
+                            //update response
+                            $getAssignmentInfo->is_start_assignment = 1;
+                            $getAssignmentInfo->start_assignment_date = date('Y-m-d');
+                            $getAssignmentInfo->start_assignment_response = $dataReport;
+                            $getAssignmentInfo->save();
+                            Log::channel('customlog')->info('Assignment Start. Cool Company Start Assignment Id: '.$createAssignment->id);
+                        }
                     }
                     Log::channel('customlog')->info('Assignment Created.');
                 } else {
@@ -222,7 +245,42 @@ class CoolCompanyCreateAssignment extends Command
             Log::channel('customlog')->error('Getting error while create an assignments.');
             $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
             Log::channel('customlog')->error($error);
-            die;
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==200 || $response_code==201)
+        {
+            return $response;
+        }
+        return false;
+    }
+
+    private function approveAssignment($accessToken, $assignmentId, $timeReportId)
+    {
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Assignments/'.$assignmentId.'/reports/'.$timeReportId.'/approve';
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'PATCH',
+          CURLOPT_HTTPHEADER => array(
+            'Accept-Language: en',
+            'Accept: application/json',
+            'Authorization: Bearer '.$accessToken,
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        if ($response === false) {
+            Log::channel('customlog')->error('Getting error while approve assignments.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);

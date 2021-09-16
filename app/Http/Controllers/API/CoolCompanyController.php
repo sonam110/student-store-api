@@ -32,30 +32,6 @@ class CoolCompanyController extends Controller
         }
     }
 
-    public function getFreelancerInfo(Request $request)
-    {
-        $access_token = null;
-        $tokenExpired = time();
-
-        if(empty($access_token) || time() > $tokenExpired)
-        {
-            $getToken = $this->getAccessToken();
-            if(!$getToken) {
-                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-            }
-            $access_token   = $getToken['access_token'];
-            $tokenExpired   = $getToken['expire_time'];
-        }
-        $cool_company_id = $request->cool_company_id;
-        $response = $this->checkFreelancerInfo($access_token, $cool_company_id);
-        if(!empty($response))
-        {
-            $jsonDecode = json_decode($response, true);
-            return response(prepareResult(false, $jsonDecode, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
-        }
-        return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-    }
-
     public function startAndApproveAssignment(Request $request)
     {
         $access_token = null;
@@ -122,7 +98,7 @@ class CoolCompanyController extends Controller
         return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
     }
 
-    public function getGroupInvoiceById(Request $request)
+    public function getTeamMember()
     {
         $access_token = null;
         $tokenExpired = time();
@@ -136,20 +112,79 @@ class CoolCompanyController extends Controller
             $access_token   = $getToken['access_token'];
             $tokenExpired   = $getToken['expire_time'];
         }
-        $assignmentId = $request->assignmentId;
-        $timeReportId = $request->timeReportId;
-        $response = $this->checkPyamentStatus($access_token, $assignmentId, $timeReportId);
+
+        $response = $this->teamMember($access_token);
         if(!empty($response))
         {
-            $jsonDecode = json_decode($response, true);
-            if(!empty($jsonDecode['groupInvoiceId']))
-            {
-                $response = $this->groupInvoiceById($access_token, $jsonDecode['groupInvoiceId']);
-                if(!empty($response))
-                {
-                    return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
-                }
+            return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+        }
+        return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    }
+
+    public function getTeamMemberInfo($teamMemberId)
+    {
+        $access_token = null;
+        $tokenExpired = time();
+
+        if(empty($access_token) || time() > $tokenExpired)
+        {
+            $getToken = $this->getAccessToken();
+            if(!$getToken) {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
             }
+            $access_token   = $getToken['access_token'];
+            $tokenExpired   = $getToken['expire_time'];
+        }
+
+        $response = $this->teamMemberInfo($access_token, $teamMemberId);
+        if(!empty($response))
+        {
+            return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+        }
+        return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    }
+
+    public function getGroupInvoices()
+    {
+        $access_token = null;
+        $tokenExpired = time();
+
+        if(empty($access_token) || time() > $tokenExpired)
+        {
+            $getToken = $this->getAccessToken();
+            if(!$getToken) {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+            $access_token   = $getToken['access_token'];
+            $tokenExpired   = $getToken['expire_time'];
+        }
+
+        $response = $this->groupInvoice($access_token);
+        if(!empty($response))
+        {
+            return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+        }
+        return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    }
+
+    public function getGroupInvoiceById($groupInvoiceId)
+    {
+        $access_token = null;
+        $tokenExpired = time();
+
+        if(empty($access_token) || time() > $tokenExpired)
+        {
+            $getToken = $this->getAccessToken();
+            if(!$getToken) {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+            $access_token   = $getToken['access_token'];
+            $tokenExpired   = $getToken['expire_time'];
+        }
+        $response = $this->groupInvoiceById($access_token, $groupInvoiceId);
+        if(!empty($response))
+        {
+            return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
         }
         return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
     }
@@ -195,43 +230,6 @@ class CoolCompanyController extends Controller
                 'expire_time'   => strtotime($getToken['expires_in'].' sec', time())
             ];
             return $returnData;
-        }
-        return false;
-    }
-
-    private function checkFreelancerInfo($accessToken, $cool_company_id)
-    {
-        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Teammembers/'.$cool_company_id;
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-          CURLOPT_URL => $url,
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => '',
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => 'GET',
-          CURLOPT_HTTPHEADER => array(
-            'Accept-Language: en',
-            'Accept: application/json',
-            'Authorization: Bearer '.$accessToken,
-            'Content-Type: application/json'
-          ),
-        ));
-
-        $response = curl_exec($curl);
-        if ($response === false) {
-            Log::channel('customlog')->error('Getting error while checking payment status.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
-            Log::channel('customlog')->error($error);
-            die;
-        }
-        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
-        if($response_code==200 || $response_code==201)
-        {
-            return $response;
         }
         return false;
     }
@@ -336,6 +334,117 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while checking payment status.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
+            die;
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==200 || $response_code==201)
+        {
+            return $response;
+        }
+        return false;
+    }
+
+    private function teamMember($accessToken)
+    {
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Teammembers';
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+          CURLOPT_HTTPHEADER => array(
+            'Accept-Language: en',
+            'Accept: application/json',
+            'Authorization: Bearer '.$accessToken,
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        if ($response === false) {
+            Log::channel('customlog')->error('Getting error while getting team member list.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
+            die;
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==200 || $response_code==201)
+        {
+            return $response;
+        }
+        return false;
+    }
+
+    private function teamMemberInfo($accessToken, $teamMemberId)
+    {
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Teammembers/'.$teamMemberId;
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+          CURLOPT_HTTPHEADER => array(
+            'Accept-Language: en',
+            'Accept: application/json',
+            'Authorization: Bearer '.$accessToken,
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        if ($response === false) {
+            Log::channel('customlog')->error('Getting error while getting team member list.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
+            die;
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==200 || $response_code==201)
+        {
+            return $response;
+        }
+        return false;
+    }
+
+    private function groupInvoice($accessToken)
+    {
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/GroupInvoice';
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+          CURLOPT_HTTPHEADER => array(
+            'Accept-Language: en',
+            'Accept: application/json',
+            'Authorization: Bearer '.$accessToken,
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        if ($response === false) {
+            Log::channel('customlog')->error('Getting error while getting team member list.');
             $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
             Log::channel('customlog')->error($error);
             die;
