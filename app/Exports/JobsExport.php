@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Auth;
+use mervick\aesEverywhere\AES256;
 
 class JobsExport implements FromCollection, WithHeadings
 {
@@ -77,7 +78,7 @@ class JobsExport implements FromCollection, WithHeadings
     		return [
     			'SNO'             				=> $key+1,
     			'id'                            => $data->id,
-                'user'                       => $data->user->first_name.' '.$data->user->last_name,
+                'user'                       => AES256::decrypt($data->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($data->user->last_name, env('ENCRYPTION_KEY')),
                 // 'language_id'                   => $data->language->title,
                 // 'address_detail_id'             => $data->address_detail_id,
                 // 'category_master_id'            => $data->categoryMaster->title,
@@ -106,7 +107,7 @@ class JobsExport implements FromCollection, WithHeadings
                 'promotion_start_date'          => $data->promotion_start_date,
                 'promotion_end_date'            => $data->promotion_end_date,
                 'view_count'                    => $data->view_count,
-              	'Created at'      				=>  $data->created_at,
+              	'Created at'      				=> $data->created_at,
     		];
     	});
     }

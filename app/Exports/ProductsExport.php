@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Auth;
+use mervick\aesEverywhere\AES256;
 
 class ProductsExport implements FromCollection, WithHeadings
 {
@@ -109,7 +110,7 @@ class ProductsExport implements FromCollection, WithHeadings
     		return [
     			'SNO'             				=> $key+1,
     			'id'      						=> $data->id,
-    			'user_name'						=> $data->user->first_name.' '.$data->user->last_name,
+    			'user_name'						=> AES256::decrypt($data->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($data->user->last_name, env('ENCRYPTION_KEY')),
     			'category_master'				=> $data->categoryMaster->title,
     			// 'sub_category'					=> $data->subCategory->title,
     			'title'							=> $data->title,
@@ -162,7 +163,7 @@ class ProductsExport implements FromCollection, WithHeadings
     			'is_sold'						=> $data->is_sold,
     			'sold_at_student_store'			=> $data->sold_at_student_store,
     			'days_taken'					=> $data->days_taken,
-              	'Created at'      				=>  $data->created_at,
+              	'Created at'      				=> $data->created_at,
     		];
     	});
     }

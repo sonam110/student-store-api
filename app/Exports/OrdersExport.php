@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Auth;
+use mervick\aesEverywhere\AES256;
 
 class OrdersExport implements FromCollection, WithHeadings
 {
@@ -124,10 +125,10 @@ class OrdersExport implements FromCollection, WithHeadings
     			// 'promo_code_discount'			=> $data->promo_code_discount,
     			'grand_total'					=> $data->grand_total,
     			// 'remark'						=> $data->remark,
-    			'first_name'					=> $data->first_name,
-    			'last_name'						=> $data->last_name,
-    			'email'							=> $data->email,
-    			'contact_number'				=> $data->contact_number,
+    			'first_name'					=> AES256::decrypt($data->first_name, env('ENCRYPTION_KEY')),
+    			'last_name'						=> AES256::decrypt($data->last_name, env('ENCRYPTION_KEY')),
+    			'email'							=> AES256::decrypt($data->email, env('ENCRYPTION_KEY')),
+    			'contact_number'				=> AES256::decrypt($data->contact_number, env('ENCRYPTION_KEY')),
     			'country'						=> $data->country,
     			'state'							=> $data->state,
     			'city'							=> $data->city,

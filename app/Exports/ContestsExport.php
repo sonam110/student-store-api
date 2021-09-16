@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Auth;
+use mervick\aesEverywhere\AES256;
 
 class ContestsExport implements FromCollection, WithHeadings
 {
@@ -113,7 +114,7 @@ class ContestsExport implements FromCollection, WithHeadings
     			'SNO'             				=> $key+1,
     			// 'auto_id'						=> $data->auto_id,
                 'id'							=> $data->id,
-                'user'							=> $data->user->first_name.' '.$data->user->last_name,
+                'user'							=> AES256::decrypt($data->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($data->user->last_name, env('ENCRYPTION_KEY')),
                 // 'address_detail_id'				=> $data->address_detail_id,
                 'category_master_id'			=> $data->categoryMaster ? $data->categoryMaster->title : '',
                 // 'service_provider_type_id'		=> $data->service_provider_type_id,
