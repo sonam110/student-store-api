@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ccbbcff5f20c7b0680f6a585b000cf0c",
+    "content-hash": "ff56b4972b214edb621f9be9bd03377e",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2613,6 +2613,43 @@
                 "vector"
             ],
             "time": "2021-05-25T15:42:17+00:00"
+        },
+        {
+            "name": "mervick/aes-everywhere",
+            "version": "v1.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mervick/aes-everywhere.git",
+                "reference": "5b0078aa579b5f4775979ec9a1b8b3c8c2debdbc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mervick/aes-everywhere/zipball/5b0078aa579b5f4775979ec9a1b8b3c8c2debdbc",
+                "reference": "5b0078aa579b5f4775979ec9a1b8b3c8c2debdbc",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "mervick\\aesEverywhere\\tests\\": "php//tests//",
+                    "mervick\\aesEverywhere\\": "php//src//"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andrey Izman",
+                    "email": "izmanw@gmail.com"
+                }
+            ],
+            "description": "Aes Everywhere - Cross Language Encryption Library (AES/256/CBC/PKCS5)",
+            "time": "2019-09-15T19:41:29+00:00"
         },
         {
             "name": "moneyphp/money",
@@ -9640,7 +9677,6 @@
                     "type": "github"
                 }
             ],
-            "abandoned": true,
             "time": "2020-09-28T06:45:17+00:00"
         },
         {

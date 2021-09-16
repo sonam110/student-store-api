@@ -28,23 +28,14 @@ class CategoriesImport implements ToModel,WithHeadingRow
     */
     public function model(array $row)
     {
-        if(Language::where('title',$this->data['language_title'])->count() > 0)
-        {
-            $language = Language::where('title',$this->data['language_title'])->first();
-        }
-        else
-        {
-            $language = new Language;
-            $language->title                = $this->data['language_title'];
-            $language->value                = $this->data['language_value'];
-            $language->status               = 1;
-            $language->save();
-        }
+        $languages = $this->data['languages'];
 
-        if(!empty($row['parent_category_title']))
+        // $languages = ['english','swedish','hindi'];
+
+        if(!empty($this->data['category_master_id']))
         {
             $is_parent = 0;
-            $category_master_id = CategoryMaster::where('title',$row['parent_category_title'])->first()->id;
+            $category_master_id = $this->data['category_master_id'];
         }
         else
         {
@@ -52,31 +43,49 @@ class CategoriesImport implements ToModel,WithHeadingRow
             $category_master_id = null;
         }
 
+        $slug_prefix = (string) \Uuid::generate(4);
+
         $categoryMaster = new CategoryMaster;
         $categoryMaster->module_type_id     = $this->data['module_type_id'];
         $categoryMaster->category_master_id = $category_master_id;
-        $categoryMaster->title              = $row['title'];
-        $categoryMaster->slug               = Str::slug($row['title']);
+        $categoryMaster->title              = $row['category_in_english'];
+        $categoryMaster->slug               = $slug_prefix.'-'.Str::slug($row['category_in_english']);
         $categoryMaster->status             = 1;
         $categoryMaster->save();
         if($categoryMaster)
         {
-            if(empty($row['parent_category_title']))
+            if(empty($this->data['category_master_id']))
             {
-                $is_parent = 1;
                 $category_master_id = $categoryMaster->id;
             }
-            $categoryDetail = new CategoryDetail;
-            $categoryDetail->category_master_id = $category_master_id;
-            $categoryDetail->language_id        = $language->id;
-            $categoryDetail->is_parent          = $is_parent;
-            $categoryDetail->title              = $row['title'];
-            $categoryDetail->slug               = Str::slug($row['title']);
-            $categoryDetail->description        = Str::slug($row['description']);
-            $categoryDetail->status             = 1;
-            $categoryDetail->save();
+
+            foreach($languages as $key => $value)
+            {
+                if(Language::where('title',$value)->count() > 0)
+                {
+                    $language = Language::where('title',$value)->first();
+                }
+                else
+                {
+                    $language = new Language;
+                    $language->title                = $value;
+                    $language->value                = $value;
+                    $language->status               = 1;
+                    $language->save();
+                }
+
+                
+
+                $categoryDetail = new CategoryDetail;
+                $categoryDetail->category_master_id = $category_master_id;
+                $categoryDetail->language_id        = $language->id;
+                $categoryDetail->is_parent          = $is_parent;
+                $categoryDetail->title              = $row['category_in_'.$value];
+                $categoryDetail->slug               = $categoryMaster->slug;
+                $categoryDetail->status             = 1;
+                $categoryDetail->save();
+            }
         }
-        
         return;
     }
 }

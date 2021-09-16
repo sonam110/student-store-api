@@ -29,7 +29,6 @@ use App\Models\ContestApplication;
 use Session;
 use App\Models\Package;
 use App\Models\ShippingCondition;
-use \mervick\aesEverywhere\AES256;
 
 
 
@@ -316,8 +315,7 @@ class OrderController extends Controller
 		                    $body = $emailTemplate->body;
 
 		                    $arrayVal = [
-		                    	'{{user_name}}' => AES256::decrypt($order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($order->last_name, env('ENCRYPTION_KEY')),
-		                    	// '{{user_name}}' => $order->user->first_name.' '.$order->user->last_name,
+		                    	'{{user_name}}' => $order->user->first_name.' '.$order->user->last_name,
 		                    	'{{order_number}}' => $order->order_number,
 		                    ];
 		                    $body = strReplaceAssoc($arrayVal, $body);
@@ -908,7 +906,7 @@ class OrderController extends Controller
 			$body = $emailTemplate->body;
 
 			$arrayVal = [
-				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{user_name}}' => $orderItem->order->first_name.' '.$orderItem->order->last_name,
 				'{{order_item}}' => $orderItem->title,
 			];
 			$body = strReplaceAssoc($arrayVal, $body);
