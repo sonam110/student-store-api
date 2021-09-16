@@ -17,4 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/payout', 'App\Http\Controllers\API\FrontController@payout');
+
 Route::get('/login', [App\Http\Controllers\Admin\MasterController::class,'login'])->name('login');
