@@ -34,11 +34,7 @@ use App\Models\ProductsServicesBook;
 use App\Models\Contest;
 use App\Models\CoolCompanyAssignment;
 use App\Models\CoolCompanyFreelancer;
-
-
-
-
-
+use \mervick\aesEverywhere\AES256;
 
 class User extends Authenticatable
 {
@@ -62,6 +58,71 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getFirstNameAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getLastNameAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getGenderAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getDobAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getEmailAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getContactNumberAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getCpFirstNameAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getCpLastNameAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getCpEmailAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getCpContactNumberAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getCpGenderAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getGuardianFirstNameAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getGuardianLastNameAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getGuardianEmailAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getGuardianContactNumberAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getSocialSecurityNumberAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
 
     public function language()
     {

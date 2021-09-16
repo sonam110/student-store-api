@@ -19,6 +19,22 @@ class Order extends Model
         'user_id','address_detail_id','order_status','sub_total','item_discount','tax','shipping_charge','total','promo_code','promo_code_discount','grand_total','remark','first_name','last_name','email','contact_number','latitude','longitude','country','state','city','full_address','order_number','used_reward_points','reward_point_status','payable_amount','vat','order_for'
     ];
 
+    public function getFirstNameAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getLastNameAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getEmailAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
+    public function getContactNumberAttribute($value)
+    {
+        return AES256::encrypt($value, env('ENCRYPTION_KEY'));
+    }
 
     public function user()
     {

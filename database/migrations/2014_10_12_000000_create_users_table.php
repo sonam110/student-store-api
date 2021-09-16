@@ -20,12 +20,12 @@ class CreateUsersTable extends Migration
             $table->foreignId('language_id',10)->constrained()->onDelete('cascade');
             $table->foreignId('user_type_id',100)->constrained()->onDelete('cascade');
             
-            $table->string('first_name',100);
-            $table->string('last_name',100)->nullable();
-            $table->string('gender',10)->nullable();
-            $table->date('dob')->nullable();
-            $table->string('email',100)->unique();
-            $table->bigInteger('contact_number')->unique();
+            $table->string('first_name');
+            $table->string('last_name')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('dob')->nullable();
+            $table->string('email')->unique();
+            $table->string('contact_number')->unique();
             $table->string('password');
             $table->rememberToken();
             $table->timestamp('email_verified_at')->nullable();
@@ -40,14 +40,14 @@ class CreateUsersTable extends Migration
             $table->string('cp_first_name')->nullable();
             $table->string('cp_last_name')->nullable();
             $table->string('cp_email')->nullable();
-            $table->bigInteger('cp_contact_number')->nullable();
-            $table->string('cp_gender',10)->nullable();
+            $table->string('cp_contact_number')->nullable();
+            $table->string('cp_gender')->nullable();
             $table->boolean('is_minor')->nullable();
             $table->string('guardian_first_name')->nullable();
             $table->string('guardian_last_name')->nullable();
             $table->string('guardian_email')->nullable();
             $table->string('guardian_password')->nullable();
-            $table->bigInteger('guardian_contact_number')->nullable();
+            $table->string('guardian_contact_number')->nullable();
             $table->boolean('is_guardian_email_verified')->nullable();
             $table->boolean('is_guardian_contact_number_verified')->nullable();
             $table->boolean('is_verified')->default(false)->nullable();

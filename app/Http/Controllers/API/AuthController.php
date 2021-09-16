@@ -24,7 +24,6 @@ use App\Models\EmailTemplate;
 use App\Models\SmsTemplate;
 use App\Mail\RegistrationMail;
 use Stripe;
-use \mervick\aesEverywhere\AES256;
 
 class AuthController extends Controller
 {
@@ -81,7 +80,7 @@ class AuthController extends Controller
 			}
 			
 			$otp = rand(1000,9999);
-			$this->sendOtp(AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')),$otp);
+			$this->sendOtp($request->contact_number,$otp);
 
 			return response()->json(prepareResult(false, ['otp'=>$otp], getLangByLabelGroups('messages','message_otp_sent')), config('http_response.success'));
 		}
@@ -143,7 +142,7 @@ class AuthController extends Controller
 
 		if($request->dob)
 		{
-			$dob = $request->dob;
+			$dob = date("Y-m-d", strtotime($request->dob));
 		}
 		else
 		{
@@ -318,7 +317,7 @@ class AuthController extends Controller
 				$body = $emailTemplate->body;
 
 				$arrayVal = [
-					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
+					'{{user_name}}' => $user->first_name.' '.$user->last_name,
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
 				
@@ -327,7 +326,7 @@ class AuthController extends Controller
 					'body' => $body
 				];
 				
-				Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
+				Mail::to($user->email)->send(new RegistrationMail($details));
 
 				//------------------------Mail End-------------------------//
 			}
@@ -403,7 +402,7 @@ class AuthController extends Controller
 			$body = $emailTemplate->body;
 
 			$arrayVal = [
-				'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
+				'{{user_name}}' => $user->first_name.' '.$user->last_name,
 			];
 			$body = $this->strReplaceAssoc($arrayVal, $body);
 			
@@ -412,7 +411,7 @@ class AuthController extends Controller
 				'body' => $body
 			];
 			
-			Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
+			Mail::to($user->email)->send(new RegistrationMail($details));
 
 			//------------------------Mail End-------------------------//
 
@@ -442,7 +441,7 @@ class AuthController extends Controller
 
 		try
 		{
-			$user = User::where('email',AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')))->orWhere('contact_number',AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')))->orWhere('guardian_email',AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')))->orWhere('guardian_contact_number',AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')))->first(['id','first_name','last_name','email','contact_number','profile_pic_path','user_type_id','language_id','password','guardian_email','guardian_contact_number','is_minor']);
+			$user = User::where('email',$request->contact_number)->orWhere('contact_number',$request->contact_number)->orWhere('guardian_email',$request->contact_number)->orWhere('guardian_contact_number',$request->contact_number)->first(['id','first_name','last_name','email','contact_number','profile_pic_path','user_type_id','language_id','password','guardian_email','guardian_contact_number','is_minor']);
 			
 
 			if (!$user) {
@@ -459,7 +458,7 @@ class AuthController extends Controller
 				$user['login_with_guardian_data'] = false;
 
 
-				if(($user->is_minor == true) && ((AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')) == AES256::decrypt($user->email, env('ENCRYPTION_KEY'))) or (AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')) == AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY')))))
+				if(($user->is_minor == true) && (($request->contact_number == $user->email) or ($request->contact_number == $user->contact_number)))
 				{
 					$user['login_with_guardian_data'] = true;
 				}
@@ -555,7 +554,7 @@ class AuthController extends Controller
 		{
 			try
 			{
-				$email = AES256::decrypt($request->email, env('ENCRYPTION_KEY'));
+				$email = $request->email;
 				$user = User::where('email',$email)->orWhere('guardian_email',$email)->first();
 				if(!$user)
 				{
@@ -572,7 +571,7 @@ class AuthController extends Controller
 				$body = $emailTemplate->body;
 
 				$arrayVal = [
-					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
+					'{{user_name}}' => $user->first_name.' '.$user->last_name,
 					'{{otp}}'		=> $otp,
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
@@ -597,13 +596,13 @@ class AuthController extends Controller
 		{
 			try
 			{
-				$user = User::where('contact_number',AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')))->orWhere('guardian_contact_number',AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')))->first();
+				$user = User::where('contact_number',$request->contact_number)->orWhere('guardian_contact_number',$request->contact_number)->first();
 				if(!$user)
 				{
 					return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_not_exists')), config('http_response.internal_server_error'));
 				}
 				$otp = rand(1000,9999);
-				$this->sendOtp(AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')),$otp);
+				$this->sendOtp($request->contact_number,$otp);
 
 				return response()->json(prepareResult(false, ['otp'=>$otp,'user_id'=>$user->id], getLangByLabelGroups('messages','message_otp_sent')), config('http_response.success'));
 			}
@@ -631,7 +630,7 @@ class AuthController extends Controller
 		try
 		{
 			$user = User::find($request->user_id);
-			if((AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')) == AES256::decrypt($user->guardian_contact_number, env('ENCRYPTION_KEY'))) || (AES256::decrypt($request->contact_number, env('ENCRYPTION_KEY')) == AES256::decrypt($user->guardian_email, env('ENCRYPTION_KEY'))))
+			if(($request->contact_number == $user->guardian_contact_number) || ($request->contact_number == $user->guardian_email))
 			{
 				$user->guardian_password   = bcrypt($request->new_password);
 			}
