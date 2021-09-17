@@ -20,6 +20,9 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\CvsViewLog;
 use App\Models\SharedRewardPoint;
+use App\Models\EmailTemplate;
+use App\Mail\OrderMail;
+use Mail;
 
 class UserProfileController extends Controller
 {
@@ -258,8 +261,32 @@ class UserProfileController extends Controller
 			$userPackageSubscription->top_up_fee            = $package->top_up_fee;
 			$userPackageSubscription->save();
 		}
-
 		$user = Auth::user();
+
+        //Mail Start
+
+            $emailTemplate = EmailTemplate::where('template_for','package_upgrade')->first();
+
+            $body = $emailTemplate->body;
+
+            $arrayVal = [
+            	'{{user_name}}' => $user->first_name.' '.$user->last_name,
+            	'{{module}}' => 	$userPackageSubscription->module,
+            	'{{valid_till}}' => $userPackageSubscription->package_valid_till,
+            	'{{package_type}}' => $userPackageSubscription->type_of_package,
+            ];
+            $body = strReplaceAssoc($arrayVal, $body);
+            
+            $details = [
+            	'title' => $emailTemplate->subject,
+            	'body' => $body
+            ];
+            
+            Mail::to($user)->send(new OrderMail($details));
+
+		//Mail End
+
+		
 		if($user)
 		{
 			return response(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_updated')), config('http_response.created'));
@@ -397,5 +424,11 @@ class UserProfileController extends Controller
 	{
 		$data = Auth::user()->coolCompanyFreelancer;
 		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_cool_company_freelancer_list')), config('http_response.created'));
+	}
+
+	public function unreadNotifications()
+	{
+		$data = Auth::user()->unreadNotifications->count();
+		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_unread_notiication_count')), config('http_response.created'));
 	}
 }

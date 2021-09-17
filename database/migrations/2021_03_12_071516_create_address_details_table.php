@@ -25,7 +25,7 @@ class CreateAddressDetailsTable extends Migration
             $table->string('country',100)->nullable();
             $table->string('state',100)->nullable();
             $table->string('city',100)->nullable();
-            $table->bigInteger('zip_code')->nullable();
+            $table->string('zip_code')->nullable();
             $table->text('full_address')->nullable();
             $table->string('address_type',20)->nullable();
             $table->boolean('is_default')->default(false)->nullable();
