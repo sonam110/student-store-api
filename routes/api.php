@@ -383,6 +383,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/orders-export', [App\Http\Controllers\API\Admin\ExportController::class, 'ordersExport']);
 	Route::post('/languages-export', [App\Http\Controllers\API\Admin\ExportController::class, 'languagesExport']);
 	Route::post('/categories-export', [App\Http\Controllers\API\Admin\ExportController::class, 'categoriesExport']);
+	Route::post('/sample-categories-export', [App\Http\Controllers\API\Admin\ExportController::class, 'sampleCategoriesExport']);
 	Route::post('/labels-export', [App\Http\Controllers\API\Admin\ExportController::class, 'labelsExport']);
 
 

@@ -16,6 +16,8 @@ use App\Exports\OrdersExport;
 use App\Exports\LanguagesExport;
 use App\Exports\LabelsExport;
 use App\Exports\CategoriesExport;
+use App\Exports\SampleCategoriesExport;
+
 
 
 
@@ -71,6 +73,13 @@ class ExportController extends Controller
         $data = ['ids' => $request->category_master_id,'module_type_id' => $request->module_type_id, 'language_id' => $request->language_id];
         $excel = Excel::store(new CategoriesExport($data), 'export/categories'.$rand.'.xlsx' , 'export_path');
          return response(prepareResult(false, ['url' => env('ASSET_URL').'export/categories'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
+         
+    }
+    public function sampleCategoriesExport(Request $request) 
+    {
+        $rand = rand(10,99);
+        $excel = Excel::store(new SampleCategoriesExport(), 'export/sample_categories'.$rand.'.xlsx' , 'export_path');
+         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/sample_categories'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
          
     }
 
