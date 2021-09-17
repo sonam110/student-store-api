@@ -249,7 +249,9 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/dashboard-jobs-list', [App\Http\Controllers\API\DashboardController::class, 'jobsList']);
 
 
-	Route::get('/cool-company-assignment-list', [App\Http\Controllers\API\Admin\CoolCompanyController::class,'index']);
+	Route::get('/cool-company-assignment-list', [App\Http\Controllers\API\CoolCompanyController::class,'index']);
+	Route::get('/get-assignment-info/{assignmentId}', [App\Http\Controllers\API\CoolCompanyController::class,'getAssignmentInfo']);
+	Route::get('/cool-company-statistics', [App\Http\Controllers\API\CoolCompanyController::class,'coolCompanyStatistics']);
 
 });
 
@@ -402,7 +404,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	
 
 });
-Route::post('/get-freelancer-info', [App\Http\Controllers\API\CoolCompanyController::class,'getFreelancerInfo']);
+
 Route::get('/get-team-member', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMember']);
 Route::get('/get-team-member/{teamMemberId}', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMemberInfo']);
 Route::post('/payment-current-status', [App\Http\Controllers\API\CoolCompanyController::class,'paymentCurrentStatus']);

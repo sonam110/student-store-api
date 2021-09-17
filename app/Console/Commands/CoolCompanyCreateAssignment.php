@@ -105,7 +105,7 @@ class CoolCompanyCreateAssignment extends Command
                 }
 
                 $data = [
-                    'name'          => $user->user_id.' :Assignment, Date:'.date('Y-m-d'),
+                    'name'          => "Assignment:".time(),
                     'workTypeId'    => 2,
                     'teamMembers'   => [
                       [

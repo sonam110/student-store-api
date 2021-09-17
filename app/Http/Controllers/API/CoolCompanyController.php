@@ -44,6 +44,67 @@ class CoolCompanyController extends Controller
         }
     }
 
+    public function coolCompanyStatistics(Request $request)
+    {
+        try
+        {
+            $freelancer = CoolCompanyFreelancer::select('id');
+            if(Auth::user()->user_type_id != 1) 
+            {
+                $totalFreelancer = $freelancer->where('user_id', Auth::id());
+            }
+            $totalFreelancer = $freelancer->count();
+
+
+            $assignments = CoolCompanyAssignment::select('id');
+            if(Auth::user()->user_type_id != 1) 
+            {
+                $totalAssignment = $assignments->where('user_id', Auth::id());
+            }
+            $totalAssignment = $assignments->count();
+
+            $budget = CoolCompanyAssignment::select('id');
+            if(Auth::user()->user_type_id != 1) 
+            {
+                $totalBudget = $budget->where('user_id', Auth::id());
+            }
+            $totalBudget = $budget->sum('totalBudget');
+            $returnObj = [
+                'totalFreelancer'   => $totalFreelancer,
+                'totalAssignment'   => $totalAssignment,
+                'totalBudget'       => $totalBudget
+            ];
+
+            return response(prepareResult(false, $returnObj, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+        }
+        catch (\Throwable $exception) 
+        {
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
+    public function getAssignmentInfo($assignmentId)
+    {
+        $access_token = null;
+        $tokenExpired = time();
+
+        if(empty($access_token) || time() > $tokenExpired)
+        {
+            $getToken = $this->getAccessToken();
+            if(!$getToken) {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+            $access_token   = $getToken['access_token'];
+            $tokenExpired   = $getToken['expire_time'];
+        }
+        $response = $this->assignmentInfo($access_token, $assignmentId);
+        if(!empty($response))
+        {
+            return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+        }
+        return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    }
+
     public function startAndApproveAssignment(Request $request)
     {
         $access_token = null;
@@ -272,6 +333,43 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while start  assignment.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
+            die;
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==200 || $response_code==201)
+        {
+            return $response;
+        }
+        return false;
+    }
+
+    private function assignmentInfo($accessToken, $assignmentId)
+    {
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Assignments/'.$assignmentId;
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+          CURLOPT_HTTPHEADER => array(
+            'Accept-Language: en',
+            'Accept: application/json',
+            'Authorization: Bearer '.$accessToken,
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        if ($response === false) {
+            Log::channel('customlog')->error('Getting error while checking payment status.');
             $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
             Log::channel('customlog')->error($error);
             die;
