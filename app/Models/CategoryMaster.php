@@ -9,6 +9,7 @@ use App\Models\ModuleType;
 use App\Models\CategoryMaster;
 use App\Models\CategoryDetail;
 use App\Models\Brand;
+use App\Models\Language;
 
 class CategoryMaster extends Model
 {
@@ -70,6 +71,11 @@ class CategoryMaster extends Model
     public function categoryLanguageDetails()
     {
         return $this->hasMany(CategoryDetail::class, 'slug', 'slug');
+    }
+
+    public function language()
+    {
+        return $this->belongsTo(Language::class, 'language_id', 'id');
     }
 
     

@@ -26,33 +26,29 @@ class CategoriesExport implements FromCollection, WithHeadings
     public function headings(): array {
     	return [
     		'SNO',
-    		'module_type_id',
-            'category_master_id',
+    		'module',
+            'parent_category',
             'title',
-            'status',
-            'language_id',
-            'title',
-            'slug',
-            'description',
-            'is_parent',
-            'status',
-    		'Created At'
+            // 'slug',
+            // 'is_parent',
+            // 'language',
+    		// 'Created At'
     	];
     }
 
     public function collection()
     {
-    	$categories = CategoryMaster::join('category_details', function ($join) {
-                $join->on('category_masters.title', '=', 'category_details.title');
+    	$categories = CategoryMaster::select('category_masters.category_master_id','category_masters.slug','category_details.title','category_details.language_id','category_masters.module_type_id','category_details.is_parent')->join('category_details', function ($join) {
+                $join->on('category_masters.slug', '=', 'category_details.slug');
             })
-        ->orderBy('category_masters.created_at','desc');
+        ->orderBy('category_details.language_id','asc');
     	if(!empty($requestData->ids))
     	{
     		$categories = $categories->whereIn('category_masters.id',$requestData->ids);
     	}
     	if(!empty($requestData->module_type_id))
     	{
-    		$categories = $categories->where('category_details.module_type_id',$requestData->module_type_id);
+    		$categories = $categories->where('category_masters.module_type_id',$requestData->module_type_id);
     	}
         if(!empty($requestData->language_id))
         {
@@ -65,15 +61,13 @@ class CategoriesExport implements FromCollection, WithHeadings
     	return $categories->map(function ($data, $key) {
     		return [
     			'SNO'             				=> $key+1,
-    			'module_type_id'				=> $data->moduleType->title,
-    			'category_master_id'			=> $data->categoryMaster ? $data->categoryMaster->title : null,
+    			'module'				        => $data->moduleType->title,
+    			'parent_category'				=> $data->categoryMaster ? $data->categoryMaster->title : null,
     			'title'							=> $data->title,
-    			'status'						=> $data->status,
-    			'language_id'					=> $data->language_id,
-    			'title'							=> $data->title,
-    			'description'					=> $data->description,
-    			'is_parent'						=> $data->is_parent,
-              	'Created At'      				=> $data->created_at,
+    			// 'slug'							=> $data->slug,
+    			// 'is_parent'						=> $data->is_parent,
+    			// 'language_id'					=> $data->language->title,
+              	// 'Created At'      				=> $data->created_at,
     		];
     	});
     }

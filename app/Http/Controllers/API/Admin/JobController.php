@@ -133,7 +133,8 @@ class JobController extends Controller
                 $job->description                   = $request->description;
                 $job->duties_and_responsibilities   = $request->duties_and_responsibilities;
                 $job->nice_to_have_skills           = json_encode($request->nice_to_have_skills);
-                $job->meta_description              = substr($request->description, 0, 250);
+                // $job->meta_description              = substr($request->description, 0, 250);
+                $job->meta_description              = $request->meta_description;
                 $job->short_summary                 = substr($request->description, 0, 175);
                 $job->job_type                      = $request->job_type;
                 $job->job_nature                    = $request->job_nature;
@@ -262,7 +263,8 @@ class JobController extends Controller
             $job->description                   = $request->description;
             $job->duties_and_responsibilities   = $request->duties_and_responsibilities;
             $job->nice_to_have_skills           = json_encode($request->nice_to_have_skills);
-            $job->meta_description              = substr($request->description, 0, 250);
+            // $job->meta_description              = substr($request->description, 0, 250);
+            $job->meta_description              = $request->meta_description;
             $job->short_summary                 = substr($request->description, 0, 175);
             $job->job_type                      = $request->job_type;
             $job->job_nature                    = $request->job_nature;
