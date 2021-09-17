@@ -325,7 +325,7 @@ class OrderController extends Controller
 		                    	'body' => $body
 		                    ];
 		                    
-		                    Mail::to(Auth::user()->email)->send(new OrderMail($details));
+		                    Mail::to(AES256::decrypt(Auth::user()->email), env('ENCRYPTION_KEY'))->send(new OrderMail($details));
 
 	                    //Mail End
 	                }
