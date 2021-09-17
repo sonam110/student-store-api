@@ -282,7 +282,7 @@ class UserProfileController extends Controller
             	'body' => $body
             ];
             
-            Mail::to($user)->send(new OrderMail($details));
+            Mail::to($user->email)->send(new OrderMail($details));
 
 		//Mail End
 
