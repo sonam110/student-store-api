@@ -149,7 +149,7 @@ class ContestController extends Controller
                 $contest->is_deleted                    		= false;
                 $contest->status                    			= 'pending';
                 $contest->tags                         = json_encode($request->tags);
-                $contest->status                                = 'verified';
+                //$contest->status                                = 'verified';
                 $contest->save();
 
                 // $user_package->update(['used_number_of_contest'=>($user_package->used_number_of_contest + 1),'used_number_of_event'=>($user_package->used_number_of_event + 1)]);
