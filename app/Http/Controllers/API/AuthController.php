@@ -326,7 +326,7 @@ class AuthController extends Controller
 					'body' => $body
 				];
 				
-				Mail::to($user->email)->send(new RegistrationMail($details));
+				Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
 
 				//------------------------Mail End-------------------------//
 			}
@@ -411,7 +411,7 @@ class AuthController extends Controller
 				'body' => $body
 			];
 			
-			Mail::to($user->email)->send(new RegistrationMail($details));
+			Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
 
 			//------------------------Mail End-------------------------//
 
@@ -581,7 +581,7 @@ class AuthController extends Controller
 					'body' => $body
 				];
 				
-				$mail = Mail::to($email)->send(new ForgotPasswordMail($otp));
+				$mail = Mail::to(AES256::decrypt($email, env('ENCRYPTION_KEY')))->send(new ForgotPasswordMail($otp));
 
 				//------------------------Mail End-------------------------//
 

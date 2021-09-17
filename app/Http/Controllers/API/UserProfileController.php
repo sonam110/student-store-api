@@ -282,7 +282,7 @@ class UserProfileController extends Controller
             	'body' => $body
             ];
             
-            Mail::to($user->email)->send(new OrderMail($details));
+            Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($details));
 
 		//Mail End
 
