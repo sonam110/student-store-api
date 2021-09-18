@@ -368,6 +368,7 @@ class UserProfileController extends Controller
                 $join->on('order_items.order_id', '=', 'orders.id');
             })
 		->where('order_items.user_id',Auth::id())
+		->where('order_items.earned_reward_points', '>', 0)
 		->get(['orders.order_number','order_items.created_at','order_items.title','order_items.product_type','order_items.cover_image','order_items.item_status','order_items.price','order_items.quantity','order_items.earned_reward_points','order_items.reward_point_status']);
 		$data['reward_points_sharing_history'] 		= SharedRewardPoint::where('sender_id',Auth::id())->orWhere('receiver_id',Auth::id())->with('receiver:id,first_name,last_name,profile_pic_path','sender:id,first_name,last_name,profile_pic_path')->orderBy('created_at','desc')->get();
 
