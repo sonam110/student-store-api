@@ -94,7 +94,7 @@ class AuthController extends Controller
 	public function emailValidate(Request $request)
 	{
 		$validation = \Validator::make($request->all(),[ 
-			'email'=> 'email|required|unique:users',
+			'email'=> 'required|unique:users',
 		]);
 
 		if ($validation->fails()) {
@@ -115,9 +115,9 @@ class AuthController extends Controller
 	{
 		// return $request->all();
 		$validation = \Validator::make($request->all(),[ 
-			'first_name'      	=> 'required|max:55',
-			'email'          	=> 'email|required|unique:users',
-			'contact_number'    => 'numeric|required|unique:users',
+			'first_name'      	=> 'required',
+			'email'          	=> 'required|unique:users',
+			'contact_number'    => 'required|unique:users',
 			'password'      	=> 'required',
 		]);
 
