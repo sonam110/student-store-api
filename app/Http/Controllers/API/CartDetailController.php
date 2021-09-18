@@ -78,9 +78,9 @@ class CartDetailController extends Controller
             $quantity = $request->quantity;
 
 
-            if($productsServicesBook->quantity < $quantity)
+            if(($productsServicesBook->type != 'service') && $productsServicesBook->quantity < $quantity)
             {
-                return response()->json(prepareResult(true, ['quantity exceeded.Only '.$quantity.' left.'], getLangByLabelGroups('messages','message_quantity_exceeded')), config('http_response.bad_request'));
+                return response()->json(prepareResult(true, ['quantity exceeded.Only '.$productsServicesBook->quantity.' left.'], getLangByLabelGroups('messages','message_quantity_exceeded')), config('http_response.bad_request'));
             }
 
             if(CartDetail::where('user_id',Auth::id())->where('products_services_book_id',$request->products_services_book_id)->count() > 0)
@@ -91,7 +91,7 @@ class CartDetailController extends Controller
                 $left_quantity = $productsServicesBook->quantity - $cartDetail->quantity;
 
 
-                if($productsServicesBook->quantity < $quantity)
+                if(($productsServicesBook->type != 'service') && ($productsServicesBook->quantity < $quantity))
                 {
                     return response()->json(prepareResult(true, ['quantity exceeded.Only '.$left_quantity.' left.'], getLangByLabelGroups('messages','message_quantity_exceeded')), config('http_response.bad_request'));
                 }
