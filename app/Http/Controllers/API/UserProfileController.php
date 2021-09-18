@@ -23,6 +23,7 @@ use App\Models\SharedRewardPoint;
 use App\Models\EmailTemplate;
 use App\Mail\OrderMail;
 use Mail;
+use mervick\aesEverywhere\AES256;
 
 class UserProfileController extends Controller
 {
@@ -270,7 +271,7 @@ class UserProfileController extends Controller
             $body = $emailTemplate->body;
 
             $arrayVal = [
-            	'{{user_name}}' => $user->first_name.' '.$user->last_name,
+            	'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
             	'{{module}}' => 	$userPackageSubscription->module,
             	'{{valid_till}}' => $userPackageSubscription->package_valid_till,
             	'{{package_type}}' => $userPackageSubscription->type_of_package,

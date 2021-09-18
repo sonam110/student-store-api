@@ -141,10 +141,10 @@ class OrderController extends Controller
 			$order->promo_code_discount = $request->promo_code_discount;
 			$order->grand_total         = $request->grand_total;
 			$order->remark              = $request->remark;
-			$order->first_name          = Auth::user()->first_name;
-			$order->last_name           = Auth::user()->last_name;
-			$order->email               = Auth::user()->email;
-			$order->contact_number      = Auth::user()->contact_number;
+			$order->first_name          = (!empty(Auth::user()->first_name)) ? AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')) : NULL;
+			$order->last_name           = (!empty(Auth::user()->last_name)) ? AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY')) : NULL;
+			$order->email               = (!empty(Auth::user()->email)) ? AES256::decrypt(Auth::user()->email, env('ENCRYPTION_KEY')) : NULL;
+			$order->contact_number      = (!empty(Auth::user()->contact_number)) ? AES256::decrypt(Auth::user()->contact_number, env('ENCRYPTION_KEY')) : NULL;
 			$order->latitude            = AddressDetail::find($request->address_detail_id)->latitude;
 			$order->longitude           = AddressDetail::find($request->address_detail_id)->longitude;
 			$order->country             = AddressDetail::find($request->address_detail_id)->country;
@@ -315,7 +315,7 @@ class OrderController extends Controller
 		                    $body = $emailTemplate->body;
 
 		                    $arrayVal = [
-		                    	'{{user_name}}' => $order->user->first_name.' '.$order->user->last_name,
+		                    	'{{user_name}}' => AES256::decrypt($order->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($order->user->last_name, env('ENCRYPTION_KEY')),
 		                    	'{{order_number}}' => $order->order_number,
 		                    ];
 		                    $body = strReplaceAssoc($arrayVal, $body);
@@ -906,7 +906,7 @@ class OrderController extends Controller
 			$body = $emailTemplate->body;
 
 			$arrayVal = [
-				'{{user_name}}' => $orderItem->order->first_name.' '.$orderItem->order->last_name,
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
 				'{{order_item}}' => $orderItem->title,
 			];
 			$body = strReplaceAssoc($arrayVal, $body);

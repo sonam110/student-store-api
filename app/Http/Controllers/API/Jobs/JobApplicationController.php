@@ -128,7 +128,7 @@ class JobApplicationController extends Controller
                 $user_type = 'applicant';
                 $screen = 'my-jobs';
             }
-            $body =  'Status updated to '.$request->application_status.' by '.$user->name.'for Application on Job '.$jobApplication->job->title;
+            $body =  'Status updated to '.$request->application_status.' for Application on Job '.$jobApplication->job->title;
             $type = 'Job Application';
             pushNotification($title,$body,$user,$type,true,$user_type,'job',$jobApplication->id,$screen);
 

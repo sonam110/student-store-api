@@ -12,6 +12,8 @@ use Str;
 use DB;
 use Auth;
 use Event;
+use mervick\aesEverywhere\AES256;
+
 
 class ContestApplicationController extends Controller
 {
@@ -68,7 +70,7 @@ class ContestApplicationController extends Controller
                 // Notification Start
 
                 $title = 'Document Updated';
-                $body =  'New Documen uploaded by '.Auth::user()->name.'for Application Received on Contest '.$contest->title;
+                $body =  'New Documen uploaded by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'for Application Received on Contest '.$contest->title;
                 $user = $contest->user;
                 $type = 'Contest Application';
                 pushNotification($title,$body,$user,$type,true,'seller','contest',$contestApplication->id,'created');
@@ -177,7 +179,7 @@ class ContestApplicationController extends Controller
                 $user_type = 'buyer';
                 $screen = 'joined';
             }
-            $body =  'Status updated to '.$request->application_status.' by '.$user->name.'for Application on Contest '.$contestApplication->contest->title;
+            $body =  'Status updated to '.$request->application_status.' by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'for Application on Contest '.$contestApplication->contest->title;
             $type = 'Contest Application';
             pushNotification($title,$body,$user,$type,true,$user_type,'contest',$contestApplication->id,$screen);
 

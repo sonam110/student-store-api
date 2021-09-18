@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
 use DB;
+use mervick\aesEverywhere\AES256;
 use Auth;
 
 class ContestApplicationController extends Controller
@@ -197,7 +198,7 @@ class ContestApplicationController extends Controller
 			$user_type = 'buyer';
 			$screen = 'joined';
 
-			$body =  'Status updated to '.$request->application_status.' by '.$user->name.'for Application on Contest '.$contestApplication->contest->title;
+			$body =  'Status updated to '.$request->application_status.' by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'for Application on Contest '.$contestApplication->contest->title;
 			$type = 'Contest Application';
 			pushNotification($title,$body,$user,$type,true,$user_type,'contest',$contestApplication->id,$screen);
 
@@ -259,7 +260,7 @@ class ContestApplicationController extends Controller
 				$user_type = 'buyer';
 				$screen = 'joined';
 
-				$body =  'Status updated to '.$request->application_status.' by '.$user->name.'for Application on Contest '.$contestApplication->contest->title;
+				$body =  'Status updated to '.$request->application_status.' by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'for Application on Contest '.$contestApplication->contest->title;
 				$type = 'Contest Application';
 				pushNotification($title,$body,$user,$type,true,$user_type,'contest',$contestApplication->id,$screen);
 			}

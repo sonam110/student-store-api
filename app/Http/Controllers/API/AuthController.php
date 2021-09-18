@@ -23,6 +23,7 @@ use App\Models\Package;
 use App\Models\EmailTemplate;
 use App\Models\SmsTemplate;
 use App\Mail\RegistrationMail;
+use mervick\aesEverywhere\AES256;
 use Stripe;
 
 class AuthController extends Controller
@@ -317,7 +318,7 @@ class AuthController extends Controller
 				$body = $emailTemplate->body;
 
 				$arrayVal = [
-					'{{user_name}}' => $user->first_name.' '.$user->last_name,
+					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
 				
@@ -402,7 +403,7 @@ class AuthController extends Controller
 			$body = $emailTemplate->body;
 
 			$arrayVal = [
-				'{{user_name}}' => $user->first_name.' '.$user->last_name,
+				'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
 			];
 			$body = $this->strReplaceAssoc($arrayVal, $body);
 			
@@ -571,7 +572,7 @@ class AuthController extends Controller
 				$body = $emailTemplate->body;
 
 				$arrayVal = [
-					'{{user_name}}' => $user->first_name.' '.$user->last_name,
+					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
 					'{{otp}}'		=> $otp,
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
