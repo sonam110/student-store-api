@@ -12,6 +12,7 @@ use DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\LanguagesImport;
 use Auth;
+use App\Models\Label;
 
 class LanguageController extends Controller
 {
@@ -131,7 +132,16 @@ class LanguageController extends Controller
      */
     public function destroy(Language $language)
     {
-        $language->delete();
+        if($language->title == 'english')
+        {
+            return response()->json(prepareResult(true, ['English language can not be deleted'], getLangByLabelGroups('messages','message_language_cannot_be_deleted')), config('http_response.success'));
+        }
+        else
+        {  
+            Label::where('language_id',$language->id)->delete();
+            $language->delete();
+        }
+
         return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_language_deleted')), config('http_response.success'));
     }
 
