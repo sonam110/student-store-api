@@ -715,6 +715,10 @@ class ProductsServicesBookController extends Controller
                 {
                     $products->where('products_services_books.user_id', $request->user_id);
                 }
+                if(!empty($request->gtin_isbn))
+                {
+                    $products->where('gtin_isbn','like', '%'.$request->gtin_isbn.'%');
+                }
             }
             elseif($searchType=='promotion')
             {

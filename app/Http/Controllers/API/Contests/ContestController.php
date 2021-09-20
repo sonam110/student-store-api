@@ -544,11 +544,11 @@ class ContestController extends Controller
     	{
     	    if(!empty($request->per_page_record))
     	    {
-    	        $contestApplications = ContestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:user_id,id,company_logo_path')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+    	        $contestApplications = ContestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,email,contact_number','user.serviceProviderDetail:user_id,id,company_logo_path')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
     	    }
     	    else
     	    {
-    	        $contestApplications = contestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:user_id,id,company_logo_path')->get();
+    	        $contestApplications = contestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,email,contact_number','user.serviceProviderDetail:user_id,id,company_logo_path')->get();
     	    }
     	    return response(prepareResult(false, $contestApplications, getLangByLabelGroups('messages','messages_contest_application_list')), config('http_response.success'));
     	}

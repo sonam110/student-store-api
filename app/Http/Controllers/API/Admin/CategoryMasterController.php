@@ -25,13 +25,24 @@ class CategoryMasterController extends Controller
     {
         try
         {
+            $categoryMasters = CategoryMaster::orderBy('created_at','DESC');
+            if(!empty($request->module_type_id))
+            {
+                $categoryMasters = $categoryMasters->where('module_type_id',$request->module_type_id);
+            }
+
+            if(!empty($request->title))
+            {
+                $categoryMasters = $categoryMasters->where('title','like', '%'.$request->title.'%');
+            }
+
             if(!empty($request->per_page_record))
             {
-                $categoryMasters = CategoryMaster::with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $categoryMasters = $categoryMasters->with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->where('category_master_id',null)->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $categoryMasters = CategoryMaster::with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->where('category_master_id',null)->orderBy('created_at','DESC')->get();
+                $categoryMasters = $categoryMasters->with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->where('category_master_id',null)->get();
             }
             return response(prepareResult(false, $categoryMasters, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
         }
