@@ -28,6 +28,10 @@ class LabelController extends Controller
             {
                 $labels = $labels->where('language_id',$request->language_id);
             }
+            if(!empty($request->label_name))
+            {
+                $labels = $labels->where('label_name','like', '%'.$request->label_name.'%');
+            }
             if(!empty($request->per_page_record))
             {
                 $labels = $labels->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);

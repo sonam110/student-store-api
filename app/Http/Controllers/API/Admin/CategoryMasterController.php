@@ -36,6 +36,15 @@ class CategoryMasterController extends Controller
                 $categoryMasters = $categoryMasters->where('title','like', '%'.$request->title.'%');
             }
 
+            // if(!empty($request->language_id))
+            // {
+            //     $categoryMasters = $categoryMasters->join('category_details', function ($join) {
+            //             $join->on('category_masters.id', '=', 'category_details.category_master_id');
+            //         })
+            //     ->where('category_details.language_id',$request->language_id)
+            //     ->where('category_details.is_parent',1);
+            // }
+
             if(!empty($request->per_page_record))
             {
                 $categoryMasters = $categoryMasters->with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->where('category_master_id',null)->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);

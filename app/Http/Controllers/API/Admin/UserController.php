@@ -394,6 +394,13 @@ class UserController extends Controller
                 $users->where('users.gender', $request->gender);
             }
 
+            if (!empty($request->package_id)) {
+            	$users->join('user_package_subscriptions', function ($join) {
+		                $join->on('users.id', '=', 'user_package_subscriptions.user_id');
+		            })
+            	->where('package_id',$request->package_id);
+            }
+
             if(!empty($request->per_page_record))
             {
                 $usersData = $users->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
