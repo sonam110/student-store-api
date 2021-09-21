@@ -210,8 +210,12 @@ class FrontController extends Controller
 				$language_id = 1;
 			}
 
-			$pages = Page::where('language_id',$language_id)->get();
-			return response(prepareResult(false, $pages, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
+			$data = [];
+			$data['header_pages'] = Page::where('is_header_menu',true)->where('language_id',$language_id)->get();
+
+			$data['footer']['section_1'] = Page::where('is_footer_menu',true)->where('footer_section',1)->where('language_id',$language_id)->get(); 
+			$data['footer']['section_2'] = Page::where('is_footer_menu',true)->where('footer_section',2)->where('language_id',$language_id)->get(); 
+			return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}
 		catch (\Throwable $exception) 
 		{
