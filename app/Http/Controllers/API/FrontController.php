@@ -197,6 +197,28 @@ class FrontController extends Controller
 		}
 	}
 
+	public function getPages(Request $request)
+	{
+		try
+		{
+			if(!empty($request->language_id))
+			{
+				$language_id = $request->language_id;
+			}
+			else
+			{
+				$language_id = 1;
+			}
+
+			$pages = Page::where('language_id',$language_id)->get();
+			return response(prepareResult(false, $pages, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
 	public function page( Request $request,$slug)
 	{
 		try
@@ -253,8 +275,8 @@ class FrontController extends Controller
 				$language_id = 1;
 			}
 
-			$faq = Slider::where('language_id',$language_id)->get();
-			return response(prepareResult(false, $faq, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
+			$sliders = Slider::where('language_id',$language_id)->get();
+			return response(prepareResult(false, $sliders, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}
 		catch (\Throwable $exception) 
 		{

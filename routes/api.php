@@ -419,4 +419,5 @@ Route::get('/get-appSettings', 'App\Http\Controllers\API\FrontController@appSett
 Route::get('/get-reward-point-currency-value', 'App\Http\Controllers\API\FrontController@getRewardPointCurrencyValue');
 Route::get('/get-sliders', 'App\Http\Controllers\API\FrontController@getSliders');
 Route::get('/get-faqs', 'App\Http\Controllers\API\FrontController@getFaqs');
+Route::get('/get-pages', 'App\Http\Controllers\API\FrontController@getPages');
 Route::get('/{slug}', 'App\Http\Controllers\API\FrontController@page');
