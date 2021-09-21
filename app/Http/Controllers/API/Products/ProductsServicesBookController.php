@@ -787,6 +787,7 @@ class ProductsServicesBookController extends Controller
             ->where('products_services_books.is_used_item', $is_used_item)
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
+            ->where('products_services_books.quantity','>' ,'0')
             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($searchType=='filter')
             {
@@ -925,6 +926,7 @@ class ProductsServicesBookController extends Controller
 					            ->where('products_services_books.is_used_item', $is_used_item)
 					            ->where('products_services_books.type', $type)
 					            ->where('products_services_books.is_published', '1')
+                                ->where('products_services_books.quantity','>' ,'0')
                 	 			->withCount('orderItems')->orderBy('order_items_count','desc')
 					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }
@@ -1071,6 +1073,7 @@ class ProductsServicesBookController extends Controller
                                 //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
+                                ->where('quantity','>' ,'0')
                 	 			->withCount('orderItems')->orderBy('order_items_count','desc')
 					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }
@@ -1618,6 +1621,7 @@ class ProductsServicesBookController extends Controller
             ->where('products_services_books.is_used_item', $is_used_item)
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
+            ->where('products_services_books.quantity','>' ,'0')
             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($searchType=='filter')
             {
@@ -1757,6 +1761,7 @@ class ProductsServicesBookController extends Controller
                                 ->where('products_services_books.is_used_item', $is_used_item)
                                 ->where('products_services_books.type', $type)
                                 ->where('products_services_books.is_published', '1')
+                                ->where('products_services_books.quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
                                 ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }
@@ -1857,6 +1862,7 @@ class ProductsServicesBookController extends Controller
                                 //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
+                                ->where('quantity','>' ,'0')
                                 ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($searchType=='filter')
             {
@@ -1884,6 +1890,7 @@ class ProductsServicesBookController extends Controller
                                 //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
+                                ->where('quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
                                 ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }

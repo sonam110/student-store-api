@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Country;
 use App\Models\State;
 use App\Models\City;
+use App\Models\AddressDetail;
 
 class CountryStateCityController extends Controller
 {
@@ -44,7 +45,8 @@ class CountryStateCityController extends Controller
 
     public function citiesByCountryName($name)
     {
-        $cities = Country::where('name',$name)->first()->cities;
+        // $cities = Country::where('name',$name)->first()->cities;
+        $cities = AddressDetail::where('city','!=',null)->groupBy('city')->get(['city']);
         return response()->json(prepareResult(false, $cities, getLangByLabelGroups('messages','message_state_list')), config('http_response.success'));
     }
 }
