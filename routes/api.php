@@ -401,9 +401,16 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 	Route::apiResource('/slider', 'App\Http\Controllers\API\Admin\SliderController')->only('index','store','destroy');
 
+
+	Route::apiResource('/subscriber', 'App\Http\Controllers\API\Admin\SubscriberController')->only('index','destroy');
+
 	
 
 });
+
+
+
+Route::post('/subscriber', [App\Http\Controllers\API\SubscriberController::class,'store']);
 
 Route::get('/get-team-member', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMember']);
 Route::get('/get-team-member/{teamMemberId}', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMemberInfo']);
