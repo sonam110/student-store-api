@@ -115,10 +115,10 @@
 					<img src="{{$user->profile_pic_path}}" title="{{$user->first_name}} {{$user->last_name}}" alt="{{$user->first_name}} {{$user->last_name}}" />
 				</div>
 				<div id="name">
-					<h1 class=" delayTwo">{{$user->first_name}} {{$user->last_name}}</h1>
+					<h1 class=" delayTwo">{{\mervick\aesEverywhere\AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'))}} {{\mervick\aesEverywhere\AES256::decrypt($user->last_name, env('ENCRYPTION_KEY'))}}</h1>
 				</div>
 				<div class="bioDetails">
-					<div style="text-align: center;">{{\Carbon\Carbon::parse($user->dob)->format('M d, Y')}}</div>
+					<div style="text-align: center;">{{\Carbon\Carbon::parse(\mervick\aesEverywhere\AES256::decrypt($user->dob, env('ENCRYPTION_KEY')))->format('M d, Y')}}</div>
 					<div style="text-align: center;">Citizenship: {{$user->userCvDetail->addressDetail->country}}</div>
 					<div style="text-align: center;">{{$user->userCvDetail->addressDetail->city}}</div>
 				</div>
@@ -246,11 +246,11 @@
 							<table>
 								<tr>
 									<th>Contact</th>
-									<td>: {{$user->contact_number}}</td>
+									<td>: {{\mervick\aesEverywhere\AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'))}}</td>
 								</tr>
 								<tr>
 									<th>Email</th>
-									<td>: {{$user->email}}</td>
+									<td>: {{\mervick\aesEverywhere\AES256::decrypt($user->email, env('ENCRYPTION_KEY'))}}</td>
 								</tr>
 								<tr>
 									<th>Address</th>
@@ -264,7 +264,7 @@
 								</tr>
 								<tr>
 									<th>Date of birth</th>
-									<td>: {{\Carbon\Carbon::parse($user->dob)->format('d M, Y')}}</td>
+									<td>: {{\Carbon\Carbon::parse(\mervick\aesEverywhere\AES256::decrypt($user->dob, env('ENCRYPTION_KEY')))->format('d M, Y')}}</td>
 								</tr>
 							</table>
 						</div>
