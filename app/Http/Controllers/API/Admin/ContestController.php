@@ -636,7 +636,7 @@ class ContestController extends Controller
                 }
                 if(!empty($request->city))
                 {
-                    $contests->where('city','LIKE', '%'.$request->city.'%');
+                    $contests->where('target_city','LIKE', '%'.$request->city.'%');
                 }
                 if(!empty($request->status))
                 {
