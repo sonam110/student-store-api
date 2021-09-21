@@ -59,13 +59,27 @@ class PageController extends Controller
         try
         {
             $page = new Page;
+
+            if($request->is_existing == true)
+            {
+                $page->slug                 = $request->slug;
+            }
+            else
+            {
+
+                $page->slug                 = Str::slug($request->title);
+            }
+
             $page->language_id          = $request->language_id;
-            $page->title               	= $request->title;
-            $page->slug                 = Str::slug($request->title);
-            $page->description         	= $request->description;
+            $page->title                = $request->title;
+            $page->description          = $request->description;
             $page->image_path           = $request->image_path;
-            $page->status      			= $request->status;
+            $page->status               = $request->status;
+            $page->is_header_menu       = $request->is_header_menu;
+            $page->is_footer_menu       = $request->is_footer_menu;
+            $page->footer_section       = $request->footer_section;
             $page->save();
+
             DB::commit();
             return response()->json(prepareResult(false, $page, getLangByLabelGroups('messages','message_page_created')), config('http_response.created'));
         }
@@ -114,6 +128,9 @@ class PageController extends Controller
             $page->description          = $request->description;
             $page->image_path           = $request->image_path;
             $page->status               = $request->status;
+            $page->is_header_menu       = $request->is_header_menu;
+            $page->is_footer_menu       = $request->is_footer_menu;
+            $page->footer_section       = $request->footer_section;
             $page->save();
             DB::commit();
             return response()->json(prepareResult(false, $page, getLangByLabelGroups('messages','message_page_updated')), config('http_response.success'));

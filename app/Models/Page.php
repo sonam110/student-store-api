@@ -12,7 +12,9 @@ class Page extends Model
     use HasFactory, Uuid;
 
 
-    protected $fillable = ['title','slug','description','image_path','status','language_id'];
+    protected $fillable = [
+    	'title','slug','description','image_path','status','language_id','is_header_menu','is_footer_menu','footer_section'
+    ];
 
     public function language()
     {

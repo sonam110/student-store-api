@@ -19,10 +19,14 @@ class CreatePagesTable extends Migration
 
             $table->foreignId('language_id')->constrained()->onDelete('cascade');
             
-            $table->string('title')->nullable();
+
             $table->string('slug')->nullable();
+            $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->string('image_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
+            $table->boolean('is_header_menu')->nullable();
+            $table->boolean('is_footer_menu')->nullable();
+            $table->string('footer_section')->nullable();
             $table->boolean('status')->default(true)->nullable();
             $table->timestamps();
         });
