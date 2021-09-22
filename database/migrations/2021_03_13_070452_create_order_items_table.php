@@ -65,6 +65,11 @@ class CreateOrderItemsTable extends Migration
             $table->text('reason_for_cancellation_request_decline')->nullable();
             $table->boolean('is_sent_to_cool_company')->nullable()->default(0);
             $table->date('sent_to_cool_company_date')->nullable();
+
+            $table->boolean('is_transferred_to_vendor')->nullable()->default(0);
+            $table->decimal('amount_transferred_to_vendor', 12,2)->default(0)->nullable();
+            $table->string('fund_transferred_date', 50)->nullable();
+
             $table->timestamps();
         });
     }

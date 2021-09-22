@@ -260,6 +260,8 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/create-stripe-account', [App\Http\Controllers\API\StripeController::class,'createStripeAccount']);
 	Route::get('/regenerate-stripe-account-link', [App\Http\Controllers\API\StripeController::class,'regenerateStripeAccountLink']);
 
+	Route::get('/vendor-fund-transfer-list', [App\Http\Controllers\API\StripeController::class,'vendorFundTransferList']);
+
 });
 
 Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin']],function () {
@@ -411,6 +413,9 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 	Route::apiResource('/subscriber', 'App\Http\Controllers\API\Admin\SubscriberController')->only('index','destroy');
 
+	//Fund transferred log
+	Route::post('/vendor-fund-transfer-list', [App\Http\Controllers\API\VendorFundLogController::class,'vendorFundTransferList']);
+	Route::post('/vendor-wise-fund-transfer-list', [App\Http\Controllers\API\VendorFundLogController::class,'vendorWiseFundTransferList']);
 	
 
 });
