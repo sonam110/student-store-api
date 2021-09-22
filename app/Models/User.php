@@ -34,6 +34,7 @@ use App\Models\ProductsServicesBook;
 use App\Models\Contest;
 use App\Models\CoolCompanyAssignment;
 use App\Models\CoolCompanyFreelancer;
+use App\Models\VendorFundTransfer;
 use mervick\aesEverywhere\AES256;
 
 class User extends Authenticatable
@@ -46,7 +47,7 @@ class User extends Authenticatable
     const QR_NUMBER_START       = 100000000;
 
     protected $fillable = [
-        'language_id','user_type_id','first_name','last_name','gender','dob','email','contact_number','password','email_verified_at','is_email_verified','is_contact_number_verified','profile_pic_path','short_intro','qr_code_img_path','qr_code_number','qr_code_valid_till','reward_points','cp_first_name','cp_last_name','cp_email','cp_contact_number','cp_gender','is_minor','guardian_first_name','guardian_last_name','guardian_email','guardian_contact_number','is_guardian_email_verified','is_guardian_contact_number_verified','is_verified','is_agreed_on_terms','is_prime_user','is_deleted','status','last_login','guardian_password','social_security_number','show_email','show_contact_number','bank_account_type','bank_name','bank_account_num','bank_identifier_code'
+        'language_id','user_type_id','first_name','last_name','gender','dob','email','contact_number','password','email_verified_at','is_email_verified','is_contact_number_verified','profile_pic_path','short_intro','qr_code_img_path','qr_code_number','qr_code_valid_till','reward_points','cp_first_name','cp_last_name','cp_email','cp_contact_number','cp_gender','is_minor','guardian_first_name','guardian_last_name','guardian_email','guardian_contact_number','is_guardian_email_verified','is_guardian_contact_number_verified','is_verified','is_agreed_on_terms','is_prime_user','is_deleted','status','last_login','guardian_password','social_security_number','show_email','show_contact_number','bank_account_type','bank_name','bank_account_num','bank_identifier_code','stripe_account_id','stripe_status'
     ];
 
     protected $hidden = [
@@ -316,8 +317,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(CoolCompanyFreelancer::class,'user_id','id')->with('coolCompanyAssignment');
     }
+    
     public function coolCompanyAssignment()
     {
         return $this->hasMany(CoolCompanyAssignment::class,'user_id','id');
+    }
+
+    public function vendorFundTransfers()
+    {
+        return $this->hasMany(VendorFundTransfer::class,'user_id','id');
     }
 }

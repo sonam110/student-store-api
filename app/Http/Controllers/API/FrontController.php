@@ -388,15 +388,15 @@ class FrontController extends Controller
 		*/
 
 		
-		/*$payout = \Stripe\Transfer::create([
+		$payout = \Stripe\Transfer::create([
 		  "amount" => 999,
 		  "currency" => "USD",
 		  "destination" => "acct_1Jc7iyRgancAKpJI",
 		  "transfer_group" => "ORDER_95"
 		]);
-
+		return $payout;
 		dd($payout);
-		*/
+		
 
 		/*
 		$payout = \Stripe\PaymentIntent::create([

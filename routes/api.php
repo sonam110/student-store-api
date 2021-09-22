@@ -257,7 +257,8 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/cool-company-statistics', [App\Http\Controllers\API\CoolCompanyController::class,'coolCompanyStatistics']);
 
 	//Stripe
-	Route::get('/create-connect', [App\Http\Controllers\API\StripeController::class,'createConnect']);
+	Route::get('/create-stripe-account', [App\Http\Controllers\API\StripeController::class,'createStripeAccount']);
+	Route::get('/regenerate-stripe-account-link', [App\Http\Controllers\API\StripeController::class,'regenerateStripeAccountLink']);
 
 });
 

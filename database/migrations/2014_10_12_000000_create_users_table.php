@@ -64,6 +64,9 @@ class CreateUsersTable extends Migration
             $table->string('bank_name')->nullable();
             $table->string('bank_account_num')->nullable();
             $table->string('bank_identifier_code')->nullable();
+
+            $table->string('stripe_account_id')->nullable();
+            $table->enum('stripe_status',['1','2','3','4'])->default('1')->nullable()->comment('1:Pending, 2:Process, 3: Activate, 4: Failed');
             $table->timestamps();
         });
     }
