@@ -591,7 +591,8 @@ class AuthController extends Controller
 			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
 		}
 
-		$otp = rand(1000,9999);
+		//$otp = rand(1000,9999);
+		$otp = 1234;
 
 		if($request->email != null)
 		{
@@ -644,7 +645,9 @@ class AuthController extends Controller
 				{
 					return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_not_exists')), config('http_response.internal_server_error'));
 				}
-				$otp = rand(1000,9999);
+				//$otp = rand(1000,9999);
+				$otp = 1234;
+
 				$this->sendOtp($request->contact_number,$otp);
 
 				if(OtpVerification::where('mobile_number', $request->contact_number)->where('otp_for', $request->otp_for)->count()>0)

@@ -105,6 +105,12 @@ return [
             'path' => storage_path('logs/cool-company.log'),
             'level' => 'info',
         ],
+
+        'paymentTransferred' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/payment-transferred.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];

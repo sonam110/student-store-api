@@ -376,27 +376,27 @@ class FrontController extends Controller
 		dd($account);
 		*/
 		
-		
+		/*
 		$account_links = \Stripe\AccountLink::create([
 		  'account' => 'acct_1Jc8zuRnhaMphhEV',
 		  'refresh_url' => 'https://example.com/reauth',
 		  'return_url' => 'https://example.com/return',
 		  'type' => 'account_onboarding',
 		]);
-		return $account_links;
+
 		dd($account_links);
-		
+		*/
 
 		
-		$payout = \Stripe\Transfer::create([
+		/*$payout = \Stripe\Transfer::create([
 		  "amount" => 999,
 		  "currency" => "USD",
 		  "destination" => "acct_1Jc7iyRgancAKpJI",
 		  "transfer_group" => "ORDER_95"
 		]);
-		return $payout;
+
 		dd($payout);
-		
+		*/
 
 		/*
 		$payout = \Stripe\PaymentIntent::create([
@@ -457,12 +457,18 @@ class FrontController extends Controller
 		dd($users);
 		*/
 
-		$updateCapability = $stripe->accounts->updateCapability(
+		/*$updateCapability = $stripe->accounts->updateCapability(
 		  'acct_1Ja0Q7RmXczxfXRt',
 		  'card_payments',
 		  ['requested' => true]
 		);
 
-		dd($updateCapability);
+		dd($updateCapability);*/
+
+		$account = $stripe->accounts->delete(
+		  'acct_1Jc7fdDH2Q0vOxnt',
+		  []
+		);
+		dd($account);
 	}
 }
