@@ -376,16 +376,16 @@ class FrontController extends Controller
 		dd($account);
 		*/
 		
-		/*
+		
 		$account_links = \Stripe\AccountLink::create([
 		  'account' => 'acct_1Jc8zuRnhaMphhEV',
 		  'refresh_url' => 'https://example.com/reauth',
 		  'return_url' => 'https://example.com/return',
 		  'type' => 'account_onboarding',
 		]);
-
+		return $account_links;
 		dd($account_links);
-		*/
+		
 
 		
 		$payout = \Stripe\Transfer::create([
