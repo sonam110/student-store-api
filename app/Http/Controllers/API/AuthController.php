@@ -52,15 +52,15 @@ class AuthController extends Controller
 			];
 			$message = $this->strReplaceAssoc($arrayVal, $headerContent);
 
-			/*
+			
 			curl_setopt($ch, CURLOPT_URL,  "http://smsserver.pixie.se/sendsms?");
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, "account=$account&pwd=$password&sender=$sender&receivers=$receivers&message=$message");
 			$buffer = curl_exec($ch);
-			*/
+			
 
-			$curl = curl_init();
+			/*$curl = curl_init();
  
 			curl_setopt_array($curl, array(
 			  CURLOPT_URL => 'https://www.oursms.in/api/v1/generate-otp?app_key=KrHJYfM6UeSukIOVVJjaOf6qy&app_secret=bIquoJ56Z7SfOWB3iD1JcNkCZ&dlt_template_id=1507162755811107949&mobile_number='.$phone_number.'&v1='.$otp,
@@ -77,7 +77,7 @@ class AuthController extends Controller
 			));
 
 			$response = curl_exec($curl);
-			curl_close($curl);
+			curl_close($curl);*/
 		}
 	}
 
@@ -102,7 +102,8 @@ class AuthController extends Controller
 				}
 			}
 			
-			$otp = rand(1000,9999);
+			//$otp = rand(1000,9999);
+			$otp = 1234;
 			$this->sendOtp($request->contact_number,$otp);
 			if(OtpVerification::where('mobile_number', $request->contact_number)->where('otp_for', $request->otp_for)->count()>0)
 			{
