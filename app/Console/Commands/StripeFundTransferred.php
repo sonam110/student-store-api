@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Stripe;
 
 class StripeFundTransferred extends Command
 {
@@ -37,6 +38,11 @@ class StripeFundTransferred extends Command
      */
     public function handle()
     {
-        return 0;
+        $payout = \Stripe\Transfer::create([
+          "amount" => 999,
+          "currency" => "USD",
+          "destination" => "acct_1Jc7iyRgancAKpJI",
+          "transfer_group" => "ORDER_95"
+        ]);
     }
 }
