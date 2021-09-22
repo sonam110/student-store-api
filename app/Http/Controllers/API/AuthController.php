@@ -646,6 +646,16 @@ class AuthController extends Controller
 				$otp = rand(1000,9999);
 				$this->sendOtp($request->contact_number,$otp);
 
+				if(OtpVerification::where('mobile_number', $request->contact_number)->where('otp_for', $request->otp_for)->count()>0)
+				{
+					OtpVerification::where('mobile_number', $request->contact_number)->where('otp_for', $request->otp_for)->delete();
+				}
+				$otpStore = new OtpVerification;
+				$otpStore->mobile_number 	= $request->contact_number;
+				$otpStore->otp 				= $otp;
+				$otpStore->otp_for 			= $request->otp_for;
+				$otpStore->save();
+
 				return response()->json(prepareResult(false, ['otp'=>$otp,'user_id'=>$user->id], getLangByLabelGroups('messages','message_otp_sent')), config('http_response.success'));
 			}
 			catch (\Throwable $exception)
