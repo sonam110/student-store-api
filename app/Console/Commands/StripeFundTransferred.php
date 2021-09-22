@@ -84,7 +84,6 @@ class StripeFundTransferred extends Command
                     $orderItemId[] = $order->id;
                     $totalAmountForPaid += $order->amount_transferred_to_vendor;
                 }
-                echo $totalAmountForPaid;
                 $payout = \Stripe\Transfer::create([
                   "amount"          => $totalAmountForPaid * 100,
                   "currency"        => "SEK",
