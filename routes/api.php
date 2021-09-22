@@ -35,6 +35,7 @@ Route::get('/get-educational-institutes', [App\Http\Controllers\API\FrontControl
 Route::get('/get-job-tags', [App\Http\Controllers\API\FrontController::class,'getJobTags'])->name('get-educational-institutes');
 
 Route::post('/get-otp', [App\Http\Controllers\API\AuthController::class,'getOtp']);
+Route::post('/otp-verification', [App\Http\Controllers\API\AuthController::class,'otpVerification']);
 Route::post('/email-validate', [App\Http\Controllers\API\AuthController::class,'emailValidate']);
 Route::post('/register', [App\Http\Controllers\API\AuthController::class,'register']);
 Route::post('/save-user-details', [App\Http\Controllers\API\AuthController::class,'saveUserDetails']);
@@ -97,6 +98,8 @@ Route::get('/attribute-list/{catId}/{language_id}', [App\Http\Controllers\API\Ca
 Route::get('/brands/{catId}', [App\Http\Controllers\API\CategoryController::class, 'brands']);
 
 Route::apiResource('/upload-doc', 'App\Http\Controllers\API\UploadDocController')->only('store');
+
+
 Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('logout',[App\Http\Controllers\API\AuthController::class,'logout']);
     
@@ -252,6 +255,9 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/cool-company-assignment-list', [App\Http\Controllers\API\CoolCompanyController::class,'index']);
 	Route::get('/get-assignment-info/{assignmentId}', [App\Http\Controllers\API\CoolCompanyController::class,'getAssignmentInfo']);
 	Route::get('/cool-company-statistics', [App\Http\Controllers\API\CoolCompanyController::class,'coolCompanyStatistics']);
+
+	//Stripe
+	Route::get('/create-connect', [App\Http\Controllers\API\StripeController::class,'createConnect']);
 
 });
 

@@ -338,4 +338,131 @@ class FrontController extends Controller
 			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
 	}
+
+	public function payout()
+	{ 	//acct_1F0knGLBmnAF4Rxg -aman
+		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+
+		/*
+		$account = \Stripe\Customer::create(
+		  ["email" => "aman.h@nrt.co.in"],
+		  ["stripe_account" => "acct_1F0knGLBmnAF4Rxg"]
+		);
+
+		dd($account);
+		*/
+
+		
+		/*$account = \Stripe\Account::create([
+		  'country' => 'US',
+		  'type' => 'custom',
+		  'capabilities' => [
+		    'card_payments' => [
+		      'requested' => true,
+		    ],
+		    'transfers' => [
+		      'requested' => true,
+		    ],
+		  ],
+		]);
+
+		dd($account);*/
+
+		/*
+		$account = \Stripe\Account::create([
+		  'type' => 'standard',
+		]);
+
+		dd($account);
+		*/
+		
+		/*
+		$account_links = \Stripe\AccountLink::create([
+		  'account' => 'acct_1Jc8zuRnhaMphhEV',
+		  'refresh_url' => 'https://example.com/reauth',
+		  'return_url' => 'https://example.com/return',
+		  'type' => 'account_onboarding',
+		]);
+
+		dd($account_links);
+		*/
+
+		
+		/*$payout = \Stripe\Transfer::create([
+		  "amount" => 999,
+		  "currency" => "USD",
+		  "destination" => "acct_1Jc7iyRgancAKpJI",
+		  "transfer_group" => "ORDER_95"
+		]);
+
+		dd($payout);
+		*/
+
+		/*
+		$payout = \Stripe\PaymentIntent::create([
+		  'amount' => 1000,
+		  'currency' => 'usd',
+		  'payment_method_types' => ['card_present'],
+		  'capture_method' => 'manual',
+		], [
+		  'stripe_account' => 'acct_1Ja0oURm6mY5ns6G',
+		]);
+
+		dd($payout);
+		*/
+
+		/*
+		$payment_intent = \Stripe\PaymentIntent::create([
+		  'payment_method_types' => ['card'],
+		  'amount' => 1000,
+		  'currency' => 'usd',
+		  'transfer_data' => [
+		    'amount' => 877,
+		    'destination' => 'acct_1Ja0oURm6mY5ns6G',
+		  ],
+		]);
+
+		dd($payment_intent);
+
+		*/
+
+		/*
+		$payout = \Stripe\Payout::create([
+		  'amount' => 999,
+		  'currency' => 'USD',
+		  'method' => 'standard',
+		], [
+		  'stripe_account' => 'acct_1Ja0oURm6mY5ns6G',
+		]);
+
+		dd($payout);
+		*/
+
+		/*
+		$payout = \Stripe\Payout::create([
+		  'amount' => 889,
+		  'currency' => 'usd',
+		], [
+		  'stripe_account' => 'acct_1Ja0oURm6mY5ns6G',
+		]);
+
+		dd($payout);
+		*/
+
+		
+		$stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+
+		/*
+		$users = $stripe->accounts->all(['limit' => 3]);
+		dd($users);
+		*/
+
+		$updateCapability = $stripe->accounts->updateCapability(
+		  'acct_1Ja0Q7RmXczxfXRt',
+		  'card_payments',
+		  ['requested' => true]
+		);
+
+		dd($updateCapability);
+	}
 }

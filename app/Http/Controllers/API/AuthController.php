@@ -22,6 +22,7 @@ use App\Models\UserPackageSubscription;
 use App\Models\Package;
 use App\Models\EmailTemplate;
 use App\Models\SmsTemplate;
+use App\Models\OtpVerification;
 use App\Mail\RegistrationMail;
 use mervick\aesEverywhere\AES256;
 use Stripe;
@@ -51,11 +52,32 @@ class AuthController extends Controller
 			];
 			$message = $this->strReplaceAssoc($arrayVal, $headerContent);
 
+			/*
 			curl_setopt($ch, CURLOPT_URL,  "http://smsserver.pixie.se/sendsms?");
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, "account=$account&pwd=$password&sender=$sender&receivers=$receivers&message=$message");
 			$buffer = curl_exec($ch);
+			*/
+
+			$curl = curl_init();
+ 
+			curl_setopt_array($curl, array(
+			  CURLOPT_URL => 'https://www.oursms.in/api/v1/generate-otp?app_key=KrHJYfM6UeSukIOVVJjaOf6qy&app_secret=bIquoJ56Z7SfOWB3iD1JcNkCZ&dlt_template_id=1507162755811107949&mobile_number='.$phone_number.'&v1='.$otp,
+			  CURLOPT_RETURNTRANSFER => true,
+			  CURLOPT_ENCODING => '',
+			  CURLOPT_MAXREDIRS => 10,
+			  CURLOPT_TIMEOUT => 0,
+			  CURLOPT_FOLLOWLOCATION => true,
+			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			  CURLOPT_CUSTOMREQUEST => 'GET',
+			  CURLOPT_HTTPHEADER => array(
+			    'Content-Type: application/json'
+			  ),
+			));
+
+			$response = curl_exec($curl);
+			curl_close($curl);
 		}
 	}
 
@@ -82,13 +104,32 @@ class AuthController extends Controller
 			
 			$otp = rand(1000,9999);
 			$this->sendOtp($request->contact_number,$otp);
+			if(OtpVerification::where('mobile_number', $request->contact_number)->where('otp_for', $request->otp_for)->count()>0)
+			{
+				OtpVerification::where('mobile_number', $request->contact_number)->where('otp_for', $request->otp_for)->delete();
+			}
+			$otpStore = new OtpVerification;
+			$otpStore->mobile_number 	= $request->contact_number;
+			$otpStore->otp 				= $otp;
+			$otpStore->otp_for 			= $request->otp_for;
+			$otpStore->save();
 
-			return response()->json(prepareResult(false, ['otp'=>$otp], getLangByLabelGroups('messages','message_otp_sent')), config('http_response.success'));
+			return response()->json(prepareResult(false, ['otp'=>'Sent'], getLangByLabelGroups('messages','message_otp_sent')), config('http_response.success'));
 		}
 		catch (\Throwable $exception)
 		{
 			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
+	}
+
+	public function otpVerification(Request $request)
+	{
+		if(OtpVerification::where('mobile_number', $request->contact_number)->where('otp_for', $request->otp_for)->where('otp', $request->otp)->count()>0)
+		{
+			OtpVerification::where('mobile_number', $request->contact_number)->where('otp_for', $request->otp_for)->where('otp', $request->otp)->delete();
+			return response()->json(prepareResult(false, ['otp'=>'Otp Verifed.'], 'Verification successfully done.'), config('http_response.success'));
+		}
+		return response()->json(prepareResult(true, [],'Not found'), config('http_response.not_found'));
 	}
 
 	public function emailValidate(Request $request)
