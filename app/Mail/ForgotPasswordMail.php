@@ -10,16 +10,16 @@ use Illuminate\Queue\SerializesModels;
 class ForgotPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
-    public $otp;
+    public $details;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($otp)
+    public function __construct($details)
     {
-        $this->otp = $otp;
+        $this->details = $details;
     }
 
     /**
@@ -31,6 +31,6 @@ class ForgotPasswordMail extends Mailable
     {
         return $this->markdown('emails.forgotPasswordMail')
             ->subject('Forgot password reset otp')
-            ->with('otp', $this->otp);
+            ->with('details', $this->details);
     }
 }

@@ -24,8 +24,10 @@ use App\Models\StudentDetail;
 use App\Models\JobTag;
 use App\Models\Label;
 use App\Models\Slider;
+use App\Models\EmailTemplate;
 use Stripe;
-
+use App\Mail\ForgotPasswordMail;
+use Mail;
 
 class FrontController extends Controller
 {
@@ -470,5 +472,32 @@ class FrontController extends Controller
 		  []
 		);
 		dd($account);
+	}
+
+	public function strReplaceAssoc(array $replace, $subject) { 
+		return str_replace(array_keys($replace), array_values($replace), $subject);
+	}
+
+	public function checkSendMail()
+	{
+		$otp = 1234;
+		$emailTemplate = EmailTemplate::where('template_for','forgot_password')->first();
+
+		$body = $emailTemplate->body;
+
+		$arrayVal = [
+			'{{user_name}}' => 'Ashok Sahu',
+			'{{otp}}'		=> $otp,
+		];
+
+		$body = $this->strReplaceAssoc($arrayVal, $body);
+		
+		$details = [
+			'title' => $emailTemplate->subject,
+			'body' => $body
+		];
+		
+		$mail = Mail::to('ashok@nrt.co.in')->send(new ForgotPasswordMail($details));
+		dd($mail);
 	}
 }

@@ -625,7 +625,7 @@ class AuthController extends Controller
 					'body' => $body
 				];
 				
-				$mail = Mail::to(AES256::decrypt($email, env('ENCRYPTION_KEY')))->send(new ForgotPasswordMail($otp));
+				$mail = Mail::to(AES256::decrypt($email, env('ENCRYPTION_KEY')))->send(new ForgotPasswordMail($details));
 
 				//------------------------Mail End-------------------------//
 
