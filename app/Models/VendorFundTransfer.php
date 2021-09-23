@@ -10,7 +10,7 @@ class VendorFundTransfer extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'transection_id', 'object', 'amount', 'amount_reversed', 'balance_transaction', 'created', 'currency', 'description', 'destination', 'destination_payment', 'livemode', 'complete_response'];
+    protected $fillable = ['user_id', 'transfer_group', 'transection_id', 'object', 'amount', 'amount_reversed', 'balance_transaction', 'created', 'currency', 'description', 'destination', 'destination_payment', 'livemode', 'reversed', 'source_type', 'complete_response'];
 
     public function user()
     {

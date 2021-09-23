@@ -19,6 +19,7 @@ class CreateVendorFundTransfersTable extends Migration
             $table->string('user_id', 50);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
+            $table->string('transfer_group');
             $table->string('transection_id');
             $table->string('object');
             $table->string('amount');
@@ -30,6 +31,8 @@ class CreateVendorFundTransfersTable extends Migration
             $table->string('destination');
             $table->string('destination_payment');
             $table->string('livemode');
+            $table->boolean('reversed')->default(false);
+            $table->string('source_type')->nullable();
             $table->longText('complete_response');
 
             $table->timestamps();

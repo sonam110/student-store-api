@@ -7,6 +7,7 @@ use App\Models\VendorFundTransfer;
 use App\Models\OrderItem;
 use App\Models\User;
 use Stripe;
+use Log;
 
 class StripeFundTransferred extends Command
 {
@@ -77,48 +78,54 @@ class StripeFundTransferred extends Command
                 ->whereDate('order_items.delivery_completed_date', '<=', $before15Days)
                 ->where('order_items.item_status', 'completed')
                 ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
-                ->where('products_services_books.user_id', $user->user_id)
-                ->join('student_details', 'student_details.user_id','=','products_services_books.user_id')            
+                ->where('products_services_books.user_id', $user->user_id)           
                 ->get();
                 foreach ($createOrderUserWise as $key => $order) {
                     $orderItemId[] = $order->id;
                     $totalAmountForPaid += $order->amount_transferred_to_vendor;
                 }
-                $payout = \Stripe\Transfer::create([
-                  "amount"          => $totalAmountForPaid * 100,
-                  "currency"        => "SEK",
-                  "destination"     => $userInfo->stripe_account_id,
-                  "transfer_group"  => "ORDER_PAYMENT_TILL_".$before15Days
-                ]);
-
-                $createLog = new VendorFundTransfer;
-                $createLog->user_id = $userId;
-                $createLog->transection_id = $payout['transection_id'];
-                $createLog->object = $payout['object'];
-                $createLog->amount = $payout['amount'];
-                $createLog->amount_reversed = $payout['amount_reversed'];
-                $createLog->balance_transaction = $payout['balance_transaction'];
-                $createLog->created = $payout['created'];
-                $createLog->currency = $payout['currency'];
-                $createLog->description = $payout['description'];
-                $createLog->destination = $payout['destination'];
-                $createLog->destination_payment = $payout['destination_payment'];
-                $createLog->livemode = $payout['livemode'];
-                $createLog->complete_response = $payout;
-                $createLog->save();
-
-                Log::channel('paymentTransferred')->info('User Id:'. $user->user_id);
-                Log::channel('paymentTransferred')->info($payout);
-
-                if($createLog)
+                if($totalAmountForPaid>0)
                 {
-                    $updateOrderInfo = OrderItem::select('id','is_transferred_to_vendor','fund_transferred_date')->whereIn('id', $orderItemId)->update([
-                            'is_transferred_to_vendor'  => '1',
-                            'fund_transferred_date'     => date('Y-m-d H:i:s')
-                        ]);
-                    Log::channel('paymentTransferred')->info('Fund transferred.');
+                    $payout = \Stripe\Transfer::create([
+                      "amount"          => $totalAmountForPaid * 100,
+                      "currency"        => env('STRIPE_CURRENCY', 'SEK'),
+                      "destination"     => $userInfo->stripe_account_id,
+                      "transfer_group"  => "ORDER_PAYMENT_TILL_".$before15Days
+                    ]);
+                    
+                    $createLog = new VendorFundTransfer;
+                    $createLog->user_id = $user->user_id;
+                    $createLog->transfer_group = $payout['transfer_group'];
+                    $createLog->transection_id = $payout['id'];
+                    $createLog->object = $payout['object'];
+                    $createLog->amount = $payout['amount'];
+                    $createLog->amount_reversed = $payout['amount_reversed'];
+                    $createLog->balance_transaction = $payout['balance_transaction'];
+                    $createLog->created = $payout['created'];
+                    $createLog->currency = $payout['currency'];
+                    $createLog->description = $payout['description'];
+                    $createLog->destination = $payout['destination'];
+                    $createLog->destination_payment = $payout['destination_payment'];
+                    $createLog->livemode = $payout['livemode'];
+                    $createLog->reversed = $payout['reversed'];
+                    $createLog->source_type = $payout['source_type'];
+                    $createLog->complete_response = $payout;
+                    $createLog->save();
+
+                    Log::channel('paymentTransferred')->info('User Id:'. $user->user_id);
+                    Log::channel('paymentTransferred')->info($payout);
+
+                    if($createLog)
+                    {
+                        $updateOrderInfo = OrderItem::select('id','is_transferred_to_vendor','fund_transferred_date')->whereIn('id', $orderItemId)->update([
+                                'is_transferred_to_vendor'  => '1',
+                                'fund_transferred_date'     => date('Y-m-d H:i:s')
+                            ]);
+                        Log::channel('paymentTransferred')->info('Fund transferred.');
+                    }
                 }
             }
         }
+        return 0;
     }
 }
