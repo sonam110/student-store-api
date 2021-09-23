@@ -30,6 +30,7 @@ use Session;
 use App\Models\Package;
 use App\Models\ShippingCondition;
 use mervick\aesEverywhere\AES256;
+use PDF;
 
 
 class OrderController extends Controller
@@ -1042,5 +1043,26 @@ class OrderController extends Controller
 		{
 			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
+	}
+
+	public function generateInvoice($orderId) 
+	{
+		$getOrder = Order::find($orderId);
+		if($getOrder)
+		{
+			$destinationPath = 'uploads/';
+			$fileName = $getOrder->order_number.'.pdf';
+
+			if(file_exists('uploads/'.$fileName)){ 
+				unlink('uploads/'.$fileName);
+			}
+			$data = [
+				'order' => $getOrder,
+			];
+			$pdf = PDF::loadView('invoice', $data);
+			$pdf->save('uploads/'.$fileName);
+			return response(prepareResult(false, env('APP_URL').$destinationPath.$fileName, 'Invoice'), config('http_response.success'));
+		}
+		return response()->json(prepareResult(true, 'Not found', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
 	}
 }

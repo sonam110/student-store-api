@@ -99,6 +99,7 @@ Route::get('/brands/{catId}', [App\Http\Controllers\API\CategoryController::clas
 
 Route::apiResource('/upload-doc', 'App\Http\Controllers\API\UploadDocController')->only('store');
 
+Route::get('/generate-invoice/{order_id}', 'App\Http\Controllers\API\OrderController@generateInvoice');
 
 Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('logout',[App\Http\Controllers\API\AuthController::class,'logout']);
