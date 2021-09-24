@@ -25,6 +25,8 @@ use App\Models\JobTag;
 use App\Models\Label;
 use App\Models\Slider;
 use App\Models\EmailTemplate;
+use App\Models\ProductImage;
+use App\Models\ServiceProviderDetail;
 use Stripe;
 use App\Mail\ForgotPasswordMail;
 use Mail;
@@ -521,5 +523,49 @@ class FrontController extends Controller
                 $imgthumb->save($thumbDestinationPath.'/'.$fileName['basename']);
       		}
       	}
+      	dd('Done');
 	}
+
+	public function addThumbFileName()
+    {
+        $allimages = ProductImage::get();
+        foreach ($allimages as $key => $image) {
+        	if(!empty($image->profile_pic_path))
+        	{
+        		$image->thumb_image_path = env('CDN_DOC_THUMB_URL').basename($image->thumb_image_path);
+        	}
+        	else
+        	{
+        		$image->thumb_image_path  = 'https://www.nrtsms.com/images/no-image.png';
+        	}
+        	$image->save();
+        }
+
+        $companyLogos = ServiceProviderDetail::get();
+        foreach ($companyLogos as $key => $image) {
+        	if(!empty($image->profile_pic_path))
+        	{
+        		$image->company_logo_thumb_path = env('CDN_DOC_THUMB_URL').basename($image->company_logo_path);
+        	}
+        	else
+        	{
+        		$image->company_logo_thumb_path  = 'https://www.nrtsms.com/images/no-image.png';
+        	}
+        	$image->save();
+        }
+
+        $userImages = User::get();
+        foreach ($userImages as $key => $image) {
+        	if(!empty($image->profile_pic_path))
+        	{
+        		$image->profile_pic_thumb_path  = env('CDN_DOC_THUMB_URL').basename($image->profile_pic_path);
+        	}
+        	else
+        	{
+        		$image->profile_pic_thumb_path  = 'https://www.nrtsms.com/images/no-image.png';
+        	}
+        	$image->save();
+        }
+        dd('Done');
+    }
 }
