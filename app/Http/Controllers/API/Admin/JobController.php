@@ -554,10 +554,14 @@ class JobController extends Controller
                 }*/
                 if(!empty($request->city))
                 {
-                    $jobs->join('address_details', function ($join) {
-                        $join->on('sp_jobs.address_detail_id', '=', 'address_details.id');
-                    })
-                    ->where('address_details.city', $request->city);
+                    // $jobs->join('address_details', function ($join) {
+                    //     $join->on('sp_jobs.address_detail_id', '=', 'address_details.id');
+                    // })
+                    // ->where('address_details.city', $request->city);
+                    $jobs->join('address_details', function ($join) use ($request) {
+                        $join->on('sp_jobs.address_detail_id', '=', 'address_details.id')
+                        ->whereIn('city', $request->city);
+                    });
                 }
 
                 if(!empty($request->job_status))

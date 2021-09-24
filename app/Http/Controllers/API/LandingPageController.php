@@ -1460,7 +1460,11 @@ class LandingPageController extends Controller
                 }*/
                 if(!empty($request->city))
                 {
-                    $jobs->where('sp_jobs.city', $request->city);
+                    // $jobs->where('sp_jobs.city', $request->city);
+                    $jobs->join('address_details', function ($join) use ($request) {
+                        $join->on('sp_jobs.address_detail_id', '=', 'address_details.id')
+                        ->whereIn('city', $request->city);
+                    });
                 }
                 $jobs->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                     ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
