@@ -483,6 +483,7 @@ class UserController extends Controller
                 $join->on('order_items.order_id', '=', 'orders.id');
             })
 		->where('order_items.user_id',$id)
+		->where('order_items.earned_reward_points', '>', 0)
 		->get(['orders.order_number','order_items.created_at','order_items.title','order_items.product_type','order_items.cover_image','order_items.item_status','order_items.price','order_items.quantity','order_items.earned_reward_points','order_items.reward_point_status']);
 
 		return response(prepareResult(false, $user, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
