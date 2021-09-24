@@ -530,19 +530,40 @@ class FrontController extends Controller
     {
         $allimages = ProductImage::get();
         foreach ($allimages as $key => $image) {
-        	$image->thumb_image_path = env('CDN_DOC_THUMB_URL').basename($image->thumb_image_path);
+        	if(!empty($image->profile_pic_path))
+        	{
+        		$image->thumb_image_path = env('CDN_DOC_THUMB_URL').basename($image->thumb_image_path);
+        	}
+        	else
+        	{
+        		$image->thumb_image_path  = 'https://www.nrtsms.com/images/no-image.png';
+        	}
         	$image->save();
         }
 
         $companyLogos = ServiceProviderDetail::get();
         foreach ($companyLogos as $key => $image) {
-        	$image->company_logo_thumb_path = env('CDN_DOC_THUMB_URL').basename($image->company_logo_path);
+        	if(!empty($image->profile_pic_path))
+        	{
+        		$image->company_logo_thumb_path = env('CDN_DOC_THUMB_URL').basename($image->company_logo_path);
+        	}
+        	else
+        	{
+        		$image->company_logo_thumb_path  = 'https://www.nrtsms.com/images/no-image.png';
+        	}
         	$image->save();
         }
 
         $userImages = User::get();
         foreach ($userImages as $key => $image) {
-        	$image->profile_pic_thumb_path  = env('CDN_DOC_THUMB_URL').basename($image->profile_pic_path );
+        	if(!empty($image->profile_pic_path))
+        	{
+        		$image->profile_pic_thumb_path  = env('CDN_DOC_THUMB_URL').basename($image->profile_pic_path);
+        	}
+        	else
+        	{
+        		$image->profile_pic_thumb_path  = 'https://www.nrtsms.com/images/no-image.png';
+        	}
         	$image->save();
         }
         dd('Done');
