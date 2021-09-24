@@ -26,6 +26,7 @@ class CreateEmailTemplatesTable extends Migration
             $table->string('subject')->nullable();
             $table->text('body')->nullable();
             $table->string('attachment_path')->nullable();
+            $table->text('attributes')->nullable();
             $table->boolean('status')->default(true)->nullable();
             $table->timestamps();
         });

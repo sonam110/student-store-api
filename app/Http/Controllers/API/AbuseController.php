@@ -5,6 +5,9 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Abuse;
+use App\Models\ProductsServicesBook;
+use App\Models\Contest;
+use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
@@ -39,6 +42,33 @@ class AbuseController extends Controller
             $contactUs->reason_for_abuse                = $request->reason_for_abuse;
             $contactUs->status              			= $request->status;
             $contactUs->save();
+
+            if(!empty($request->products_services_book_id))
+            {
+                $product = ProductsServicesBook::find($request->products_services_book_id);
+                $module = 'Product';
+                $body =  'An Abuse has been reported for the '.$product->type.' '.$product->title.' .';
+            }
+            elseif(!empty($request->contest_id))
+            {
+                $product = Contest::find($request->contest_id);
+                $module = 'Contest';
+                $body =  'An Abuse has been reported for the '.$product->type.' '.$product->title.' .';
+            }
+            else
+            {
+                $product = Job::find($request->job_id);
+                $module = 'Job';
+                $body =  'An Abuse has been reported for the job '.$product->title.' .';
+            }
+
+            
+
+            $title = 'Abuse Reported';
+            
+                
+            $type = 'Abuse';
+            pushNotification($title,$body,$product->user,$type,true,'buyer',$module,$product->id,'Abuse-list');
 
             DB::commit();
             return response()->json(prepareResult(false, $contactUs, getLangByLabelGroups('messages','message_contact_us_created')), config('http_response.created'));

@@ -8,6 +8,9 @@ use App\Models\Abuse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
+use App\Models\ProductsServicesBook;
+use App\Models\Contest;
+use App\Models\Job;
 use DB;
 
 class AbuseController extends Controller
@@ -55,7 +58,39 @@ class AbuseController extends Controller
     public function multipleStatusUpdate(Request $request)
     {
         $abuse = Abuse::whereIn('id',$request->abuse_id)->update(['status'=>$request->status]);
+
         $abuse = Abuse::whereIn('id',$request->abuse_id)->with('product','contest','job','user')->get();
+
+        foreach ($abuse as $key => $value) {
+
+            if(!empty($value->products_services_book_id))
+            {
+                $product = ProductsServicesBook::find($value->products_services_book_id);
+                $module = 'Product';
+                $body =  'Abuse status has been updated to  '.$request->status.' .';
+            }
+            elseif(!empty($value->contest_id))
+            {
+                $product = Contest::find($value->contest_id);
+                $module = 'Contest';
+                $body =  'Abuse status has been updated to  '.$request->status.' .';
+            }
+            else
+            {
+                $product = Job::find($value->job_id);
+                $module = 'Job';
+                $body =  'Abuse status has been updated to  '.$request->status.' .';
+            }
+
+            
+
+            $title = 'Abuse Status updated';
+            
+                
+            $type = 'Abuse';
+            pushNotification($title,$body,$value->user,$type,true,'buyer',$module,$product->id,'Abuse-list');
+            # code...
+        }
         return response()->json(prepareResult(false, $abuse, getLangByLabelGroups('messages','message_abuse_updated')), config('http_response.success'));
     }
 

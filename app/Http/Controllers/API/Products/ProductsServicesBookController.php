@@ -620,7 +620,7 @@ class ProductsServicesBookController extends Controller
 	                $getProductsServicesBook->published_at = date('Y-m-d');
 	            }
                 $title = 'Product Published';
-                $body =  'Product '.$getProductsServicesBook->title.'has been successfully Published.';
+                $body =  'Product '.$getProductsServicesBook->title.' has been successfully Published.';
             }
             if($request->action=='promote') 
             {
@@ -641,12 +641,12 @@ class ProductsServicesBookController extends Controller
                 	$getProductsServicesBook->promotion_end_at  = date('Y-m-d',strtotime('+'.$user_package->boost_no_of_days.'days'));
                 	$user_package->update(['used_no_of_boost'=>($user_package->used_no_of_boost + 1)]);
                     $title = 'Product Promoted';
-                    $body =  'Product '.$getProductsServicesBook->title.'has been successfully Promoted  from '.$getProductsServicesBook->promotion_start_date.' to '.$getProductsServicesBook->promotion_end_date.'.';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully Promoted  from '.$getProductsServicesBook->promotion_start_date.' to '.$getProductsServicesBook->promotion_end_date.'.';
                 }
                 else
                 {
                     $title = 'Product Removed from Promoted';
-                    $body =  'Product '.$getProductsServicesBook->title.'has been successfully Removed from Promotion.';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully Removed from Promotion.';
                 }
             }
 
@@ -669,12 +669,12 @@ class ProductsServicesBookController extends Controller
 	                $getProductsServicesBook->most_popular_end_at  = date('Y-m-d',strtotime('+'.$user_package->most_popular_no_of_days.'days'));
 	                $user_package->update(['used_most_popular'=>$user_package->used_most_popular + 1]);
 	            	$title = 'Product  updated as Most Popular';
-                    $body =  'Product '.$getProductsServicesBook->title.'has been successfully updated as Most Popular  from '.$getProductsServicesBook->most_popular_start_date.' to '.$getProductsServicesBook->most_popular_end_date.'.';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated as Most Popular  from '.$getProductsServicesBook->most_popular_start_date.' to '.$getProductsServicesBook->most_popular_end_date.'.';
                 }
                 else
                 {
                     $title = 'Product Removed from Most Popular';
-                    $body =  'Product '.$getProductsServicesBook->title.'has been successfully Removed from Most Popular.';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully Removed from Most Popular.';
                 }
                 
             }
@@ -699,12 +699,12 @@ class ProductsServicesBookController extends Controller
 	                $getProductsServicesBook->top_selling_end_at  = date('Y-m-d',strtotime('+'.$user_package->top_selling_no_of_days.'days'));
 	                $user_package->update(['used_top_selling'=>$user_package->used_top_selling + 1]);
 	            	$title = 'Product  updated as Top Selling';
-                    $body =  'Product '.$getProductsServicesBook->title.'has been successfully updated as Top Selling  from '.$getProductsServicesBook->top_selling_start_date.' to '.$getProductsServicesBook->top_selling_end_date.'.';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated as Top Selling  from '.$getProductsServicesBook->top_selling_start_date.' to '.$getProductsServicesBook->top_selling_end_date.'.';
                 }
                 else
                 {
                     $title = 'Product Removed from Top Selling';
-                    $body =  'Product '.$getProductsServicesBook->title.'has been successfully Removed from Top Selling.';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully Removed from Top Selling.';
                 }
                 
             }
