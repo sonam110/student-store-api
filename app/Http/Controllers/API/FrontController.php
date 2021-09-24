@@ -513,28 +513,32 @@ class FrontController extends Controller
 		$thumbDestinationPath = 'uploads/thumbs/';
 		$path = public_path('uploads');
       	$files = \File::allFiles($path);
-      	foreach ($files as $key => $file) {
-      		if(basename(pathinfo($file, PATHINFO_EXTENSION))=='jpg' || basename(pathinfo($file, PATHINFO_EXTENSION))=='png' || basename(pathinfo($file, PATHINFO_EXTENSION))=='jpeg')
+      	foreach ($files as $key => $file) 
+      	{
+      		if($key>=0 && $key<=50)
       		{
-      			$fileName = pathinfo($file);
-      			echo '<pre>';
-      			print_r($fileName);
-      			if(basename($fileName['dirname'])!='qr')
-      			{
-      				$imgthumb = Image::make($path.'/'.$fileName['basename']);
-	                $imgthumb->resize(260, null, function ($constraint) {
-	                    $constraint->aspectRatio();
-	                });
-	                $imgthumb->save($thumbDestinationPath.'/'.$fileName['basename']);
-      			}
-      		}
+      			if(basename(pathinfo($file, PATHINFO_EXTENSION))=='jpg' || basename(pathinfo($file, PATHINFO_EXTENSION))=='png' || basename(pathinfo($file, PATHINFO_EXTENSION))=='jpeg')
+	      		{
+	      			$fileName = pathinfo($file);
+	      			echo '<pre>';
+	      			print_r($fileName);
+	      			if(basename($fileName['dirname'])!='qr')
+	      			{
+	      				$imgthumb = Image::make($path.'/'.$fileName['basename']);
+		                $imgthumb->resize(260, null, function ($constraint) {
+		                    $constraint->aspectRatio();
+		                });
+		                $imgthumb->save($thumbDestinationPath.'/'.$fileName['basename']);
+	      			}
+	      		}
+	      	}
       	}
       	dd('Done');
 	}
 
 	public function addThumbFileName()
     {
-        /*
+        
         $allimages = ProductImage::get();
         foreach ($allimages as $key => $image) {
         	if(!empty($image->image_path))
@@ -576,7 +580,7 @@ class FrontController extends Controller
         	}
         	$image->save();
         }
-        */
+        
 
         $contests = Contest::get();
         foreach ($contests as $key => $image) {
