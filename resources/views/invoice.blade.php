@@ -112,7 +112,7 @@
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="{!! $appsetting->logo_path !!}" class="" height="80px" width="200px">
+                                <img src="{!! $appsetting->logo_thumb_path !!}" class="" height="80px" width="200px">
                             </td>
 
                             <td>

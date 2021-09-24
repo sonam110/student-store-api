@@ -51,7 +51,8 @@ class AdminUserSeeder extends Seeder
     	$appSetting->reward_point_setting_id	= $rewardPointSetting->id;
     	$appSetting->app_name					= "Student Store";
     	$appSetting->description				= "";
-    	$appSetting->logo_path					= env('CDN_DOC_URL').'uploads/logo.png';
+        $appSetting->logo_path                  = env('CDN_DOC_URL').'uploads/logo.png';
+    	$appSetting->logo_thumb_path			= env('CDN_DOC_THUMB_URL').'logo.png';
     	$appSetting->copyright_text				= "";
     	$appSetting->fb_ur						= "";
     	$appSetting->twitter_url				= "";
