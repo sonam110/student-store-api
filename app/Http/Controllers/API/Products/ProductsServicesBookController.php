@@ -31,7 +31,7 @@ class ProductsServicesBookController extends Controller
     {
         try
         {
-            $productsServicesBooks = ProductsServicesBook::where('is_published', '1')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+            $productsServicesBooks = ProductsServicesBook::where('is_published', '1')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($request->type)
             {
                 $productsServicesBooks = $productsServicesBooks->where('type',$request->type);
@@ -300,7 +300,7 @@ class ProductsServicesBookController extends Controller
             }
 
             DB::commit();
-            $productsServicesBook = ProductsServicesBook::with('categoryMaster','subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','addressDetail','productImages','productTags')->find($productsServicesBook->id);
+            $productsServicesBook = ProductsServicesBook::with('categoryMaster','subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','productImages','productTags')->find($productsServicesBook->id);
             $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
             return response()->json(prepareResult(false, $productsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_created')), config('http_response.created'));
         }
@@ -358,7 +358,7 @@ class ProductsServicesBookController extends Controller
         {
             $is_abuse_reported = false;
         }
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,show_email,show_contact_number','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
                 $query->take(3);
             }])->withCount('ratings')->find($productsServicesBook->id);
         $productsServicesBook['favourite_products_services_book'] = $favouriteProductsServicesBook;
@@ -410,7 +410,7 @@ class ProductsServicesBookController extends Controller
             $is_chat_initiated = false;
             $contactListId = null;
         }
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
                 $query->take(3);
             }])->withCount('ratings')->find($id);
         $productsServicesBook['favourite_products_services_book'] = $favouriteProductsServicesBook;
@@ -526,7 +526,7 @@ class ProductsServicesBookController extends Controller
             }
 
             DB::commit();
-            $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','addressDetail','productImages','productTags')->find($productsServicesBook->id);
+            $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','productImages','productTags')->find($productsServicesBook->id);
             $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
             return response()->json(prepareResult(false, $productsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_updated')), config('http_response.created'));
         }
@@ -552,7 +552,7 @@ class ProductsServicesBookController extends Controller
 
         $productsServicesBook = ProductsServicesBook::find($id);
         $productsServicesBook->update(['quantity'=>($productsServicesBook->quantity + $request->quantity)]);
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster','subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->find($id);
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster','subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->find($id);
         $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
         return response()->json(prepareResult(false, $productsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_stock_updated')), config('http_response.success'));
     }
@@ -737,7 +737,7 @@ class ProductsServicesBookController extends Controller
     {
         try
         {
-            $productsServicesBooks = ProductsServicesBook::where('is_used_item', true)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags');
+            $productsServicesBooks = ProductsServicesBook::where('is_used_item', true)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags');
             if(!empty($request->per_page_record))
             {
                 $productsServicesBooks = $productsServicesBooks->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -790,7 +790,7 @@ class ProductsServicesBookController extends Controller
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
             ->where('products_services_books.quantity','>' ,'0')
-            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($searchType=='filter')
             {
                 if(!empty($request->title))
@@ -930,7 +930,7 @@ class ProductsServicesBookController extends Controller
 					            ->where('products_services_books.is_published', '1')
                                 ->where('products_services_books.quantity','>' ,'0')
                 	 			->withCount('orderItems')->orderBy('order_items_count','desc')
-					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
+					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }
             }
             elseif($searchType=='topRated')
@@ -977,7 +977,7 @@ class ProductsServicesBookController extends Controller
             //->where('products_services_books.user_id', '!=', Auth::id())
             ->where('users.user_type_id','3')
             ->where('products_services_books.type','service')
-            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($searchType=='promotion')
             {
                 $products->where('products_services_books.is_promoted', '1')
@@ -1006,7 +1006,7 @@ class ProductsServicesBookController extends Controller
                     ->where('users.user_type_id','3')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
                     ->where('products_services_books.type','service')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
                 }
             }
             elseif($searchType=='topRated')
@@ -1048,7 +1048,7 @@ class ProductsServicesBookController extends Controller
                                 //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
-                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($searchType=='filter')
             {
                 
@@ -1077,7 +1077,7 @@ class ProductsServicesBookController extends Controller
                                 ->where('is_published', '1')
                                 ->where('quantity','>' ,'0')
                 	 			->withCount('orderItems')->orderBy('order_items_count','desc')
-					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
+					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }
             }
             elseif($searchType=='topRated')
@@ -1124,7 +1124,7 @@ class ProductsServicesBookController extends Controller
             ->where('products_services_books.is_published', '1')
             ->where('users.user_type_id','2')
             ->where('products_services_books.type','service')
-            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($searchType=='filter')
             {
                 if(!empty($request->title))
@@ -1267,7 +1267,7 @@ class ProductsServicesBookController extends Controller
                     ->where('users.user_type_id','2')
                     ->where('products_services_books.type','service')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
                 }
             }
             elseif($searchType=='topRated')
@@ -1589,7 +1589,7 @@ class ProductsServicesBookController extends Controller
         try
         {
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
-            $similarProducts = ProductsServicesBook::where('status', '2')->where('id','!=', $request->product_id)->where('sub_category_slug', $productsServicesBooks->sub_category_slug)->where('is_used_item', $productsServicesBooks->is_used_item)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+            $similarProducts = ProductsServicesBook::where('status', '2')->where('id','!=', $request->product_id)->where('sub_category_slug', $productsServicesBooks->sub_category_slug)->where('is_used_item', $productsServicesBooks->is_used_item)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if(!empty($request->per_page_record))
             {
                 $similarProducts = $similarProducts->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -1624,7 +1624,7 @@ class ProductsServicesBookController extends Controller
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
             ->where('products_services_books.quantity','>' ,'0')
-            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($searchType=='filter')
             {
                 if(!empty($request->title))
@@ -1765,7 +1765,7 @@ class ProductsServicesBookController extends Controller
                                 ->where('products_services_books.is_published', '1')
                                 ->where('products_services_books.quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
+                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }
             }
             elseif($searchType=='topRated')
@@ -1865,7 +1865,7 @@ class ProductsServicesBookController extends Controller
                                 ->where('status', '2')
                                 ->where('is_published', '1')
                                 ->where('quantity','>' ,'0')
-                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($searchType=='filter')
             {
                 
@@ -1894,7 +1894,7 @@ class ProductsServicesBookController extends Controller
                                 ->where('is_published', '1')
                                 ->where('quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
+                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }
             }
             elseif($searchType=='topRated')
@@ -1986,7 +1986,7 @@ class ProductsServicesBookController extends Controller
     {
         $productsServicesBook = ProductsServicesBook::find($id);
         $productsServicesBook->update(['is_sold'=>true,'sold_at_student_store'=>$request->sold_at_student_store,'days_taken'=>$request->days_taken]);
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster','subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->find($id);
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster','subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')->find($id);
         $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
 
 

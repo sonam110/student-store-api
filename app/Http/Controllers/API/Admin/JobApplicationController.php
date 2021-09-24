@@ -65,7 +65,7 @@ class JobApplicationController extends Controller
                     ->join('sp_jobs', function ($join) {
                         $join->on('job_applications.job_id', '=', 'sp_jobs.id');
                     })
-        	        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,status','user.cvDetail','user.defaultAddress','job.jobTags');
+        	        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail','user.defaultAddress','job.jobTags');
 
 
 

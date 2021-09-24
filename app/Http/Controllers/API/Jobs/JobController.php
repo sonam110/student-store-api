@@ -28,7 +28,7 @@ class JobController extends Controller
     {
         try
         {
-            $jobs = Job::where('is_published', '1')->where('job_status', '1')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
+            $jobs = Job::where('is_published', '1')->where('job_status', '1')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
 
             if($request->category_master_id)
             {
@@ -166,7 +166,7 @@ class JobController extends Controller
             }
             
             DB::commit();
-            $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
+            $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
             return response()->json(prepareResult(false, $job, getLangByLabelGroups('messages','messages_job_created')), config('http_response.created'));
         }
         catch (\Throwable $exception)
@@ -204,7 +204,7 @@ class JobController extends Controller
         {
             $is_abuse_reported = false;
         }
-        $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,show_email,show_contact_number','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->withCount('jobApplications','acceptedJobApplications')->find($job->id);
+        $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->withCount('jobApplications','acceptedJobApplications')->find($job->id);
         $job['favourite_job'] = $favouriteJob;
         $job['favourite_id'] = $favouriteId;
         $job['is_applied'] = $applied;
@@ -335,7 +335,7 @@ class JobController extends Controller
                     ->where('is_published', '1')
                     ->where('job_status', '1')
                     ->orderBy('created_at','DESC')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
             if($searchType=='filter')
             {
                 if(!empty($request->category_master_id))
@@ -584,7 +584,7 @@ class JobController extends Controller
                 $jobs = Job::select('sp_jobs.*')
                         ->whereIn('sp_jobs.id',$actualArray)
                         ->where('is_published', '1')
-                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory');
+                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory');
             }
             if(!empty($request->per_page_record))
             {
@@ -791,7 +791,7 @@ class JobController extends Controller
 
             if(!empty($request->per_page_record))
             {
-                $jobApplications = JobApplication::whereIn('job_id',$jobs)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,status','user.cvDetail')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $jobApplications = JobApplication::whereIn('job_id',$jobs)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
@@ -822,7 +822,7 @@ class JobController extends Controller
                     ->join('user_cv_details', function ($join) {
                         $join->on('job_applications.user_id', '=', 'user_cv_details.user_id');
                     })
-                    ->with('job:id,title','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.cvDetail.jobTags','user.defaultAddress');
+                    ->with('job:id,title','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.cvDetail.jobTags','user.defaultAddress');
 
             if($searchType=='filter')
             {

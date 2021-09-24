@@ -26,7 +26,7 @@ class MessageController extends Controller
                                           ->orWhere('buyer_id',Auth::id());
                                 })
                                 ->orderBy('created_at','DESC')
-                                ->with('user:id,first_name,last_name,profile_pic_path','contest:id,title,user_id,cover_image_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','contest.user:id,first_name,last_name,profile_pic_path','contest.user.serviceProviderDetail:id,user_id,company_name,company_logo_path')
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest:id,title,user_id,cover_image_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','contest.user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.user.serviceProviderDetail:id,user_id,company_name,company_logo_path')
                                 ->withCount('unreadMessages')
                                 ->get();
             // if($request->type == 'seller')
@@ -34,7 +34,7 @@ class MessageController extends Controller
             //     $contactLists = ContactList::where('contest_id','!=',null)
             //                     ->where('seller_id',Auth::id())
             //                     ->orderBy('created_at','DESC')
-            //                     ->with('user:id,first_name,last_name,profile_pic_path','contest:id,title')
+            //                     ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest:id,title')
             //                     ->withCount('unreadMessages')
             //                     ->get();
             // }
@@ -57,7 +57,7 @@ class MessageController extends Controller
                                           ->orWhere('buyer_id',Auth::id());
                                 })
                                 ->orderBy('created_at','DESC')
-                                ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','job:id,user_idtitle,cover_image_path','job.user.serviceProviderDetail:id,user_id,company_name,company_logo_path')
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','job:id,user_idtitle,cover_image_path','job.user.serviceProviderDetail:id,user_id,company_name,company_logo_path')
                                 ->withCount('unreadMessages')
                                 ->get();
         }
@@ -68,7 +68,7 @@ class MessageController extends Controller
                 $contactLists = ContactList::where('products_services_book_id','!=',null)
                                 ->where('seller_id',Auth::id())
                                 ->orderBy('created_at','DESC')
-                                ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','productsServicesBook:id,title')
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','productsServicesBook:id,title')
                                 ->withCount('unreadMessages')
                                 ->get();
             }
@@ -77,7 +77,7 @@ class MessageController extends Controller
                 $contactLists = ContactList::where('products_services_book_id','!=',null)                              
                                 ->where('buyer_id',Auth::id())
                                 ->orderBy('created_at','DESC')
-                                ->with('productsServicesBook:id,title,user_id','productsServicesBook.coverImage','productsServicesBook.user:id,first_name,last_name,profile_pic_path','productsServicesBook.user.serviceProviderDetail:id,user_id,company_name,company_logo_path')
+                                ->with('productsServicesBook:id,title,user_id','productsServicesBook.coverImage','productsServicesBook.user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','productsServicesBook.user.serviceProviderDetail:id,user_id,company_name,company_logo_path')
                                 ->withCount('unreadMessages')
                                 ->get();
 
@@ -92,7 +92,7 @@ class MessageController extends Controller
     {
     	
     	ChatList::where('contact_list_id',$contact_list_id)->where('receiver_id',Auth::id())->update(['status'=>'read']);
-    	$chatLists = ChatList::where('contact_list_id',$contact_list_id)->orderBy('created_at','asc')->with('sender:id,first_name,last_name,profile_pic_path','sender.serviceProviderDetail:id,user_id,company_name,company_logo_path','receiver:id,first_name,last_name,profile_pic_path','receiver.serviceProviderDetail:id,user_id,company_name,company_logo_path')->get();
+    	$chatLists = ChatList::where('contact_list_id',$contact_list_id)->orderBy('created_at','asc')->with('sender:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','sender.serviceProviderDetail:id,user_id,company_name,company_logo_path','receiver:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','receiver.serviceProviderDetail:id,user_id,company_name,company_logo_path')->get();
     	
     	return response()->json(prepareResult(false, $chatLists, getLangByLabelGroups('messages','message_list')), config('http_response.created'));
     }

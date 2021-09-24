@@ -32,6 +32,7 @@ class CreateUsersTable extends Migration
             $table->boolean('is_email_verified')->nullable();
             $table->boolean('is_contact_number_verified')->nullable();
             $table->string('profile_pic_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
+            $table->string('profile_pic_thumb_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
             $table->text('short_intro')->nullable();
             $table->string('qr_code_img_path')->nullable();
             $table->bigInteger('qr_code_number')->nullable();

@@ -29,11 +29,11 @@ class ContestApplicationController extends Controller
     	{
             if(!empty($request->per_page_record))
             {
-                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->get();
+                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->get();
             }
     		return response(prepareResult(false, $contestApplications, getLangByLabelGroups('messages','message_contest_application_list')), config('http_response.success'));
     	}
@@ -115,7 +115,7 @@ class ContestApplicationController extends Controller
 
     public function show(ContestApplication $contestApplication)
     {
-    	$contestApplication = ContestApplication::where('id',$contestApplication->id)->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->first();
+    	$contestApplication = ContestApplication::where('id',$contestApplication->id)->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->first();
     	return response()->json(prepareResult(false, $contestApplication, getLangByLabelGroups('messages','message_contest_application_list')), config('http_response.success'));
     }
 

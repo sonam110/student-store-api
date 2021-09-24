@@ -18,7 +18,7 @@ class ContestApplicationController extends Controller
 	{
 		try
 		{
-			$contestApplications = ContestApplication::with('contest','user:id,first_name,last_name,profile_pic_path','contest.cancellationRanges','contest.categoryMaster','contest.subCategory')->orderBy('created_at','DESC');
+			$contestApplications = ContestApplication::with('contest','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.cancellationRanges','contest.categoryMaster','contest.subCategory')->orderBy('created_at','DESC');
 			if(!empty($request->application_status))
 			{
 				$contestApplications = $contestApplications->where('application_status',$request->application_status);
@@ -74,7 +74,7 @@ class ContestApplicationController extends Controller
 				$join->on('contest_applications.contest_id', '=', 'contests.id');
 			})
 			->orderBy('contest_applications.created_at','DESC')
-			->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,status','user.cvDetail','user.defaultAddress');
+			->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail','user.defaultAddress');
 
 			
 			if(!empty($request->type))

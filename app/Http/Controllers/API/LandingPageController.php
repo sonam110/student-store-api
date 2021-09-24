@@ -91,7 +91,7 @@ class LandingPageController extends Controller
                                         })
                                         ->where('products_services_books.is_published', '1')
                                         ->orderBy('products_services_books.created_at','DESC')
-                                        ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                                        ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
             if($request->type)
             {
                 $productsServicesBooks = $productsServicesBooks->where('type',$request->type);
@@ -172,7 +172,7 @@ class LandingPageController extends Controller
             $is_chat_initiated = false;
             $contactListId = null;
         }
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,profile_pic_path,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','productImages','productTags')->with(['ratings.customer' => function($query){
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','productImages','productTags')->with(['ratings.customer' => function($query){
                 $query->take(3);
             }])->withCount('ratings')->find($id);
         $productsServicesBook['favourite_products_services_book'] = $favouriteProductsServicesBook;
@@ -188,7 +188,7 @@ class LandingPageController extends Controller
 
     public function getServiceProviders(Request $request)
     {
-        $users = User::select('id','first_name','last_name','profile_pic_path')->where('user_type_id', '3')
+        $users = User::select('id','first_name','last_name','profile_pic_path','profile_pic_thumb_path')->where('user_type_id', '3')
                         ->with('serviceProviderDetail:id,user_id,company_name,company_logo_path')
                         ->inRandomOrder();
 
@@ -210,7 +210,7 @@ class LandingPageController extends Controller
         try
         {
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
-            $similarProducts = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')->where('id','!=', $request->product_id)->where('sub_category_slug', $productsServicesBooks->sub_category_slug)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            $similarProducts = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')->where('id','!=', $request->product_id)->where('sub_category_slug', $productsServicesBooks->sub_category_slug)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
             if(!empty($request->per_page_record))
             {
                 $similarProducts = $similarProducts->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -248,7 +248,7 @@ class LandingPageController extends Controller
             ->where('products_services_books.is_used_item', $is_used_item)
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
-            ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
             if($searchType=='filter')
             {
                 if(!empty($request->title))
@@ -389,7 +389,7 @@ class LandingPageController extends Controller
                                 ->where('products_services_books.quantity','>' ,'0')
                                 ->where('products_services_books.is_published', '1')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
                 }
             }
             elseif($searchType=='topRated')
@@ -436,7 +436,7 @@ class LandingPageController extends Controller
             // ->where('products_services_books.user_id', '!=', Auth::id())
             ->where('users.user_type_id','3')
             ->where('products_services_books.type','service')
-            ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
             if($searchType=='promotion')
             {
                 $products->where('products_services_books.is_promoted', '1')
@@ -465,7 +465,7 @@ class LandingPageController extends Controller
                     ->where('users.user_type_id','3')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
                     ->where('products_services_books.type','service')
-                    ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
                 }
             }
             elseif($searchType=='topRated')
@@ -509,7 +509,7 @@ class LandingPageController extends Controller
                                 // ->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
-                                ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
             if($searchType=='filter')
             {
                 
@@ -539,7 +539,7 @@ class LandingPageController extends Controller
                                 ->where('is_published', '1')
                                 ->where('quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
                 }
             }
             elseif($searchType=='topRated')
@@ -586,7 +586,7 @@ class LandingPageController extends Controller
             ->where('products_services_books.is_published', '1')
             ->where('users.user_type_id','2')
             ->where('products_services_books.type','service')
-            ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
             if($searchType=='filter')
             {
                 if(!empty($request->title))
@@ -729,7 +729,7 @@ class LandingPageController extends Controller
                     ->where('users.user_type_id','2')
                     ->where('products_services_books.type','service')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
-                    ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
                 }
             }
             elseif($searchType=='topRated')
@@ -1064,7 +1064,7 @@ class LandingPageController extends Controller
             ->where('products_services_books.is_used_item', $is_used_item)
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
-            ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
             if($searchType=='filter')
             {
                 if(!empty($request->title))
@@ -1205,7 +1205,7 @@ class LandingPageController extends Controller
                                 ->where('products_services_books.is_published', '1')
                                 ->where('products_services_books.quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
                 }
             }
             elseif($searchType=='topRated')
@@ -1250,7 +1250,7 @@ class LandingPageController extends Controller
                                 // ->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
-                                ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
             if($searchType=='filter')
             {
                 
@@ -1280,7 +1280,7 @@ class LandingPageController extends Controller
                                 ->where('is_published', '1')
                                 ->where('quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
                 }
             }
             elseif($searchType=='topRated')
@@ -1316,7 +1316,7 @@ class LandingPageController extends Controller
     {
         $jobs = Job::where('is_published', '1')
                         ->where('job_status', '1')
-                        ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title','addressDetail','isApplied','isFavourite','categoryMaster','subCategory')
+                        ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title','addressDetail','isApplied','isFavourite','categoryMaster','subCategory')
                         ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'))
                         ->inRandomOrder();
@@ -1353,7 +1353,7 @@ class LandingPageController extends Controller
         {
             $applied = false;
         }
-        $job = Job::with('user:id,first_name,last_name,profile_pic_path,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
+        $job = Job::with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
         $job['favourite_job'] = $favouriteJob;
         $job['favourite_id'] = $favouriteId;
         $job['is_applied'] = $applied;
@@ -1370,7 +1370,7 @@ class LandingPageController extends Controller
             $jobs = Job::select('sp_jobs.id','sp_jobs.user_id', 'sp_jobs.address_detail_id', 'sp_jobs.title', 'sp_jobs.slug', 'sp_jobs.short_summary', 'sp_jobs.job_type', 'sp_jobs.job_nature', 'sp_jobs.years_of_experience', 'sp_jobs.job_environment', 'sp_jobs.category_master_id','sp_jobs.sub_category_slug')
                     ->where('sp_jobs.is_published', '1')
                     ->where('sp_jobs.job_status', '1')
-                    ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title','isApplied','isFavourite','addressDetail','categoryMaster','subCategory');
+                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title','isApplied','isFavourite','addressDetail','categoryMaster','subCategory');
             if($searchType=='filter')
             {
                 if(!empty($request->category_master_id))
@@ -1618,7 +1618,7 @@ class LandingPageController extends Controller
                 $jobs = Job::select('sp_jobs.*')
                         ->whereIn('sp_jobs.id',$actualArray)
                         ->where('sp_jobs.is_published', '1')
-                        ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title');
+                        ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','jobTags:id,job_id,title');
             }
             if(!empty($request->per_page_record))
             {
@@ -1684,7 +1684,7 @@ class LandingPageController extends Controller
     public function getContests(Request $request)
     {
         $contests = Contest::where('is_published', '1')
-                        ->with('user:id,first_name,last_name,profile_pic_path','cancellationRanges','isApplied','categoryMaster','subCategory')
+                        ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','cancellationRanges','isApplied','categoryMaster','subCategory')
                         ->withCount('contestApplications')
                         ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'))
@@ -1740,7 +1740,7 @@ class LandingPageController extends Controller
                     // ->where('contests.user_id', '!=', Auth::id())
                     ->where('contests.type', $request->type)
                     ->where('contests.is_published', '1')
-                    ->with('user:id,first_name,last_name,profile_pic_path','categoryMaster','subCategory','cancellationRanges','isApplied','categoryMaster','subCategory');
+                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','isApplied','categoryMaster','subCategory');
             if($searchType=='filter')
             {
                 if(!empty($request->category_master_id))

@@ -28,7 +28,7 @@ class FavouriteProductController extends Controller
             //                 $join->on('favourite_products.products_services_book_id', '=', 'products_services_books.id');
             //             })
             //             ->where('products_services_books.user_id', Auth::id())
-            //             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.studentDetail');
+            //             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail');
             // }
 
             if(!empty($request->per_page_record))

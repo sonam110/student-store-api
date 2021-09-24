@@ -93,6 +93,7 @@ class UserController extends Controller
 		$user->gender               = $request->gender;
 		$user->dob                  = $dob;
 		$user->profile_pic_path     = $request->profile_pic_path;
+		$user->profile_pic_thumb_path     = env('CDN_DOC_THUMB_URL').basename($request->profile_pic_path);
 		$user->user_type_id         = $request->user_type_id;
 		$user->language_id          = $request->language_id;
 		$user->is_verified          = true;

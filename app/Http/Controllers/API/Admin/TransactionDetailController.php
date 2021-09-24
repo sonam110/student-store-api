@@ -17,11 +17,11 @@ class TransactionDetailController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $transactionDetails = TransactionDetail::orderBy('created_at','DESC')->with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $transactionDetails = TransactionDetail::orderBy('created_at','DESC')->with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $transactionDetails = TransactionDetail::orderBy('created_at','DESC')->with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path')->get();
+                $transactionDetails = TransactionDetail::orderBy('created_at','DESC')->with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->get();
             }
             return response(prepareResult(false, $transactionDetails, getLangByLabelGroups('messages','messages_transactionDetail_list')), config('http_response.success'));
         }
@@ -35,7 +35,7 @@ class TransactionDetailController extends Controller
     {
         try
         {
-            $transactionDetails = TransactionDetail::with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path')->find($transactionDetail->id);
+            $transactionDetails = TransactionDetail::with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->find($transactionDetail->id);
             return response(prepareResult(false, $transactionDetails, getLangByLabelGroups('messages','messages_transactionDetail_list')), config('http_response.success'));
         }
         catch (\Throwable $exception) 
@@ -50,7 +50,7 @@ class TransactionDetailController extends Controller
         {
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria transactionDetail
             $transactionDetails = TransactionDetail::select('sp_transactionDetails.*')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','transactionDetailTags:id,transactionDetail_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','transactionDetailTags:id,transactionDetail_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
             if($searchType=='filter')
             {
                 if(!empty($request->category_master_id))
@@ -299,7 +299,7 @@ class TransactionDetailController extends Controller
                 $transactionDetails = TransactionDetail::select('sp_transactionDetails.*')
                         ->whereIn('sp_transactionDetails.id',$actualArray)
                         ->where('is_published', '1')
-                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','transactionDetailTags:id,transactionDetail_id,title','addressDetail','categoryMaster','subCategory');
+                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','transactionDetailTags:id,transactionDetail_id,title','addressDetail','categoryMaster','subCategory');
             }
             if(!empty($request->per_page_record))
             {

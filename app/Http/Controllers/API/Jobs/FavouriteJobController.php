@@ -24,9 +24,9 @@ class FavouriteJobController extends Controller
                         ->where('sp_jobs.application_end_date','>=', date('Y-m-d'))
                         ->where('favourite_jobs.sa_id', Auth::id())
                         ->orderBy('favourite_jobs.created_at','DESC')
-                        ->with('job.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','job.user.serviceProviderDetail','job.addressDetail','job.jobTags:id,job_id,title','job.categoryMaster','job.subCategory');
+                        ->with('job.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','job.user.serviceProviderDetail','job.addressDetail','job.jobTags:id,job_id,title','job.categoryMaster','job.subCategory');
             } else {
-                $query = FavouriteJob::query()->where('sp_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,email,dob,contact_number,profile_pic_path','user.cvDetail','user.studentDetail','user.educations','user.experiences','user.defaultAddress');
+                $query = FavouriteJob::query()->where('sp_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,email,dob,contact_number,profile_pic_path,profile_pic_thumb_path','user.cvDetail','user.studentDetail','user.educations','user.experiences','user.defaultAddress');
             }
 
             if(!empty($request->per_page_record))

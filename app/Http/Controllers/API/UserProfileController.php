@@ -132,6 +132,7 @@ class UserProfileController extends Controller
 		$user->short_intro          				= $request->short_intro;
 		$user->dob                  				= $dob;
 		$user->profile_pic_path     				= $request->profile_pic_path;
+		$user->profile_pic_thumb_path     			= env('CDN_DOC_THUMB_URL').basename($request->profile_pic_path);
 		$user->is_email_verified 					= $request->is_email_verified;
 		$user->is_contact_number_verified 			= $request->is_contact_number_verified;
 		$user->cp_first_name 						= $request->cp_first_name;
@@ -370,7 +371,7 @@ class UserProfileController extends Controller
 		->where('order_items.user_id',Auth::id())
 		->where('order_items.earned_reward_points', '>', 0)
 		->get(['orders.order_number','order_items.created_at','order_items.title','order_items.product_type','order_items.cover_image','order_items.item_status','order_items.price','order_items.quantity','order_items.earned_reward_points','order_items.reward_point_status']);
-		$data['reward_points_sharing_history'] 		= SharedRewardPoint::where('sender_id',Auth::id())->orWhere('receiver_id',Auth::id())->with('receiver:id,first_name,last_name,profile_pic_path','sender:id,first_name,last_name,profile_pic_path')->orderBy('created_at','desc')->get();
+		$data['reward_points_sharing_history'] 		= SharedRewardPoint::where('sender_id',Auth::id())->orWhere('receiver_id',Auth::id())->with('receiver:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','sender:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path')->orderBy('created_at','desc')->get();
 
 		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
 	}

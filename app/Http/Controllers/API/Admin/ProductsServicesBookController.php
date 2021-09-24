@@ -33,7 +33,7 @@ class ProductsServicesBookController extends Controller
                                         ->join('users', function ($join) {
                                             $join->on('products_services_books.user_id', '=', 'users.id');
                                         })
-                                        ->orderBy('products_services_books.created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','addressDetail','categoryMaster','subCategory','coverImage','productTags');
+                                        ->orderBy('products_services_books.created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','addressDetail','categoryMaster','subCategory','coverImage','productTags');
             if($request->type)
             {
                 $productsServicesBooks = $productsServicesBooks->where('type',$request->type);
@@ -213,7 +213,7 @@ class ProductsServicesBookController extends Controller
             }
 
             
-            $productsServicesBook = ProductsServicesBook::with('categoryMaster','subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','addressDetail','productImages','productTags')->find($productsServicesBook->id);
+            $productsServicesBook = ProductsServicesBook::with('categoryMaster','subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','productImages','productTags')->find($productsServicesBook->id);
             $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
             return response()->json(prepareResult(false, $productsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_created')), config('http_response.created'));
         }
@@ -227,7 +227,7 @@ class ProductsServicesBookController extends Controller
 
     public function show(Request $request,ProductsServicesBook $productsServicesBook)
     {
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,show_email,show_contact_number','user.serviceProviderDetail','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
                 $query->take(3);
             }])->withCount('ratings')->find($productsServicesBook->id);
         $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
@@ -354,7 +354,7 @@ class ProductsServicesBookController extends Controller
             }
 
             DB::commit();
-            $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','addressDetail','productImages','productTags')->find($productsServicesBook->id);
+            $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','productImages','productTags')->find($productsServicesBook->id);
             $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
             return response()->json(prepareResult(false, $productsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_updated')), config('http_response.created'));
         }
@@ -543,7 +543,7 @@ class ProductsServicesBookController extends Controller
             $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','discounted_price','deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug','products_services_books.is_published','products_services_books.brand')
             ->where('products_services_books.type', $type)
             // ->where('products_services_books.status', $request->status)
-            ->with('user:id,user_type_id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+            ->with('user:id,user_type_id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
             ->orderBy('products_services_books.created_at','DESC');
 
             if($request->user_type == 'student')
@@ -746,7 +746,7 @@ class ProductsServicesBookController extends Controller
                                 ->where('products_services_books.type', $type)
                                 ->where('products_services_books.is_published', '1')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }
             }
             elseif($searchType=='topRated')

@@ -232,6 +232,7 @@ class AuthController extends Controller
 		$user->is_contact_number_verified 			= $request->is_contact_number_verified;
 		$user->dob 									= $dob;
 		$user->profile_pic_path						= $profile_pic_path;
+		$user->profile_pic_path						= env('CDN_DOC_THUMB_URL').basename($profile_pic_path);
 		$user->user_type_id         				= $request->user_type_id;
 		$user->language_id          				= $request->language_id;
 		$user->cp_first_name 						= $request->cp_first_name;
@@ -484,7 +485,7 @@ class AuthController extends Controller
 
 		try
 		{
-			$user = User::where('email',$request->contact_number)->orWhere('contact_number',$request->contact_number)->orWhere('guardian_email',$request->contact_number)->orWhere('guardian_contact_number',$request->contact_number)->first(['id','first_name','last_name','email','contact_number','profile_pic_path','user_type_id','language_id','password','guardian_email','guardian_contact_number','is_minor']);
+			$user = User::where('email',$request->contact_number)->orWhere('contact_number',$request->contact_number)->orWhere('guardian_email',$request->contact_number)->orWhere('guardian_contact_number',$request->contact_number)->first(['id','first_name','last_name','email','contact_number','profile_pic_path','profile_pic_thumb_path','user_type_id','language_id','password','guardian_email','guardian_contact_number','is_minor']);
 			
 
 			if (!$user) {

@@ -26,11 +26,11 @@ class ContestController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path','isApplied','contestWinners')->withCount('contestApplications')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path','isApplied','contestWinners')->withCount('contestApplications')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path','isApplied','contestWinners')->withCount('contestApplications')->get();
+                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path','isApplied','contestWinners')->withCount('contestApplications')->get();
             }
             return response(prepareResult(false, $contests, getLangByLabelGroups('messages','messages_contest_list')), config('http_response.success'));
         }
@@ -232,7 +232,7 @@ class ContestController extends Controller
                 
             // }
             DB::commit();
-            $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','categoryMaster','subCategory','addressDetail','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path')->find($contest->id);
+            $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','addressDetail','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path')->find($contest->id);
             return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_created')), config('http_response.created'));
         }
         catch (\Throwable $exception)
@@ -273,7 +273,7 @@ class ContestController extends Controller
         {
             $is_abuse_reported = false;
         }
-        $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,show_email,show_contact_number','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path','contestWinners')->withCount('contestApplications')->find($contest->id);
+        $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path','contestWinners')->withCount('contestApplications')->find($contest->id);
         $contest['is_applied'] = $applied;
         $contest['auth_application'] = $authApplication;
 
@@ -544,11 +544,11 @@ class ContestController extends Controller
     	{
     	    if(!empty($request->per_page_record))
     	    {
-    	        $contestApplications = ContestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,email,contact_number','user.defaultAddress:id,user_id,full_address')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+    	        $contestApplications = ContestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,email,contact_number','user.defaultAddress:id,user_id,full_address')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
     	    }
     	    else
     	    {
-    	        $contestApplications = contestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,email,contact_number','user.defaultAddress:id,user_id,full_address')->get();
+    	        $contestApplications = contestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,email,contact_number','user.defaultAddress:id,user_id,full_address')->get();
     	    }
     	    return response(prepareResult(false, $contestApplications, getLangByLabelGroups('messages','messages_contest_application_list')), config('http_response.success'));
     	}
@@ -582,7 +582,7 @@ class ContestController extends Controller
                     // ->where('contests.user_id', '!=', Auth::id())
             		->where('contests.type', $request->type)
                     ->where('contests.is_published', '1')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path','isApplied','contestWinners');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path','isApplied','contestWinners');
             if($searchType=='filter')
             {
                 if(!empty($request->category_master_id))

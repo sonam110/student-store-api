@@ -87,7 +87,8 @@ class AdminUserSeeder extends Seeder
     	$user->email         			= 'admin@gmail.com';
     	$user->email_verified_at 		= date('Y-m-d H:i:s');
     	$user->password      			= \Hash::make('12345678');   
-    	$user->profile_pic_path			= env('CDN_DOC_URL').'uploads/noimage.jpg'; 	
+        $user->profile_pic_path         = env('CDN_DOC_URL').'uploads/noimage.jpg';     
+    	$user->profile_pic_thumb_path	= env('CDN_DOC_THUMB_URL').'noimage.jpg'; 	
         $user->gender       			= 'male';
         $user->dob       				= '1990-03-20';
     	$user->contact_number     		= '9876543210';

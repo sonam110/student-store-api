@@ -112,7 +112,7 @@
 		<div id="drag" class="cv instaFade breakFastBurrito" style="padding: 0px">
 			<div class="mainDetails">
 				<div id="headshot" class="">
-					<img src="{{$user->profile_pic_path}}" title="{{$user->first_name}} {{$user->last_name}}" alt="{{$user->first_name}} {{$user->last_name}}" />
+					<img src="{{$user->profile_pic_thumb_path}}" title="{{$user->first_name}} {{$user->last_name}}" alt="{{$user->first_name}} {{$user->last_name}}" />
 				</div>
 				<div id="name">
 					<h1 class=" delayTwo">{{\mervick\aesEverywhere\AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'))}} {{\mervick\aesEverywhere\AES256::decrypt($user->last_name, env('ENCRYPTION_KEY'))}}</h1>

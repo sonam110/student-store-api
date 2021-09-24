@@ -93,7 +93,7 @@ class JobApplicationController extends Controller
 
     public function show(JobApplication $jobApplication)
     {
-    	$jobApplication = JobApplication::where('id',$jobApplication->id)->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','userCvDetail.jobTags')->first();
+    	$jobApplication = JobApplication::where('id',$jobApplication->id)->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','userCvDetail.jobTags')->first();
     	return response()->json(prepareResult(false, new JobApplicationResource($jobApplication), getLangByLabelGroups('messages','message_job_application_list')), config('http_response.success'));
     }
 

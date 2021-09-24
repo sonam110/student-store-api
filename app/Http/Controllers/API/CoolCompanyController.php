@@ -20,7 +20,7 @@ class CoolCompanyController extends Controller
 
             if(!empty($request->per_page_record))
             {
-                $assignments = CoolCompanyAssignment::with('user:id,first_name,last_name,profile_pic_path','user.studentDetail:user_id,cool_company_id');
+                $assignments = CoolCompanyAssignment::with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.studentDetail:user_id,cool_company_id');
                 if(Auth::user()->user_type_id != 1) 
                 {
                     $assignmentsList = $assignments->where('user_id', Auth::id());
@@ -29,7 +29,7 @@ class CoolCompanyController extends Controller
             }
             else
             {
-                $assignments = CoolCompanyAssignment::with('user:id,first_name,last_name,profile_pic_path','user.studentDetail:user_id,cool_company_id');
+                $assignments = CoolCompanyAssignment::with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.studentDetail:user_id,cool_company_id');
                 if(Auth::user()->user_type_id != 1) 
                 {
                     $assignmentsList = $assignments->where('user_id', Auth::id());

@@ -99,6 +99,7 @@ class UserController extends Controller
 		$user->gender               = $request->gender;
 		$user->dob                  = $dob;
 		$user->profile_pic_path     = $request->profile_pic_path;
+		$user->profile_pic_thumb_path     = env('CDN_DOC_THUMB_URL').basename($request->profile_pic_path);
 		$user->user_type_id         = $request->user_type_id;
 		$user->language_id          = $request->language_id;
 		$user->is_verified          = true;
@@ -144,6 +145,7 @@ class UserController extends Controller
 		$user->short_intro          				= $request->short_intro;
 		$user->dob                  				= $dob;
 		$user->profile_pic_path     				= $request->profile_pic_path;
+		$user->profile_pic_thumb_path     			= env('CDN_DOC_THUMB_URL').basename($request->profile_pic_path);
 		$user->is_email_verified 					= $request->is_email_verified;
 		$user->is_contact_number_verified 			= $request->is_contact_number_verified;
 		$user->cp_first_name 						= $request->cp_first_name;
@@ -423,11 +425,11 @@ class UserController extends Controller
 		{
 			if(!empty($request->per_page_record))
 			{
-			    $userPackageSubscriptions = UserPackageSubscription::select('id','user_id')->groupBy('user_id')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,email,contact_number,profile_pic_path','user.userPackageSubscriptions')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			    $userPackageSubscriptions = UserPackageSubscription::select('id','user_id')->groupBy('user_id')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.userPackageSubscriptions')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 			}
 			else
 			{
-			    $userPackageSubscriptions = UserPackageSubscription::select('id','user_id')->groupBy('user_id')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,email,contact_number,profile_pic_path','user.userPackageSubscriptions')->get();
+			    $userPackageSubscriptions = UserPackageSubscription::select('id','user_id')->groupBy('user_id')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.userPackageSubscriptions')->get();
 			}
 			return response(prepareResult(false, $userPackageSubscriptions, getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
 		}

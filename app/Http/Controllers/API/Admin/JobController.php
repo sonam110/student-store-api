@@ -28,11 +28,11 @@ class JobController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $jobs = Job::orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','jobTags:id,job_id,title','jobApplications.user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $jobs = Job::orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','jobApplications.user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $jobs = Job::orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','jobTags:id,job_id,title','jobApplications.user')->get();
+                $jobs = Job::orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','jobApplications.user')->get();
             }
             return response(prepareResult(false, $jobs, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
         }
@@ -48,11 +48,11 @@ class JobController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $jobs = Job::orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','jobTags:id,job_id,title','jobApplications.user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $jobs = Job::orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','jobApplications.user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $jobs = Job::orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','jobTags:id,job_id,title','jobApplications.user')->get();
+                $jobs = Job::orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','jobApplications.user')->get();
             }
             return response(prepareResult(false, $jobs, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
         }
@@ -185,7 +185,7 @@ class JobController extends Controller
             }
             
             DB::commit();
-            $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
+            $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
             return response()->json(prepareResult(false, $job, getLangByLabelGroups('messages','messages_job_created')), config('http_response.created'));
         }
         catch (\Throwable $exception)
@@ -200,7 +200,7 @@ class JobController extends Controller
         try
         {
             $job_id = $job->id;
-            $jobs = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','jobTags:id,job_id,title','jobApplications.user')->find($job_id);
+            $jobs = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','jobApplications.user')->find($job_id);
             return response(prepareResult(false, $jobs, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
         }
         catch (\Throwable $exception) 
@@ -463,7 +463,7 @@ class JobController extends Controller
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria job
             $jobs = Job::select('sp_jobs.*')
                     ->orderBy('sp_jobs.created_at','DESC')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
             if($searchType=='filter')
             {
                 if(!empty($request->category_master_id))
@@ -732,7 +732,7 @@ class JobController extends Controller
                 $jobs = Job::select('sp_jobs.*')
                         ->whereIn('sp_jobs.id',$actualArray)
                         ->where('is_published', '1')
-                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory');
+                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory');
             }
             if(!empty($request->per_page_record))
             {

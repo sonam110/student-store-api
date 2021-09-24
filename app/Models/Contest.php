@@ -64,6 +64,6 @@ class Contest extends Model
 
     public function contestWinners()
     {
-        return $this->hasMany(ContestWinner::class, 'contest_id', 'id')->with('user:id,first_name,last_name,profile_pic_path');
+        return $this->hasMany(ContestWinner::class, 'contest_id', 'id')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path');
     }
 }

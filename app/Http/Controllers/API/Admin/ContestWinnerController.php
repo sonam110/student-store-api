@@ -16,7 +16,7 @@ class ContestWinnerController extends Controller
 	{
 		try
 		{
-            $contestWinners = ContestWinner::with('contest','user:id,first_name,last_name,profile_pic_path','contest.categoryMaster','contest.subCategory')->orderBy('created_at','DESC');
+            $contestWinners = ContestWinner::with('contest','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory')->orderBy('created_at','DESC');
 			if(!empty($request->per_page_record))
 			{
 			   $contestWinners = $contestWinners->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -67,7 +67,7 @@ class ContestWinnerController extends Controller
                     ->join('contests', function ($join) {
                         $join->on('contest_winners.contest_id', '=', 'contests.id');
                     })
-        	        ->with('contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,status','user.cvDetail','user.defaultAddress');
+        	        ->with('contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail','user.defaultAddress');
                     
             if(!empty($request->user_id))
             {
