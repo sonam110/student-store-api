@@ -530,9 +530,10 @@ class FrontController extends Controller
     {
         $allimages = ProductImage::get();
         foreach ($allimages as $key => $image) {
-        	if(!empty($image->profile_pic_path))
+        	if(!empty($image->image_path))
         	{
-        		$image->thumb_image_path = env('CDN_DOC_THUMB_URL').basename($image->thumb_image_path);
+        		$image->image_path = env('CDN_DOC_URL').'uploads/'.basename($image->image_path);
+        		$image->thumb_image_path = env('CDN_DOC_THUMB_URL').basename($image->image_path);
         	}
         	else
         	{
@@ -543,8 +544,9 @@ class FrontController extends Controller
 
         $companyLogos = ServiceProviderDetail::get();
         foreach ($companyLogos as $key => $image) {
-        	if(!empty($image->profile_pic_path))
+        	if(!empty($image->company_logo_path))
         	{
+        		$image->company_logo_path = env('CDN_DOC_URL').'uploads/'.basename($image->company_logo_path);
         		$image->company_logo_thumb_path = env('CDN_DOC_THUMB_URL').basename($image->company_logo_path);
         	}
         	else
@@ -558,7 +560,8 @@ class FrontController extends Controller
         foreach ($userImages as $key => $image) {
         	if(!empty($image->profile_pic_path))
         	{
-        		$image->profile_pic_thumb_path  = env('CDN_DOC_THUMB_URL').basename($image->profile_pic_path);
+        		$image->profile_pic_path = env('CDN_DOC_URL').'uploads/'.basename($image->profile_pic_path);
+        		$image->profile_pic_thumb_path = env('CDN_DOC_THUMB_URL').basename($image->profile_pic_path);
         	}
         	else
         	{
