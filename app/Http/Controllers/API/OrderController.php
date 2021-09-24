@@ -31,6 +31,7 @@ use App\Models\Package;
 use App\Models\ShippingCondition;
 use mervick\aesEverywhere\AES256;
 use PDF;
+use App\Models\UserPackageSubscription;
 
 
 class OrderController extends Controller
@@ -224,6 +225,7 @@ class OrderController extends Controller
 							$price = $productsServicesBook->price;
 						}
 						$title = $productsServicesBook->type_of_package;
+						$user_package = UserPackageSubscription::where('user_id',null)->first();
 					}
 
 					//reward point will be applicable to student only
@@ -238,9 +240,18 @@ class OrderController extends Controller
 						$earned_reward_points = '0';
 					}
 
+					if($user_package)
+					{
+						$commission = $user_package->commission_per_sale;
+					}
+					else
+					{
+						$commission = 0;
+					}
+
 					$reward_points_value = AppSetting::first()->single_rewards_pt_value * $earned_reward_points;
 
-					$amount_transferred_to_vendor = (($price * $orderedItem['quantity']) - $reward_points_value) * 
+					$amount_transferred_to_vendor = (($price * $orderedItem['quantity']) - $reward_points_value) * (100 - $commission) / 100;
 
 					if($productsServicesBook->discount_type == 1)
 					{
@@ -249,7 +260,7 @@ class OrderController extends Controller
 					else
 					{
 						$discount = $productsServicesBook->discount_value.'Rupees';
-					}
+					} 
 
 					$sub_total = $sub_total + ($price*$orderedItem['quantity']);
 
