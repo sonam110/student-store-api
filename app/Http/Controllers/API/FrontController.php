@@ -25,6 +25,8 @@ use App\Models\JobTag;
 use App\Models\Label;
 use App\Models\Slider;
 use App\Models\EmailTemplate;
+use App\Models\ProductImage;
+use App\Models\ServiceProviderDetail;
 use Stripe;
 use App\Mail\ForgotPasswordMail;
 use Mail;
@@ -521,5 +523,22 @@ class FrontController extends Controller
                 $imgthumb->save($thumbDestinationPath.'/'.$fileName['basename']);
       		}
       	}
+      	dd('Done');
 	}
+
+	public function addThumbFileName()
+    {
+        $allimages = ProductImage::get();
+        foreach ($allimages as $key => $image) {
+        	$image->thumb_image_path = env('CDN_DOC_THUMB_URL').basename($image->thumb_image_path);
+        	$image->save();
+        }
+
+        $companyLogos = ServiceProviderDetail::get();
+        foreach ($companyLogos as $key => $image) {
+        	$image->company_logo_thumb_path = env('CDN_DOC_THUMB_URL').basename($image->company_logo_path);
+        	$image->save();
+        }
+        dd('Done');
+    }
 }

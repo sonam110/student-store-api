@@ -22,4 +22,6 @@ Route::get('/check-send-mail', 'App\Http\Controllers\API\FrontController@checkSe
 
 Route::get('/get-all-files', 'App\Http\Controllers\API\FrontController@getAllFiles');
 
+Route::get('/add-thumb-filename', 'App\Http\Controllers\API\FrontController@addThumbFileName');
+
 Route::get('/login', [App\Http\Controllers\Admin\MasterController::class,'login'])->name('login');
