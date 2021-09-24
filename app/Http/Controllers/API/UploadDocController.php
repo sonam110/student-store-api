@@ -35,6 +35,7 @@ class UploadDocController extends Controller
             $destinationPath = 'uploads/';
             $thumbDestinationPath = 'uploads/thumbs/';
             $fileArray = array();
+            $formatCheck = ['tif','tiff','bmp','gif','eps','raw','jfif'];
 
             if($request->is_multiple==1)
             {
@@ -61,7 +62,11 @@ class UploadDocController extends Controller
                     }
                     else
                     {
-                        $value->move($destinationPath, $fileName);
+                        $filecopy = $value->move($destinationPath, $fileName);
+                        if(in_array($extension, $formatCheck))
+                        {
+                            $filecopy->move($thumbDestinationPath, $fileName);
+                        }
                     }
                     
                     $fileArray[] = [
@@ -95,7 +100,11 @@ class UploadDocController extends Controller
                 }
                 else
                 {
-                    $file->move($destinationPath, $fileName);
+                    $filecopy = $file->move($destinationPath, $fileName);
+                    if(in_array($extension, $formatCheck))
+                    {
+                        $filecopy->move($thumbDestinationPath, $fileName);
+                    }
                 }
                 $fileInfo = [
                     'file_name'         => env('CDN_DOC_URL').$destinationPath.$fileName,
