@@ -516,11 +516,16 @@ class FrontController extends Controller
       		if(basename(pathinfo($file, PATHINFO_EXTENSION))=='jpg' || basename(pathinfo($file, PATHINFO_EXTENSION))=='png' || basename(pathinfo($file, PATHINFO_EXTENSION))=='jpeg')
       		{
       			$fileName = pathinfo($file);
-      			$imgthumb = Image::make($path.'/'.$fileName['basename']);
-                $imgthumb->resize(260, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
-                $imgthumb->save($thumbDestinationPath.'/'.$fileName['basename']);
+      			echo '<pre>';
+      			print_r($fileName);
+      			if(basename($fileName['dirname'])!='qr')
+      			{
+      				$imgthumb = Image::make($path.'/'.$fileName['basename']);
+	                $imgthumb->resize(260, null, function ($constraint) {
+	                    $constraint->aspectRatio();
+	                });
+	                $imgthumb->save($thumbDestinationPath.'/'.$fileName['basename']);
+      			}
       		}
       	}
       	dd('Done');
