@@ -87,7 +87,7 @@ class UploadDocController extends Controller
                     $img->save($destinationPath.'/'.$fileName, 75);
 
                     //Thumb image generate
-                    $imgthumb = Image::make($value->getRealPath());
+                    $imgthumb = Image::make($file->getRealPath());
                     $imgthumb->resize(260, null, function ($constraint) {
                         $constraint->aspectRatio();
                     });
