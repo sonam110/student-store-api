@@ -44,13 +44,13 @@ class LandingPageController extends Controller
         foreach ($productsSpIds as $key => $value) {
             $pspids[] = $value->user_id;
         }
-        $productSps = ServiceProviderDetail::whereIn('user_id',$pspids)->with('user:id')->get(['id','user_id','company_name','company_logo_path,company_logo_thumb_path']);
+        $productSps = ServiceProviderDetail::whereIn('user_id',$pspids)->with('user:id')->get(['id','user_id','company_name','company_logo_path','company_logo_thumb_path']);
 
         $jobsSpIds = Job::where('user_id','!=', Auth::id())->where('job_status', '1')->distinct()->inRandomOrder()->limit(6)->get(['user_id']);
         foreach ($jobsSpIds as $key => $value) {
             $jspids[] = $value->user_id;
         }
-        $jobSps = ServiceProviderDetail::whereIn('user_id',$jspids)->with('user:id')->get(['id','user_id','company_name','company_logo_path,company_logo_thumb_path']);
+        $jobSps = ServiceProviderDetail::whereIn('user_id',$jspids)->with('user:id')->get(['id','user_id','company_name','company_logo_path','company_logo_thumb_path']);
 
         $contests = Contest::where('is_published', '1')
                             ->where('application_start_date','<=', date('Y-m-d'))
