@@ -27,6 +27,7 @@ use App\Models\Slider;
 use App\Models\EmailTemplate;
 use App\Models\ProductImage;
 use App\Models\ServiceProviderDetail;
+use App\Models\Contest;
 use Stripe;
 use App\Mail\ForgotPasswordMail;
 use Mail;
@@ -533,6 +534,7 @@ class FrontController extends Controller
 
 	public function addThumbFileName()
     {
+        /*
         $allimages = ProductImage::get();
         foreach ($allimages as $key => $image) {
         	if(!empty($image->image_path))
@@ -571,6 +573,21 @@ class FrontController extends Controller
         	else
         	{
         		$image->profile_pic_thumb_path  = 'https://www.nrtsms.com/images/no-image.png';
+        	}
+        	$image->save();
+        }
+        */
+
+        $contests = Contest::get();
+        foreach ($contests as $key => $image) {
+        	if(!empty($image->cover_image_path))
+        	{
+        		$image->cover_image_path = env('CDN_DOC_URL').'uploads/'.basename($image->cover_image_path);
+        		$image->cover_image_thumb_path = env('CDN_DOC_THUMB_URL').basename($image->cover_image_path);
+        	}
+        	else
+        	{
+        		$image->cover_image_thumb_path  = 'https://www.nrtsms.com/images/no-image.png';
         	}
         	$image->save();
         }

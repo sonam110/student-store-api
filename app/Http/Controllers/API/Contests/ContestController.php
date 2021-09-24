@@ -102,6 +102,7 @@ class ContestController extends Controller
                 $contest->description          					= $request->description;
                 $contest->type                  				= $request->type;
                 $contest->cover_image_path          			= $request->cover_image_path;
+                $contest->cover_image_thumb_path                = env('CDN_DOC_THUMB_URL').basename($request->cover_image_path);
                 $contest->sponsor_detail            			= $request->sponsor_detail;
                 $contest->start_date                			= $start_date;
                 $contest->start_time                    		= $request->start_time;
@@ -337,6 +338,7 @@ class ContestController extends Controller
             $contest->description          					= $request->description;
             $contest->type                  				= $request->type;
             $contest->cover_image_path          			= $request->cover_image_path;
+            $contest->cover_image_thumb_path                = env('CDN_DOC_THUMB_URL').basename($request->cover_image_path);
             $contest->sponsor_detail            			= $request->sponsor_detail;
             $contest->start_date                			= $start_date;
             $contest->start_time                    		= $request->start_time;

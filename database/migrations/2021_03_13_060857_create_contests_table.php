@@ -39,6 +39,7 @@ class CreateContestsTable extends Migration
             // $table->string('contest_type',100)->nullable();
             // $table->string('event_type',100)->nullable();
             $table->string('cover_image_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
+            $table->string('cover_image_thumb_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
             $table->text('sponsor_detail')->nullable();
             $table->date('start_date')->nullable();
             // $table->date('end_date')->nullable();

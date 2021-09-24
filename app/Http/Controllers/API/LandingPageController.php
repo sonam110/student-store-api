@@ -58,7 +58,7 @@ class LandingPageController extends Controller
                             // ->where('user_id','!=', Auth::id())
                             ->limit(2)
                             ->inRandomOrder()
-                            ->get(['id','title','subscription_fees','start_date','cover_image_path']);
+                            ->get(['id','title','subscription_fees','start_date','cover_image_path','cover_image_thumb_path']);
 
         $books = ProductsServicesBook::where('type','book')
                                     ->where('is_published', '1')

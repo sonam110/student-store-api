@@ -26,7 +26,7 @@ class MessageController extends Controller
                                           ->orWhere('buyer_id',Auth::id());
                                 })
                                 ->orderBy('created_at','DESC')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest:id,title,user_id,cover_image_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','contest.user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path')
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest:id,title,user_id,cover_image_path,cover_image_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','contest.user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path')
                                 ->withCount('unreadMessages')
                                 ->get();
             // if($request->type == 'seller')
@@ -57,7 +57,7 @@ class MessageController extends Controller
                                           ->orWhere('buyer_id',Auth::id());
                                 })
                                 ->orderBy('created_at','DESC')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','job:id,user_idtitle,cover_image_path','job.user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path')
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','job:id,user_idtitle,cover_image_path,cover_image_thumb_path','job.user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path')
                                 ->withCount('unreadMessages')
                                 ->get();
         }
