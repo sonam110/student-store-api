@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
 use PDF;
-
 use Image;
 
 class UploadDocController extends Controller

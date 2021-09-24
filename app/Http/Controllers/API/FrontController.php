@@ -28,6 +28,7 @@ use App\Models\EmailTemplate;
 use Stripe;
 use App\Mail\ForgotPasswordMail;
 use Mail;
+use Image;
 
 class FrontController extends Controller
 {
@@ -502,5 +503,23 @@ class FrontController extends Controller
 		
 		$mail = Mail::to('ashok@nrt.co.in')->send(new ForgotPasswordMail($details));
 		dd($mail);
+	}
+
+	public function getAllFiles()
+	{
+		$thumbDestinationPath = 'uploads/thumbs/';
+		$path = public_path('uploads');
+      	$files = \File::allFiles($path);
+      	foreach ($files as $key => $file) {
+      		if(basename(pathinfo($file, PATHINFO_EXTENSION))=='jpg' || basename(pathinfo($file, PATHINFO_EXTENSION))=='png' || basename(pathinfo($file, PATHINFO_EXTENSION))=='jpeg')
+      		{
+      			$fileName = pathinfo($file);
+      			$imgthumb = Image::make($path.'/'.$fileName['basename']);
+                $imgthumb->resize(260, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+                $imgthumb->save($thumbDestinationPath.'/'.$fileName['basename']);
+      		}
+      	}
 	}
 }
