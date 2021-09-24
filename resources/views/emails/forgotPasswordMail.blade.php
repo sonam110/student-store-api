@@ -22,10 +22,16 @@
                         </tr>
                      </tbody>
                   </table>
+                  
+                  
                   <table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #ffffff; box-shadow: 0px 0px 20px rgba(15, 40, 55, 0.06); border: 1px solid rgba(239, 239, 239, 1); border-radius: 20px;">
                      <tbody>
                         <tr>
-                           <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px;">
+                           <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px; background: #ffffff;">
+
+
+                           	<!-- ###################################################### -->
+                           	<!-- Content Start -->
                               <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                                  <tbody>
                                     <tr>
@@ -42,10 +48,15 @@
                                     </tr>
                                  </tbody>
                               </table>
+                              <!-- Content End -->
+                              <!-- ###################################################### -->
+
                            </td>
                         </tr>
                      </tbody>
                   </table>
+                  
+
                   <table class="header-table" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; margin-top: 10px; padding-bottom: 10px; border-bottom: 1px solid #CCC;">
                      <tbody>
                         <tr>
