@@ -8,8 +8,8 @@
       <tbody>
          <tr>
             <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
-            <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto; max-width: 580px; padding: 10px; width: 580px;">
-               <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
+            <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto; max-width: 100%; padding: 10px; width: 100%;">
+               <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 100%; padding: 10px;">
                   <table class="header-table" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; margin-top: 30px; margin-bottom: 10px;">
                      <tbody>
                         <tr>
@@ -36,11 +36,13 @@
                                  <tbody>
                                     <tr>
                                        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" align="center">
-                                          <br><br>
-                                          <h3 style="font-family: sans-serif; font-size: 22px; font-weight: normal; margin: 0; Margin-bottom: 30px; color: #00B4E1; font-weight: bold;">
+                                          <br>
+                                          <center>
+                                          	<h3 style="font-family: sans-serif; font-size: 22px; font-weight: normal; margin: 0; Margin-bottom: 30px; color: #00B4E1; font-weight: bold; text-align: center;">
                                              {!! $details['title'] !!}
                                           </h3>
-                                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px; color: #002F6C; line-height:2; Padding-left:15px;Padding-right:15px;">
+                                          </center>
+                                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px; color: #002F6C; line-height:2;">
                                              {!! $details['body'] !!}
                                           </p>
                                           <br><br>
