@@ -501,7 +501,7 @@ class AuthController extends Controller
 				$user['login_with_guardian_data'] = false;
 
 
-				if(($user->is_minor == true) && (($request->contact_number == $user->email) or ($request->contact_number == $user->contact_number)))
+				if(($user->is_minor == true) && (($request->contact_number == AES256::decrypt($user->email, env('ENCRYPTION_KEY'))) or ($request->contact_number == AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY')))))
 				{
 					$user['login_with_guardian_data'] = true;
 				}

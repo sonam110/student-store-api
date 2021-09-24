@@ -192,6 +192,8 @@ class OrderController extends Controller
 						{
 							return response()->json(prepareResult(true, ['quantity exceeded.Only '.$productsServicesBook->quantity.' left.'], getLangByLabelGroups('messages','message_quantity_exceeded')), config('http_response.bad_request'));
 						}
+
+						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module',$productsServicesBook->type)->orderBy('created_at','desc')->first();
 						
 					}
 					elseif(!empty($orderedItem['contest_application_id']))
@@ -207,6 +209,8 @@ class OrderController extends Controller
 							$price = $productsServicesBook->subscription_fees;
 						}
 						$title = $productsServicesBook->title;
+
+						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module','contest')->orderBy('created_at','desc')->first();
 					}
 					else
 					{
@@ -221,9 +225,11 @@ class OrderController extends Controller
 						}
 						$title = $productsServicesBook->type_of_package;
 					}
+
+					//reward point will be applicable to student only
 					
 
-					if($productsServicesBook->is_reward_point_applicable == 1)
+					if(($productsServicesBook->is_reward_point_applicable == 1) && (Auth::user()->user_type_id == 2))
 					{
 						$earned_reward_points = $productsServicesBook->reward_points * $orderedItem['quantity'];
 					}
@@ -231,6 +237,10 @@ class OrderController extends Controller
 					{
 						$earned_reward_points = '0';
 					}
+
+					$reward_points_value = AppSetting::first()->single_rewards_pt_value * $earned_reward_points;
+
+					$amount_transferred_to_vendor = (($price * $orderedItem['quantity']) - $reward_points_value) * 
 
 					if($productsServicesBook->discount_type == 1)
 					{
@@ -276,6 +286,7 @@ class OrderController extends Controller
 					$orderItem->rent_duration					= $productsServicesBook->rent_duration;
 					$orderItem->item_status						= $request->order_status;
 					$orderItem->item_payment_status				= true;
+					$orderItem->amount_transferred_to_vendor	= $amount_transferred_to_vendor;
 					$orderItem->save();
 
 

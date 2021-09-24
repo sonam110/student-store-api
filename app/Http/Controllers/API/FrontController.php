@@ -34,35 +34,38 @@ class FrontController extends Controller
 
 	public function getUserType()
 	{
-		
-		
 
-    // foreach ($labels as $key => $label) {
-    //         if(LabelGroup::where('name',$key)->count() > 0)
-    //         {
-    //             $labelGroup = LabelGroup::where('name',$key)->first();
-    //         }
-    //         else
-    //         {
-    //             $labelGroup = new LabelGroup;
-    //             $labelGroup->name                = $key;
-    //             $labelGroup->status              = 1;
-    //             $labelGroup->save();
-    //         }
+    	// foreach ($labels as $key => $label) {
+     //        if(LabelGroup::where('name',$key)->count() > 0)
+     //        {
+     //            $labelGroup = LabelGroup::where('name',$key)->first();
+     //        }
+     //        else
+     //        {
+     //            $labelGroup = new LabelGroup;
+     //            $labelGroup->name                = $key;
+     //            $labelGroup->status              = 1;
+     //            $labelGroup->save();
+     //        }
 
-    //         foreach ($label as $key1 => $value) {
-    //             if(Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->count() == 0)
-    //             {
-    //                 $label = new Label;
-    //                 $label->label_group_id         = $labelGroup->id;
-    //                 $label->language_id            = 1;
-    //                 $label->label_name             = $key1;
-    //                 $label->label_value            = $value;
-    //                 $label->status                 = 1;
-    //                 $label->save(); 
-    //             }
-    //         }
-    //     }
+     //        foreach ($label as $key1 => $value) {
+     //            if(Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->count() > 0)
+     //            {
+     //            	$label = Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->first();
+     //            }
+     //        	else
+     //        	{
+     //                $label = new Label;
+     //            }
+     //            $label->label_group_id         = $labelGroup->id;
+     //            $label->language_id            = 1;
+     //            $label->label_name             = $key1;
+     //            $label->label_value            = $value;
+     //            $label->status                 = 1;
+     //            $label->save(); 
+     //        }
+     //    }
+
 		$userTypes = UserType::where('id','!=', 1)->get();
 		return response()->json(prepareResult(false, $userTypes, getLangByLabelGroups('messages','message_user_type_list')), config('http_response.success'));		
 	}
