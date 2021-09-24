@@ -539,6 +539,12 @@ class FrontController extends Controller
         	$image->company_logo_thumb_path = env('CDN_DOC_THUMB_URL').basename($image->company_logo_path);
         	$image->save();
         }
+
+        $userImages = User::get();
+        foreach ($userImages as $key => $image) {
+        	$image->profile_pic_thumb_path  = env('CDN_DOC_THUMB_URL').basename($image->profile_pic_path );
+        	$image->save();
+        }
         dd('Done');
     }
 }
