@@ -29,6 +29,7 @@ class CreateServiceProviderDetailsTable extends Migration
             $table->text('about_company')->nullable();
             $table->string('company_website_url',200)->nullable();
             $table->string('company_logo_path',200)->default('https://www.nrtsms.com/images/no-image.png')->nullable();
+            $table->string('company_logo_thumb_path',200)->default('https://www.nrtsms.com/images/no-image.png')->nullable();
             $table->string('vat_number',50)->nullable();
             $table->string('vat_registration_file_path',200)->nullable();
             $table->integer('year_of_establishment')->nullable();

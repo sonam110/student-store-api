@@ -384,6 +384,7 @@ class AuthController extends Controller
 			if($spDetail = ServiceProviderDetail::where('user_id',$user->id)->first())
 			{
 				$user['company_logo'] = $spDetail->company_logo_path;
+				$user['company_logo_thumb_path'] = $spDetail->company_logo_thumb_path;
 			}
 			// $user['account'] = $account;
 			DB::commit();
@@ -431,6 +432,7 @@ class AuthController extends Controller
 			$userDetail->about_company 				= $request->about_company;
 			$userDetail->company_website_url 		= $request->company_website_url;
 			$userDetail->company_logo_path 			= $request->company_logo_path;
+			$userDetail->company_logo_thumb_path 	= env('CDN_DOC_THUMB_URL').basename($request->company_logo_path);
 			$userDetail->vat_number 				= $request->vat_number;
 			$userDetail->vat_registration_file_path = $request->vat_registration_file_path;
 			$userDetail->year_of_establishment 		= $request->year_of_establishment;
@@ -463,6 +465,7 @@ class AuthController extends Controller
 			if($spDetail = ServiceProviderDetail::where('user_id',$request->user_id)->first())
 			{
 				$user['company_logo'] = $spDetail->company_logo_path;
+				$user['company_logo_thumb_path'] = $spDetail->company_logo_thumb_path;
 			}
 			return response(prepareResult(false, $user, getLangByLabelGroups('messages','message_user_detail_saved')), config('http_response.created'));
 		}
@@ -566,6 +569,7 @@ class AuthController extends Controller
 				if($spDetail = ServiceProviderDetail::where('user_id',$user->id)->first())
 				{
 					$user['company_logo'] = $spDetail->company_logo_path;
+					$user['company_logo_thumb_path'] = $spDetail->company_logo_thumb_path;
 				}
 
 				

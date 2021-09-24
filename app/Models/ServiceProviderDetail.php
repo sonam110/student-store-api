@@ -16,7 +16,7 @@ class ServiceProviderDetail extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'user_id','registration_type_id','service_provider_type_id','company_name','organization_number','about_company','company_website_url','company_logo_path','vat_number','vat_registration_file_path','year_of_establishment','avg_rating','status'
+        'user_id','registration_type_id','service_provider_type_id','company_name','organization_number','about_company','company_website_url','company_logo_path', 'company_logo_thumb_path','vat_number','vat_registration_file_path','year_of_establishment','avg_rating','status'
     ];
 
     public function user()
