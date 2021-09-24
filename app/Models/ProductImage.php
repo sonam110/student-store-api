@@ -12,7 +12,7 @@ class ProductImage extends Model
     use HasFactory, Uuid;
 
 
-    protected $fillable = ['products_services_book_id','image_path','cover'];
+    protected $fillable = ['products_services_book_id','image_path','thumb_image_path','cover'];
 
     public function user()
     {

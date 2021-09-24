@@ -34,12 +34,14 @@ class UploadDocController extends Controller
         {
             $file = $request->file;
             $destinationPath = 'uploads/';
+            $thumbDestinationPath = 'uploads/thumbs/';
             $fileArray = array();
 
             if($request->is_multiple==1)
             {
                 foreach ($file as $key => $value) {
-                    $fileName   = Str::slug($value).time().'-'.rand(0,99999).'.' . $value->getClientOriginalExtension();
+                    
+                    $fileName   = strip_tags(Str::limit(Str::slug($value), 50)).time().'-'.rand(0,99999).'.' . $value->getClientOriginalExtension();
                     $extension = $value->getClientOriginalExtension();
 
                     if($extension == 'jpg' || $extension == 'jpeg' || $extension == 'png')
@@ -50,6 +52,13 @@ class UploadDocController extends Controller
                         // },'top')->save($destinationPath.'/'.$fileName);
 
                         $img->save($destinationPath.'/'.$fileName, 75);
+
+                        //Thumb image generate
+                        $imgthumb = Image::make($value->getRealPath());
+                        $imgthumb->resize(260, null, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                        $imgthumb->save($thumbDestinationPath.'/'.$fileName);
                     }
                     else
                     {
@@ -58,6 +67,7 @@ class UploadDocController extends Controller
                     
                     $fileArray[] = [
                         'file_name'         => env('CDN_DOC_URL').$destinationPath.$fileName,
+                        'thumb_file_name'   => env('CDN_DOC_URL').$thumbDestinationPath.$fileName,
                         'file_extension'    => $value->getClientOriginalExtension()
                     ];
                 }
@@ -66,7 +76,7 @@ class UploadDocController extends Controller
             }
             else
             {
-                $fileName   = Str::slug($request->file_title).time().'-'.rand(0,99999).'.' . $file->getClientOriginalExtension();
+                $fileName   = strip_tags(Str::limit(Str::slug($request->file_title), 50)).time().'-'.rand(0,99999).'.' . $file->getClientOriginalExtension();
                 $extension = $file->getClientOriginalExtension();
                 if($extension == 'jpg' || $extension == 'jpeg' || $extension == 'png')
                 {
@@ -76,6 +86,13 @@ class UploadDocController extends Controller
                     // },'top')->save($destinationPath.'/'.$fileName);
 
                     $img->save($destinationPath.'/'.$fileName, 75);
+
+                    //Thumb image generate
+                    $imgthumb = Image::make($value->getRealPath());
+                    $imgthumb->resize(260, null, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                    $imgthumb->save($thumbDestinationPath.'/'.$fileName);
                 }
                 else
                 {
@@ -83,6 +100,7 @@ class UploadDocController extends Controller
                 }
                 $fileInfo = [
                     'file_name'         => env('CDN_DOC_URL').$destinationPath.$fileName,
+                    'thumb_file_name'   => env('CDN_DOC_URL').$thumbDestinationPath.$fileName,
                     'file_extension'    => $file->getClientOriginalExtension()
                 ];
                 return response(prepareResult(false, $fileInfo, getLangByLabelGroups('messages','messages_success')), config('http_response.success'));

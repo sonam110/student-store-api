@@ -193,6 +193,7 @@ class ProductsServicesBookController extends Controller
                         $productImage = new ProductImage;
                         $productImage->products_services_book_id   = $productsServicesBook->id;
                         $productImage->image_path                  = $image['file_name'];
+                        $productImage->thumb_image_path            = env('CDN_DOC_THUMB_URL').basename($image['file_name']);
                         $productImage->cover                       = $image['cover'];
                         $productImage->save();
                     }
@@ -335,6 +336,7 @@ class ProductsServicesBookController extends Controller
                         $productImage = new ProductImage;
                         $productImage->products_services_book_id   = $productsServicesBook->id;
                         $productImage->image_path                  = $image['file_name'];
+                        $productImage->thumb_image_path            = env('CDN_DOC_THUMB_URL').basename($image['file_name']);
                         $productImage->cover                       = $image['cover'];
                         $productImage->save();
                     }

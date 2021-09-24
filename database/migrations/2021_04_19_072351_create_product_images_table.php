@@ -21,6 +21,7 @@ class CreateProductImagesTable extends Migration
             $table->foreign('products_services_book_id')->references('id')->on('products_services_books')->onDelete('cascade');
             
             $table->string('image_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
+            $table->string('thumb_image_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
             $table->boolean('cover')->nullable();
             $table->timestamps();
         });
