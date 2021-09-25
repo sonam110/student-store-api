@@ -34,6 +34,9 @@ Route::get('/citiesByCountryName/{countryName}', [App\Http\Controllers\API\Count
 Route::get('/get-educational-institutes', [App\Http\Controllers\API\FrontController::class,'getEducationInstitutes'])->name('get-educational-institutes');
 Route::get('/get-job-tags', [App\Http\Controllers\API\FrontController::class,'getJobTags'])->name('get-educational-institutes');
 
+
+Route::get('/email-verification/{email}/{otp}', [App\Http\Controllers\API\AuthController::class,'emailVerification']);
+
 Route::post('/get-otp', [App\Http\Controllers\API\AuthController::class,'getOtp']);
 Route::post('/otp-verification', [App\Http\Controllers\API\AuthController::class,'otpVerification']);
 Route::post('/email-validate', [App\Http\Controllers\API\AuthController::class,'emailValidate']);
@@ -431,6 +434,7 @@ Route::post('/payment-current-status', [App\Http\Controllers\API\CoolCompanyCont
 Route::get('/get-group-invoices', [App\Http\Controllers\API\CoolCompanyController::class,'getGroupInvoices']);
 Route::get('/get-group-invoice-by-id/{groupInvoiceId}', [App\Http\Controllers\API\CoolCompanyController::class,'getGroupInvoiceById']);
 // Route::get('/orders-export', [App\Http\Controllers\API\Admin\ExportController::class, 'ordersExport']);
+
 
 
 

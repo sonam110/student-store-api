@@ -679,7 +679,7 @@ class ContestController extends Controller
             }
             elseif($searchType=='most-popular')
             {
-                $contests->->where('application_start_date','<=', date('Y-m-d'))
+                $contests->where('application_start_date','<=', date('Y-m-d'))
                     ->where('application_end_date','>=', date('Y-m-d'));
             }
             elseif($searchType=='latest')
