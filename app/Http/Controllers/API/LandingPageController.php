@@ -1744,8 +1744,17 @@ class LandingPageController extends Controller
                     // ->where('contests.user_id', '!=', Auth::id())
                     ->where('contests.type', $request->type)
                     ->where('contests.is_published', '1')
+                    ->where('application_start_date','<=', date('Y-m-d'))
+                    ->where('application_end_date','>=', date('Y-m-d'))
                     ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','isApplied','categoryMaster','subCategory');
-            if($searchType=='filter')
+            if($searchType=='only_category_filter')
+            {
+                if(!empty($request->category_master_id))
+                {
+                    $contests->where('category_master_id',$request->category_master_id);
+                }
+            }
+            elseif($searchType=='filter')
             {
                 if(!empty($request->category_master_id))
                 {
@@ -1834,9 +1843,8 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='most-popular')
             {
-                // $contests->where('is_promoted', '1')
-                //     ->where('promotion_start_date','<=', date('Y-m-d'))
-                //     ->where('promotion_end_date','>=', date('Y-m-d'));
+                $contests->where('application_start_date','<=', date('Y-m-d'))
+                    ->where('application_end_date','>=', date('Y-m-d'));
             }
             elseif($searchType=='latest')
             {
