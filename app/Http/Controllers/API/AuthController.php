@@ -774,14 +774,10 @@ class AuthController extends Controller
 		{
 			if(OtpVerification::where('mobile_number',$email)->where('otp',$otp)->where('otp_for','email_verification')->count() > 0)
 			{
-				return $otp;
-
 				return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_email_verification_success')), config('http_response.success'));
 			}
 			else
 			{
-
-				
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_email_verification_failed')), config('http_response.bad_request'));
 			}
 		}
