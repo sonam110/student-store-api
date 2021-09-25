@@ -397,7 +397,7 @@ class AuthController extends Controller
 
 			$user['access_token'] = $accessToken;
 			$user['address_detail'] = $addressDetail;
-			$user['url'] =  url('/api/email-verification/'.base64_encode($email).'/'.base64_encode($otp));
+			// $user['url'] =  url('/api/email-verification/'.base64_encode($email).'/'.base64_encode($otp));
 			if($spDetail = ServiceProviderDetail::where('user_id',$user->id)->first())
 			{
 				$user['company_logo'] = $spDetail->company_logo_path;
@@ -774,7 +774,8 @@ class AuthController extends Controller
 		{
 			if(OtpVerification::where('mobile_number',$email)->where('otp',$otp)->where('otp_for','email_verification')->count() > 0)
 			{
-				return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_email_verification_success')), config('http_response.success'));
+				$user = User::where('email',$email)->first();
+				return response()->json(prepareResult(false, $user, getLangByLabelGroups('messages','message_email_verification_success')), config('http_response.success'));
 			}
 			else
 			{
