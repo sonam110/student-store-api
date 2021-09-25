@@ -353,6 +353,20 @@ class AuthController extends Controller
 
 			if($request->user_type_id == '4')
 			{
+				// $otp = rand(1000,9999);
+				$otp = 1234;
+				$email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+
+				if(OtpVerification::where('mobile_number', $user->email)->where('otp_for', 'email_verification')->count()>0)
+				{
+					OtpVerification::where('mobile_number', $user->email)->where('otp_for', 'email_verification')->delete();
+				}
+				$otpStore = new OtpVerification;
+				$otpStore->mobile_number 	= $email;
+				$otpStore->otp 				= $otp;
+				$otpStore->otp_for 			= 'email_verification';
+				$otpStore->save();
+
 				//------------------------Mail start-------------------------//
 
 
@@ -362,6 +376,8 @@ class AuthController extends Controller
 
 				$arrayVal = [
 					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
+					'{{verification_link}}' => url('/api/email-verification/'.base64_encode($email).'/'.base64_encode($otp)),
+
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
 				
@@ -381,6 +397,7 @@ class AuthController extends Controller
 
 			$user['access_token'] = $accessToken;
 			$user['address_detail'] = $addressDetail;
+			$user['url'] =  url('/api/email-verification/'.base64_encode($email).'/'.base64_encode($otp));
 			if($spDetail = ServiceProviderDetail::where('user_id',$user->id)->first())
 			{
 				$user['company_logo'] = $spDetail->company_logo_path;
@@ -441,25 +458,42 @@ class AuthController extends Controller
 		
 		if($userDetail->save())
 		{
-			//------------------------Mail start-------------------------//
+			// $otp = rand(1000,9999);
+				$otp = 1234;
+				$email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
 
-			$emailTemplate = EmailTemplate::where('template_for','registration')->first();
+				if(OtpVerification::where('mobile_number', $user->email)->where('otp_for', 'email_verification')->count()>0)
+				{
+					OtpVerification::where('mobile_number', $user->email)->where('otp_for', 'email_verification')->delete();
+				}
+				$otpStore = new OtpVerification;
+				$otpStore->mobile_number 	= $email;
+				$otpStore->otp 				= $otp;
+				$otpStore->otp_for 			= 'email_verification';
+				$otpStore->save();
 
-			$body = $emailTemplate->body;
+				//------------------------Mail start-------------------------//
 
-			$arrayVal = [
-				'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
-			];
-			$body = $this->strReplaceAssoc($arrayVal, $body);
-			
-			$details = [
-				'title' => $emailTemplate->subject,
-				'body' => $body
-			];
-			
-			Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
 
-			//------------------------Mail End-------------------------//
+				$emailTemplate = EmailTemplate::where('template_for','registration')->first();
+
+				$body = $emailTemplate->body;
+
+				$arrayVal = [
+					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
+					'{{verification_link}}' => url('/api/email-verification/'.base64_encode($email).'/'.base64_encode($otp)),
+
+				];
+				$body = $this->strReplaceAssoc($arrayVal, $body);
+				
+				$details = [
+					'title' => $emailTemplate->subject,
+					'body' => $body
+				];
+				
+				Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
+
+				//------------------------Mail End-------------------------//
 
 			$user['userDetail'] = $userDetail;
 			if($spDetail = ServiceProviderDetail::where('user_id',$request->user_id)->first())
@@ -728,6 +762,33 @@ class AuthController extends Controller
 				DB::rollback();
 				return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
+		}
+	}
+
+
+	public function emailVerification($email,$otp)
+	{
+		$email = base64_decode($email);
+		$otp = base64_decode($otp);
+		try
+		{
+			if(OtpVerification::where('mobile_number',$email)->where('otp',$otp)->where('otp_for','email_verification')->count() > 0)
+			{
+				return $otp;
+
+				return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_email_verification_success')), config('http_response.success'));
+			}
+			else
+			{
+
+				
+				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_email_verification_failed')), config('http_response.bad_request'));
+			}
+		}
+		catch (\Throwable $exception)
+		{
+			DB::rollback();
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
 	}
 }
