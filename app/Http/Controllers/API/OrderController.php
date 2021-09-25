@@ -823,7 +823,7 @@ class OrderController extends Controller
 		if($request->item_status == 'ask_to_cancel')
 		{
 			$type = 'no_tracking';
-			$item_status = $orderItem->status;
+			$item_status = $orderItem->item_status;
 			$reason_id_for_cancellation_request = $request->reason_id;
 			$reason_for_cancellation_request = $request->reason_for_cancellation_request;
 			$title = 'Order Cancellation Request from seller.';

@@ -1823,8 +1823,8 @@ class LandingPageController extends Controller
                 {
                     $contests->where('user_id', $request->user_id);
                 }
-                // $contests->where('application_start_date','<=', date('Y-m-d'))
-                //     ->where('application_end_date','>=', date('Y-m-d'));
+                $contests->where('application_start_date','<=', date('Y-m-d'))
+                    ->where('application_end_date','>=', date('Y-m-d'));
             }
             elseif($searchType=='promotions')
             {
