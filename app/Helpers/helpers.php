@@ -94,7 +94,7 @@ function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,
 				])
 				->setDevicesToken($userDeviceInfo->fcm_token);
 				$push = $push->send();
-				return $push->getFeedback();
+				//return $push->getFeedback();
 			}
 		}
 	}
