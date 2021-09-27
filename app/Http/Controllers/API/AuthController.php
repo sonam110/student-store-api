@@ -228,7 +228,7 @@ class AuthController extends Controller
 			$user->guardian_password 					= bcrypt($request->guardian_password);
 		}
 		
-		$user->is_email_verified 					= $request->is_email_verified;
+		$user->is_email_verified 					= false;
 		$user->is_contact_number_verified 			= $request->is_contact_number_verified;
 		$user->dob 									= $dob;
 		$user->profile_pic_path						= $profile_pic_path;
@@ -243,7 +243,7 @@ class AuthController extends Controller
 		$user->is_minor 							= $request->is_minor;
 		$user->social_security_number 				= $request->social_security_number;
 		
-		$user->is_guardian_email_verified 			= $request->is_guardian_email_verified;
+		$user->is_guardian_email_verified 			= false;
 		$user->is_guardian_contact_number_verified 	= $request->is_guardian_contact_number_verified;
 		$user->qr_code_img_path     				= env('CDN_DOC_URL').'uploads/qr/'.$qrCodeNumber.'.png';
 		$user->qr_code_number       				= $qrCodeNumber;
@@ -376,7 +376,7 @@ class AuthController extends Controller
 
 				$arrayVal = [
 					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
-					'{{verification_link}}' => url('/api/email-verification/'.base64_encode($email).'/'.base64_encode($otp)),
+					'{{verification_link}}' => env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp),
 
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
@@ -481,7 +481,7 @@ class AuthController extends Controller
 
 				$arrayVal = [
 					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
-					'{{verification_link}}' => url('/api/email-verification/'.base64_encode($email).'/'.base64_encode($otp)),
+					'{{verification_link}}' => env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp),
 
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
@@ -775,6 +775,16 @@ class AuthController extends Controller
 			if(OtpVerification::where('mobile_number',$email)->where('otp',$otp)->where('otp_for','email_verification')->count() > 0)
 			{
 				$user = User::where('email',$email)->first();
+				if($user) {
+					$user->is_email_verified = 1;
+					$user->save();
+				} else {
+					$user = User::where('guardian_email',$email)->first();
+					if($user) {
+						$user->is_guardian_email_verified = 1;
+						$user->save();
+					}
+				}
 				return response()->json(prepareResult(false, $user, getLangByLabelGroups('messages','message_email_verification_success')), config('http_response.success'));
 			}
 			else
