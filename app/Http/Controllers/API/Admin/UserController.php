@@ -304,7 +304,7 @@ class UserController extends Controller
 	            $body =  'User '.$user->title.' status has been successfully updated.';
 
 	            $type = 'User Action';
-	            pushNotification($title,$body,$user->user,$type,true,'creator','user',$user->id,'my-listing');
+	            $data = pushNotification($title,$body,$user,$type,true,'creator','user',$user->id,'my-listing');
 	        }
 
 	        DB::commit();

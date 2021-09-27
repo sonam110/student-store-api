@@ -16,7 +16,7 @@ return [
     ],
     'apn' => [
         'certificate' => __DIR__ . '/iosCertificates/apns-dev-cert.pem',
-        'passPhrase' => 'secret', //Optional
+        'passPhrase' => 'qaz121wsx', //Optional
         'passFile' => __DIR__ . '/iosCertificates/yourKey.pem', //Optional
         'dry_run' => true,
     ],
