@@ -300,11 +300,11 @@ class UserController extends Controller
 	            	$servceProviderDetail->save();
 	            }
 	            
-	            // $title = 'User Status Updated';
-	            // $body =  'User '.$user->title.' status has been successfully updated.';
+	            $title = 'User Status Updated';
+	            $body =  'User '.$user->title.' status has been successfully updated.';
 
-	            // $type = 'User Action';
-	            // pushNotification($title,$body,$user->user,$type,true,'creator','user',$user->id,'my-listing');
+	            $type = 'User Action';
+	            pushNotification($title,$body,$user->user,$type,true,'creator','user',$user->id,'my-listing');
 	        }
 
 	        DB::commit();
