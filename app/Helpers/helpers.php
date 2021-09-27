@@ -89,7 +89,7 @@ function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,
 
 		            ],
 		            'extraPayLoad' => [
-		                'custom' => 'My custom data'
+		                'custom' => 'My custom data',
 		            ]                       
 				])
 				->setDevicesToken($userDeviceInfo->fcm_token);

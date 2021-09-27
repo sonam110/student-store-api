@@ -305,7 +305,6 @@ class UserController extends Controller
 
 	            $type = 'User Action';
 	            pushNotification($title,$body,$user,$type,true,'creator','user',$user->id,'my-listing');
-	            
 	        }
 
 	        DB::commit();
