@@ -26,11 +26,11 @@ class ContestController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')->withCount('contestApplications')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $contests = Contest::where('user_id', Auth::id())->where('status', 'verified')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')->withCount('contestApplications')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')->withCount('contestApplications')->get();
+                $contests = Contest::where('user_id', Auth::id())->where('status', 'verified')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')->withCount('contestApplications')->get();
             }
             return response(prepareResult(false, $contests, getLangByLabelGroups('messages','messages_contest_list')), config('http_response.success'));
         }
@@ -578,12 +578,12 @@ class ContestController extends Controller
             		->join('users', function ($join) use ($user_type_id) {
             		    $join->on('contests.user_id', 'users.id')
             			->where('users.user_type_id', $user_type_id);
-
             		})
                     ->orderBy('contests.created_at','DESC')
                     // ->where('contests.user_id', '!=', Auth::id())
             		->where('contests.type', $request->type)
                     ->where('contests.is_published', '1')
+                    ->where('contests.status', 'verified')
                     ->where('contests.application_start_date','<=', date('Y-m-d'))
                     ->where('contests.application_end_date','>=', date('Y-m-d'))
                     ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners');

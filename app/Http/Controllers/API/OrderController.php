@@ -21,6 +21,7 @@ use App\Models\PaymentCardDetail;
 use App\Models\AppSetting;
 use App\Models\EmailTemplate;
 use App\Mail\OrderMail;
+use App\Mail\OrderPlacedMail;
 use App\Mail\OrderConfirmedMail;
 use Mail;
 use App\Models\ReasonForAction;
@@ -345,14 +346,15 @@ class OrderController extends Controller
 		                    
 		                    $details = [
 		                    	'title' => $emailTemplate->subject,
-		                    	'body' => $body
+		                    	'body' => $body,
+		                    	'order_details' => Order::with('orderItems')->find($order->id),
 		                    ];
 		                    
-		                    Mail::to(AES256::decrypt(Auth::user()->email, env('ENCRYPTION_KEY')))->send(new OrderMail($details));
+		                    Mail::to(AES256::decrypt(Auth::user()->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
 
 	                    //Mail End
 	                }
-				}
+				} 
 
 
 				$paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);

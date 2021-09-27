@@ -1466,8 +1466,10 @@ class LandingPageController extends Controller
                         ->whereIn('city', $request->city);
                     });
                 }
-                $jobs->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
-                    ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
+                // $jobs->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
+                    // ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
+
+                    $jobs->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
             }
             elseif($searchType=='promotions')
             {
@@ -1478,7 +1480,7 @@ class LandingPageController extends Controller
             elseif($searchType=='latest')
             {
                 $jobs->orderBy('sp_jobs.created_at','DESC')
-                    ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
+                    // ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                     ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
             }
             elseif($searchType=='closingSoon')
@@ -1487,8 +1489,10 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='random')
             {
-                $jobs->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
-                    ->where('sp_jobs.application_end_date','>=', date('Y-m-d'))
+                // $jobs->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
+                    // ->where('sp_jobs.application_end_date','>=', date('Y-m-d'))
+                    // ->inRandomOrder();
+                $jobs->where('sp_jobs.application_end_date','>=', date('Y-m-d'))
                     ->inRandomOrder();
             }
             elseif($searchType=='criteria')
@@ -1506,7 +1510,7 @@ class LandingPageController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('sp_jobs.is_published', '1')
-                        ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
+                        // ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                         ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
                     $job_environments = json_decode($userCvDetail->preferred_job_env, true);
                     $jobsIdsMatch->where(function($query) use ($job_environments) {
@@ -1530,7 +1534,7 @@ class LandingPageController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('sp_jobs.is_published', '1')
-                        ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
+                        // ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                         ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
 
                     $jobsIdsMatch->where('years_of_experience', '<=', $userCvDetail->total_experience);
@@ -1546,7 +1550,7 @@ class LandingPageController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('sp_jobs.is_published', '1')
-                        ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
+                        // ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                         ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
 
                     $cityName = $userCvDetail->user->defaultAddress->city;
@@ -1566,7 +1570,7 @@ class LandingPageController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('sp_jobs.is_published', '1')
-                        ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
+                        // ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                         ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
 
                     $key_skills = json_decode($userCvDetail->key_skills, true);
@@ -1596,7 +1600,7 @@ class LandingPageController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('sp_jobs.is_published', '1')
-                        ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
+                        // ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                         ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
 
                     $cvTitle = $userCvDetail->title;
@@ -1690,6 +1694,7 @@ class LandingPageController extends Controller
         $contests = Contest::where('is_published', '1')
                         ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','cancellationRanges','isApplied','categoryMaster','subCategory')
                         ->withCount('contestApplications')
+                        ->where('status', 'verified')
                         ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'))
                         ->inRandomOrder();
@@ -1744,6 +1749,7 @@ class LandingPageController extends Controller
                     // ->where('contests.user_id', '!=', Auth::id())
                     ->where('contests.type', $request->type)
                     ->where('contests.is_published', '1')
+                    ->where('contests.status', 'verified')
                     ->where('application_start_date','<=', date('Y-m-d'))
                     ->where('application_end_date','>=', date('Y-m-d'))
                     ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','isApplied','categoryMaster','subCategory');

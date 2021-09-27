@@ -438,8 +438,9 @@ class JobController extends Controller
                         ->whereIn('city', $request->city);
                     });
                 }
-                $jobs->where('application_start_date','<=', date('Y-m-d'))
-                    ->where('application_end_date','>=', date('Y-m-d'));
+                // $jobs->where('application_start_date','<=', date('Y-m-d'))
+                //     ->where('application_end_date','>=', date('Y-m-d'));
+                $jobs->where('application_end_date','>=', date('Y-m-d'));
             }
             elseif($searchType=='promotions')
             {
@@ -450,7 +451,7 @@ class JobController extends Controller
             elseif($searchType=='latest')
             {
                 $jobs->orderBy('created_at','DESC')
-                    ->where('application_start_date','<=', date('Y-m-d'))
+                    // ->where('application_start_date','<=', date('Y-m-d'))
                     ->where('application_end_date','>=', date('Y-m-d'));
             }
             elseif($searchType=='closingSoon')
@@ -459,8 +460,10 @@ class JobController extends Controller
             }
             elseif($searchType=='random')
             {
-                $jobs->where('application_start_date','<=', date('Y-m-d'))
-                    ->where('application_end_date','>=', date('Y-m-d'))
+                // $jobs->where('application_start_date','<=', date('Y-m-d'))
+                //     ->where('application_end_date','>=', date('Y-m-d'))
+                //     ->inRandomOrder();
+                $jobs->where('application_end_date','>=', date('Y-m-d'))
                     ->inRandomOrder();
             }
             elseif($searchType=='criteria')
@@ -478,7 +481,7 @@ class JobController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('is_published', '1')
-                        ->where('application_start_date','<=', date('Y-m-d'))
+                        // ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'));
                     $job_environments = json_decode($userCvDetail->preferred_job_env, true);
                     $jobsIdsMatch->where(function($query) use ($job_environments) {
@@ -502,7 +505,7 @@ class JobController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('is_published', '1')
-                        ->where('application_start_date','<=', date('Y-m-d'))
+                        // ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'));
 
                     $jobsIdsMatch->where('years_of_experience', '<=', $userCvDetail->total_experience);
@@ -518,7 +521,7 @@ class JobController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('is_published', '1')
-                        ->where('application_start_date','<=', date('Y-m-d'))
+                        // ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'));
 
                     $cityName = $userCvDetail->user->defaultAddress->city;
@@ -538,7 +541,7 @@ class JobController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('is_published', '1')
-                        ->where('application_start_date','<=', date('Y-m-d'))
+                        // ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'));
 
                     $key_skills = json_decode($userCvDetail->key_skills, true);
@@ -568,7 +571,7 @@ class JobController extends Controller
                 {
                     $jobsIdsMatch = Job::select('sp_jobs.id')
                         ->where('is_published', '1')
-                        ->where('application_start_date','<=', date('Y-m-d'))
+                        // ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'));
 
                     $cvTitle = $userCvDetail->title;
@@ -741,7 +744,7 @@ class JobController extends Controller
 
             
             $type = 'Job Action';
-            pushNotification($title,$body,Auth::user(),$type,true,'creator','job',$getJob->id,'posted-jobs');
+            pushNotification($title,$body,Auth::user(),$type,true,'creator','job',$getJob->id,'student-landing');
 
             DB::commit();
             return response()->json(prepareResult(false, $getJob, getLangByLabelGroups('messages','messages_job_'.$request->action)), config('http_response.created'));
