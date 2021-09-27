@@ -47,31 +47,55 @@ function getLangByLabelGroups($groupName, $label_name)
 
 function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,$module,$id,$screen)
 {
-	$userDeviceInfo = UserDeviceInfo::where('user_id',$user->id)->latest()->first();
-
+	$userDeviceInfo = UserDeviceInfo::where('user_id',$user->id)->orderBy('created_at', 'DESC')->first();
 	if(!empty($userDeviceInfo))
 	{ 
 		if(!empty($userDeviceInfo->fcm_token))
 		{
-			$push = new PushNotification('fcm');
-			$push->setMessage([
-				"notification"=>[
-					'title' => $title,
-					'body'  => $body,
-					'sound' => 'default',
-					'android_channel_id' => '1',
-                    //'timestamp' => date('Y-m-d G:i:s')
-				],
-				'data'=>[
-					'id'  => $id,
-					'user_type'  => $user_type,
-					'module'  => $module,
-					'screen'  => $screen
-				]                        
-			])
-			->setApiKey(env('FIREBASE_KEY'))
-			->setDevicesToken($userDeviceInfo->fcm_token)
-			->send();
+			if($userDeviceInfo->platform=='Android')
+			{
+				$push = new PushNotification('fcm');
+				$push->setMessage([
+					"notification"=>[
+						'title' => $title,
+						'body'  => $body,
+						'sound' => 'default',
+						'android_channel_id' => '1',
+	                    //'timestamp' => date('Y-m-d G:i:s')
+					],
+					'data'=>[
+						'id'  => $id,
+						'user_type'  => $user_type,
+						'module'  => $module,
+						'screen'  => $screen
+					]                        
+				])
+				->setApiKey(env('FIREBASE_KEY'))
+				->setDevicesToken($userDeviceInfo->fcm_token)
+				->send();
+			}
+			elseif($userDeviceInfo->platform=='iOS')
+			{
+				$push = new PushNotification('apn');
+
+				$push->setMessage([
+					'aps' => [
+		                'alert' => [
+		                    'title' => $title,
+		                    'body' => $body
+		                ],
+		                'sound' => 'default',
+		                'badge' => 1
+
+		            ],
+		            'extraPayLoad' => [
+		                'custom' => 'My custom data'
+		            ]                       
+				])
+				->setDevicesToken($userDeviceInfo->fcm_token);
+				$push = $push->send();
+				//return $push->getFeedback();
+			}
 		}
 	}
 	if($save_to_database == true)
