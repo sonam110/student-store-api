@@ -81,15 +81,15 @@ function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,
 				$push->setMessage([
 					'aps' => [
 		                'alert' => [
-		                    'title' => 'This is the title',
-		                    'body' => 'This is the body'
+		                    'title' => $title,
+		                    'body' => $body
 		                ],
 		                'sound' => 'default',
 		                'badge' => 1
 
 		            ],
 		            'extraPayLoad' => [
-		                'custom' => 'My custom data',
+		                'custom' => 'My custom data'
 		            ]                       
 				])
 				->setDevicesToken($userDeviceInfo->fcm_token);
