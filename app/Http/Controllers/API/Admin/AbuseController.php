@@ -25,7 +25,45 @@ class AbuseController extends Controller
     {
         try
         {
-            $abuses = Abuse::orderBy('created_at','desc');
+            $abuses = Abuse::orderBy('abuses.created_at','desc');
+            if(!empty($request->type))
+            {
+                if(($request->type == 'product') || ($request->type == 'service') || ($request->type == 'book'))
+                {
+                    $abuses->join('products_services_books', function ($join) {
+                            $join->on('abuses.products_services_book_id', '=', 'products_services_books.id');
+                        })
+                    ->where('products_services_books.type',$request->type);
+                }
+                elseif(($request->type == 'contest') || ($request->type == 'event'))
+                {
+                    $abuses->join('contests', function ($join) {
+                            $join->on('abuses.contest_id', '=', 'contests.id');
+                        })
+                    ->where('contests.type',$request->type);
+                }
+                else
+                {
+                    $abuses->whereNotNull('abuses.job_id');
+                }
+                
+            }
+            if(!empty($request->products_services_book_id))
+            {
+                $abuses->whereIn('abuses.products_services_book_id',$request->products_services_book_id);
+            }
+            if(!empty($request->contest_id))
+            {
+                $abuses->whereIn('abuses.contest_id',$request->contest_id);
+            }
+            if(!empty($request->job_id))
+            {
+                $abuses->whereIn('abuses.job_id',$request->job_id);
+            }
+            if(!empty($request->user_id))
+            {
+                $abuses->whereIn('abuses.user_id',$request->user_id);
+            }
             if(!empty($request->per_page_record))
             {
                 $abuses = $abuses->with('product','contest','job','user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);

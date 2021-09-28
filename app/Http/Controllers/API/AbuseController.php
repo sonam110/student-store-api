@@ -35,9 +35,9 @@ class AbuseController extends Controller
         {
             $contactUs = new Abuse;
             $contactUs->user_id                        	= Auth::id();
-            $contactUs->products_services_book_id       = $request->products_services_book_id;
-            $contactUs->contest_id                      = $request->contest_id;
-            $contactUs->job_id                          = $request->job_id;
+            $contactUs->products_services_book_id       = !empty($request->products_services_book_id) ? $request->products_services_book_id : NULL;
+            $contactUs->contest_id                      = !empty($request->contest_id) ? $request->contest_id : NULL;
+            $contactUs->job_id                          = !empty($request->job_id) ? $request->job_id : NULL;
             $contactUs->reason_id_for_abuse             = $request->reason_id_for_abuse;
             $contactUs->reason_for_abuse                = $request->reason_for_abuse;
             $contactUs->status              			= $request->status;

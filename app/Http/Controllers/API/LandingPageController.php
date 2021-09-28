@@ -53,8 +53,9 @@ class LandingPageController extends Controller
         $jobSps = ServiceProviderDetail::whereIn('user_id',$jspids)->with('user:id')->get(['id','user_id','company_name','company_logo_path','company_logo_thumb_path']);
 
         $contests = Contest::where('is_published', '1')
-                            ->where('application_start_date','<=', date('Y-m-d'))
+                            // ->where('application_start_date','<=', date('Y-m-d'))
                             ->where('application_end_date','>=', date('Y-m-d'))
+                            ->where('status', 'verified')
                             // ->where('user_id','!=', Auth::id())
                             ->limit(2)
                             ->inRandomOrder()
@@ -89,6 +90,7 @@ class LandingPageController extends Controller
                                         ->join('users', function ($join) {
                                             $join->on('products_services_books.user_id', '=', 'users.id');
                                         })
+                                        ->where('products_services_books.status', '2')
                                         ->where('products_services_books.is_published', '1')
                                         ->orderBy('products_services_books.created_at','DESC')
                                         ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
@@ -210,7 +212,12 @@ class LandingPageController extends Controller
         try
         {
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
-            $similarProducts = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')->where('id','!=', $request->product_id)->where('sub_category_slug', $productsServicesBooks->sub_category_slug)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            $similarProducts = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')
+            ->where('id','!=', $request->product_id)
+            ->where('sub_category_slug', $productsServicesBooks->sub_category_slug)
+            ->orderBy('created_at','DESC')
+            ->where('status', '2')
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
             if(!empty($request->per_page_record))
             {
                 $similarProducts = $similarProducts->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);

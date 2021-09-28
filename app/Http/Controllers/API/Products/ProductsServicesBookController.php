@@ -31,7 +31,7 @@ class ProductsServicesBookController extends Controller
     {
         try
         {
-            $productsServicesBooks = ProductsServicesBook::where('is_published', '1')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+            $productsServicesBooks = ProductsServicesBook::where('is_published', '1')->where('status', '2')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
             if($request->type)
             {
                 $productsServicesBooks = $productsServicesBooks->where('type',$request->type);
