@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Contest;
+use App\Models\OrderItem;
+
 
 class ContestApplication extends Model
 {
@@ -25,5 +27,10 @@ class ContestApplication extends Model
     public function contest()
     {
         return $this->belongsTo(Contest::class, 'contest_id', 'id');
+    }
+
+    public function orderItem()
+    {
+        return $this->hasOne(OrderItem::class, 'contest_application_id', 'id');
     }
 }

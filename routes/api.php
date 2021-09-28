@@ -378,6 +378,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/order-filter', [App\Http\Controllers\API\Admin\OrderController::class, 'filter']);
 
 	Route::get('/contact-us', [App\Http\Controllers\API\Admin\ContactUsController::class, 'index']);
+	Route::get('/contact-us/{id}', [App\Http\Controllers\API\Admin\ContactUsController::class, 'destroy']);
 
 	Route::post('/send-notification', [App\Http\Controllers\API\Admin\NotificationController::class, 'sendNotification']);
 
