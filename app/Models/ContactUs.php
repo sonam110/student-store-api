@@ -12,11 +12,11 @@ class ContactUs extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'user_id','email','item_id','item_type','title','message','files','status'
+        'name','phone','email','message','user_id','item_id','item_type','title','files','status'
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class,'user_id','id');
-    }
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class,'user_id','id');
+    // }
 }

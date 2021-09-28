@@ -17,16 +17,18 @@ class CreateContactUsTable extends Migration
             $table->bigInteger('auto_id');
             $table->uuid('id')->primary();
 
-            $table->string('user_id', 50);
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // $table->string('user_id', 50);
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            $table->string('item_id')->nullable();
-            $table->string('item_type')->nullable();
+            // $table->string('item_id')->nullable();
+            // $table->string('item_type')->nullable();
+            $table->string('name');
+            $table->string('phone');
             $table->string('email');
-            $table->string('title');
+            // $table->string('title');
             $table->text('message');
-            $table->text('files')->nullable();
-            $table->boolean('status')->default(false)->nullable();
+            // $table->text('files')->nullable();
+            // $table->boolean('status')->default(false)->nullable();
             $table->timestamps();
         });
     }

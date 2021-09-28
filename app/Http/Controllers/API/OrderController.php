@@ -347,7 +347,8 @@ class OrderController extends Controller
 		                    $details = [
 		                    	'title' => $emailTemplate->subject,
 		                    	'body' => $body,
-		                    	'order_details' => Order::with('orderItems')->find($order->id),
+		                    	// 'order_details' => Order::with('orderItems')->find($order->id),
+		                    	'order_details' => $order,
 		                    ];
 		                    
 		                    Mail::to(AES256::decrypt(Auth::user()->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));

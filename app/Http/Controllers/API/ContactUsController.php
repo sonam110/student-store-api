@@ -12,6 +12,7 @@ use DB;
 use Auth;
 use App\Models\EmailTemplate;
 use Mail;
+use mervick\aesEverywhere\AES256;
 use App\Mail\ContactUsMail;
 
 class ContactUsController extends Controller
@@ -20,7 +21,8 @@ class ContactUsController extends Controller
     public function store(Request $request)
     {        
         $validation = Validator::make($request->all(), [
-            'message'  => 'required'
+            'message'  => 'required',
+            'email'  => 'required'
         ]);
 
         if ($validation->fails()) {
@@ -31,21 +33,26 @@ class ContactUsController extends Controller
         try
         {
             $contactUs = new ContactUs;
-            $contactUs->user_id                        	= Auth::id();
-            $contactUs->title                          	= $request->title;
+            $contactUs->name                           = $request->name;
+            $contactUs->phone                           = $request->phone;
             $contactUs->message                  		= $request->message;
-            $contactUs->files       					= json_encode($request->images);
             $contactUs->email              				= $request->email;
-            $contactUs->status                         	= true;
             $contactUs->save();
 
             $emailTemplate = EmailTemplate::where('template_for','contact-us')->first();
+
+            $body = $emailTemplate->body;
+
+            $arrayVal = [
+                '{{user_name}}' => $request->name,
+            ];
+            $body = strReplaceAssoc($arrayVal, $body);
+            
             $details = [
                 'title' => $emailTemplate->subject,
-                'body' => $emailTemplate->body
-                // 'url' => url('/password/reset/'.$token.'?email='.$myEmail)
+                'body' => $body,
             ];
-            
+
             Mail::to($request->email)->send(new ContactUsMail($details));
 
 

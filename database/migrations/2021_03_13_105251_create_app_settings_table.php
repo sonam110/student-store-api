@@ -39,6 +39,7 @@ class CreateAppSettingsTable extends Migration
             $table->text('meta_keywords')->nullable();
             $table->text('meta_description')->nullable();
             $table->integer('coolCompanyVatRateId')->default('7');
+            $table->double('coolCompanyCommission',[10,2])->nullable()->default(0);
             $table->timestamps();
         });
     }
