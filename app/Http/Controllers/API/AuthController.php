@@ -376,14 +376,32 @@ class AuthController extends Controller
 
 				$arrayVal = [
 					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
-					'{{verification_link}}' => env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp),
+					'{{verification_link}}' => '<a href="'.env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp).'" style="background: linear-gradient(
+90deg,#1da89c 0,#1da89c);
+    border-color: #1da89c;display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;">'.getLangByLabelGroups('messages','verify_your_email_address').'</a>',
 
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
 				
 				$details = [
 					'title' => $emailTemplate->subject,
-					'body' => $body
+					'body' 	=> $body
 				];
 				
 				Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
@@ -481,7 +499,25 @@ class AuthController extends Controller
 
 				$arrayVal = [
 					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
-					'{{verification_link}}' => env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp),
+					'{{verification_link}}' => '<a href="'.env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp).'" style="background: linear-gradient(
+90deg,#1da89c 0,#1da89c);
+    border-color: #1da89c;display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;">'.getLangByLabelGroups('messages','verify_your_email_address').'</a>',
 
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
