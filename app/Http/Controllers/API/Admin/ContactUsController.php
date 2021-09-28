@@ -29,4 +29,18 @@ class ContactUsController extends Controller
         }
     }
 
+    public function destroy($id)
+    {
+        try
+        {
+            
+            ContactUs::find($id)->delete();
+            return response(prepareResult(false, [], getLangByLabelGroups('messages','message_contact_us_deleted')), config('http_response.success'));
+        }
+        catch (\Throwable $exception) 
+        {
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
 }
