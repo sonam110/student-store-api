@@ -33,8 +33,9 @@ class CreateProductsServicesBooksTable extends Migration
             $table->string('title')->nullable();
             $table->string('slug')->nullable();
 
-            $table->float('price')->nullable()->comment('this is actual price before applied discount');
-            $table->float('discounted_price')->nullable()->comment('this is final price after applied discount');
+            $table->float('basic_price_wo_vat')->nullable()->comment('this is basic price without vat');
+            $table->float('price')->nullable()->comment('this is price with vat before applied discount');
+            $table->float('discounted_price')->nullable()->comment('this is price with vat after applied discount');
             $table->boolean('is_on_offer')->default(0);
             $table->integer('discount_type')->nullable()->comment('0:fixed amount, 1:percentage');
             $table->float('discount_value')->nullable()->comment('amount or percentage value');

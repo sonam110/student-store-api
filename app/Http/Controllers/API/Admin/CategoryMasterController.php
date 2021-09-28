@@ -93,6 +93,7 @@ class CategoryMasterController extends Controller
                     $categoryMaster->title              = $value['category_title'];
                     $categoryMaster->slug               = $cat_slug_prefix.'-'.Str::slug($value['category_title']);
                     $categoryMaster->status             = 1;
+                    $categoryMaster->vat                = $request->vat;
                     $categoryMaster->save();
                 }
                 $cat_parent_id = $categoryMaster->id;
@@ -138,6 +139,7 @@ class CategoryMasterController extends Controller
                         $subCategoryMaster->title              = $subvalue;
                         $subCategoryMaster->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subvalue);
                         $subCategoryMaster->status             = 1;
+                        $subCategoryMaster->vat                = $categoryMaster->vat;
                         $subCategoryMaster->save();
 
                         $sub_cat_parent_id[$subkey] = $subCategoryMaster->id;
@@ -267,6 +269,7 @@ class CategoryMasterController extends Controller
                     $categoryMaster = CategoryMaster::find($request->category_master_id);
                     $categoryMaster->category_master_id = null;
                     $categoryMaster->title              = $value['category_title'];
+                    $categoryMaster->vat                = $request->vat;
                     $categoryMaster->save();
                 }
                 $cat_parent_id = $categoryMaster->id;
@@ -312,6 +315,7 @@ class CategoryMasterController extends Controller
 
                             $subCategoryMaster = CategoryMaster::find($subvalue['subcategory_id']);
                             $subCategoryMaster->title              = $subvalue['subcategory_title'];
+                            $subCategoryMaster->vat                = $categoryMaster->vat;
                             $subCategoryMaster->save();
                         }
                         else
@@ -322,6 +326,7 @@ class CategoryMasterController extends Controller
                             $subCategoryMaster->title              = $subvalue['subcategory_title'];
                             $subCategoryMaster->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subCategoryMaster->title);
                             $subCategoryMaster->status             = 1;
+                            $subCategoryMaster->vat                = $categoryMaster->vat;
                             $subCategoryMaster->save();
                         }
 

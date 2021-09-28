@@ -56,6 +56,7 @@ class CategoriesImport implements ToModel,WithHeadingRow
             $categoryMaster->module_type_id     = $this->data['module_type_id'];
             $categoryMaster->category_master_id = $category_master_id;
             $categoryMaster->title              = $row['category_in_english'];
+            $categoryMaster->vat                = $row['vat'];
             $categoryMaster->slug               = $slug_prefix.'-'.Str::slug($row['category_in_english']);
             $categoryMaster->status             = 1;
             $categoryMaster->save();

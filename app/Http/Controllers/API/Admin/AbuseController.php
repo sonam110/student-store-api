@@ -25,13 +25,14 @@ class AbuseController extends Controller
     {
         try
         {
+            $abuses = Abuse::orderBy('created_at','desc');
             if(!empty($request->per_page_record))
             {
-                $abuses = Abuse::with('product','contest','job','user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $abuses = $abuses->with('product','contest','job','user')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $abuses = Abuse::with('product','contest','job','user')->get();
+                $abuses = $abuses->with('product','contest','job','user')->get();
             }
             return response(prepareResult(false, $abuses, getLangByLabelGroups('messages','message_abuse_list')), config('http_response.success'));
         }

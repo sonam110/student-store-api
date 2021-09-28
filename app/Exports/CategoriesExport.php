@@ -27,6 +27,7 @@ class CategoriesExport implements FromCollection, WithHeadings
     	return [
     		'SNO',
     		'module',
+            'vat',
             'parent_category',
             'title',
             // 'slug',
@@ -62,6 +63,7 @@ class CategoriesExport implements FromCollection, WithHeadings
     		return [
     			'SNO'             				=> $key+1,
     			'module'				        => $data->moduleType->title,
+                'vat'                           => $data->vat;
     			'parent_category'				=> $data->categoryMaster ? $data->categoryMaster->title : null,
     			'title'							=> $data->title,
     			// 'slug'							=> $data->slug,

@@ -23,7 +23,7 @@ class SampleCategoriesExport implements FromCollection, WithHeadings
     */
 
     public function headings(): array {
-        $data = ['SNO','module','parent_category'];
+        $data = ['SNO','module','parent_category','vat'];
         foreach(Language::all() as $language)
         {
             $data[] = 'title_in_'.$language->title;
@@ -46,6 +46,7 @@ class SampleCategoriesExport implements FromCollection, WithHeadings
                 'SNO'                           => $key+1,
                 'module'                        => $data->moduleType->title,
                 'parent_category'               => $data->categoryMaster ? $data->categoryMaster->title : null,
+                'vat'                           => $data->vat;
             ];
 
             foreach(Language::all() as $language)

@@ -39,6 +39,7 @@ class ProductsImport implements ToModel,WithHeadingRow
             'gtin_isbn'            		=> $row['gtin_isbn'],
             'title'                		=> $row['title'],
             'slug'                		=> Str::slug($row['title']),
+            'basic_price_wo_vat'        => $row['basic_price_wo_vat'];
             'price'                		=> $row['price'],
             'discounted_price'     		=> $row['discounted_price'],
             'is_on_offer'          		=> $row['is_on_offer'],

@@ -128,6 +128,7 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->gtin_isbn                    = $request->gtin_isbn;
             $productsServicesBook->title                        = $request->title;
             $productsServicesBook->slug                         = ($checkSlugExist>0 ? Str::slug($request->title).'-'.($checkSlugExist+1) : Str::slug($request->title));
+            $productsServicesBook->basic_price_wo_vat           = $request->basic_price_wo_vat;
             $productsServicesBook->price                        = $request->price;
             $productsServicesBook->shipping_charge              = $request->shipping_charge;
             $productsServicesBook->discounted_price             = $request->discounted_price;
@@ -275,6 +276,7 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->sku                      = $request->sku;
             $productsServicesBook->gtin_isbn                = $request->gtin_isbn;
             $productsServicesBook->title                    = $request->title;
+            $productsServicesBook->basic_price_wo_vat       = $request->basic_price_wo_vat;
             $productsServicesBook->price                    = $request->price;
             $productsServicesBook->shipping_charge          = $request->shipping_charge;
             $productsServicesBook->discounted_price         = $request->discounted_price;
