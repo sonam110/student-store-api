@@ -254,6 +254,14 @@ class OrderController extends Controller
 
 					$amount_transferred_to_vendor = (($price * $orderedItem['quantity']) - $reward_points_value) * (100 - $commission) / 100;
 
+					//cool company commission for student
+					if(($productsServicesBook->user) && ($productsServicesBook->user->user_type_id == 2))
+					{
+						$cool_company_commission = AppSetting::first()->coolCompanyCommission;
+						$amount_transferred_to_vendor = $amount_transferred_to_vendor * (100 - $cool_company_commission)/100;
+
+					}
+
 					if($productsServicesBook->discount_type == 1)
 					{
 						$discount = $productsServicesBook->discount_value.'%';
@@ -397,7 +405,9 @@ class OrderController extends Controller
 
 			$vat = (AppSetting::first()->vat) * $total / 100;
 
-			$total = $total + $vat + $shipping_charge;
+			// $total = $total + $vat + $shipping_charge;
+
+			$total = $total + $shipping_charge;
 
 			$order->update([
 				'sub_total' => $sub_total,

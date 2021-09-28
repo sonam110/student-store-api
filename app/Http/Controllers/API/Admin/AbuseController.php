@@ -106,19 +106,19 @@ class AbuseController extends Controller
             {
                 $product = ProductsServicesBook::find($value->products_services_book_id);
                 $module = 'Product';
-                $body =  'Abuse status has been updated to  '.$request->status.' .';
+                $body =  'Abuse status  for product '.$product->title.' has been updated to  '.$request->status.' .';
             }
             elseif(!empty($value->contest_id))
             {
                 $product = Contest::find($value->contest_id);
                 $module = 'Contest';
-                $body =  'Abuse status has been updated to  '.$request->status.' .';
+                $body =  'Abuse status for contest '.$product->title.' has been updated to  '.$request->status.' .';
             }
             else
             {
                 $product = Job::find($value->job_id);
                 $module = 'Job';
-                $body =  'Abuse status has been updated to  '.$request->status.' .';
+                $body =  'Abuse status for job '.$product->title.' has been updated to  '.$request->status.' .';
             }
 
             

@@ -65,6 +65,7 @@ class AppSettingController extends Controller
             $appSetting->single_rewards_pt_value    = $request->single_rewards_pt_value;
             $appSetting->vat                        = $request->vat;
             $appSetting->coolCompanyVatRateId       = $request->cool_company_vat_rate_id;
+            $appSetting->coolCompanyCommission      = $request->coolCompanyCommission;
             $appSetting->save();
             return response()->json(prepareResult(false, new AppSettingResource($appSetting), getLangByLabelGroups('messages','message_updated')), config('http_response.success'));
         }
