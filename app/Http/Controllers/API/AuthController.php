@@ -234,6 +234,7 @@ class AuthController extends Controller
 		$user->profile_pic_path						= $profile_pic_path;
 		$user->profile_pic_path						= env('CDN_DOC_THUMB_URL').basename($profile_pic_path);
 		$user->user_type_id         				= $request->user_type_id;
+		$user->gender         						= $request->gender;
 		$user->language_id          				= $request->language_id;
 		$user->cp_first_name 						= $request->cp_first_name;
 		$user->cp_last_name 						= $request->cp_last_name;

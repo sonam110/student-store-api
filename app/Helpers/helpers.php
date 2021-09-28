@@ -52,7 +52,26 @@ function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,
 	{ 
 		if(!empty($userDeviceInfo->fcm_token))
 		{
-			if($userDeviceInfo->platform=='Android')
+			$push = new PushNotification('fcm');
+			$push->setMessage([
+				"notification"=>[
+					'title' => $title,
+					'body'  => $body,
+					'sound' => 'default',
+					'android_channel_id' => '1',
+                    //'timestamp' => date('Y-m-d G:i:s')
+				],
+				'data'=>[
+					'id'  => $id,
+					'user_type'  => $user_type,
+					'module'  => $module,
+					'screen'  => $screen
+				]                        
+			])
+			->setApiKey(env('FIREBASE_KEY'))
+			->setDevicesToken($userDeviceInfo->fcm_token)
+			->send();
+			/*if($userDeviceInfo->platform=='Android')
 			{
 				$push = new PushNotification('fcm');
 				$push->setMessage([
@@ -95,7 +114,7 @@ function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,
 				->setDevicesToken($userDeviceInfo->fcm_token);
 				$push = $push->send();
 				//return $push->getFeedback();
-			}
+			}*/
 		}
 	}
 	if($save_to_database == true)
