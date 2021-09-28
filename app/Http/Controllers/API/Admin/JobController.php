@@ -356,18 +356,44 @@ class JobController extends Controller
             //For Update job status
             if($request->action=='update-status')
             {
+                if($request->job_status == "1")
+                {
+                    $status_text = 'Active';
+                }
+                elseif($request->job_status == "2")
+                {
+                    $status_text = 'Rejected';
+                }
+                elseif($request->job_status == "4")
+                {
+                    $status_text = 'Canceled';
+                }
+                else
+                {
+                    $status_text = 'In-Active';
+                }
+
                 $getJob->job_status = $request->job_status;
 
                 $title = 'Job Status Updated';
-                $body =  'Job '.$getJob->title.' status has been successfully updated.';
+                $body =  'Job '.$getJob->title.' status has been successfully updated to '.$status_text.'.';
             }
             if($request->action=='publish') 
             {
+                if($request->is_published == "1")
+                {
+                    $status_text = 'Published';
+                }
+                else
+                {
+                    $status_text = 'Un-Published';
+                }
+
                 $getJob->is_published = $request->is_published;
                 $getJob->published_at = date('Y-m-d');
                 // event(new JobPostNotification($job_id));
                 $title = 'Job Published';
-                $body =  'Job '.$getJob->title.'has been successfully Published.';
+                $body =  'Job '.$getJob->title.'has been successfully '.$status_text.'.';
             }
             $getJob->save();
 
@@ -401,11 +427,27 @@ class JobController extends Controller
         try
         {
             $jobs = Job::whereIn('id',$request->job_id)->get();
+            if($request->job_status == "1")
+            {
+                $status_text = 'Active';
+            }
+            elseif($request->job_status == "2")
+            {
+                $status_text = 'Rejected';
+            }
+            elseif($request->job_status == "4")
+            {
+                $status_text = 'Canceled';
+            }
+            else
+            {
+                $status_text = 'In-Active';
+            }
             foreach ($jobs as $key => $job) {
                 $job->job_status = $request->job_status;
                 
                 $title = 'Job Status Updated';
-                $body =  'Job '.$job->title.' status has been successfully updated.';
+                $body =  'Job '.$job->title.' status has been successfully updated to '.$status_text.'.';
                 $job->save();
 
                 $type = 'Job Action';
@@ -437,6 +479,14 @@ class JobController extends Controller
         try
         {
             $jobs = Job::whereIn('id',$request->job_id)->get();
+            if($request->is_published == "1")
+            {
+                $status_text = 'Published';
+            }
+            else
+            {
+                $status_text = 'Un-Published';
+            }
             foreach ($jobs as $key => $job) {
                 $job->is_published = $request->is_published;
                 if($request->is_published == true)
@@ -445,7 +495,7 @@ class JobController extends Controller
                 }
                 
                 $title = 'Job Published';
-                $body =  'Job '.$job->title.'has been successfully Published.';
+                $body =  'Job '.$job->title.'has been successfully '.$status_text.'.';
                 $job->save();
 
                 $type = 'Job Action';

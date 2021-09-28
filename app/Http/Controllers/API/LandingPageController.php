@@ -1720,7 +1720,7 @@ class LandingPageController extends Controller
     public function contestDetail(Request $request, $id)
     {
         $contest = Contest::find($id);
-        if(ContestApplication::where('contest_id',$contest->id)->where('user_id',Auth::id())->first())
+        if(ContestApplication::where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->first())
         {
             $applied = true;
         }

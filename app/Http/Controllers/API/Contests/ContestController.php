@@ -245,7 +245,7 @@ class ContestController extends Controller
 
     public function show(Contest $contest)
     {
-        if($contestApplication = ContestApplication::where('contest_id',$contest->id)->where('user_id',Auth::id())->first())
+        if($contestApplication = ContestApplication::where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->first())
         {
             $applied = true;
             $authApplication = $contestApplication;
