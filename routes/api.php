@@ -334,6 +334,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/user-filter', [App\Http\Controllers\API\Admin\UserController::class,'userFilter']);
 
 	Route::get('/user-package-subscriptions', [App\Http\Controllers\API\Admin\UserController::class, 'userPackageSubscriptions']);
+	Route::get('/user-package-subscription-order/{id}', [App\Http\Controllers\API\Admin\UserController::class, 'userPackageSubscriptionOrder']);
 
 	Route::post('/user-basic-detail-update/{user_id}', 'App\Http\Controllers\API\Admin\UserController@basicDetailUpdate');
 	Route::post('/user-extra-detail-update/{user_id}', 'App\Http\Controllers\API\Admin\UserController@extraDetailUpdate');

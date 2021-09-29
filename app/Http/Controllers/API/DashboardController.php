@@ -100,7 +100,7 @@ class DashboardController extends Controller
 			->where('order_items.item_status','delivered')
 			->count();
 
-			$data['total_earnings'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+			$data['total_earnings'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 			->join('products_services_books',function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
@@ -114,7 +114,7 @@ class DashboardController extends Controller
 				$join->on('contest_applications.contest_id', '=', 'contests.id');
 			})
 			->where('contests.user_id',Auth::id())
-			->sum('order_items.price');
+			->sum('order_items.amount_transferred_to_vendor');
 
 
 			$data['total_amount_refunded']  = OrderItem::select('order_items.id')
@@ -170,7 +170,7 @@ class DashboardController extends Controller
 			{
 				$date = date('Y-m-d',strtotime('-'.($i-1).' days'));
 				$total_sales_book = OrderItem::select( 
-					\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('products_services_books', function ($join) {
 					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 				})
@@ -180,7 +180,7 @@ class DashboardController extends Controller
 
 
 				$total_sales_service = OrderItem::select( 
-					\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('products_services_books', function ($join) {
 					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 				})
@@ -190,7 +190,7 @@ class DashboardController extends Controller
 
 
 				$total_sales_product = OrderItem::select( 
-					\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('products_services_books', function ($join) {
 					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 				})
@@ -199,7 +199,7 @@ class DashboardController extends Controller
 				->where('products_services_books.user_id',Auth::id());
 
 				$contestOrders = OrderItem::select( 
-					\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('contest_applications', function ($join) {
 					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
 				})
@@ -212,7 +212,7 @@ class DashboardController extends Controller
 
 
 				$eventOrders = OrderItem::select( 
-					\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('contest_applications', function ($join) {
 					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
 				})
@@ -435,14 +435,14 @@ class DashboardController extends Controller
 	{
 		try{
 			$data = [];
-			$data['total_earnings_of_today'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+			$data['total_earnings_of_today'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('products_services_books',function ($join) {
 					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 				})
 				->where('products_services_books.user_id',Auth::id())
 				->whereDate('order_items.created_at',date('Y-m-d'))
 				->get()[0]['total_amount'];
-				+ OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+				+ OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('contest_applications',function ($join) {
 					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
 				})
@@ -453,14 +453,14 @@ class DashboardController extends Controller
 				->where('contests.user_id',Auth::id())
 				->get()[0]['total_amount'];
 
-				$data['total_earnings_of_week'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+				$data['total_earnings_of_week'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('products_services_books',function ($join) {
 					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 				})
 				->where('products_services_books.user_id',Auth::id())
 				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-7days')))
 				->get()[0]['total_amount'];
-				+ OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+				+ OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('contest_applications',function ($join) {
 					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
 				})
@@ -470,14 +470,14 @@ class DashboardController extends Controller
 				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-7days')))
 				->where('contests.user_id',Auth::id())
 				->get()[0]['total_amount'];
-				$data['total_earnings_of_month'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+				$data['total_earnings_of_month'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('products_services_books',function ($join) {
 					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 				})
 				->where('products_services_books.user_id',Auth::id())
 				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-30days')))
 				->get()[0]['total_amount'];
-				+ OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+				+ OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
 				->join('contest_applications',function ($join) {
 					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
 				})
