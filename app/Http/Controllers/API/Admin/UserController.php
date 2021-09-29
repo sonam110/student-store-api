@@ -440,21 +440,7 @@ class UserController extends Controller
 		} 
     }
 
-    public function userPackageSubscriptionOrder($id)
-    {
-    	try
-		{
-			$userPackageSubscription = UserPackageSubscription::select('id','package_id','user_id')->find($id);
-			// return $userPackageSubscription;
-			$userPackageSubscription['order_item_id'] = OrderItem::where('package_id',$userPackageSubscription->package_id)->where('user_id',$userPackageSubscription->user_id)->orderBy('created_at','desc')->first()->id;
-			$userPackageSubscription['order_id'] = OrderItem::where('package_id',$userPackageSubscription->package_id)->where('user_id',$userPackageSubscription->user_id)->orderBy('created_at','desc')->first()->order_id; 
-			return response(prepareResult(false, $userPackageSubscription, getLangByLabelGroups('messages','message_order_number_list')), config('http_response.success'));
-		}
-		catch (\Throwable $exception) 
-		{
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-		} 
-    }
+    
 
     public function addressList(Request $request,$user_id)
 	{

@@ -53,16 +53,16 @@ class FrontController extends Controller
      //        }
 
      //        foreach ($label as $key1 => $value) {
-     //            if(Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->count() > 0)
+     //            if(Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',3)->count() > 0)
      //            {
-     //            	$label = Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->first();
+     //            	$label = Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',3)->first();
      //            }
      //        	else
      //        	{
      //                $label = new Label;
      //            }
      //            $label->label_group_id         = $labelGroup->id;
-     //            $label->language_id            = 1;
+     //            $label->language_id            = 3;
      //            $label->label_name             = $key1;
      //            $label->label_value            = $value;
      //            $label->status                 = 1;

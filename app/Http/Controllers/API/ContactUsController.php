@@ -33,10 +33,11 @@ class ContactUsController extends Controller
         try
         {
             $contactUs = new ContactUs;
-            $contactUs->name                           = $request->name;
+            $contactUs->name                            = $request->name;
             $contactUs->phone                           = $request->phone;
             $contactUs->message                  		= $request->message;
             $contactUs->email              				= $request->email;
+            $contactUs->images                          = $request->images ? json_encode($request->images) : Null;
             $contactUs->save();
 
             $emailTemplate = EmailTemplate::where('template_for','contact-us')->first();

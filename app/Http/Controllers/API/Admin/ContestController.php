@@ -120,6 +120,7 @@ class ContestController extends Controller
             $contest->condition_file_path                   = $request->condition_file_path;
             $contest->jury_members                          = $request->jury_members;
             $contest->is_free                               = $request->is_free;
+            $contest->basic_price_wo_vat                     = $request->basic_price_wo_vat;
             $contest->subscription_fees                     = $request->subscription_fees;
             $contest->use_cancellation_policy               = $request->use_cancellation_policy;
             $contest->provide_participation_certificate     = $request->provide_participation_certificate;
@@ -326,6 +327,7 @@ class ContestController extends Controller
             $contest->condition_file_path                   = $request->condition_file_path;
             $contest->jury_members                          = $request->jury_members;
             $contest->is_free                               = $request->is_free;
+            $contest->basic_price_wo_vat                     = $request->basic_price_wo_vat;
             $contest->subscription_fees                     = $request->subscription_fees;
             $contest->use_cancellation_policy               = $request->use_cancellation_policy;
             $contest->provide_participation_certificate     = $request->provide_participation_certificate;

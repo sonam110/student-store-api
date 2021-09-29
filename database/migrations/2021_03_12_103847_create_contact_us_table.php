@@ -27,7 +27,7 @@ class CreateContactUsTable extends Migration
             $table->string('email');
             // $table->string('title');
             $table->text('message');
-            // $table->text('files')->nullable();
+            $table->text('images')->nullable();
             // $table->boolean('status')->default(false)->nullable();
             $table->timestamps();
         });

@@ -68,6 +68,7 @@ class CreateContestsTable extends Migration
             $table->string('condition_file_path')->nullable();
             $table->text('jury_members')->nullable();
             $table->boolean('is_free')->default(false)->nullable();
+            $table->float('basic_price_wo_vat')->nullable()->comment('this is basic price without vat');
             $table->float('subscription_fees')->nullable()->default('0');
             $table->boolean('use_cancellation_policy')->nullable();
             $table->boolean('provide_participation_certificate')->nullable();
