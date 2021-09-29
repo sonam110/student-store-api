@@ -238,7 +238,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::apiResource('/contest-winner', 'App\Http\Controllers\API\Contests\ContestWinnerController')->only('store');
 
 
-	Route::post('/contact-us', [App\Http\Controllers\API\ContactUsController::class,'store']);
+	
 	Route::post('/abuse', [App\Http\Controllers\API\AbuseController::class,'store']);
 
 	Route::post('/products-export', [App\Http\Controllers\API\ExportController::class, 'productsExport']);
@@ -269,6 +269,8 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/user-package-subscription-order/{id}', [App\Http\Controllers\API\UserController::class, 'userPackageSubscriptionOrder']);
 
 });
+
+Route::post('/contact-us', [App\Http\Controllers\API\ContactUsController::class,'store']);
 
 Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin']],function () {
 	Route::post('/dashboard', [App\Http\Controllers\API\Admin\DashboardController::class, 'index']);
