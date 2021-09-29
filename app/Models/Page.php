@@ -13,7 +13,7 @@ class Page extends Model
 
 
     protected $fillable = [
-    	'title','slug','description','image_path','status','language_id','is_header_menu','is_footer_menu','footer_section'
+    	'title','slug','description','image_path','status','language_id','is_header_menu','is_footer_menu','footer_section','meta_title','meta_keywords','meta_description'
     ];
 
     public function language()

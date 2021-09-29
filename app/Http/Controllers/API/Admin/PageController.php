@@ -78,6 +78,9 @@ class PageController extends Controller
             $page->is_header_menu       = $request->is_header_menu;
             $page->is_footer_menu       = $request->is_footer_menu;
             $page->footer_section       = $request->footer_section;
+            $page->meta_title           = $request->meta_title;
+            $page->meta_keywords        = $request->meta_keywords;
+            $page->meta_description     = $request->meta_description;
             $page->save();
 
             DB::commit();
@@ -131,6 +134,9 @@ class PageController extends Controller
             $page->is_header_menu       = $request->is_header_menu;
             $page->is_footer_menu       = $request->is_footer_menu;
             $page->footer_section       = $request->footer_section;
+            $page->meta_title           = $request->meta_title;
+            $page->meta_keywords        = $request->meta_keywords;
+            $page->meta_description     = $request->meta_description;
             $page->save();
             DB::commit();
             return response()->json(prepareResult(false, $page, getLangByLabelGroups('messages','message_page_updated')), config('http_response.success'));

@@ -27,6 +27,9 @@ class CreatePagesTable extends Migration
             $table->boolean('is_header_menu')->nullable();
             $table->boolean('is_footer_menu')->nullable();
             $table->string('footer_section')->nullable();
+            $table->string('meta_title')->nullable();
+            $table->text('meta_keywords')->nullable();
+            $table->text('meta_description')->nullable();
             $table->boolean('status')->default(true)->nullable();
             $table->timestamps();
         });
