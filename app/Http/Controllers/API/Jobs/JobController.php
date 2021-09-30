@@ -241,6 +241,10 @@ class JobController extends Controller
         DB::beginTransaction();
         try
         { 
+            if($job->user_id != Auth::id())
+            {
+                return response(prepareResult(true, [], getLangByLabelGroups('messages','message_unauthorized')), config('http_response.unauthorized'));
+            }
             //delete tags before update
             JobTag::where('job_id', $job->id)->delete();
 

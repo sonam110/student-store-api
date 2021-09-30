@@ -442,6 +442,10 @@ class ProductsServicesBookController extends Controller
         DB::beginTransaction();
         try
         { 
+            if($productsServicesBook->user_id != Auth::id())
+            {
+                return response(prepareResult(true, [], getLangByLabelGroups('messages','message_unauthorized')), config('http_response.unauthorized'));
+            }
             if(!empty($request->is_used_item))
             {
                 $is_used_item = $request->is_used_item;

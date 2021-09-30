@@ -26,6 +26,29 @@ class AbuseController extends Controller
         try
         {
             $abuses = Abuse::orderBy('abuses.created_at','desc');
+            // if(!empty($request->product_title))
+            // {
+            //     $abuses->join('products_services_books', function ($join) {
+            //                 $join->on('abuses.products_services_book_id', '=', 'products_services_books.id');
+            //             })
+            //         ->where('products_services_books.title','like','%'.$request->product_title.'%');
+            // }
+            // if(!empty($request->job_title))
+            // {
+            //     $abuses->join('sp_jobs', function ($join) {
+            //                 $join->on('abuses.job_id', '=', 'sp_jobs.id');
+            //             })
+            //         ->where('sp_jobs.title','like','%'.$request->job_title.'%');
+            // }
+
+            // if(!empty($request->contest_title))
+            // {
+            //     $abuses->join('contests', function ($join) {
+            //                 $join->on('abuses.contest_id', '=', 'contests.id');
+            //             })
+            //         ->where('contests.title','like','%'.$request->contest_title.'%');
+            // }
+
             if(!empty($request->type))
             {
                 if(($request->type == 'product') || ($request->type == 'service') || ($request->type == 'book'))
@@ -63,6 +86,14 @@ class AbuseController extends Controller
             if(!empty($request->user_id))
             {
                 $abuses->whereIn('abuses.user_id',$request->user_id);
+            }
+            if(!empty($request->user_name))
+            {
+                $abuses->join('users', function ($join) {
+                            $join->on('abuses.user_id', '=', 'users.id');
+                        })
+                    ->where('users.first_name','like','%'.$request->user_name.'%')
+                    ->orWhere('users.last_name','like','%'.$request->user_name.'%');
             }
             if(!empty($request->per_page_record))
             {
