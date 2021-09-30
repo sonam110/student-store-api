@@ -89,7 +89,7 @@ class OrderController extends Controller
 			})
 			->orderBy('order_items.created_at','DESC')
 			->where('products_services_books.user_id',Auth::id())
-			->with('productsServicesBook.user.serviceProviderDetail','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','user','orderTrackings','return','replacement','dispute','ratingAndFeedback','order:id,order_number,first_name,last_name,email,contact_number,latitude,longitude,country,state,city,full_address');
+			->with('productsServicesBook.user.serviceProviderDetail','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','user','orderTrackings','return','replacement','dispute','ratingAndFeedback','order:id,order_number,first_name,last_name,email,contact_number,latitude,longitude,country,state,city,full_address','order.addressDetail');
 			if(!empty($request->per_page_record))
 			{
 				$orders = $orderItems->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
