@@ -21,6 +21,7 @@ use App\Models\PaymentCardDetail;
 use App\Models\AppSetting;
 use App\Models\EmailTemplate;
 use App\Mail\OrderMail;
+use App\Mail\OrderStatusMail;
 use App\Mail\OrderPlacedMail;
 use App\Mail\OrderConfirmedMail;
 use Mail;
@@ -342,28 +343,40 @@ class OrderController extends Controller
 
 	                    //Mail Start
 
-		                    $emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
+	                    ///to Seller
 
-		                    $body = $emailTemplate->body;
-
-		                    $arrayVal = [
-		                    	'{{user_name}}' => AES256::decrypt($order->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($order->user->last_name, env('ENCRYPTION_KEY')),
-		                    	'{{order_number}}' => $order->order_number,
-		                    ];
-		                    $body = strReplaceAssoc($arrayVal, $body);
-		                    
-		                    $details = [
-		                    	'title' => $emailTemplate->subject,
-		                    	'body' => $body,
-		                    	// 'order_details' => Order::with('orderItems')->find($order->id),
-		                    	'order_details' => $order,
-		                    ];
-		                    
-		                    Mail::to(AES256::decrypt(Auth::user()->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
+	                    $seller_details = [
+	                    	'title' => $title,
+	                    	'body' => $body
+	                    ];
+	                    
+	                    Mail::to(AES256::decrypt($orderItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($seller_details));
 
 	                    //Mail End
 	                }
-				} 
+				}
+
+				//Mail-start-buyer
+
+                $emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
+
+                $email_body = $emailTemplate->body;
+
+                $arrayVal = [
+                	'{{user_name}}' => AES256::decrypt($order->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($order->user->last_name, env('ENCRYPTION_KEY')),
+                	'{{order_number}}' => $order->order_number,
+                ];
+                $email_body = strReplaceAssoc($arrayVal, $email_body);
+                
+                $details = [
+                	'title' => $emailTemplate->subject,
+                	'body' => $email_body,
+                	// 'order_details' => Order::with('orderItems')->find($order->id),
+                	'order_details' => $order,
+                ];
+                
+                Mail::to(AES256::decrypt($order->user->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
+                //mail-end
 
 
 				$paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);
@@ -562,7 +575,42 @@ class OrderController extends Controller
 			$orderItemReplacement->save();
 
 			$title = 'Replacement Request';
-			$body =  'Order for '.$orderItem->title.' has Replacement Request.';
+			$body =  'Order for '.$orderItem->title.' has Replacement Request because of '.$request->reason_of_replacement.'.';
+
+
+			//Mail-start
+
+
+			///to Buyer
+
+			$emailTemplate = EmailTemplate::where('template_for','order_replacement_request')->first();
+
+			$mail_body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+				'{{replacement_reason}}' => $request->reason_of_replacement,
+			];
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $mail_body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
+
+			///to Seller
+
+			$seller_details = [
+				'title' => $title,
+				'body' => $body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($seller_details));
+
+			//Mail end
 		}
 
 		if($request->item_status == 'replaced')
@@ -611,6 +659,31 @@ class OrderController extends Controller
 
 			$title = 'Replacement Request Accepted';
 			$body =  'Request for replacement of ordered product '.$orderItem->title.' has Accepted.';
+
+
+			//Mail-start
+
+
+			///to Buyer
+
+			$emailTemplate = EmailTemplate::where('template_for','order_replaced')->first();
+
+			$mail_body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+			];
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $mail_body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
+
+			//Mail end
 		}
 
 		if($request->item_status == 'return_initiated')
@@ -659,7 +732,41 @@ class OrderController extends Controller
 			$orderItemReturn->save();
 
 			$title = 'Return Request';
-			$body =  'Order for '.$orderItem->title.' has Return Request.';
+			$body =  'Order for '.$orderItem->title.' has Return Request because of '.$request->reason_of_return.'.';
+			
+			//Mail-start
+
+
+			///to Buyer
+
+			$emailTemplate = EmailTemplate::where('template_for','order_return_request')->first();
+
+			$mail_body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+				'{{return_reason}}' => $request->reason_of_return,
+			];
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $mail_body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
+
+			///to Seller
+
+			$seller_details = [
+				'title' => $title,
+				'body' => $body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($seller_details));
+
+			//Mail end
 		}
 
 		if($request->item_status == 'returned')
@@ -676,6 +783,30 @@ class OrderController extends Controller
 
 			$title = 'Return Request Accepted';
 			$body =  'Request for return of ordered product '.$orderItem->title.' has Accepted.';
+
+			//Mail-start
+
+
+			///to Buyer
+
+			$emailTemplate = EmailTemplate::where('template_for','order_returned')->first();
+
+			$mail_body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+			];
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $mail_body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
+
+			//Mail end
 
 			$add_qty = ProductsServicesBook::where('id',$orderItemReturn->products_services_book_id)->first()->quantity +
 			$orderItemReturn->quantity;
@@ -712,6 +843,7 @@ class OrderController extends Controller
 
 			$title = 'Dispute Raised';
 			$body =  'Dispute raised on Ordered product '.$orderItem->title.'.';
+			$emailTemplate = EmailTemplate::where('template_for','order_dispute_raised')->first();
 		}
 
 		if($request->item_status == 'resolved_to_customer')
@@ -726,6 +858,7 @@ class OrderController extends Controller
 
 			$title = 'Dispute Resolved';
 			$body =  'Dispute raised on Ordered product '.$orderItem->title.' has been resolved.';
+			$emailTemplate = EmailTemplate::where('template_for','order_dispute_resolved')->first();
 		}
 
 		if($request->item_status == 'reviewed_by_seller')
@@ -741,6 +874,7 @@ class OrderController extends Controller
 
 			$title = 'Dispute Reviewed';
 			$body =  'Dispute raised on Ordered product '.$orderItem->title.' has been reviewed by seller.';
+			$emailTemplate = EmailTemplate::where('template_for','order_dispute_reviewed_by_seller')->first();
 		}
 
 		if($request->item_status == 'review_accepted')
@@ -756,6 +890,7 @@ class OrderController extends Controller
 
 			$title = 'Dispute Review Accepted';
 			$body =  'Dispute reviewed by seller on Ordered product '.$orderItem->title.' has been Accepted by user.';
+			$emailTemplate = EmailTemplate::where('template_for','order_completed')->first();
 		}
 
 		if($request->item_status == 'review_declined')
@@ -771,6 +906,7 @@ class OrderController extends Controller
 
 			$title = 'Dispute Review Declined';
 			$body =  'Dispute reviewed by seller on Ordered product '.$orderItem->title.' has been Declined by user.';
+			$emailTemplate = EmailTemplate::where('template_for','order_dispute_review_declined')->first();
 		}
 
 		if($request->item_status == 'declined')
@@ -788,6 +924,7 @@ class OrderController extends Controller
 
 				$title = 'Return request Declined';
 				$body =  'Return request of ordered product '.$orderItem->title.' has been Declined.';
+				$emailTemplate = EmailTemplate::where('template_for','order_return_declined')->first();
 			}
 			elseif(!empty($request->reason_for_dispute_decline))
 			{
@@ -802,6 +939,7 @@ class OrderController extends Controller
 
 				$title = 'Raised Dispute Declined';
 				$body =  'Raised Dispute on  ordered product '.$orderItem->title.' has been Declined.';
+				$emailTemplate = EmailTemplate::where('template_for','order_dispute_declined')->first();
 			}
 			elseif(!empty($request->reason_for_replacement_decline))
 			{
@@ -816,6 +954,7 @@ class OrderController extends Controller
 
 				$title = 'Replacement request Declined';
 				$body =  'Replacement request of ordered product '.$orderItem->title.' has been Declined.';
+				$emailTemplate = EmailTemplate::where('template_for','order_replacement_declined')->first();
 			}
 			// elseif(!empty($request->reason_for_review_decline))
 			// {
@@ -935,46 +1074,140 @@ class OrderController extends Controller
 			$title = 'Order Confirmed';
 			$body =  'Order for '.$orderItem->title.' has been Confirmed.';
 
-			//Mail Start
+			//Mail-start
+
+
+			///to Buyer
 
 			$emailTemplate = EmailTemplate::where('template_for','order_confirmed')->first();
 
-			$body = $emailTemplate->body;
+			$mail_body = $emailTemplate->body;
 
 			$arrayVal = [
 				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
 				'{{order_item}}' => $orderItem->title,
 			];
-			$body = strReplaceAssoc($arrayVal, $body);
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
 			
 			$details = [
 				'title' => $emailTemplate->subject,
-				'body' => $body
+				'body' => $mail_body
 			];
 			
-			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderMail($details));
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
 
-			//Mail End
+			//Mail end
 		}
 		elseif($request->item_status == 'shipped')
 		{
 			$title = 'Order Shipped';
 			$body =  'Order for '.$orderItem->title.' has been Shipped.';
+
+			
+			//Mail start
+			///to Buyer
+
+			$emailTemplate = EmailTemplate::where('template_for','order_shipped')->first();
+
+			$mail_body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+			];
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $mail_body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
+
+			//Mail end
 		}
 		elseif($request->item_status == 'delivered')
 		{
 			$title = 'Order Delivered';
 			$body =  'Order for '.$orderItem->title.' has been Delivered.';
+			
+
+			//Mail start
+			///to Buyer
+
+			$emailTemplate = EmailTemplate::where('template_for','order_delivered')->first();
+
+			$mail_body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+			];
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $mail_body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
+
+			//Mail end
 		}
 		elseif($request->item_status == 'completed')
 		{
 			$title = 'Order Completed';
 			$body =  'Order for '.$orderItem->title.' has been Completed.';
+			
+			//Mail start
+			///to Buyer
+
+			$emailTemplate = EmailTemplate::where('template_for','order_completed')->first();
+
+			$mail_body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+			];
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $mail_body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
+
+			//Mail end
 		}
 		elseif($request->item_status == 'canceled')
 		{
 			$title = 'Order canceled';
 			$body =  'Order for '.$orderItem->title.' has been canceled.';
+			$emailTemplate = EmailTemplate::where('template_for','order_canceled')->first();
+
+			//Mail start
+			///to Buyer
+
+			$emailTemplate = EmailTemplate::where('template_for','order_canceled')->first();
+
+			$mail_body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+			];
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $mail_body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
+
+			//Mail end
 		}
 
 		$type = 'Order Status';
@@ -1027,7 +1260,7 @@ class OrderController extends Controller
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
 			->where('products_services_books.user_id',Auth::id())
-			->sum('order_items.price');
+			->sum('order_items.amount_transferred_to_vendor');
 
 			$orders['amount_refunded'] = OrderItem::select('order_items.*')
 			->join('products_services_books', function ($join) {
