@@ -65,11 +65,11 @@ class OrderController extends Controller
 		{
 			if(!empty($request->per_page_record))
 			{
-				$orders = Order::where('user_id', Auth::id())->where('order_for', 'product')->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 			}
 			else
 			{
-				$orders = Order::where('user_id', Auth::id())->where('order_for', 'product')->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction')->get();
+				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction')->get();
 			}
 			return response(prepareResult(false, $orders, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
 		}
@@ -89,7 +89,7 @@ class OrderController extends Controller
 			})
 			->orderBy('order_items.created_at','DESC')
 			->where('products_services_books.user_id',Auth::id())
-			->with('productsServicesBook.user.serviceProviderDetail','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','user','orderTrackings','return','replacement','dispute','ratingAndFeedback','order:id,order_number,first_name,last_name,email,contact_number,latitude,longitude,country,state,city,full_address','order.addressDetail');
+			->with('productsServicesBook.user.serviceProviderDetail','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','user','orderTrackings','return','replacement','dispute','ratingAndFeedback','order:id,order_number,first_name,last_name,email,contact_number,latitude,longitude,country,state,city,full_address,zip_code','order.addressDetail');
 			if(!empty($request->per_page_record))
 			{
 				$orders = $orderItems->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -132,6 +132,9 @@ class OrderController extends Controller
 			{
 				$order_number = env('ORDER_START_NUMBER');
 			}
+
+			$addressfind = AddressDetail::find($request->address_detail_id);
+
 			$order                      = new Order;
 			$order->order_number        = $order_number;
 			$order->user_id        		= Auth::id();
@@ -149,12 +152,13 @@ class OrderController extends Controller
 			$order->last_name           = (!empty(Auth::user()->last_name)) ? AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY')) : NULL;
 			$order->email               = (!empty(Auth::user()->email)) ? AES256::decrypt(Auth::user()->email, env('ENCRYPTION_KEY')) : NULL;
 			$order->contact_number      = (!empty(Auth::user()->contact_number)) ? AES256::decrypt(Auth::user()->contact_number, env('ENCRYPTION_KEY')) : NULL;
-			$order->latitude            = AddressDetail::find($request->address_detail_id)->latitude;
-			$order->longitude           = AddressDetail::find($request->address_detail_id)->longitude;
-			$order->country             = AddressDetail::find($request->address_detail_id)->country;
-			$order->state               = AddressDetail::find($request->address_detail_id)->state;
-			$order->city                = AddressDetail::find($request->address_detail_id)->city;
-			$order->full_address        = AddressDetail::find($request->address_detail_id)->full_address;
+			$order->latitude            = $addressfind->latitude;
+			$order->longitude           = $addressfind->longitude;
+			$order->country             = $addressfind->country;
+			$order->state               = $addressfind->state;
+			$order->city                = $addressfind->city;
+			$order->full_address        = $addressfind->full_address;
+			$order->zip_code        	= $addressfind->zip_code;
 			$order->used_reward_points 	= $request->used_reward_points;
 			$order->order_for 			= $request->order_for;
 			$order->reward_point_status = 'used';
@@ -546,6 +550,8 @@ class OrderController extends Controller
 				$replacement_code = null;
 			}
 
+			$addressfind = AddressDetail::find($request->address_id);
+
 			$orderItemReplacement = new OrderItemReplacement;
 			$orderItemReplacement->user_id                   	= Auth::id();
 			$orderItemReplacement->replacement_address_id       = $request->address_id;
@@ -564,12 +570,12 @@ class OrderController extends Controller
 			$orderItemReplacement->last_name					= $orderItem->productsServicesBook->user->last_name;
 			$orderItemReplacement->email						= $orderItem->productsServicesBook->user->email;
 			$orderItemReplacement->contact_number				= $orderItem->productsServicesBook->user->contact_number;
-			$orderItemReplacement->latitude           	= AddressDetail::find($request->address_id)->latitude;
-			$orderItemReplacement->longitude           	= AddressDetail::find($request->address_id)->longitude;
-			$orderItemReplacement->country             	= AddressDetail::find($request->address_id)->country;
-			$orderItemReplacement->state               	= AddressDetail::find($request->address_id)->state;
-			$orderItemReplacement->city                	= AddressDetail::find($request->address_id)->city;
-			$orderItemReplacement->full_address        	= AddressDetail::find($request->address_id)->full_address;
+			$orderItemReplacement->latitude           	= $addressfind->latitude;
+			$orderItemReplacement->longitude           	= $addressfind->longitude;
+			$orderItemReplacement->country             	= $addressfind->country;
+			$orderItemReplacement->state               	= $addressfind->state;
+			$orderItemReplacement->city                	= $addressfind->city;
+			$orderItemReplacement->full_address        	= $addressfind->full_address;
 			$orderItemReplacement->replacement_status             = $request->item_status;
 			$orderItemReplacement->replacement_code             = $replacement_code;
 			$orderItemReplacement->save();
@@ -700,6 +706,8 @@ class OrderController extends Controller
 				$return_code = null;
 			} 
 
+			$addressfind = AddressDetail::find($request->address_id);
+
 			$orderItemReturn = new OrderItemReturn;
 			$orderItemReturn->user_id                  	= Auth::id();
 			$orderItemReturn->return_address_id        	= $request->address_id;
@@ -721,12 +729,12 @@ class OrderController extends Controller
 			$orderItemReturn->last_name					= $orderItem->productsServicesBook->user->last_name;
 			$orderItemReturn->email						= $orderItem->productsServicesBook->user->email;
 			$orderItemReturn->contact_number			= $orderItem->productsServicesBook->user->contact_number;
-			$orderItemReturn->latitude            		= AddressDetail::find($request->address_id)->latitude;
-			$orderItemReturn->longitude           		= AddressDetail::find($request->address_id)->longitude;
-			$orderItemReturn->country             		= AddressDetail::find($request->address_id)->country;
-			$orderItemReturn->state               		= AddressDetail::find($request->address_id)->state;
-			$orderItemReturn->city                		= AddressDetail::find($request->address_id)->city;
-			$orderItemReturn->full_address        		= AddressDetail::find($request->address_id)->full_address;
+			$orderItemReturn->latitude            		= $addressfind->latitude;
+			$orderItemReturn->longitude           		= $addressfind->longitude;
+			$orderItemReturn->country             		= $addressfind->country;
+			$orderItemReturn->state               		= $addressfind->state;
+			$orderItemReturn->city                		= $addressfind->city;
+			$orderItemReturn->full_address        		= $addressfind->full_address;
 			$orderItemReturn->return_status				= $request->item_status;
 			$orderItemReturn->return_code               = $return_code;
 			$orderItemReturn->save();
