@@ -433,7 +433,7 @@ class UserProfileController extends Controller
 
 	public function unreadNotifications()
 	{
-		$data = Auth::user()->unreadNotifications->count();
+		$data = Auth::user()->unreadChats->count();
 		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_unread_notiication_count')), config('http_response.created'));
 	}
 }

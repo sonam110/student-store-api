@@ -35,6 +35,7 @@ use App\Models\Contest;
 use App\Models\CoolCompanyAssignment;
 use App\Models\CoolCompanyFreelancer;
 use App\Models\VendorFundTransfer;
+use App\Models\ChatList;
 use mervick\aesEverywhere\AES256;
 
 class User extends Authenticatable
@@ -276,6 +277,11 @@ class User extends Authenticatable
     public function unreadNotifications()
     {
         return $this->hasMany(Notification::class, 'user_id', 'id')->where('read_status',0);
+    }
+
+    public function unreadChats()
+    {
+        return $this->hasMany(ChatList::class, 'receiver_id', 'id')->where('status','unread');
     }
     
 
