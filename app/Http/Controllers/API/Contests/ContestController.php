@@ -17,6 +17,7 @@ use App\Models\ContestTag;
 use App\Models\UserPackageSubscription;
 use App\Models\OrderItem;
 use App\Models\Abuse;
+use App\Models\RatingAndFeedback;
 
 class ContestController extends Controller
 {
@@ -257,6 +258,17 @@ class ContestController extends Controller
             $applied = false;
             $authApplication = null;
         }
+
+        if(RatingAndFeedback::where('contest_id',$contest->id)->where('from_user',Auth::id())->count() > 0)
+        {
+            $rated = true;
+
+        }
+        else
+        {
+            $rated = false;
+        }
+
         if($message = ContactList::where('contest_id',$contest->id)->where('buyer_id',Auth::id())->first())
         {
             $is_chat_initiated = true;
@@ -282,6 +294,7 @@ class ContestController extends Controller
                     }])
         ->find($contest->id);
         $contest['is_applied'] = $applied;
+        $contest['is_rated'] = $rated;
         $contest['auth_application'] = $authApplication;
 
         $contest['is_chat_initiated'] = $is_chat_initiated;
