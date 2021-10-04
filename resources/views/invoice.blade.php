@@ -209,7 +209,7 @@
             </tr>
             <tr class="total">
                 <td></td>
-                <td colspan="2"><strong>VAT (25%):</strong> </td>
+                <td colspan="2"><strong>VAT:</strong> </td>
                 <td>
                    <center>{{$order->vat}} Kr</center>
                 </td>
