@@ -397,14 +397,14 @@ class FrontController extends Controller
 		*/
 
 		
-		$payout = \Stripe\Transfer::create([
+		/*$payout = \Stripe\Transfer::create([
 		  "amount" => 999,
 		  "currency" => "USD",
 		  "destination" => "acct_1Jc7iyRgancAKpJI",
 		  "transfer_group" => "ORDER_95"
 		]);
 
-		dd($payout);
+		dd($payout);*/
 		
 
 		/*
@@ -474,11 +474,38 @@ class FrontController extends Controller
 
 		dd($updateCapability);*/
 
-		$account = $stripe->accounts->delete(
+		/*$account = $stripe->accounts->delete(
 		  'acct_1Jc7fdDH2Q0vOxnt',
 		  []
 		);
-		dd($account);
+		dd($account);*/
+
+		/*
+		//Create customer
+		$account = $stripe->customers->create([
+			'name' 				=> 'Rakesh Dwivedi',
+			'phone'				=> '9752655455',
+			'email'				=> 'rakesh@nrt.co.in',
+		  	'description' 		=> 'My First Test Customer (created for API docs)',
+		]);
+		dd($account);  //customer id cus_KLWfeafgS59wL4 */
+
+
+		//Create card
+		$cardinfo = $stripe->customers->createSource(
+		  	'cus_KLWfeafgS59wL4',
+		  	[
+		  		'source' 	=> [
+		  			'object'	=> 'card',
+		  			'number' 	=> 4000056655665556,
+			  		'exp_month' => 12,
+			  		'exp_year' 	=> 2023,
+			  		'cvc' 		=> 234,
+			  		'name'      => 'Jhon Paul'
+		  		],
+		  	]
+		);
+		dd($cardinfo);  // card id : card_1JgpoLD6j8NkE89KdhaeZRkI , card_1JgpqED6j8NkE89Kj3FSPcZC
 	}
 
 	public function strReplaceAssoc(array $replace, $subject) { 
