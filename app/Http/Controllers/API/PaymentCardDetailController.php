@@ -74,7 +74,7 @@ class PaymentCardDetailController extends Controller
             {
                 return response()->json(prepareResult(true, $account, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
             }
-            $cardExpiry = explode('/', AES256::decrypt($request->card_expiry, env('ENCRYPTION_KEY')))
+            $cardExpiry = explode('/', AES256::decrypt($request->card_expiry, env('ENCRYPTION_KEY')));
 
             $cardinfo = $stripe->customers->createSource(
                 $customerId,
@@ -176,7 +176,7 @@ class PaymentCardDetailController extends Controller
                 $checkUser->save();
             }
 
-            $cardExpiry = explode('/', AES256::decrypt($request->card_expiry, env('ENCRYPTION_KEY')))
+            $cardExpiry = explode('/', AES256::decrypt($request->card_expiry, env('ENCRYPTION_KEY')));
 
             $cardinfo = $stripe->customers->updateSource(
                 $customerId,
