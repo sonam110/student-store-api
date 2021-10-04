@@ -52,7 +52,7 @@ class PaymentCardDetailController extends Controller
             $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
             $checkUser = User::find(Auth::id());
             $customerId = $checkUser->stripe_customer_id;
-            if(!empty($checkUser->stripe_customer_id))
+            if(empty($customerId))
             {
                 $first_name = AES256::decrypt($checkUser->first_name, env('ENCRYPTION_KEY'));
                 $last_name = (!empty($checkUser->last_name)) ? AES256::decrypt($checkUser->last_name, env('ENCRYPTION_KEY')) : null;
@@ -157,7 +157,7 @@ class PaymentCardDetailController extends Controller
             $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
             $checkUser = User::find(Auth::id());
             $customerId = $checkUser->stripe_customer_id;
-            if(!empty($checkUser->stripe_customer_id))
+            if(empty($customerId))
             {
                 $first_name = AES256::decrypt($checkUser->first_name, env('ENCRYPTION_KEY'));
                 $last_name = (!empty($checkUser->last_name)) ? AES256::decrypt($checkUser->last_name, env('ENCRYPTION_KEY')) : null;
