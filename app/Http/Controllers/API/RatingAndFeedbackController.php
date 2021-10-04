@@ -34,9 +34,13 @@ class RatingAndFeedbackController extends Controller
             {
                  $ratingAndFeedbacks = RatingAndFeedback::where('products_services_book_id',$request->product_id)->with('customer','orderItem.productsServicesBook.user');
             }
+            elseif(!empty($request->contest_id))
+            {
+                $ratingAndFeedbacks = RatingAndFeedback::where('contest_id',$request->contest_id)->where('to_user',$request->user_id)->with('customer','contest.user');
+            }
             elseif(!empty($request->user_id))
             {
-                $ratingAndFeedbacks = RatingAndFeedback::where('to_user',$request->user_id)->with('customer','orderItem.productsServicesBook.user');
+                $ratingAndFeedbacks = RatingAndFeedback::where('to_user',$request->user_id)->with('customer','orderItem.productsServicesBook.user','contest.user');
             }
             else
             {

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\OrderItem;
 use App\Models\ProductsServicesBook;
+use App\Models\Contest;
+
 
 
 class RatingAndFeedback extends Model
@@ -42,5 +44,10 @@ class RatingAndFeedback extends Model
     public function product()
     {
         return $this->belongsTo(ProductsServicesBook::class,'products_services_book_id','id');
+    }
+
+    public function contest()
+    {
+        return $this->belongsTo(Contest::class,'contest_id','id');
     }
 }

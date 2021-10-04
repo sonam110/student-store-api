@@ -1349,12 +1349,6 @@ class OrderController extends Controller
 	{
 		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
-		/*$intent = \Stripe\PaymentIntent::create([
-		  'amount' 		=> ($request->amount) * 100,
-		  'currency' 	=> env('STRIPE_CURRENCY'),
-		]);
-		$client_secret = $intent->client_secret;
-		return response(prepareResult(false, ['client_secret' => $client_secret], 'Order Intent create'), config('http_response.success'));*/
 		$customer_id = 'cus_KLWfeafgS59wL4';
 		$ephemeralKey = \Stripe\EphemeralKey::create(
 		    ['customer' => $customer_id],
