@@ -54,10 +54,10 @@ class PaymentCardDetailController extends Controller
             $customerId = $checkUser->stripe_customer_id;
             if(!empty($checkUser->stripe_customer_id))
             {
-                $first_name = AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'));
-                $last_name = (!empty($user->last_name)) ? AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')) : null;
-                $contact_number = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
-                $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+                $first_name = AES256::decrypt($checkUser->first_name, env('ENCRYPTION_KEY'));
+                $last_name = (!empty($checkUser->last_name)) ? AES256::decrypt($checkUser->last_name, env('ENCRYPTION_KEY')) : null;
+                $contact_number = AES256::decrypt($checkUser->contact_number, env('ENCRYPTION_KEY'));
+                $email = AES256::decrypt($checkUser->email, env('ENCRYPTION_KEY'));
 
                 $account = $stripe->customers->create([
                     'name'              => $first_name .' '.$last_name,
@@ -159,10 +159,10 @@ class PaymentCardDetailController extends Controller
             $customerId = $checkUser->stripe_customer_id;
             if(!empty($checkUser->stripe_customer_id))
             {
-                $first_name = AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'));
-                $last_name = (!empty($user->last_name)) ? AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')) : null;
-                $contact_number = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
-                $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+                $first_name = AES256::decrypt($checkUser->first_name, env('ENCRYPTION_KEY'));
+                $last_name = (!empty($checkUser->last_name)) ? AES256::decrypt($checkUser->last_name, env('ENCRYPTION_KEY')) : null;
+                $contact_number = AES256::decrypt($checkUser->contact_number, env('ENCRYPTION_KEY'));
+                $email = AES256::decrypt($checkUser->email, env('ENCRYPTION_KEY'));
 
                 $account = $stripe->customers->create([
                     'name'              => $first_name .' '.$last_name,
