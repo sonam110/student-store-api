@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/initial-screen', [App\Http\Controllers\API\LandingPageController::class,'initialScreen']);
 
 Route::get('/packages', [App\Http\Controllers\API\PackageController::class, 'index']);
+Route::get('/packages/{id}', [App\Http\Controllers\API\PackageController::class, 'show']);
 Route::get('/package-by-type/{package_for}', [App\Http\Controllers\API\PackageController::class, 'packageByType']);
 Route::get('/package-by-module/{module}', [App\Http\Controllers\API\PackageController::class, 'packageByModule']);
 Route::get('/modules', [App\Http\Controllers\API\PackageController::class, 'modules']);

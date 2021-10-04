@@ -49,16 +49,16 @@ class OrderStatus extends Command
     			$to = date('Y-m-d',strtotime($edd));
     			// $to = \Carbon\Carbon::parse($edd)->format('Y-m-d h:i A');
     			$from = \Carbon\Carbon::now();
-    			$diff_in_hours = \Carbon\Carbon::parse('edd')->diffInHours();
+    			$diff_in_hours = \Carbon\Carbon::parse($to)->diffInHours();
     			if($diff_in_hours > '24'){
     				$orderItem->update(['item_status'=>'delivered']);
     				$title = 'Order Delivered';
     				$body =  'Order for '.$orderItem->title.' has been Delivered.';
     				$type = 'Order Status';
     				$user = $orderItem->user;
-    				pushNotification($title,$body,$user,$type,true,'buyer','product');
+    				pushNotification($title,$body,$user,$type,true,'buyer','product','','my-orders');
     				$seller = $orderItem->productsServicesBook->user;
-    				pushNotification($title,$body,$seller,$type,true,'seller','product');
+    				pushNotification($title,$body,$seller,$type,true,'seller','product','','my-orders');
 
     				$orderTracking = new OrderTracking;
     				$orderTracking->order_item_id = $orderItem->id;
@@ -67,22 +67,21 @@ class OrderStatus extends Command
     				$orderTracking->type = 'delivery';
     				$orderTracking->save();
     			}
-
     		}
     		elseif($orderItem->item_status == 'delivered')
     		{
     			$to = $orderItem->updated_at;
     			$from = \Carbon\Carbon::now();
-    			$diff_in_hours = \Carbon\Carbon::parse('edd')->diffInHours();
+    			$diff_in_hours = \Carbon\Carbon::parse($to)->diffInHours();
     			if($diff_in_hours > '24'){
     				$orderItem->update(['item_status'=>'delivered']);
     				$title = 'Order Completed';
     				$body =  'Order for '.$orderItem->title.' has been Completed.';
     				$type = 'Order Status';
     				$user = $orderItem->user;
-    				pushNotification($title,$body,$user,$type,true,'buyer','product');
+    				pushNotification($title,$body,$user,$type,true,'buyer','product','','my-orders');
     				$seller = $orderItem->productsServicesBook->user;
-    				pushNotification($title,$body,$seller,$type,true,'seller','product');
+    				pushNotification($title,$body,$seller,$type,true,'seller','product','','my-orders');
 
     				$orderTracking = new OrderTracking;
     				$orderTracking->order_item_id = $orderItem->id;
@@ -92,7 +91,6 @@ class OrderStatus extends Command
     				$orderTracking->save();
     			}
     		}
-
     	}
     	return 0;
     }
