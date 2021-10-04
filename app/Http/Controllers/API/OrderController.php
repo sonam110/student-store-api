@@ -1372,7 +1372,6 @@ class OrderController extends Controller
 		    'ephemeralKey' => $ephemeralKey->secret,
 		    'customer' => $customer_id
 		];
-		$jsonDecode = json_encode($returnObj);
-		return response(prepareResult(false, $jsonDecode, 'Order Intent create'), config('http_response.success'));
+		return response(prepareResult(false, $returnObj, 'Order Intent create'), config('http_response.success'));
 	}
 }
