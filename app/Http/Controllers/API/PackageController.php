@@ -22,6 +22,19 @@ class PackageController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        try
+        {
+            $package = Package::find($id);
+            return response(prepareResult(false, $package, getLangByLabelGroups('messages','message_success_title')), config('http_response.success'));
+        }
+        catch (\Throwable $exception) 
+        {
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
     public function packageByType($package_for)
     {
         try

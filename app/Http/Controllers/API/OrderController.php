@@ -65,11 +65,11 @@ class OrderController extends Controller
 		{
 			if(!empty($request->per_page_record))
 			{
-				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 			}
 			else
 			{
-				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name')->get();
+				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners')->get();
 			}
 			return response(prepareResult(false, $orders, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
 		}
@@ -478,6 +478,7 @@ class OrderController extends Controller
 		$reason_for_cancellation = $orderItem->reason_for_cancellation;
 		$return_applicable_date = $orderItem->return_applicable_date;
 		$is_returned = $orderItem->is_returned;
+		$amount_returned = $orderItem->amount_returned;
 		$is_replaced = $orderItem->is_replaced;
 		$is_disputed = $orderItem->is_disputed;
 		$delivery_completed_date = $orderItem->delivery_completed_date;
@@ -781,10 +782,11 @@ class OrderController extends Controller
 		{
 			$type = 'return';
 			$orderItemReturn = OrderItemReturn::where('order_item_id',$id)->first();
-			if($orderItemReturn->return_type == 'by_hand' && $request->return_code != $orderItemReturn->return_code)
-			{
-				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
-			}
+			$amount_returned = $orderItemReturn->amount_to_be_returned;
+			// if($orderItemReturn->return_type == 'by_hand' && $request->return_code != $orderItemReturn->return_code)
+			// {
+			// 	return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
+			// }
 			$orderItemReturn->date_of_return_completed      = date('Y-m-d');
 			$orderItemReturn->return_status                 = $request->item_status;
 			$orderItemReturn->save();
@@ -1026,6 +1028,7 @@ class OrderController extends Controller
 		$orderItem->reason_id_for_cancellation_request_decline 	= $reason_id_for_cancellation_request_decline;
 		$orderItem->reason_for_cancellation_request_decline 	= $reason_for_cancellation_request_decline;
 		$orderItem->is_returned 								= $is_returned;
+		$orderItem->amount_returned 							= $amount_returned;
 		$orderItem->is_replaced 								= $is_replaced;
 		$orderItem->is_disputed 								= $is_disputed;
 		$orderItem->save();
