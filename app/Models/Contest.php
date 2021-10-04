@@ -10,6 +10,7 @@ use App\Models\CategoryMaster;
 use App\Models\AddressDetail;
 use App\Models\ContestCancellationRange;
 use App\Models\ContestApplication;
+use App\Models\RatingAndFeedback;
 use Auth;
 
 class Contest extends Model
@@ -65,5 +66,10 @@ class Contest extends Model
     public function contestWinners()
     {
         return $this->hasMany(ContestWinner::class, 'contest_id', 'id')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path');
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(RatingAndFeedback::class,'contest_id','id');
     }
 }

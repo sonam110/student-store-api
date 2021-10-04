@@ -275,7 +275,12 @@ class ContestController extends Controller
         {
             $is_abuse_reported = false;
         }
-        $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.defaultAddress:id,user_id,full_address','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','contestWinners')->withCount('contestApplications')->find($contest->id);
+        $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.defaultAddress:id,user_id,full_address','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','contestWinners')
+        ->withCount('contestApplications','ratings')
+        ->with(['ratings.customer' => function($query){
+                        $query->take(3);
+                    }])
+        ->find($contest->id);
         $contest['is_applied'] = $applied;
         $contest['auth_application'] = $authApplication;
 
