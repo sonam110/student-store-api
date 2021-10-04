@@ -72,7 +72,7 @@ class PaymentCardDetailController extends Controller
             }
             if(empty($customerId))
             {
-                return response()->json(prepareResult(true, $account, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+                return response()->json(prepareResult(true, $customerId, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
             }
             $cardExpiry = explode('/', AES256::decrypt($request->card_expiry, env('ENCRYPTION_KEY')));
 
