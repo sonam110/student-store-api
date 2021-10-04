@@ -480,15 +480,15 @@ class FrontController extends Controller
 		);
 		dd($account);*/
 
-		/*
+		
 		//Create customer
 		$account = $stripe->customers->create([
-			'name' 				=> 'Rakesh Dwivedi',
-			'phone'				=> '9752655455',
-			'email'				=> 'rakesh@nrt.co.in',
+			'name' 				=> 'Ashok Sahu',
+			'phone'				=> '9713753131',
+			'email'				=> 'ashok@nrt.co.in',
 		  	'description' 		=> 'My First Test Customer (created for API docs)',
 		]);
-		dd($account);  //customer id cus_KLWfeafgS59wL4 */
+		dd($account->id);  //customer id cus_KLWfeafgS59wL4 
 
 
 		//Create card

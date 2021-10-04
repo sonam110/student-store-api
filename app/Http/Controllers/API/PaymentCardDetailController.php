@@ -4,12 +4,15 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\PaymentCardDetail;
+use App\Models\User;
 use App\Http\Resources\PaymentCardDetailResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
 use DB;
 use Auth;
+use Stripe;
+use mervick\aesEverywhere\AES256;
 
 class PaymentCardDetailController extends Controller
 {
@@ -46,6 +49,50 @@ class PaymentCardDetailController extends Controller
         DB::beginTransaction();
         try
         {
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $checkUser = User::find(Auth::id());
+            $customerId = $checkUser->stripe_customer_id;
+            if(!empty($checkUser->stripe_customer_id))
+            {
+                $first_name = AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'));
+                $last_name = (!empty($user->last_name)) ? AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')) : null;
+                $contact_number = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
+                $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+
+                $account = $stripe->customers->create([
+                    'name'              => $first_name .' '.$last_name,
+                    'phone'             => $contact_number,
+                    'email'             => $email,
+                    'description'       => 'New Customer added',
+                ]);
+                $customerId = $account->id;
+
+                $checkUser->stripe_customer_id = $customerId;
+                $checkUser->save();
+            }
+            if(empty($customerId))
+            {
+                return response()->json(prepareResult(true, $account, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+            $cardExpiry = explode('/', AES256::decrypt($request->card_expiry, env('ENCRYPTION_KEY')))
+
+            $cardinfo = $stripe->customers->createSource(
+                $customerId,
+                [
+                    'source'    => [
+                        'object'    => 'card',
+                        'number'    => AES256::decrypt($request->card_number, env('ENCRYPTION_KEY')),
+                        'exp_month' => $cardExpiry[0],
+                        'exp_year'  => $cardExpiry[1],
+                        'cvc'       => AES256::decrypt($request->card_cvv, env('ENCRYPTION_KEY')),
+                        'name'      => $request->card_holder_name
+                    ],
+                ]
+            );
+            if(empty($cardinfo->id))
+            {
+                return response()->json(prepareResult(true, $cardinfo, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
         	if($request->is_default == true)
         	{
         		PaymentCardDetail::where('user_id',Auth::id())->update(['is_default'=>false]);
@@ -61,8 +108,10 @@ class PaymentCardDetailController extends Controller
             $paymentCardDetail->status              = 1;
             $paymentCardDetail->is_minor            = $request->is_minor;
             $paymentCardDetail->parent_full_name    = $request->parent_full_name;
-            $paymentCardDetail->mobile_number		= $request->mobile_number;
+            $paymentCardDetail->mobile_number       = $request->mobile_number;
+            $paymentCardDetail->stripe_card_id      = $cardinfo->id;
             $paymentCardDetail->save();
+
             DB::commit();
             return response()->json(prepareResult(false, $paymentCardDetail, getLangByLabelGroups('messages','message_payment_card_detail_created')), config('http_response.created'));
         }
@@ -105,6 +154,49 @@ class PaymentCardDetailController extends Controller
         DB::beginTransaction();
         try
         {
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $checkUser = User::find(Auth::id());
+            $customerId = $checkUser->stripe_customer_id;
+            if(!empty($checkUser->stripe_customer_id))
+            {
+                $first_name = AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'));
+                $last_name = (!empty($user->last_name)) ? AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')) : null;
+                $contact_number = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
+                $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+
+                $account = $stripe->customers->create([
+                    'name'              => $first_name .' '.$last_name,
+                    'phone'             => $contact_number,
+                    'email'             => $email,
+                    'description'       => 'New Customer added',
+                ]);
+                $customerId = $account->id;
+
+                $checkUser->stripe_customer_id = $customerId;
+                $checkUser->save();
+            }
+
+            $cardExpiry = explode('/', AES256::decrypt($request->card_expiry, env('ENCRYPTION_KEY')))
+
+            $cardinfo = $stripe->customers->updateSource(
+                $customerId,
+                $paymentCardDetail->stripe_card_id,
+                [
+                    'source'    => [
+                        'object'    => 'card',
+                        'number'    => AES256::decrypt($request->card_number, env('ENCRYPTION_KEY')),
+                        'exp_month' => $cardExpiry[0],
+                        'exp_year'  => $cardExpiry[1],
+                        'cvc'       => AES256::decrypt($request->card_cvv, env('ENCRYPTION_KEY')),
+                        'name'      => $request->card_holder_name
+                    ],
+                ]
+            );
+            if(empty($cardinfo->id))
+            {
+                return response()->json(prepareResult(true, $cardinfo, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+
             $paymentCardDetail->user_id             = Auth::user()->id;
             $paymentCardDetail->card_number         = $request->card_number;
             $paymentCardDetail->card_type           = $request->card_type;
@@ -136,6 +228,17 @@ class PaymentCardDetailController extends Controller
      */
     public function destroy(PaymentCardDetail $paymentCardDetail)
     {
+        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+        $checkUser = User::find(Auth::id());
+        $customerId = $checkUser->stripe_customer_id;
+        if(!empty($paymentCardDetail->stripe_card_id))
+        {
+            $stripe->customers->deleteSource(
+                $customerId,
+                $paymentCardDetail->stripe_card_id,
+                []
+            );
+        }
         $paymentCardDetail->delete();
         return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_payment_card_detail_deleted')), config('http_response.success'));
     }

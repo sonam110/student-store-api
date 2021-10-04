@@ -12,7 +12,7 @@ class PaymentCardDetail extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'user_id','card_number','card_type','card_cvv','card_expiry','card_holder_name','is_default','status','is_minor','parent_full_name','mobile_number'
+        'user_id','card_number','card_type','card_cvv','card_expiry','card_holder_name','is_default','status','is_minor','parent_full_name','mobile_number','payment_card_details'
     ];
 
     public function user()
