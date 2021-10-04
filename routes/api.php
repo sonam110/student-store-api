@@ -220,6 +220,8 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/orders-count', [App\Http\Controllers\API\OrderController::class,'ordersCount']);
 	Route::get('/reason-for-action', [App\Http\Controllers\API\OrderController::class,'reasonForAction']);
 
+	Route::post('/create-stripe-intent', [App\Http\Controllers\API\OrderController::class,'createStripeIntent']);
+
 	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\RatingAndFeedbackController');
 	Route::get('/rating-and-feedback-approve/{id}', [App\Http\Controllers\API\RatingAndFeedbackController::class,'approve']);
 	Route::post('/gtin-isbn-search', [App\Http\Controllers\API\FrontController::class,'gtinIsbnSearch']);

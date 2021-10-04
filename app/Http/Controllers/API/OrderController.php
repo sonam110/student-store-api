@@ -34,7 +34,7 @@ use App\Models\ShippingCondition;
 use mervick\aesEverywhere\AES256;
 use PDF;
 use App\Models\UserPackageSubscription;
-
+use Stripe;
 
 class OrderController extends Controller
 {
@@ -1340,5 +1340,17 @@ class OrderController extends Controller
 			return response(prepareResult(false, env('APP_URL').$destinationPath.$fileName, 'Invoice'), config('http_response.success'));
 		}
 		return response()->json(prepareResult(true, 'Not found', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
+	}
+
+	public function createStripeIntent(Request $request)
+	{
+		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+
+		$intent = \Stripe\PaymentIntent::create([
+		  'amount' 		=> ($request->amount) * 100,
+		  'currency' 	=> env('STRIPE_CURRENCY'),
+		]);
+		$client_secret = $intent->client_secret;
+		return response(prepareResult(false, ['client_secret' => $client_secret], 'Order Intent create'), config('http_response.success'));
 	}
 }
