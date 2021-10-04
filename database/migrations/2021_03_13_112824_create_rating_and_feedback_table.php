@@ -19,8 +19,12 @@ class CreateRatingAndFeedbackTable extends Migration
 
             $table->string('order_item_id', 50)->nullable();
             $table->foreign('order_item_id')->references('id')->on('order_items')->onDelete('cascade');
-            $table->string('products_services_book_id', 50);
+            $table->string('products_services_book_id', 50)->nullable();
             $table->foreign('products_services_book_id')->references('id')->on('products_services_books')->onDelete('cascade');
+
+            $table->string('contest_id', 50)->nullable();
+            $table->foreign('contest_id')->references('id')->on('contests')->onDelete('cascade');
+
             $table->string('from_user', 50)->nullable();
             $table->foreign('from_user')->references('id')->on('users')->onDelete('cascade');
             $table->string('to_user', 50)->nullable();

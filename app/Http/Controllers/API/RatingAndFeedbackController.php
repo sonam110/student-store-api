@@ -15,6 +15,8 @@ use App\Models\ProductsServicesBook;
 use App\Models\User;
 use App\Models\StudentDetail;
 use App\Models\ServiceProviderDetail;
+use App\Models\Contest;
+
 
 class RatingAndFeedbackController extends Controller
 {
@@ -65,77 +67,142 @@ class RatingAndFeedbackController extends Controller
      */
 
     public function store(Request $request)
-    {        
-        $validation = Validator::make($request->all(), [
-            'order_item_id'  => 'required'
-        ]);
-
-        if ($validation->fails()) {
-            return response(prepareResult(false, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-        }
-
-        DB::beginTransaction();
-        try
+    {
+        if(!empty($request->contest_id))
         {
-            $orderItem = OrderItem::find($request->order_item_id);
-            $ratingAndFeedback = new RatingAndFeedback;
-            $ratingAndFeedback->from_user     	            = Auth::id();
-            $ratingAndFeedback->to_user       				= $orderItem->productsServicesBook->user_id;
-            $ratingAndFeedback->order_item_id               = $request->order_item_id;
-            $ratingAndFeedback->products_services_book_id   = $orderItem->products_services_book_id;
-            $ratingAndFeedback->product_feedback            = $request->product_feedback;
-            $ratingAndFeedback->product_rating              = $request->product_rating;
-            $ratingAndFeedback->user_feedback               = $request->user_feedback;
-            $ratingAndFeedback->user_rating                 = $request->user_rating;
-            $ratingAndFeedback->is_feedback_approved        = 0;
-            $ratingAndFeedback->save();
+            $validation = Validator::make($request->all(), [
+                'user_rating'  => 'required'
+            ]);
 
-            $orderItem->update(['is_rated'=>true]);
-
-            $product = ProductsServicesBook::find($ratingAndFeedback->products_services_book_id);
-            $productRating = (RatingAndFeedback::where('products_services_book_id',$ratingAndFeedback->products_services_book_id)->sum('product_rating'))/(RatingAndFeedback::where('products_services_book_id',$ratingAndFeedback->products_services_book_id)->count());
-            $product->update(['avg_rating' => $productRating]);
-
-            $user = User::find($ratingAndFeedback->to_user);
-            $userRating = (RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->sum('user_rating'))/(RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->count());
-
-            if($user->user_type_id == 2)
-            {
-                StudentDetail::where('user_id',$ratingAndFeedback->to_user)->update(['avg_rating' => $userRating]);
+            if ($validation->fails()) {
+                return response(prepareResult(false, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
             }
-            else
+
+            DB::beginTransaction();
+            try
             {
-                ServiceProviderDetail::where('user_id',$ratingAndFeedback->to_user)->update(['avg_rating' => $userRating]);
+                $contest = Contest::find($request->contest_id);
+                // $orderItem = OrderItem::find($request->order_item_id);
+                $ratingAndFeedback = new RatingAndFeedback;
+                $ratingAndFeedback->from_user                   = Auth::id();
+                $ratingAndFeedback->to_user                     = $contest->user_id;
+                $ratingAndFeedback->order_item_id               = null;
+                $ratingAndFeedback->products_services_book_id   = null;
+                $ratingAndFeedback->contest_id                  = $request->contest_id;
+                $ratingAndFeedback->product_feedback            = $request->product_feedback;
+                $ratingAndFeedback->product_rating              = $request->product_rating;
+                $ratingAndFeedback->user_feedback               = $request->user_feedback;
+                $ratingAndFeedback->user_rating                 = $request->user_rating;
+                $ratingAndFeedback->is_feedback_approved        = 0;
+                $ratingAndFeedback->save();
+
+                $user = User::find($ratingAndFeedback->to_user);
+                $userRating = (RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->sum('user_rating'))/(RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->count());
+
+                if($user->user_type_id == 2)
+                {
+                    StudentDetail::where('user_id',$ratingAndFeedback->to_user)->update(['avg_rating' => $userRating]);
+                }
+                else
+                {
+                    ServiceProviderDetail::where('user_id',$ratingAndFeedback->to_user)->update(['avg_rating' => $userRating]);
+                }
+                
+                // Notification Start
+
+                $title = 'New Rating And Feedback';
+                $body = 'You have been rated for '.$contest->title.' contest.';
+                $type = 'Rating And Feedback';
+                $user_type = 'seller';
+                $module = 'contest';
+                pushNotification($title,$body,$user,$type,true,$user_type,$module,$request->contest_id,'my-contests');
+
+                // Notification End
+
+                DB::commit();
+                return response()->json(prepareResult(false, $ratingAndFeedback, getLangByLabelGroups('messages','message_rating_and_feedback_created')), config('http_response.created'));
             }
-            
-            // Notification Start
-
-            $productsServicesBook = ProductsServicesBook::find($ratingAndFeedback->products_services_book_id);
-
-            $title = 'New Rating And Feedback';
-            $body = 'Your order for product '.$productsServicesBook->title.' has been rated.';
-            $type = 'Rating And Feedback';
-            $user_type = 'seller';
-            if($productsServicesBook->type == 'book')
+            catch (\Throwable $exception)
             {
-                $module = 'book';
+                DB::rollback();
+                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
             }
-            else
-            {
-                $module = 'product_service';
-            }
-            pushNotification($title,$body,$user,$type,true,$user_type,$module,$request->order_item_id,'my-orders');
-
-            // Notification End
-
-            DB::commit();
-            return response()->json(prepareResult(false, $ratingAndFeedback, getLangByLabelGroups('messages','message_rating_and_feedback_created')), config('http_response.created'));
-        }
-        catch (\Throwable $exception)
+        } 
+        else
         {
-            DB::rollback();
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-        }
+            $validation = Validator::make($request->all(), [
+                'order_item_id'  => 'required'
+            ]);
+
+            if ($validation->fails()) {
+                return response(prepareResult(false, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+            }
+
+            DB::beginTransaction();
+            try
+            {
+                $orderItem = OrderItem::find($request->order_item_id);
+                $ratingAndFeedback = new RatingAndFeedback;
+                $ratingAndFeedback->from_user                   = Auth::id();
+                $ratingAndFeedback->to_user                     = $orderItem->productsServicesBook->user_id;
+                $ratingAndFeedback->contest_id                  = null;
+                $ratingAndFeedback->order_item_id               = $request->order_item_id;
+                $ratingAndFeedback->products_services_book_id   = $orderItem->products_services_book_id;
+                $ratingAndFeedback->product_feedback            = $request->product_feedback;
+                $ratingAndFeedback->product_rating              = $request->product_rating;
+                $ratingAndFeedback->user_feedback               = $request->user_feedback;
+                $ratingAndFeedback->user_rating                 = $request->user_rating;
+                $ratingAndFeedback->is_feedback_approved        = 0;
+                $ratingAndFeedback->save();
+
+                $orderItem->update(['is_rated'=>true]);
+
+                $product = ProductsServicesBook::find($ratingAndFeedback->products_services_book_id);
+                $productRating = (RatingAndFeedback::where('products_services_book_id',$ratingAndFeedback->products_services_book_id)->sum('product_rating'))/(RatingAndFeedback::where('products_services_book_id',$ratingAndFeedback->products_services_book_id)->count());
+                $product->update(['avg_rating' => $productRating]);
+
+                $user = User::find($ratingAndFeedback->to_user);
+                $userRating = (RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->sum('user_rating'))/(RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->count());
+
+                if($user->user_type_id == 2)
+                {
+                    StudentDetail::where('user_id',$ratingAndFeedback->to_user)->update(['avg_rating' => $userRating]);
+                }
+                else
+                {
+                    ServiceProviderDetail::where('user_id',$ratingAndFeedback->to_user)->update(['avg_rating' => $userRating]);
+                }
+                
+                // Notification Start
+
+                $productsServicesBook = ProductsServicesBook::find($ratingAndFeedback->products_services_book_id);
+
+                $title = 'New Rating And Feedback';
+                $body = 'Your order for product '.$productsServicesBook->title.' has been rated.';
+                $type = 'Rating And Feedback';
+                $user_type = 'seller';
+                if($productsServicesBook->type == 'book')
+                {
+                    $module = 'book';
+                }
+                else
+                {
+                    $module = 'product_service';
+                }
+                pushNotification($title,$body,$user,$type,true,$user_type,$module,$request->order_item_id,'my-orders');
+
+                // Notification End
+
+                DB::commit();
+                return response()->json(prepareResult(false, $ratingAndFeedback, getLangByLabelGroups('messages','message_rating_and_feedback_created')), config('http_response.created'));
+            }
+            catch (\Throwable $exception)
+            {
+                DB::rollback();
+                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+        }       
+        
     }
 
    
