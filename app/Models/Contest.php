@@ -75,18 +75,6 @@ class Contest extends Model
 
     public function ratingAndFeedback()
     {
-        return $this->hasOne(RatingAndFeedback::class,'contest_id','id')->where('user_id',Auth::id());
-    }
-
-    public function isRated()
-    {
-        if(Auth::user()->ratings->count() > 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return $this->hasOne(RatingAndFeedback::class,'contest_id','id')->where('from_user',Auth::id());
     }
 }
