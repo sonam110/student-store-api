@@ -32,13 +32,15 @@ use Stripe;
 use App\Mail\ForgotPasswordMail;
 use Mail;
 use Image;
+use App\Models\Country;
+use App\Models\State;
+use App\Models\City;
 
 class FrontController extends Controller
 {
 
 	public function getUserType()
 	{
-
     	// foreach ($labels as $key => $label) {
      //        if(LabelGroup::where('name',$key)->count() > 0)
      //        {
@@ -624,4 +626,38 @@ class FrontController extends Controller
         }
         dd('Done');
     }
+
+
+  //   public function countryStateCitySeeder()
+  //   {
+  //   	$country = new Country;
+		// $country->name = 'Sweden';
+		// $country->sortname = 'SE';
+		// $country->phonecode = '46';
+		// $country->status = 1;
+		// $country->save();
+
+
+		// foreach ($cities as $key => $value) {
+		// 	if(State::where('name',$value['admin_name'])->count() > 0)
+		// 	{
+		// 		$state = State::where('name',$value['admin_name'])->first();
+		// 	}
+		// 	else
+		// 	{
+		// 		$state = new State;
+		// 		$state->country_id = $country->id;
+		// 		$state->name = $value['admin_name'];
+		// 		$state->status = 1;
+		// 		$state->save();
+		// 	}
+
+		// 	$city = new City;
+		// 	$city->state_id = $state->id;
+		// 	$city->name = $value['city'];
+		// 	$city->status = 1;
+		// 	$city->save();
+			
+		// }
+  //   }
 }

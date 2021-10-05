@@ -45,8 +45,8 @@ class CountryStateCityController extends Controller
 
     public function citiesByCountryName($name)
     {
-        // $cities = Country::where('name',$name)->first()->cities;
-        $cities = AddressDetail::where('city','!=',null)->groupBy('city')->get(['city']);
+        $cities = Country::where('name',$name)->first()->cities;
+        // $cities = AddressDetail::where('city','!=',null)->groupBy('city')->get(['city']);
         return response()->json(prepareResult(false, $cities, getLangByLabelGroups('messages','message_state_list')), config('http_response.success'));
     }
 }

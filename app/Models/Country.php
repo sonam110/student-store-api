@@ -27,6 +27,6 @@ class Country extends Model
 
     public function cities()
     {
-        return $this->hasManyThrough(City::class, State::class);
+        return $this->hasManyThrough(City::class, State::class)->orderBy('name','asc');
     }
 }
