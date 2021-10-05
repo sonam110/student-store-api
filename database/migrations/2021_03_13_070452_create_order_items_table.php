@@ -33,7 +33,7 @@ class CreateOrderItemsTable extends Migration
             $table->string('sku',100)->nullable();
             $table->float('price')->nullable();
             $table->bigInteger('quantity')->nullable();
-            $table->float('discount')->nullable();
+            $table->string('discount')->nullable();
             $table->string('sell_type',100)->nullable();
             $table->bigInteger('rent_duration')->nullable();
             $table->string('item_status',50)->nullable()->comment('processing, shipped, delivered, completed, cancelled, returned',);
@@ -72,6 +72,9 @@ class CreateOrderItemsTable extends Migration
             
             $table->decimal('student_store_commission', 12,2)->default(0)->nullable();
             $table->decimal('cool_company_commission', 12,2)->default(0)->nullable();
+
+            $table->decimal('student_store_commission_percent', 12,2)->default(0)->nullable();
+            $table->decimal('cool_company_commission_percent', 12,2)->default(0)->nullable();
 
             $table->timestamps();
         });

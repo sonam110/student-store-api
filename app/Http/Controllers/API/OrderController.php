@@ -344,6 +344,8 @@ class OrderController extends Controller
 					$orderItem->amount_transferred_to_vendor	= $amount_transferred_to_vendor;
 					$orderItem->student_store_commission		= $student_store_commission;
 					$orderItem->cool_company_commission			= $cool_company_commission;
+					$orderItem->student_store_commission_percent= $commission;
+					$orderItem->cool_company_commission_percent	= $coolCompanyCommission;
 					$orderItem->save();
 
 
