@@ -6,11 +6,9 @@
 
     <style>
     .invoice-box {
-        max-width: 800px;
         margin: auto;
         padding: 10px;
         border: 1px solid #eee;
-        box-shadow: 0 0 10px rgba(0, 0, 0, .15);
         font-size: 16px;
         line-height: 24px;
         font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
@@ -112,7 +110,7 @@
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="{!! $appsetting->logo_thumb_path !!}" class="" height="80px" width="200px">
+                                <img src="{!! $appsetting->logo_thumb_path !!}" class="" height="60px" width="150px">
                             </td>
 
                             <td>
@@ -134,28 +132,26 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2">&nbsp;</td>
-                        </tr>
-                        <tr>
                             <td width="50%">
+                                <br><br>
                                 <strong>Seller Info</strong><br>
                                 @if($order->productsServicesBook)
-
-                                @elseif($order->productsServicesBook)
-
-                                @elseif($order->productsServicesBook)
-
-                                @else
-
+                                    @php $seller = $order->productsServicesBook->user @endphp
+                                @elseif($order->contestApplication)
+                                    @php $seller = $order->contestApplication->contest->user @endphp
+                                @elseif($order->package)
+                                    @php $seller = null @endphp
                                 @endif
-                                
+
+                                @if(!empty($seller))
                                 {{\mervick\aesEverywhere\AES256::decrypt($seller->first_name, env('ENCRYPTION_KEY'))}} {{ !empty($seller->last_name) ? \mervick\aesEverywhere\AES256::decrypt($seller->last_name, env('ENCRYPTION_KEY')) : ''}} <br>
                                 {{ !empty($seller->contact_number) ? \mervick\aesEverywhere\AES256::decrypt($seller->contact_number, env('ENCRYPTION_KEY')) : ''}}
                                 <br>
 
                                 {{$order->order->full_address}}
+                                @endif
                             </td>
-                            <td>
+                            <td width="50%">
                                 <strong>Order No.</strong> :#{{$order->order->order_number}}<br>
                                 <strong>Date:</strong> {{date('Y-m-d', strtotime($order->order->created_at))}}
 

@@ -1359,6 +1359,7 @@ class OrderController extends Controller
 			$data = [
 				'order' => $getOrder,
 			];
+			//return view('item-invoice')->with('order', $getOrder);
 			$pdf = PDF::loadView('item-invoice', $data);
 			$pdf->save('uploads/'.$fileName);
 			return response(prepareResult(false, env('APP_URL').$destinationPath.$fileName, 'Invoice'), config('http_response.success'));
