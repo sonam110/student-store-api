@@ -72,4 +72,9 @@ class Contest extends Model
     {
         return $this->hasMany(RatingAndFeedback::class,'contest_id','id');
     }
+
+    public function ratingAndFeedback()
+    {
+        return $this->hasOne(RatingAndFeedback::class,'contest_id','id')->where('from_user',Auth::id());
+    }
 }
