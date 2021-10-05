@@ -1345,6 +1345,27 @@ class OrderController extends Controller
 		return response()->json(prepareResult(true, 'Not found', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
 	}
 
+	public function generateItemInvoice($orderItemId) 
+	{
+		$getOrder = OrderItem::find($orderItemId);
+		if($getOrder)
+		{
+			$destinationPath = 'uploads/';
+			$fileName = $orderItemId.'.pdf';
+
+			if(file_exists('uploads/'.$fileName)){ 
+				unlink('uploads/'.$fileName);
+			}
+			$data = [
+				'order' => $getOrder,
+			];
+			$pdf = PDF::loadView('item-invoice', $data);
+			$pdf->save('uploads/'.$fileName);
+			return response(prepareResult(false, env('APP_URL').$destinationPath.$fileName, 'Invoice'), config('http_response.success'));
+		}
+		return response()->json(prepareResult(true, 'Not found', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
+	}
+
 	public function createStripeIntent(Request $request)
 	{
 		$sub_total = 0;
@@ -1415,8 +1436,8 @@ class OrderController extends Controller
 		// $customer_id = 'cus_KLWfeafgS59wL4';
 		$customer_id = $request->customer_id;
 		$ephemeralKey = \Stripe\EphemeralKey::create(
-		    ['customer' => $customer_id],
-		    ['stripe_version' => '2020-08-27']
+		    ['customer' 		=> $customer_id],
+		    ['stripe_version' 	=> '2020-08-27']
 		);
 
 		$paymentIntent = \Stripe\PaymentIntent::create([
@@ -1427,8 +1448,8 @@ class OrderController extends Controller
 
 		$returnObj = [
 			'paymentIntent' => $paymentIntent->client_secret,
-		    'ephemeralKey' => $ephemeralKey->secret,
-		    'customer' => $customer_id,
+		    'ephemeralKey' 	=> $ephemeralKey->secret,
+		    'customer' 		=> $customer_id,
 		    'payble_amount' => $total,
 		];
 		return response(prepareResult(false, $returnObj, 'Order Intent create'), config('http_response.success'));
