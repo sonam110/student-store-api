@@ -175,10 +175,22 @@ class OrderController extends Controller
 						if($productsServicesBook->is_on_offer == 1)
 						{
 							$price = $productsServicesBook->discounted_price;
+
+							if($productsServicesBook->discount_type == 1)
+							{
+								$discount_amount = $productsServicesBook->basic_price_wo_vat * $productsServicesBook->discount_value / 100;
+							}
+							else
+							{
+								$discount_amount = $productsServicesBook->discount_value;
+							} 
+
+							$vendor_price = $productsServicesBook->basic_price_wo_vat - $discount_amount;
 						}
 						else
 						{
 							$price = $productsServicesBook->price;
+							$vendor_price = $productsServicesBook->basic_price_wo_vat;
 						}
 						$title = $productsServicesBook->title;
 
@@ -210,10 +222,21 @@ class OrderController extends Controller
 						if($productsServicesBook->is_on_offer == 1)
 						{
 							$price = $productsServicesBook->discounted_price;
+							if($productsServicesBook->discount_type == 1)
+							{
+								$discount_amount = $productsServicesBook->basic_price_wo_vat * $productsServicesBook->discount_value / 100;
+							}
+							else
+							{
+								$discount_amount = $productsServicesBook->discount_value;
+							} 
+							
+							$vendor_price = $productsServicesBook->basic_price_wo_vat - $discount_amount;
 						}
 						else
 						{
 							$price = $productsServicesBook->subscription_fees;
+							$vendor_price = $productsServicesBook->basic_price_wo_vat;
 						}
 						$title = $productsServicesBook->title;
 
@@ -225,10 +248,12 @@ class OrderController extends Controller
 						if($productsServicesBook->price == 0)
 						{
 							$price = $productsServicesBook->subscription;
+							$vendor_price = $price;
 						}
 						else
 						{
 							$price = $productsServicesBook->price;
+							$vendor_price = $price;
 						}
 						$title = $productsServicesBook->type_of_package;
 						$user_package = UserPackageSubscription::where('user_id',null)->first();
@@ -257,13 +282,18 @@ class OrderController extends Controller
 
 					$reward_points_value = AppSetting::first()->single_rewards_pt_value * $earned_reward_points;
 
-					$amount_transferred_to_vendor = (($price * $orderedItem['quantity']) - $reward_points_value) * (100 - $commission) / 100;
+					$amount_transferred_to_vendor = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * (100 - $commission) / 100;
+					$student_store_commission = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * ($commission) / 100;
+
+					$cool_company_commission = 0;
 
 					//cool company commission for student
 					if(($productsServicesBook->user) && ($productsServicesBook->user->user_type_id == 2))
 					{
-						$cool_company_commission = AppSetting::first()->coolCompanyCommission;
-						$amount_transferred_to_vendor = $amount_transferred_to_vendor * (100 - $cool_company_commission)/100;
+						$coolCompanyCommission = AppSetting::first()->coolCompanyCommission;
+						$cool_company_commission = $amount_transferred_to_vendor * ($coolCompanyCommission)/100;
+						$amount_transferred_to_vendor = $amount_transferred_to_vendor * (100 - $coolCompanyCommission)/100;
+						
 
 					}
 
@@ -276,7 +306,7 @@ class OrderController extends Controller
 						$discount = $productsServicesBook->discount_value.'Rupees';
 					} 
 
-					$sub_total = $sub_total + ($price*$orderedItem['quantity']);
+					$sub_total = $sub_total + ($price * $orderedItem['quantity']);
 
 					$orderItem = new OrderItem;
 					$orderItem->user_id							= Auth::id();
@@ -312,6 +342,8 @@ class OrderController extends Controller
 					$orderItem->item_status						= $request->order_status;
 					$orderItem->item_payment_status				= true;
 					$orderItem->amount_transferred_to_vendor	= $amount_transferred_to_vendor;
+					$orderItem->student_store_commission		= $student_store_commission;
+					$orderItem->cool_company_commission			= $cool_company_commission;
 					$orderItem->save();
 
 

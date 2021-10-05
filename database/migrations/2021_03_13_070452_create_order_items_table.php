@@ -69,6 +69,9 @@ class CreateOrderItemsTable extends Migration
             $table->boolean('is_transferred_to_vendor')->nullable()->default(0);
             $table->decimal('amount_transferred_to_vendor', 12,2)->default(0)->nullable();
             $table->string('fund_transferred_date', 50)->nullable();
+            
+            $table->decimal('student_store_commission', 12,2)->default(0)->nullable();
+            $table->decimal('cool_company_commission', 12,2)->default(0)->nullable();
 
             $table->timestamps();
         });
