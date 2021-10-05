@@ -141,6 +141,9 @@
                                     @php $seller = $order->contestApplication->contest->user @endphp
                                 @elseif($order->package)
                                     @php $seller = null @endphp
+                                    {!! $appsetting->app_name !!}<br>
+                                    {!! $appsetting->support_email !!}<br>
+                                    {!! $appsetting->support_contact_number !!}
                                 @endif
 
                                 @if(!empty($seller))
