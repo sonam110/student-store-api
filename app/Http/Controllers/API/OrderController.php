@@ -65,11 +65,11 @@ class OrderController extends Controller
 		{
 			if(!empty($request->per_page_record))
 			{
-				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners','orderItems.contestApplication.contest.ratings')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 			}
 			else
 			{
-				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners')->get();
+				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners','orderItems.contestApplication.contest.ratings')->get();
 			}
 			return response(prepareResult(false, $orders, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
 		}
@@ -1347,16 +1347,80 @@ class OrderController extends Controller
 
 	public function createStripeIntent(Request $request)
 	{
+		$sub_total = 0;
+		$shipping_charge = 0;
+		foreach ($request->items as $key => $orderedItem) {
+			if(!empty($orderedItem['product_id']))
+			{
+				$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
+				if($productsServicesBook->is_on_offer == 1)
+				{
+					$price = $productsServicesBook->discounted_price;
+				}
+				else
+				{
+					$price = $productsServicesBook->price;
+				}
+
+				if($productsServicesBook->delivery_type == 'deliver_to_location')
+				{
+					$shipping_package = ShippingCondition::where('user_id',$productsServicesBook->user_id)->where('order_amount_from','<=', $price * $orderedItem['quantity'])->where('order_amount_to','>=',$price * $orderedItem['quantity'])->orderBy('created_at','desc')->first();
+					if($shipping_package)
+					{
+						$shipping_charge = $shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']) * (100 - $shipping_package->discount_percent) / 100;
+					}
+					else
+					{
+						$shipping_charge = $shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']);
+					}
+				}
+				
+			}
+			elseif(!empty($orderedItem['contest_application_id']))
+			{
+				$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
+				$productsServicesBook = Contest::find($contest_id);
+				if($productsServicesBook->is_on_offer == 1)
+				{
+					$price = $productsServicesBook->discounted_price;
+				}
+				else
+				{
+					$price = $productsServicesBook->subscription_fees;
+				}
+			}
+			else
+			{
+				$productsServicesBook = Package::find($orderedItem['package_id']);
+				if($productsServicesBook->price == 0)
+				{
+					$price = $productsServicesBook->subscription;
+				}
+				else
+				{
+					$price = $productsServicesBook->price;
+				}
+			}
+
+			$sub_total = $sub_total + ($price * $orderedItem['quantity']);
+		}
+
+		$reward_point_value = AppSetting::first()->customer_rewards_pt_value * $request->used_reward_points;
+
+		$total = $sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount;
+
+					
 		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
-		$customer_id = 'cus_KLWfeafgS59wL4';
+		// $customer_id = 'cus_KLWfeafgS59wL4';
+		$customer_id = $request->customer_id;
 		$ephemeralKey = \Stripe\EphemeralKey::create(
 		    ['customer' => $customer_id],
 		    ['stripe_version' => '2020-08-27']
 		);
 
 		$paymentIntent = \Stripe\PaymentIntent::create([
-		    'amount' 	=> ($request->amount) * 100,
+		    'amount' 	=> ($total) * 100,
 		    'currency' 	=> env('STRIPE_CURRENCY'),
 		    'customer' 	=> $customer_id
 		]);
@@ -1364,7 +1428,8 @@ class OrderController extends Controller
 		$returnObj = [
 			'paymentIntent' => $paymentIntent->client_secret,
 		    'ephemeralKey' => $ephemeralKey->secret,
-		    'customer' => $customer_id
+		    'customer' => $customer_id,
+		    'payble_amount' => $total,
 		];
 		return response(prepareResult(false, $returnObj, 'Order Intent create'), config('http_response.success'));
 	}
