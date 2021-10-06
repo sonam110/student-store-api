@@ -286,6 +286,7 @@ class OrderController extends Controller
 					$student_store_commission = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * ($commission) / 100;
 
 					$cool_company_commission = 0;
+					$coolCompanyCommission = 0;
 
 					//cool company commission for student
 					if(($productsServicesBook->user) && ($productsServicesBook->user->user_type_id == 2))
