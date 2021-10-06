@@ -146,7 +146,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/cvs-view/{id}', [App\Http\Controllers\API\UserProfileController::class,'cvsView']);
 	Route::get('/unread-notifications', [App\Http\Controllers\API\UserProfileController::class,'unreadNotifications']);
 	Route::get('/transaction-details', 'App\Http\Controllers\API\UserProfileController@transactionDetails');
-
+	Route::get('/earning-details', 'App\Http\Controllers\API\UserProfileController@earningDetails');
 
 	//Notification
 	Route::apiResource('/notification', 'App\Http\Controllers\API\NotificationController')->only('store','index','destroy','show');
@@ -352,6 +352,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::get('/user-payment-card-list/{user_id}', [App\Http\Controllers\API\Admin\UserController::class, 'paymentCardList']);
 	Route::get('/user-reward-points-detail/{user_id}', [App\Http\Controllers\API\Admin\UserController::class, 'rewardPointDetails']);
 	Route::get('/user-transaction-details/{user_id}', [App\Http\Controllers\API\Admin\UserController::class, 'transactionDetails']);
+	Route::get('/user-earning-details/{user_id}', [App\Http\Controllers\API\Admin\UserController::class, 'earningDetails']);
 
 
 	Route::apiResource('/job-application', 'App\Http\Controllers\API\Admin\JobApplicationController')->only('index','show','destroy');

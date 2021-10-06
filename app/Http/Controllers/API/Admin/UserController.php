@@ -496,6 +496,21 @@ class UserController extends Controller
 
 	public function transactionDetails(Request $request)
 	{
+		if(!empty($request->per_page_record))
+		{
+		    $transaction_details = VendorFundTransfer::where('user_id',$request->user_id)->orderBy('created_at','desc')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+		}
+		else
+		{
+		    $transaction_details = VendorFundTransfer::where('user_id',$request->user_id)->orderBy('created_at','desc')->get();
+		}
+		
+		return response(prepareResult(false, $transaction_details, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
+	}
+
+
+	public function earningDetails(Request $request)
+	{
 		$data = [];
 		$data['total_earned_amount'] = OrderItem::select('order_items.id')
 		->join('products_services_books',function ($join) {
@@ -580,8 +595,6 @@ class UserController extends Controller
 		})
 		->where('contests.user_id',$request->user_id)
 		->sum('order_items.cool_company_commission');
-
-		$data['transaction_details'] 	= VendorFundTransfer::where('user_id',$request->user_id)->orderBy('created_at','desc')->get();
 		
 		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
 	}
