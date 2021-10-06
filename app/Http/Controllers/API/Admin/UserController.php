@@ -17,6 +17,8 @@ use App\Models\AppSetting;
 use App\Models\PaymentCardDetail;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\VendorFundTransfer;
+
 
 
 
@@ -489,5 +491,52 @@ class UserController extends Controller
 		->get(['orders.order_number','order_items.created_at','order_items.title','order_items.product_type','order_items.cover_image','order_items.item_status','order_items.price','order_items.quantity','order_items.earned_reward_points','order_items.reward_point_status']);
 
 		return response(prepareResult(false, $user, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
+	}
+
+
+	public function transactionDetails(Request $request)
+	{
+		$data = [];
+		$data['total_earned_amount'] = OrderItem::select('order_items.id')
+		->join('products_services_books',function ($join) {
+			$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+		})
+		->where('products_services_books.user_id',$request->user_id)
+		->where('order_items.is_transferred_to_vendor',1)
+		->sum('amount_transferred_to_vendor');
+		+ OrderItem::select('order_items.id')
+		->join('contest_applications',function ($join) {
+			$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
+		})
+		->join('contests',function ($join) {
+			$join->on('contest_applications.contest_id', '=', 'contests.id');
+		})
+		->where('contests.user_id',$request->user_id)
+		->where('order_items.is_transferred_to_vendor',1)
+		->sum('order_items.amount_transferred_to_vendor');
+
+
+
+		$data['total_pending_amount'] = OrderItem::select('order_items.id')
+		->join('products_services_books',function ($join) {
+			$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+		})
+		->where('products_services_books.user_id',$request->user_id)
+		->where('order_items.is_transferred_to_vendor',0)
+		->sum('amount_transferred_to_vendor');
+		+ OrderItem::select('order_items.id')
+		->join('contest_applications',function ($join) {
+			$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
+		})
+		->join('contests',function ($join) {
+			$join->on('contest_applications.contest_id', '=', 'contests.id');
+		})
+		->where('contests.user_id',$request->user_id)
+		->where('order_items.is_transferred_to_vendor',0)
+		->sum('order_items.amount_transferred_to_vendor');
+
+		$data['transaction_details'] 	= VendorFundTransfer::where('user_id',$request->user_id)->get();
+		
+		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
 	}
 }
