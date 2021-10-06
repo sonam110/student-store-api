@@ -1486,7 +1486,7 @@ class OrderController extends Controller
 			'paymentIntent' => $paymentIntent->client_secret,
 		    'ephemeralKey' 	=> $ephemeralKey->secret,
 		    'customer' 		=> $customer_id,
-		    'payble_amount' => $total,
+		    'payable_amount' => $total,
 		];
 		return response(prepareResult(false, $returnObj, 'Order Intent create'), config('http_response.success'));
 	}

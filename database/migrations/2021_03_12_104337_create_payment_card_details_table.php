@@ -30,7 +30,7 @@ class CreatePaymentCardDetailsTable extends Migration
             $table->boolean('is_minor')->default(false)->nullable();
             $table->string('parent_full_name')->nullable();
             $table->string('mobile_number')->nullable();
-            $table->string('payment_card_details')->nullable();
+            $table->string('stripe_payment_method_id')->nullable();
             $table->timestamps();
         });
     }

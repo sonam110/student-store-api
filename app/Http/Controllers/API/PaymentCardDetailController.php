@@ -76,19 +76,21 @@ class PaymentCardDetailController extends Controller
             }
             $cardExpiry = explode('/', AES256::decrypt($request->card_expiry, env('ENCRYPTION_KEY')));
 
-            $cardinfo = $stripe->customers->createSource(
-                $customerId,
-                [
-                    'source'    => [
-                        'object'    => 'card',
-                        'number'    => AES256::decrypt($request->card_number, env('ENCRYPTION_KEY')),
-                        'exp_month' => $cardExpiry[0],
-                        'exp_year'  => $cardExpiry[1],
-                        'cvc'       => AES256::decrypt($request->card_cvv, env('ENCRYPTION_KEY')),
-                        'name'      => $request->card_holder_name
-                    ],
-                ]
+            $paymentMethods = $stripe->paymentMethods->create([
+                'type' => 'card',
+                'card' => [
+                    'number' => AES256::decrypt($request->card_number, env('ENCRYPTION_KEY')),
+                    'exp_month' => $cardExpiry[0],
+                    'exp_year'  => $cardExpiry[1],
+                    'cvc'       => AES256::decrypt($request->card_cvv, env('ENCRYPTION_KEY')),
+                ],
+            ]);
+
+            $paymentMethodAttach = $stripe->paymentMethods->attach(
+                $paymentMethods->id,
+                ['customer' => $customerId]
             );
+
             if(empty($cardinfo->id))
             {
                 return response()->json(prepareResult(true, $cardinfo, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
@@ -109,7 +111,7 @@ class PaymentCardDetailController extends Controller
             $paymentCardDetail->is_minor            = $request->is_minor;
             $paymentCardDetail->parent_full_name    = $request->parent_full_name;
             $paymentCardDetail->mobile_number       = $request->mobile_number;
-            $paymentCardDetail->stripe_card_id      = $cardinfo->id;
+            $paymentCardDetail->stripe_payment_method_id      = $paymentMethods->id;
             $paymentCardDetail->save();
 
             DB::commit();
@@ -178,20 +180,29 @@ class PaymentCardDetailController extends Controller
 
             $cardExpiry = explode('/', AES256::decrypt($request->card_expiry, env('ENCRYPTION_KEY')));
 
-            $cardinfo = $stripe->customers->updateSource(
-                $customerId,
-                $paymentCardDetail->stripe_card_id,
-                [
-                    'source'    => [
-                        'object'    => 'card',
-                        'number'    => AES256::decrypt($request->card_number, env('ENCRYPTION_KEY')),
-                        'exp_month' => $cardExpiry[0],
-                        'exp_year'  => $cardExpiry[1],
-                        'cvc'       => AES256::decrypt($request->card_cvv, env('ENCRYPTION_KEY')),
-                        'name'      => $request->card_holder_name
-                    ],
-                ]
+            if(!empty($paymentCardDetail->stripe_payment_method_id))
+            {
+                $stripe->paymentMethods->detach(
+                    $paymentCardDetail->stripe_payment_method_id,
+                    []
+                );
+            }
+
+            $paymentMethods = $stripe->paymentMethods->create([
+                'type' => 'card',
+                'card' => [
+                    'number' => AES256::decrypt($request->card_number, env('ENCRYPTION_KEY')),
+                    'exp_month' => $cardExpiry[0],
+                    'exp_year'  => $cardExpiry[1],
+                    'cvc'       => AES256::decrypt($request->card_cvv, env('ENCRYPTION_KEY')),
+                ],
+            ]);
+
+            $paymentMethodAttach = $stripe->paymentMethods->attach(
+                $paymentMethods->id,
+                ['customer' => $customerId]
             );
+
             if(empty($cardinfo->id))
             {
                 return response()->json(prepareResult(true, $cardinfo, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
@@ -208,6 +219,7 @@ class PaymentCardDetailController extends Controller
             $paymentCardDetail->is_minor            = $request->is_minor;
             $paymentCardDetail->parent_full_name    = $request->parent_full_name;
             $paymentCardDetail->mobile_number       = $request->mobile_number;
+            $paymentCardDetail->stripe_payment_method_id      = $paymentMethods->id;
             $paymentCardDetail->save();
             DB::commit();
             return response()->json(prepareResult(false, $paymentCardDetail, getLangByLabelGroups('messages','message_payment_card_detail_updated')), config('http_response.success'));
@@ -231,11 +243,10 @@ class PaymentCardDetailController extends Controller
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
         $checkUser = User::find(Auth::id());
         $customerId = $checkUser->stripe_customer_id;
-        if(!empty($paymentCardDetail->stripe_card_id))
+        if(!empty($paymentCardDetail->stripe_payment_method_id))
         {
-            $stripe->customers->deleteSource(
-                $customerId,
-                $paymentCardDetail->stripe_card_id,
+            $stripe->paymentMethods->detach(
+                $paymentCardDetail->stripe_payment_method_id,
                 []
             );
         }

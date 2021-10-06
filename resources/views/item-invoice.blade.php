@@ -68,7 +68,7 @@
     }
 
     .invoice-box table tr.total td:nth-child(2) {
-        border-top: 2px solid #eee;
+        border-top: 1px solid #eee;
         font-weight: bold;
     }
 
@@ -222,6 +222,32 @@
                    <strong><center>{{$order->quantity * $order->price}} Kr</center></strong>
                 </td>
             </tr>
+
+            @if(\Auth::user()->user_type_id==1)
+                <tr class="total">
+                    <td></td>
+                    <td colspan="2"><strong>Student Store Commission:</strong> </td>
+                    <td>
+                       <strong><center>{{ $order->student_store_commission }} Kr</center></strong>
+                    </td>
+                </tr>
+
+                <tr class="total">
+                    <td></td>
+                    <td colspan="2"><strong>Cool Company Commission:</strong> </td>
+                    <td>
+                       <strong><center>{{ $order->cool_company_commission }} Kr</center></strong>
+                    </td>
+                </tr>
+
+                <tr class="total">
+                    <td></td>
+                    <td colspan="2"><strong>Payable Amount to Vendor:</strong> </td>
+                    <td>
+                       <strong><center>{{ $order->amount_transferred_to_vendor }} Kr</center></strong>
+                    </td>
+                </tr>
+            @endif
         </table>
     </div>
 </body>

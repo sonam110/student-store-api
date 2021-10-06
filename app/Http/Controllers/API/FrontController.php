@@ -483,23 +483,23 @@ class FrontController extends Controller
 		dd($account);*/
 
 		
-		//Create customer
+		/*//Create customer
 		$account = $stripe->customers->create([
 			'name' 				=> 'Ashok Sahu',
 			'phone'				=> '9713753131',
 			'email'				=> 'ashok@nrt.co.in',
 		  	'description' 		=> 'My First Test Customer (created for API docs)',
 		]);
-		dd($account->id);  //customer id cus_KLWfeafgS59wL4 
+		dd($account->id);  //customer id cus_KLWfeafgS59wL4 */
 
 
-		//Create card
+		/*//Create card
 		$cardinfo = $stripe->customers->createSource(
 		  	'cus_KLWfeafgS59wL4',
 		  	[
 		  		'source' 	=> [
 		  			'object'	=> 'card',
-		  			'number' 	=> 4000056655665556,
+		  			'number' 	=> 5555555555554444,
 			  		'exp_month' => 12,
 			  		'exp_year' 	=> 2023,
 			  		'cvc' 		=> 234,
@@ -507,7 +507,33 @@ class FrontController extends Controller
 		  		],
 		  	]
 		);
-		dd($cardinfo);  // card id : card_1JgpoLD6j8NkE89KdhaeZRkI , card_1JgpqED6j8NkE89Kj3FSPcZC
+		dd($cardinfo);  // card id : card_1JhVWUD6j8NkE89KojLGbmyM*/
+
+		/*$paymentMethods = $stripe->paymentMethods->create([
+		  'type' => 'card',
+		  'card' => [
+		    'number' => '5105105105105100',
+		    'exp_month' => 10,
+		    'exp_year' => 2022,
+		    'cvc' => '314',
+		  ],
+		]);
+
+		dd($paymentMethods);  //pm_1JhVX1D6j8NkE89KtsRV9JY1*/
+
+		$paymentMethodAttach = $stripe->paymentMethods->attach(
+		  'pm_1JhVX1D6j8NkE89KtsRV9JY1',
+		  ['customer' => 'cus_KLWfeafgS59wL4']
+		);
+
+		dd($paymentMethodAttach);
+
+		/*$customerInfo = $stripe->customers->retrieve(
+		  'cus_KLWfeafgS59wL4',
+		  []
+		);
+
+		dd($customerInfo);*/
 	}
 
 	public function strReplaceAssoc(array $replace, $subject) { 
