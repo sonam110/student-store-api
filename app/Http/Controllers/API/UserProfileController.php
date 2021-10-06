@@ -438,7 +438,7 @@ class UserProfileController extends Controller
 		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_unread_notiication_count')), config('http_response.created'));
 	}
 
-	public function transactionDetails()
+	public function transactionDetails(Request $request)
 	{
 		$data = [];
 		$data['total_earned_amount'] = OrderItem::select('order_items.id')
@@ -447,7 +447,7 @@ class UserProfileController extends Controller
 		})
 		->where('products_services_books.user_id',Auth::id())
 		->where('order_items.is_transferred_to_vendor',1)
-		->sum('amount_transferred_to_vendor');
+		->sum('order_items.amount_transferred_to_vendor');
 		+ OrderItem::select('order_items.id')
 		->join('contest_applications',function ($join) {
 			$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
@@ -467,7 +467,10 @@ class UserProfileController extends Controller
 		})
 		->where('products_services_books.user_id',Auth::id())
 		->where('order_items.is_transferred_to_vendor',0)
-		->sum('amount_transferred_to_vendor');
+		->where('order_items.is_replaced','0')
+		->where('order_items.is_returned','0')
+		->where('order_items.is_disputed','0')
+		->sum('order_items.amount_transferred_to_vendor');
 		+ OrderItem::select('order_items.id')
 		->join('contest_applications',function ($join) {
 			$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
@@ -476,10 +479,53 @@ class UserProfileController extends Controller
 			$join->on('contest_applications.contest_id', '=', 'contests.id');
 		})
 		->where('contests.user_id',Auth::id())
+		->where('order_items.is_replaced','0')
+		->where('order_items.is_returned','0')
+		->where('order_items.is_disputed','0')
 		->where('order_items.is_transferred_to_vendor',0)
 		->sum('order_items.amount_transferred_to_vendor');
 
-		$data['transaction_details'] 	= VendorFundTransfer::where('user_id',Auth::id())->get();
+
+		$data['student_store_commission'] = OrderItem::select('order_items.id')
+		->join('products_services_books',function ($join) {
+			$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+		})
+		->where('products_services_books.user_id',Auth::id())
+		->where('order_items.is_replaced','0')
+		->where('order_items.is_returned','0')
+		->where('order_items.is_disputed','0')
+		->sum('order_items.student_store_commission');
+		+ OrderItem::select('order_items.id')
+		->join('contest_applications',function ($join) {
+			$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
+		})
+		->join('contests',function ($join) {
+			$join->on('contest_applications.contest_id', '=', 'contests.id');
+		})
+		->where('contests.user_id',Auth::id())
+		->sum('order_items.student_store_commission');
+
+
+		$data['cool_company_commission'] = OrderItem::select('order_items.id')
+		->join('products_services_books',function ($join) {
+			$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+		})
+		->where('products_services_books.user_id',Auth::id())
+		->where('order_items.is_replaced','0')
+		->where('order_items.is_returned','0')
+		->where('order_items.is_disputed','0')
+		->sum('order_items.cool_company_commission');
+		+ OrderItem::select('order_items.id')
+		->join('contest_applications',function ($join) {
+			$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
+		})
+		->join('contests',function ($join) {
+			$join->on('contest_applications.contest_id', '=', 'contests.id');
+		})
+		->where('contests.user_id',Auth::id())
+		->sum('order_items.cool_company_commission');
+
+		$data['transaction_details'] 	= VendorFundTransfer::where('user_id',Auth::id())->orderBy('created_at','desc')->get();
 		
 		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
 	}
