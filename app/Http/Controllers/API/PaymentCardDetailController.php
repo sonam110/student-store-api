@@ -91,9 +91,9 @@ class PaymentCardDetailController extends Controller
                 ['customer' => $customerId]
             );
 
-            if(empty($cardinfo->id))
+            if(empty($paymentMethods->id))
             {
-                return response()->json(prepareResult(true, $cardinfo, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+                return response()->json(prepareResult(true, $paymentMethods, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
             }
         	if($request->is_default == true)
         	{
@@ -203,9 +203,9 @@ class PaymentCardDetailController extends Controller
                 ['customer' => $customerId]
             );
 
-            if(empty($cardinfo->id))
+            if(empty($paymentMethods->id))
             {
-                return response()->json(prepareResult(true, $cardinfo, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+                return response()->json(prepareResult(true, $paymentMethods, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
             }
 
             $paymentCardDetail->user_id             = Auth::user()->id;
