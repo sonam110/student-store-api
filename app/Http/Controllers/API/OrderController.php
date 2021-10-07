@@ -1433,10 +1433,9 @@ class OrderController extends Controller
 				}
 				
 			}
-			elseif(!empty($orderedItem['contest_application_id']))
+			elseif(!empty($orderedItem['contest_id']))
 			{
-				$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
-				$productsServicesBook = Contest::find($contest_id);
+				$productsServicesBook = Contest::find($orderedItem['contest_id']);
 				if($productsServicesBook->is_on_offer == 1)
 				{
 					$price = $productsServicesBook->discounted_price;
@@ -1488,6 +1487,26 @@ class OrderController extends Controller
 		    'payable_amount' 	=> $total,
 		];
 		return response(prepareResult(false, $returnObj, 'Order Intent create'), config('http_response.success'));
+	}
+
+	public function createStripeSubscription(Request $request)
+	{
+		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+		$subscription = $stripe->subscriptions->create([
+		  'customer' => Auth::user()->stripe_customer_id,
+		  'items' => [
+		    ['price' => $request->stripe_plan_id],
+		  ],
+		  'payment_behavior' => 'default_incomplete',
+		  'expand' => ['latest_invoice.payment_intent'],
+		]);
+		$returnObj = [
+			'subscription_id' 	=> $subscription->id,
+			'client_secret' 	=> $subscription->latest_invoice->payment_intent->client_secret,
+			'status' 			=> $subscription->status,
+			'hosted_invoice_url'=> $subscription->latest_invoice->hosted_invoice_url,
+		];
+		return response(prepareResult(false, $returnObj, 'Cancel Subscription'), config('http_response.success'));
 	}
 
 	public function cancelStripeSubscription(Request $request)

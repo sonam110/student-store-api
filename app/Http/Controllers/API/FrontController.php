@@ -514,7 +514,7 @@ class FrontController extends Controller
 		);
 		dd($cardinfo);  // card id : card_1JhVWUD6j8NkE89KojLGbmyM*/
 
-		$paymentMethods = $stripe->paymentMethods->create([
+		/*$paymentMethods = $stripe->paymentMethods->create([
 		  'type' => 'card',
 		  'card' => [
 		    'number' => '4000002760003184',
@@ -522,7 +522,7 @@ class FrontController extends Controller
 		    'exp_year' => 2022,
 		    'cvc' => '314',
 		  ],
-		]);
+		]);*/
 
 		//dd($paymentMethods);  //pm_1JhZRRD6j8NkE89KQsjaoesm
 
@@ -548,7 +548,7 @@ class FrontController extends Controller
 
 		dd($allPaymentMethods);*/
 
-		/*$subscription = $stripe->subscriptions->create([
+		$subscription = $stripe->subscriptions->create([
 		  'customer' => 'cus_KLWfeafgS59wL4',
 		  'items' => [
 		    ['price' => 'price_1JhY1FD6j8NkE89KlREv79q6'],
@@ -557,7 +557,7 @@ class FrontController extends Controller
 		  'expand' => ['latest_invoice.payment_intent'],
 		]);
 
-		dd($subscription);*/
+		dd($subscription);
 
 		/*$refund = \Stripe\Refund::create([
 			'amount' => '5000',
@@ -582,11 +582,13 @@ class FrontController extends Controller
         ]);
         dd($createProduct, $plan);*/
 
-        $user = User::find('50cf9827-b3c0-42cb-ae8e-8ec58f36f5e5');
-        $createSubscription = $user->newSubscription(
-		        'default', 'plan_KMNd3saNfiOecE'
-		    )->create('pm_1JhVX1D6j8NkE89KtsRV9JY1');
-        dd($createSubscription);
+        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+		$cancelSubscription = $stripe->subscriptions->cancel(
+		  	'pi_3JhYxfD6j8NkE89K0yisXqzh',
+		  	[]
+		);
+
+		dd($cancelSubscription);
 
 	}
 
