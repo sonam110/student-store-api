@@ -583,6 +583,18 @@ class FrontController extends Controller
             'product'         => $createProduct->id,
         ]);
         dd($createProduct, $plan);*/
+        $is_published = 1;
+        $planInfo = $stripe->plans->retrieve(
+            'plan_KMeJrQBXCET999',
+            []
+        );
+        $productInfo = $planInfo->product;
+        $createProduct = $stripe->products->update([
+            'prod_KMeJ65ZAEVbUis',
+            ['active' => 1]
+        ]);
+
+        dd($createProduct);
 
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 		$cancelSubscription = $stripe->subscriptions->cancel(

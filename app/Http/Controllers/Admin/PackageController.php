@@ -174,10 +174,10 @@ class PackageController extends Controller
                 []
             );
             $productInfo = $planInfo->product;
-            $createProduct = $stripe->products->update([
+            $createProduct = $stripe->products->update(
                 $productInfo,
                 ['active'    => ($request->is_published==1) ? true : false]
-            ]);
+            );
 
             if($request->subscription>0) {
                 $amount = $request->subscription;
