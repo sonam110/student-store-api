@@ -187,6 +187,15 @@ class JobController extends Controller
                         pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'landing_screen');
                         // event(new JobPostNotification($job->id));
                     }
+
+                    foreach ($request->known_languages as $key => $lang) {
+                        if(LangForDDL::where('name', $lang)->count() < 1)
+                        {
+                            $langddl = new LangForDDL;
+                            $langddl->name  = $lang;
+                            $langddl->save();
+                        }
+                    }
                 }
             }
             
@@ -309,9 +318,18 @@ class JobController extends Controller
                         $jobTag->save();
                     }
                 }
-                if($request->is_published == true)
-                {
-                    event(new JobPostNotification($job->id));
+                // if($request->is_published == true)
+                // {
+                //     event(new JobPostNotification($job->id));
+                // }
+
+                foreach ($request->known_languages as $key => $lang) {
+                    if(LangForDDL::where('name', $lang)->count() < 1)
+                    {
+                        $langddl = new LangForDDL;
+                        $langddl->name  = $lang;
+                        $langddl->save();
+                    }
                 }
             }
             DB::commit();

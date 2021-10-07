@@ -14,6 +14,7 @@ use PDF;
 use Str;
 use DB;
 use Auth;
+use App\Models\LangForDDL;
 
 class UserCvDetailController extends Controller
 {
@@ -69,6 +70,8 @@ class UserCvDetailController extends Controller
 				JobTag::where('cv_id', $userCvDetail->id)->delete();
 			}
 
+			
+
 			foreach ($request->key_skills as $key => $tag) {
                 if(JobTag::where('title', $tag)->where('cv_id', $userCvDetail->id)->count()<1)
                 {
@@ -79,6 +82,16 @@ class UserCvDetailController extends Controller
                     $jobTag->save();
                 }
             }
+
+            foreach ($request->languages_known as $key => $lang) {
+                if(LangForDDL::where('name', $lang)->count() < 1)
+                {
+                    $langddl = new LangForDDL;
+                    $langddl->name  = $lang;
+                    $langddl->save();
+                }
+            }
+
 			return response(prepareResult(false, $userCvDetail, getLangByLabelGroups('messages','message_user_cv_detail_updated')), config('http_response.created'));
 		}
 		else
