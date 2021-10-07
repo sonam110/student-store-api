@@ -205,15 +205,22 @@ function createResume($fileName,$user)
 
 function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason)
 {
+	\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+	
 	$orderItem = OrderItem::find($refundOrderItemId);
 	$orderId = $orderItem->order->id;
 	$transaction = $orderItem->order->transaction;
 	$stripe = new \Stripe\StripeClient(
 	  env('STRIPE_SECRET')
 	);
-	$data = $stripe->refunds->create([
-	  'charge' => $transaction->transaction_id,
-	  'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
+	// $data = $stripe->refunds->create([
+	//   'charge' => $transaction->transaction_id,
+	//   'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
+	// ]);
+
+	$refund = \Stripe\Refund::create([
+		'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
+	  	'payment_intent' => $transaction->transaction_id,
 	]);
 
 	$refund = new Refund;
