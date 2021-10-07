@@ -37,10 +37,11 @@ use App\Models\CoolCompanyFreelancer;
 use App\Models\VendorFundTransfer;
 use App\Models\ChatList;
 use mervick\aesEverywhere\AES256;
+use Laravel\Cashier\Billable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, Uuid;
+    use HasFactory, Notifiable, Uuid, Billable;
     use HasApiTokens;
 
     const QR_NUMBER_PREFIX      = null;

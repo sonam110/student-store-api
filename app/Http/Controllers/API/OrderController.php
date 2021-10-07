@@ -1469,7 +1469,6 @@ class OrderController extends Controller
 					
 		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
-		// $customer_id = 'cus_KLWfeafgS59wL4';
 		$customer_id = $request->customer_id;
 		$ephemeralKey = \Stripe\EphemeralKey::create(
 		    ['customer' 		=> $customer_id],
@@ -1483,11 +1482,21 @@ class OrderController extends Controller
 		]);
 
 		$returnObj = [
-			'paymentIntent' => $paymentIntent->client_secret,
-		    'ephemeralKey' 	=> $ephemeralKey->secret,
-		    'customer' 		=> $customer_id,
-		    'payable_amount' => $total,
+			'paymentIntent' 	=> $paymentIntent->client_secret,
+		    'ephemeralKey' 		=> $ephemeralKey->secret,
+		    'customer' 			=> $customer_id,
+		    'payable_amount' 	=> $total,
 		];
 		return response(prepareResult(false, $returnObj, 'Order Intent create'), config('http_response.success'));
+	}
+
+	public function cancelStripeSubscription(Request $request)
+	{
+		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+		$cancelSubscription = $stripe->subscriptions->cancel(
+		  	$request->subscription_id,
+		  	[]
+		);
+		return response(prepareResult(false, $cancelSubscription, 'Cancel Subscription'), config('http_response.success'));
 	}
 }

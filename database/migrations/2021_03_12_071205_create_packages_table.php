@@ -53,6 +53,7 @@ class CreatePackagesTable extends Migration
 
             $table->boolean('is_published')->default(false);
             $table->date('published_at')->nullable();
+            $table->string('stripe_plan_id')->nullable();
             $table->timestamps();
         });
     }

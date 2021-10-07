@@ -225,6 +225,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/reason-for-action', [App\Http\Controllers\API\OrderController::class,'reasonForAction']);
 
 	Route::post('/create-stripe-intent', [App\Http\Controllers\API\OrderController::class,'createStripeIntent']);
+	Route::post('/cancel-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'cancelStripeSubscription']);
 
 	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\RatingAndFeedbackController');
 	Route::get('/rating-and-feedback-approve/{id}', [App\Http\Controllers\API\RatingAndFeedbackController::class,'approve']);

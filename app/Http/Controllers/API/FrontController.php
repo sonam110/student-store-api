@@ -35,9 +35,14 @@ use Image;
 use App\Models\Country;
 use App\Models\State;
 use App\Models\City;
+use mervick\aesEverywhere\AES256;
 
 class FrontController extends Controller
 {
+	function __construct()
+    {
+        $this->appsetting = AppSetting::first();
+    }
 
 	public function getUserType()
 	{
@@ -509,24 +514,24 @@ class FrontController extends Controller
 		);
 		dd($cardinfo);  // card id : card_1JhVWUD6j8NkE89KojLGbmyM*/
 
-		/*$paymentMethods = $stripe->paymentMethods->create([
+		$paymentMethods = $stripe->paymentMethods->create([
 		  'type' => 'card',
 		  'card' => [
-		    'number' => '5105105105105100',
+		    'number' => '4000002760003184',
 		    'exp_month' => 10,
 		    'exp_year' => 2022,
 		    'cvc' => '314',
 		  ],
 		]);
 
-		dd($paymentMethods);  //pm_1JhVX1D6j8NkE89KtsRV9JY1*/
+		//dd($paymentMethods);  //pm_1JhZRRD6j8NkE89KQsjaoesm
 
-		$paymentMethodAttach = $stripe->paymentMethods->attach(
-		  'pm_1JhVX1D6j8NkE89KtsRV9JY1',
+		/*$paymentMethodAttach = $stripe->paymentMethods->attach(
+		  'pm_1JhZRRD6j8NkE89KQsjaoesm',
 		  ['customer' => 'cus_KLWfeafgS59wL4']
 		);
 
-		dd($paymentMethodAttach);
+		dd($paymentMethodAttach);*/
 
 		/*$customerInfo = $stripe->customers->retrieve(
 		  'cus_KLWfeafgS59wL4',
@@ -534,6 +539,55 @@ class FrontController extends Controller
 		);
 
 		dd($customerInfo);*/
+
+
+		/*$allPaymentMethods = \Stripe\PaymentMethod::all([
+		  'customer' => 'cus_KLWfeafgS59wL4',
+		  'type' => 'card',
+		]);
+
+		dd($allPaymentMethods);*/
+
+		/*$subscription = $stripe->subscriptions->create([
+		  'customer' => 'cus_KLWfeafgS59wL4',
+		  'items' => [
+		    ['price' => 'price_1JhY1FD6j8NkE89KlREv79q6'],
+		  ],
+		  'payment_behavior' => 'default_incomplete',
+		  'expand' => ['latest_invoice.payment_intent'],
+		]);
+
+		dd($subscription);*/
+
+		/*$refund = \Stripe\Refund::create([
+			'amount' => '5000',
+		  	'payment_intent' => 'pi_3Jha3RD6j8NkE89K0iYHSoa4',
+		]);
+
+		dd($refund);*/
+
+        /*$createProduct = $stripe->products->create([
+        	'images'	=> $this->appsetting->logo_path,
+            'name'      => 'testing plan 1',
+            'type'		=> 'service',
+            'active'    => true
+        ]);
+
+        $plan = $stripe->plans->create([
+            'amount'          => 1000,
+            'currency'        => env('STRIPE_CURRENCY'),
+            'interval'        => 'day',
+            'interval_count'  => 30,
+            'product'         => $createProduct->id,
+        ]);
+        dd($createProduct, $plan);*/
+
+        $user = User::find('50cf9827-b3c0-42cb-ae8e-8ec58f36f5e5');
+        $createSubscription = $user->newSubscription(
+		        'default', 'plan_KMNd3saNfiOecE'
+		    )->create('pm_1JhVX1D6j8NkE89KtsRV9JY1');
+        dd($createSubscription);
+
 	}
 
 	public function strReplaceAssoc(array $replace, $subject) { 

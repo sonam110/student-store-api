@@ -10,9 +10,16 @@ use Str;
 use DB;
 use Auth;
 use App\Models\UserPackageSubscription;
+use Stripe;
+use App\Models\AppSetting;
 
 class PackageController extends Controller
 {
+    function __construct()
+    {
+        $this->appsetting = AppSetting::select('logo_path')->first();
+    }
+
     public function index(Request $request)
     {
         try
@@ -61,6 +68,29 @@ class PackageController extends Controller
         DB::beginTransaction();
         try
         {
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+
+            $createProduct = $stripe->products->create([
+                'images'    => $this->appsetting->logo_path,
+                'name'      => str_replace(' ', '_', $request->type_of_package),
+                'type'      => 'service',
+                'active'    => $request->is_published
+            ]);
+
+            if($request->subscription>0) {
+                $amount = $request->subscription;
+            } else {
+                $amount = $request->price;
+            }
+
+            $plan = $stripe->plans->create([
+                'amount'          => $amount * 100,
+                'currency'        => env('STRIPE_CURRENCY'),
+                'interval'        => 'day',
+                'interval_count'  => $request->duration,
+                'product'         => $createProduct->id,
+            ]);
+
             $package  = new Package;
             $package->module                    = $request->module;
             $package->package_for               = $request->package_for;
@@ -94,6 +124,7 @@ class PackageController extends Controller
             $package->cost_for_each_attendee    = $request->cost_for_each_attendee;
             $package->top_up_fee                = $request->top_up_fee;
             $package->is_published              = $request->is_published;
+            $package->stripe_plan_id            = $plan->id;
             if($request->is_published)
             {
                 $package->published_at = date('Y-m-d');
@@ -136,6 +167,37 @@ class PackageController extends Controller
         DB::beginTransaction();
         try
         {
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+
+            $createProduct = $stripe->products->update([
+                $package->stripe_plan_id,
+                ['active'    => $request->is_published]
+            ]);
+
+            if($request->subscription>0) {
+                $amount = $request->subscription;
+            } else {
+                $amount = $request->price;
+            }
+
+            if($package->duration != $request->duration || $package->subscription != ($amount * 100))
+            {
+                $stripe->plans->update(
+                    $package->stripe_plan_id,
+                    ['active' => false]
+                );
+
+                $plan = $stripe->plans->create([
+                    'amount'          => $request->subscription * 100,
+                    'currency'        => env('STRIPE_CURRENCY'),
+                    'interval'        => 'day',
+                    'interval_count'  => $request->duration,
+                    'product'         => $createProduct->id,
+                ]);
+                $package->stripe_plan_id = $plan->id;
+            }
+            
+
             $package->job_ads                   = $request->job_ads;
             $package->publications_day          = $request->publications_day;
             $package->duration                  = $request->duration;
@@ -164,6 +226,7 @@ class PackageController extends Controller
             $package->cost_for_each_attendee    = $request->cost_for_each_attendee;
             $package->top_up_fee                = $request->top_up_fee;
             $package->is_published              = $request->is_published;
+
             if($request->is_published)
             {
                 $package->published_at = date('Y-m-d');
@@ -184,6 +247,13 @@ class PackageController extends Controller
         if(UserPackageSubscription::where('package_id',$package->id)->count() > 0)
         {
             return response()->json(prepareResult(true, ['package subscribed'], getLangByLabelGroups('messages','messages_can\'t_delete')), config('http_response.success'));
+        }
+        if(!empty($package->stripe_plan_id)) {
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $stripe->plans->delete(
+                $package->stripe_plan_id,
+                []
+            );
         }
         $package->delete();
         return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','messages_package_deleted')), config('http_response.success'));
