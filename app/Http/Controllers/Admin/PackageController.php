@@ -74,7 +74,7 @@ class PackageController extends Controller
                 'images'    => $this->appsetting->logo_path,
                 'name'      => str_replace(' ', '_', $request->type_of_package),
                 'type'      => 'service',
-                'active'    => ($request->is_published==1) ? true : false;
+                'active'    => ($request->is_published==1) ? true : false
             ]);
 
             if($request->subscription>0) {
@@ -171,7 +171,7 @@ class PackageController extends Controller
 
             $createProduct = $stripe->products->update([
                 $package->stripe_plan_id,
-                ['active'    => ($request->is_published==1) ? true : false;]
+                ['active'    => ($request->is_published==1) ? true : false]
             ]);
 
             if($request->subscription>0) {
