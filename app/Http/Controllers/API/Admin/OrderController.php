@@ -95,7 +95,7 @@ class OrderController extends Controller
 	                        $join->on('order_items.user_id', '=', 'users.id');
 	                    })
 						->orderBy('order_items.created_at','DESC')
-						->with('productsServicesBook.user','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','orderTrackings','return','replacement','dispute','ratingAndFeedback');
+						->with('productsServicesBook.user','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','orderTrackings','return','replacement','dispute','ratingAndFeedback','contestApplication.contest.user:id,first_name,last_name','contestApplication.contest.cancellationRanges','contestApplication.contest.contestWinners','contestApplication .contest.ratingAndFeedback');
 			if(!empty($request->from_date))
 			{
 				$orderItems = $orderItems->where('order_items.created_at','>=',$request->from_date);
