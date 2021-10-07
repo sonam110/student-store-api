@@ -71,7 +71,7 @@ class PackageController extends Controller
             $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
 
             $createProduct = $stripe->products->create([
-                'images'    => $this->appsetting->logo_path,
+                'images'    => [$this->appsetting->logo_path],
                 'name'      => str_replace(' ', '_', $request->type_of_package),
                 'type'      => 'service',
                 'active'    => ($request->is_published==1) ? true : false
