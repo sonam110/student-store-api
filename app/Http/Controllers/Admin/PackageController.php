@@ -169,8 +169,13 @@ class PackageController extends Controller
         {
             $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
 
-            $createProduct = $stripe->products->update([
+            $planInfo = $stripe->plans->retrieve(
                 $package->stripe_plan_id,
+                []
+            );
+            $productInfo = $planInfo->product;
+            $createProduct = $stripe->products->update([
+                $productInfo,
                 ['active'    => ($request->is_published==1) ? true : false]
             ]);
 
