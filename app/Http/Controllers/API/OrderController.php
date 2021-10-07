@@ -1491,7 +1491,7 @@ class OrderController extends Controller
 
 	public function createStripeSubscription(Request $request)
 	{
-		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+		$stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
 		$subscription = $stripe->subscriptions->create([
 		  'customer' => Auth::user()->stripe_customer_id,
 		  'items' => [
@@ -1511,7 +1511,7 @@ class OrderController extends Controller
 
 	public function cancelStripeSubscription(Request $request)
 	{
-		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+		$stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
 		$cancelSubscription = $stripe->subscriptions->cancel(
 		  	$request->subscription_id,
 		  	[]
