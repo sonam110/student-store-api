@@ -802,9 +802,9 @@ class ProductsServicesBookController extends Controller
             {
                 if(empty($request->search))
                 {
-                    $products->where('products_services_books.type', $type)
+                    $products->where('products_services_books.type', $type);
                 }
-                
+
                 if(!empty($request->title))
                 {
                     $products->where('products_services_books.title', 'LIKE', '%'.$request->title.'%');
