@@ -71,10 +71,10 @@ class PackageController extends Controller
             $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
 
             $createProduct = $stripe->products->create([
-                'images'    => $this->appsetting->logo_path,
+                'images'    => [$this->appsetting->logo_path],
                 'name'      => str_replace(' ', '_', $request->type_of_package),
                 'type'      => 'service',
-                'active'    => $request->is_published
+                'active'    => ($request->is_published==1) ? true : false
             ]);
 
             if($request->subscription>0) {
@@ -169,10 +169,15 @@ class PackageController extends Controller
         {
             $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
 
-            $createProduct = $stripe->products->update([
+            $planInfo = $stripe->plans->retrieve(
                 $package->stripe_plan_id,
-                ['active'    => $request->is_published]
-            ]);
+                []
+            );
+            $productInfo = $planInfo->product;
+            $createProduct = $stripe->products->update(
+                $productInfo,
+                ['active'    => ($request->is_published==1) ? true : false]
+            );
 
             if($request->subscription>0) {
                 $amount = $request->subscription;

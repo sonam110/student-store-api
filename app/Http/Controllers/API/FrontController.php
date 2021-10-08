@@ -548,7 +548,7 @@ class FrontController extends Controller
 
 		dd($allPaymentMethods);*/
 
-		$subscription = $stripe->subscriptions->create([
+		/*$subscription = $stripe->subscriptions->create([
 		  'customer' => 'cus_KLWfeafgS59wL4',
 		  'items' => [
 		    ['price' => 'price_1JhY1FD6j8NkE89KlREv79q6'],
@@ -557,7 +557,7 @@ class FrontController extends Controller
 		  'expand' => ['latest_invoice.payment_intent'],
 		]);
 
-		dd($subscription);
+		dd($subscription);*/
 
 		/*$refund = \Stripe\Refund::create([
 			'amount' => '5000',
@@ -567,11 +567,13 @@ class FrontController extends Controller
 		dd($refund);*/
 
         /*$createProduct = $stripe->products->create([
-        	'images'	=> $this->appsetting->logo_path,
-            'name'      => 'testing plan 1',
+        	'images'	=> [$this->appsetting->logo_path],
+            'name'      => 'testing plan 2',
             'type'		=> 'service',
             'active'    => true
         ]);
+
+        dd($createProduct);
 
         $plan = $stripe->plans->create([
             'amount'          => 1000,
@@ -581,6 +583,18 @@ class FrontController extends Controller
             'product'         => $createProduct->id,
         ]);
         dd($createProduct, $plan);*/
+        $is_published = 1;
+        $planInfo = $stripe->plans->retrieve(
+            'plan_KMeJrQBXCET999',
+            []
+        );
+        $productInfo = $planInfo->product;
+        $createProduct = $stripe->products->update([
+            'prod_KMeJ65ZAEVbUis',
+            ['active' => 1]
+        ]);
+
+        dd($createProduct);
 
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 		$cancelSubscription = $stripe->subscriptions->cancel(
