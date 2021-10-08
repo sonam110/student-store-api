@@ -10,7 +10,7 @@ use Hash;
 use Auth;
 use App\Models\ProductImage;
 use App\Models\ProductTag;
-use App\Imports\CategoryMaster;
+use App\Models\CategoryMaster;
 use Str;
 
 class ProductsImport implements ToModel,WithHeadingRow
