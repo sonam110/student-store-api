@@ -48,7 +48,7 @@ class ProductsImport implements ToModel,WithHeadingRow
             'quantity'             		=> $row['quantity'],
             'short_summary'        		=> $row['short_summary'],
             'description'          		=> $row['description'],
-            'attribute_details'    		=> $row['attribute_details'],
+            // 'attribute_details'    		=> $row['attribute_details'],
             'meta_description'     		=> $row['meta_description'],
             'sell_type'            		=> $row['sell_type'],
             'deposit_amount'       		=> $row['deposit_amount'],
@@ -72,12 +72,7 @@ class ProductsImport implements ToModel,WithHeadingRow
             // 'service_languages'        	=> $row['service_languages'],
 
             'delivery_type'        		=> $row['delivery_type'],
-            'tags'                     	=> json_encode($row['tags']),
-            'is_promoted'              	=> $row['is_promoted'],
-            'promotion_start_at'   		=> date('Y-m-d'),
-            'promotion_end_at'     		=> date('Y-m-d',strtotime('+10 days')),
-            'is_published'             	=> $row['is_published'],
-            'published_at'             	=> $row['is_published']==1 ? date('Y-m-d H:i:s') : null,
+            'tags'                     	=> json_encode($row['tags'])
         ]);
 
         // foreach ($row['images'] as $key => $image) 
