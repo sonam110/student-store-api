@@ -22,37 +22,6 @@ class PackageController extends Controller
 
     public function index(Request $request)
     {
-        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
-        $packages = Package::where('type_of_package','!=','packages_free')->get();
-        foreach ($packages as $key => $package) {
-            if(empty($package->stripe_plan_id))
-            {
-                $createProduct = $stripe->products->create([
-                    'images'    => [$this->appsetting->logo_path],
-                    'name'      => ucfirst(str_replace('_', ' ', $package->type_of_package)),
-                    'type'      => 'service',
-                    'active'    => ($package->is_published==1) ? true : false
-                ]);
-
-                if($package->subscription>0) {
-                    $amount = $package->subscription;
-                } else {
-                    $amount = $package->price;
-                }
-
-                $plan = $stripe->plans->create([
-                    'amount'          => $amount * 100,
-                    'currency'        => env('STRIPE_CURRENCY'),
-                    'interval'        => 'day',
-                    'interval_count'  => $package->duration,
-                    'product'         => $createProduct->id,
-                ]);
-                $package->stripe_plan_id = $plan->id;
-            }
-            $package->stripe_plan_id            = $plan->id;
-            $package->save();
-        }
-        
         try
         {
             $packages = Package::orderBy('created_at','DESC');
