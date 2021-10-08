@@ -72,7 +72,7 @@ class PackageController extends Controller
 
             $createProduct = $stripe->products->create([
                 'images'    => [$this->appsetting->logo_path],
-                'name'      => str_replace(' ', '_', $request->type_of_package),
+                'name'      => ucfirst(str_replace('_', ' ', $request->type_of_package)),
                 'type'      => 'service',
                 'active'    => ($request->is_published==1) ? true : false
             ]);
@@ -173,7 +173,7 @@ class PackageController extends Controller
             {
                 $createProduct = $stripe->products->create([
                     'images'    => [$this->appsetting->logo_path],
-                    'name'      => str_replace(' ', '_', $request->type_of_package),
+                    'name'      => ucfirst(str_replace('_', ' ', $request->type_of_package)),
                     'type'      => 'service',
                     'active'    => ($request->is_published==1) ? true : false
                 ]);
