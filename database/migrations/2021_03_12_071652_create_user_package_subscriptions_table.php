@@ -25,6 +25,7 @@ class CreateUserPackageSubscriptionsTable extends Migration
             $table->string('subscription_id', 150)->nullable();
             $table->boolean('is_canceled')->nullable()->default(0);
             $table->string('canceled_date')->nullable();
+            $table->longText('response_request')->nullable();
 
             
             $table->dateTime('package_valid_till')->nullable();
