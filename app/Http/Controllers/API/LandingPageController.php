@@ -1374,7 +1374,7 @@ class LandingPageController extends Controller
         try
         {
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria job
-            $jobs = Job::select('sp_jobs.id','sp_jobs.user_id', 'sp_jobs.address_detail_id', 'sp_jobs.title', 'sp_jobs.slug', 'sp_jobs.short_summary', 'sp_jobs.job_type', 'sp_jobs.job_nature', 'sp_jobs.years_of_experience', 'sp_jobs.job_environment', 'sp_jobs.category_master_id','sp_jobs.sub_category_slug')
+            $jobs = Job::select('sp_jobs.id','sp_jobs.user_id', 'sp_jobs.address_detail_id', 'sp_jobs.title', 'sp_jobs.slug', 'sp_jobs.short_summary', 'sp_jobs.job_type', 'sp_jobs.job_nature', 'sp_jobs.years_of_experience', 'sp_jobs.job_environment', 'sp_jobs.category_master_id','sp_jobs.sub_category_slug','sp_jobs.job_hours')
                     ->where('sp_jobs.is_published', '1')
                     ->where('sp_jobs.job_status', '1')
                     ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','jobTags:id,job_id,title','isApplied','isFavourite','addressDetail','categoryMaster','subCategory');
