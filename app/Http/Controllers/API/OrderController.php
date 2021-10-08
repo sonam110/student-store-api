@@ -208,6 +208,12 @@ class OrderController extends Controller
 							}
 						}
 
+						$delivery_code = NULL;
+						if($productsServicesBook->delivery_type == 'pickup_from_location')
+						{
+							$delivery_code = rand(100000, 999999);
+						}
+
 						if(($orderedItem['quantity'] > $productsServicesBook->quantity) && ($productsServicesBook->type != 'service'))
 						{
 							return response()->json(prepareResult(true, ['quantity exceeded.Only '.$productsServicesBook->quantity.' left.'], getLangByLabelGroups('messages','message_quantity_exceeded')), config('http_response.bad_request'));
@@ -351,6 +357,7 @@ class OrderController extends Controller
 					$orderItem->student_store_commission_percent= $commission;
 					$orderItem->cool_company_commission_percent	= $coolCompanyCommission;
 					$orderItem->vat_percent						= $vat_percent;
+					$orderItem->delivery_code					= $delivery_code;
 					$orderItem->save();
 
 
@@ -542,6 +549,15 @@ class OrderController extends Controller
 			$reason_id_for_cancellation = $request->reason_id;
 		}
 
+		if($request->item_status == 'delivered') 
+		{
+			$orderItemDelivered = OrderItem::where('order_item_id', $id)->first();
+
+			if(!empty($request->delivery_code) && $request->delivery_code != $orderItemDelivered->delivery_code)
+			{
+				return response()->json(prepareResult(true, 'Delivery code not matched.', getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
+			}
+		}
 		
 
 		$type = 'delivery';

@@ -43,6 +43,7 @@ class CreateOrderItemsTable extends Migration
             $table->dateTime('expected_delivery_date')->nullable();
             $table->string('tracking_number',100)->nullable();
             $table->dateTime('delivery_completed_date')->nullable();
+            $table->integer('delivery_code')->nullable();
             $table->dateTime('return_applicable_date')->nullable();
             $table->float('amount_returned')->nullable();
             $table->boolean('is_returned')->nullable()->default(0);
