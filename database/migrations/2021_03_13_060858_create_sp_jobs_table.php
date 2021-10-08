@@ -55,6 +55,9 @@ class CreateSpJobsTable extends Migration
 
             $table->string('meta_title')->nullable();
             $table->text('meta_keywords')->nullable();
+
+            $table->text('reason_id_for_rejection')->nullable();
+            $table->text('reason_for_rejection')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

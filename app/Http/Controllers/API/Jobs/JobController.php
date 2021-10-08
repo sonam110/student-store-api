@@ -722,6 +722,11 @@ class JobController extends Controller
             if($request->action=='update-status')
             {
                 $getJob->job_status = $request->job_status;
+                if(!empty($request->reason_id_for_rejection))
+                {
+                    $getJob->reason_id_for_rejection = $request->reason_id_for_rejection;
+                    $getJob->reason_for_rejection = $request->reason_for_rejection;
+                }
 
                 $title = 'Job Status Updated';
                 $body =  'Job '.$getJob->title.' status has been successfully updated.';

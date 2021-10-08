@@ -75,6 +75,7 @@ class CreateOrderItemsTable extends Migration
 
             $table->decimal('student_store_commission_percent', 12,2)->default(0)->nullable();
             $table->decimal('cool_company_commission_percent', 12,2)->default(0)->nullable();
+            $table->decimal('vat_percent', 12,2)->default(0)->nullable();
 
             $table->timestamps();
         });

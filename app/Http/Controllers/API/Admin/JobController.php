@@ -381,6 +381,8 @@ class JobController extends Controller
                 elseif($request->job_status == "2")
                 {
                     $status_text = 'Rejected';
+                    $getJob->reason_id_for_rejection = $request->reason_id_for_rejection;
+                    $getJob->reason_for_rejection = $request->reason_for_rejection;
                 }
                 elseif($request->job_status == "4")
                 {
@@ -463,6 +465,11 @@ class JobController extends Controller
             }
             foreach ($jobs as $key => $job) {
                 $job->job_status = $request->job_status;
+                if($request->job_status == "2")
+                {
+                    $job->reason_id_for_rejection = $request->reason_id_for_rejection;
+                    $job->reason_for_rejection = $request->reason_for_rejection;
+                }
                 
                 $title = 'Job Status Updated';
                 $body =  'Job '.$job->title.' status has been successfully updated to '.$status_text.'.';

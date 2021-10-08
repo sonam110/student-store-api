@@ -172,6 +172,7 @@ class OrderController extends Controller
 					if(!empty($orderedItem['product_id']))
 					{
 						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
+						$vat_percent = $productsServicesBook->categoryMaster->title;
 						if($productsServicesBook->is_on_offer == 1)
 						{
 							$price = $productsServicesBook->discounted_price;
@@ -219,6 +220,7 @@ class OrderController extends Controller
 					{
 						$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
 						$productsServicesBook = Contest::find($contest_id);
+						$vat_percent = $productsServicesBook->categoryMaster->title;
 						if($productsServicesBook->is_on_offer == 1)
 						{
 							$price = $productsServicesBook->discounted_price;
@@ -245,6 +247,7 @@ class OrderController extends Controller
 					else
 					{
 						$productsServicesBook = Package::find($orderedItem['package_id']);
+						$vat_percent = '0';
 						if($productsServicesBook->price == 0)
 						{
 							$price = $productsServicesBook->subscription;
@@ -347,6 +350,7 @@ class OrderController extends Controller
 					$orderItem->cool_company_commission			= $cool_company_commission;
 					$orderItem->student_store_commission_percent= $commission;
 					$orderItem->cool_company_commission_percent	= $coolCompanyCommission;
+					$orderItem->vat_percent						= $vat_percent;
 					$orderItem->save();
 
 
