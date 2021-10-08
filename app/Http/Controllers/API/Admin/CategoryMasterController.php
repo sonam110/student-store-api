@@ -87,14 +87,22 @@ class CategoryMasterController extends Controller
             foreach ($category as $key => $value) {
                 if($key == 0)
                 {
-                    $categoryMaster = new CategoryMaster;
-                    $categoryMaster->module_type_id     = $request->module_type_id;
-                    $categoryMaster->category_master_id = null;
-                    $categoryMaster->title              = $value['category_title'];
-                    $categoryMaster->slug               = $cat_slug_prefix.'-'.Str::slug($value['category_title']);
-                    $categoryMaster->status             = 1;
-                    $categoryMaster->vat                = $request->vat;
-                    $categoryMaster->save();
+                    if(CategoryMaster::where('module_type_id', $request->module_type_id)->where('title', $value['category_title'])->count()<1)
+                    {
+                        $categoryMaster = new CategoryMaster;
+                        $categoryMaster->module_type_id     = $request->module_type_id;
+                        $categoryMaster->category_master_id = null;
+                        $categoryMaster->title              = $value['category_title'];
+                        $categoryMaster->slug               = $cat_slug_prefix.'-'.Str::slug($value['category_title']);
+                        $categoryMaster->status             = 1;
+                        $categoryMaster->vat                = $request->vat;
+                        $categoryMaster->save();
+                    }
+                    else
+                    {
+                        $categoryMaster = CategoryMaster::where('module_type_id', $request->module_type_id)->where('title', $value['category_title'])->first();
+                    }
+                    
                 }
                 $cat_parent_id = $categoryMaster->id;
                 if($key > 0)
@@ -117,15 +125,18 @@ class CategoryMasterController extends Controller
                         $language->save();
                     }
 
-                    $categoryDetail = new CategoryDetail;
-                    $categoryDetail->category_master_id = $categoryMaster->id;
-                    $categoryDetail->language_id        = $language->id;
-                    $categoryDetail->is_parent          = 1;
-                    $categoryDetail->title              = $value['category_title'];
-                    $categoryDetail->slug               = $cat_slug_prefix.'-'.Str::slug($categoryMaster->title);
-                    $categoryDetail->description        = $request->description;
-                    $categoryDetail->status             = 1;
-                    $categoryDetail->save();
+                    if(CategoryDetail::where('category_master_id', $categoryMaster->id)->where('language_id', $language->id)->where('title', $value['category_title'])->count()<1)
+                    {
+                        $categoryDetail = new CategoryDetail;
+                        $categoryDetail->category_master_id = $categoryMaster->id;
+                        $categoryDetail->language_id        = $language->id;
+                        $categoryDetail->is_parent          = 1;
+                        $categoryDetail->title              = $value['category_title'];
+                        $categoryDetail->slug               = $cat_slug_prefix.'-'.Str::slug($categoryMaster->title);
+                        $categoryDetail->description        = $request->description;
+                        $categoryDetail->status             = 1;
+                        $categoryDetail->save();
+                    }
                 }
 
                 $subCategory = $value['subcategories'];
@@ -133,14 +144,22 @@ class CategoryMasterController extends Controller
                 foreach ($subCategory as $subkey => $subvalue) {
                     if($key == 0)
                     {
-                        $subCategoryMaster = new CategoryMaster;
-                        $subCategoryMaster->module_type_id     = $request->module_type_id;
-                        $subCategoryMaster->category_master_id = $categoryMaster->id;
-                        $subCategoryMaster->title              = $subvalue;
-                        $subCategoryMaster->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subvalue);
-                        $subCategoryMaster->status             = 1;
-                        $subCategoryMaster->vat                = $categoryMaster->vat;
-                        $subCategoryMaster->save();
+                        if(CategoryMaster::where('module_type_id', $request->module_type_id)->where('category_master_id', $categoryMaster->id)->where('title', $subvalue)->count()<1)
+                        {
+
+                            $subCategoryMaster = new CategoryMaster;
+                            $subCategoryMaster->module_type_id     = $request->module_type_id;
+                            $subCategoryMaster->category_master_id = $categoryMaster->id;
+                            $subCategoryMaster->title              = $subvalue;
+                            $subCategoryMaster->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subvalue);
+                            $subCategoryMaster->status             = 1;
+                            $subCategoryMaster->vat                = $categoryMaster->vat;
+                            $subCategoryMaster->save();
+                        }
+                        else
+                        {
+                            $subCategoryMaster = CategoryMaster::where('module_type_id', $request->module_type_id)->where('category_master_id', $categoryMaster->id)->where('title', $subvalue)->first();
+                        }
 
                         $sub_cat_parent_id[$subkey] = $subCategoryMaster->id;
                     }
@@ -153,15 +172,18 @@ class CategoryMasterController extends Controller
 
                     if($subCategoryMaster)
                     {
-                        $categoryDetail = new CategoryDetail;
-                        $categoryDetail->category_master_id = $subCategoryMaster->category_master_id;
-                        $categoryDetail->language_id        = $language->id;
-                        $categoryDetail->is_parent          = 0;
-                        $categoryDetail->title              = $subvalue;
-                        $categoryDetail->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subCategoryMaster->title);
-                        $categoryDetail->description        = $request->description;
-                        $categoryDetail->status             = 1;
-                        $categoryDetail->save();
+                        if(CategoryDetail::where('category_master_id', $subCategoryMaster->category_master_id)->where('language_id', $language->id)->where('title', $subvalue)->count()<1)
+                        {
+                            $categoryDetail = new CategoryDetail;
+                            $categoryDetail->category_master_id = $subCategoryMaster->category_master_id;
+                            $categoryDetail->language_id        = $language->id;
+                            $categoryDetail->is_parent          = 0;
+                            $categoryDetail->title              = $subvalue;
+                            $categoryDetail->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subCategoryMaster->title);
+                            $categoryDetail->description        = $request->description;
+                            $categoryDetail->status             = 1;
+                            $categoryDetail->save();
+                        }
                     }
                 }
             }
