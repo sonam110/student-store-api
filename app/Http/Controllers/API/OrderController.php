@@ -1527,7 +1527,7 @@ class OrderController extends Controller
 			  	$request->subscription_id,
 			  	[]
 			);
-			$user_package->response_request = json_encode($cancelSubscription);
+			$user_package->response_request = $cancelSubscription;
 			$user_package->save();
 			return response(prepareResult(false, $cancelSubscription, 'Cancel Subscription'), config('http_response.success'));
 		}
