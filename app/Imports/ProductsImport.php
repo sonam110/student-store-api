@@ -28,6 +28,7 @@ class ProductsImport implements ToModel,WithHeadingRow
     */
     public function model(array $row)
     {
+        $getCat = CategoryMaster::select('vat')->find($this->data['category_master_id']);
         $products = ProductsServicesBook::create([
             'user_id'              		=> Auth::id(),
             'address_detail_id'    		=> $this->data['address_detail_id'],
@@ -39,7 +40,7 @@ class ProductsImport implements ToModel,WithHeadingRow
             'gtin_isbn'            		=> $row['gtin_isbn'],
             'title'                		=> $row['title'],
             'slug'                		=> Str::slug($row['title']),
-            'basic_price_wo_vat'        => $row['basic_price_wo_vat'],
+            'basic_price_wo_vat'        => $row['price'] - (($row['price'] * $getCat->vat)/100),
             'price'                		=> $row['price'],
             'discounted_price'     		=> $row['discounted_price'],
             'is_on_offer'          		=> $row['is_on_offer'],
