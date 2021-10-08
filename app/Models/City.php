@@ -15,6 +15,11 @@ class City extends Model
         'status'
     ];
 
+    protected $appends = ["city"];
+
+    public function getCityAttribute() {
+         return $this->attributes['name'];
+    }
 
     public function state()
     {

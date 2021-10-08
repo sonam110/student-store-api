@@ -68,7 +68,7 @@ class CoolCompanyCreateAssignment extends Command
         {
             $reportArray = [];
             $orderItemId = [];
-            $createBatchUserWise = OrderItem::select('products_services_books.user_id','order_items.id','order_items.order_id','order_items.products_services_book_id','order_items.price','order_items.quantity','student_details.cool_company_id')
+            $createBatchUserWise = OrderItem::select('products_services_books.user_id','order_items.id','order_items.order_id','order_items.products_services_book_id','order_items.price','order_items.quantity','order_items.vat_percent','student_details.cool_company_id')
             ->where('order_items.is_returned', '0')
             ->where('order_items.is_replaced', '0')
             ->where('order_items.is_disputed', '0')
@@ -81,22 +81,30 @@ class CoolCompanyCreateAssignment extends Command
             ->join('student_details', 'student_details.user_id','=','products_services_books.user_id')
             ->where('student_details.cool_company_id', '!=', null)
             ->get();
-            foreach ($createBatchUserWise as $key => $batchInfo) {
-                $teamMemberId = $batchInfo->cool_company_id;
-                $orderItemId[] = $batchInfo->id;
-                $reportArray[] = [
+            foreach ($createBatchUserWise as $key => $itemInfo) {
+                if($itemInfo->vat_percent=='6') {
+                    $vatRateId = '1';
+                } elseif($itemInfo->vat_percent=='0') {
+                    $vatRateId = '2';
+                } elseif($itemInfo->vat_percent=='12') {
+                    $vatRateId = '3';
+                } else {
+                    $vatRateId = '7';
+                }
+
+                $teamMemberId = $itemInfo->cool_company_id;
+                $orderItemId = $itemInfo->id;
+                $reportArray = [
                     'dateFrom'    => $before15Days.'T00:00:01Z',
                     'dateTo'      => $before15Days.'T23:59:59Z',
                     'paymentType' => 2,
                     'customUnitType'    => 'days',
-                    'unitQuantity'=> $batchInfo->quantity,
-                    'unitRate'    => $batchInfo->price,
+                    'unitQuantity'=> $itemInfo->quantity,
+                    'unitRate'    => $itemInfo->price - (($itemInfo->price * $itemInfo->vat_percent)/100),
                     'totalHours'  => 24
 
                 ];
-            }
-            if(sizeof($reportArray)>0)
-            {
+
                 if(empty($access_token) || time() > $tokenExpired)
                 {
                     $getToken = $this->getAccessToken();
@@ -137,7 +145,7 @@ class CoolCompanyCreateAssignment extends Command
 
                     if($createAssignment) {
                         //Update Record
-                        $updateOrderInfo = OrderItem::select('id','is_sent_to_cool_company','sent_to_cool_company_date')->whereIn('id', $orderItemId)->update([
+                        $updateOrderInfo = OrderItem::select('id','is_sent_to_cool_company','sent_to_cool_company_date')->where('id', $orderItemId)->update([
                             'is_sent_to_cool_company'   => '1',
                             'sent_to_cool_company_date' => date('Y-m-d')
                         ]);
@@ -170,6 +178,7 @@ class CoolCompanyCreateAssignment extends Command
                     Log::channel('customlog')->Error('Assignment Not Created.');
                 }
             }
+            
         }
     }
 
