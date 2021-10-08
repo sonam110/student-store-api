@@ -1515,11 +1515,20 @@ class OrderController extends Controller
 
 	public function cancelStripeSubscription(Request $request)
 	{
-		$stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
-		$cancelSubscription = $stripe->subscriptions->cancel(
-		  	$request->subscription_id,
-		  	[]
-		);
-		return response(prepareResult(false, $cancelSubscription, 'Cancel Subscription'), config('http_response.success'));
+		$user_package = UserPackageSubscription::where('subscription_id', $request->subscription_id)->orderBy('auto_id', 'DESC')->first();
+		if($user_package)
+		{
+			$user_package->is_canceled = 1;
+			$user_package->canceled_date = date('Y-m-d');
+			$user_package->save();
+
+			$stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+			$cancelSubscription = $stripe->subscriptions->cancel(
+			  	$request->subscription_id,
+			  	[]
+			);
+			return response(prepareResult(false, $cancelSubscription, 'Cancel Subscription'), config('http_response.success'));
+		}
+		return response()->json(prepareResult(true, 'Subscription id not found.', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
 	}
 }

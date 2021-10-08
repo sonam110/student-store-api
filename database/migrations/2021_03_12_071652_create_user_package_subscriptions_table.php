@@ -23,6 +23,9 @@ class CreateUserPackageSubscriptionsTable extends Migration
             $table->foreign('package_id')->references('id')->on('packages')->onDelete('cascade');
 
             $table->string('subscription_id', 150)->nullable();
+            $table->boolean('is_canceled')->nullable()->default(0);
+            $table->string('canceled_date')->nullable();
+
             
             $table->dateTime('package_valid_till')->nullable();
             $table->string('subscription_status',50)->nullable();
