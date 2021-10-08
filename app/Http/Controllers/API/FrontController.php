@@ -583,7 +583,7 @@ class FrontController extends Controller
             'product'         => $createProduct->id,
         ]);
         dd($createProduct, $plan);*/
-        $is_published = 1;
+        /*$is_published = 1;
         $planInfo = $stripe->plans->retrieve(
             'plan_KMeJrQBXCET999',
             []
@@ -594,15 +594,15 @@ class FrontController extends Controller
             ['active' => 1]
         ]);
 
-        dd($createProduct);
+        dd($createProduct);*/
 
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 		$cancelSubscription = $stripe->subscriptions->cancel(
-		  	'pi_3JhYxfD6j8NkE89K0yisXqzh',
+		  	'sub_1JhYEPD6j8NkE89KA5XVE8jO',
 		  	[]
 		);
 
-		dd($cancelSubscription);
+		return str_replace('Stripe\Subscription JSON: ', '', $cancelSubscription);
 
 	}
 

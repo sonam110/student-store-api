@@ -92,6 +92,7 @@ class JobController extends Controller
                 $user_id = Auth::id();
             }
 
+            /*
             $user_package = UserPackageSubscription::where('user_id',$user_id)->where('module','Job')->orderBy('created_at','desc')->first();
             if(empty($user_package))
             {
@@ -103,98 +104,98 @@ class JobController extends Controller
             }
             else
             {
-                $getLastJob = Job::select('id')->orderBy('created_at','DESC')->first();
-                if($getLastJob) {
-                    $jobNumber = $getLastJob->id;
-                } else {
-                    $jobNumber = 1;
+                */
+            $getLastJob = Job::select('id')->orderBy('created_at','DESC')->first();
+            if($getLastJob) {
+                $jobNumber = $getLastJob->id;
+            } else {
+                $jobNumber = 1;
+            }
+
+            if($request->is_published == true)
+            { 
+                $published_at = date('Y-m-d');
+            }
+            else
+            {
+                $published_at = null;
+            }
+
+            $job_start_date = date("Y-m-d", strtotime($request->job_start_date));
+            $application_start_date = date("Y-m-d", strtotime($request->application_start_date));
+            $application_end_date = date("Y-m-d", strtotime($request->application_end_date)); 
+
+            $job                                = new Job;
+            $job->user_id                       = $user_id;
+            $job->language_id                   = $request->language_id;
+            $job->address_detail_id             = $request->address_detail_id;
+            $job->category_master_id            = $request->category_master_id;
+            $job->sub_category_slug             = $request->sub_category_slug;
+            $job->title                         = $request->title;
+            $job->slug                          = Str::slug(substr($request->title, 0, 175)).$jobNumber;
+            $job->description                   = $request->description;
+            $job->duties_and_responsibilities   = $request->duties_and_responsibilities;
+            $job->nice_to_have_skills           = json_encode($request->nice_to_have_skills);
+            // $job->meta_description              = substr($request->description, 0, 250);
+            $job->meta_description              = $request->meta_description;
+            $job->short_summary                 = substr($request->description, 0, 175);
+            $job->job_type                      = $request->job_type;
+            $job->job_nature                    = $request->job_nature;
+            $job->job_hours                     = $request->job_hours;
+            $job->job_environment               = json_encode($request->job_environment);
+            $job->years_of_experience           = $request->years_of_experience;
+            $job->known_languages               = json_encode($request->known_languages);
+            $job->job_start_date                = $job_start_date;
+            $job->application_start_date        = $application_start_date;
+            $job->application_end_date          = $application_end_date;
+            $job->is_published                  = $request->is_published;
+            $job->meta_title                    = $request->meta_title;
+            $job->meta_keywords                 = $request->meta_keywords;
+            $job->published_at                  = $published_at;
+            $job->save();
+            if($job)
+            {
+                $user_package->update(['used_job_ads'=>($user_package->used_job_ads + 1)]);
+
+
+                foreach ($request->tags as $key => $tag) {
+                    if(JobTag::where('title', $tag)->where('job_id', $job->id)->count()<1)
+                    {
+                        $jobTag = new JobTag;
+                        $jobTag->job_id     = $job->id;
+                        $jobTag->title      = $tag;
+                        $jobTag->user_id    = $user_id;
+                        $jobTag->save();
+                    }
+                }
+
+                foreach ($request->nice_to_have_skills as $key => $nice_to_have) {
+                    if(JobTag::where('nice_to_have', $nice_to_have)->where('job_id', $job->id)->count()<1)
+                    {
+                        $jobTag = new JobTag;
+                        $jobTag->job_id         = $job->id;
+                        $jobTag->nice_to_have   = $nice_to_have;
+                        $jobTag->user_id        = $user_id;
+                        $jobTag->save();
+                    }
                 }
 
                 if($request->is_published == true)
                 { 
-                    $published_at = date('Y-m-d');
+                    $users = User::where('user_type_id',2)->get();
+                    $title = 'New Job Posted';
+                    $body =  'New Job '.$job->title.' Posted by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'  '.AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY'));
+                    $type = 'Job Posted';
+                    pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'landing_screen');
+                    // event(new JobPostNotification($job->id));
                 }
-                else
-                {
-                    $published_at = null;
-                }
 
-                $job_start_date = date("Y-m-d", strtotime($request->job_start_date));
-                $application_start_date = date("Y-m-d", strtotime($request->application_start_date));
-                $application_end_date = date("Y-m-d", strtotime($request->application_end_date)); 
-
-                $job                                = new Job;
-                $job->user_id                       = $user_id;
-                $job->language_id                   = $request->language_id;
-                $job->address_detail_id             = $request->address_detail_id;
-                $job->category_master_id            = $request->category_master_id;
-                $job->sub_category_slug             = $request->sub_category_slug;
-                $job->title                         = $request->title;
-                $job->slug                          = Str::slug(substr($request->title, 0, 175)).$jobNumber;
-                $job->description                   = $request->description;
-                $job->duties_and_responsibilities   = $request->duties_and_responsibilities;
-                $job->nice_to_have_skills           = json_encode($request->nice_to_have_skills);
-                // $job->meta_description              = substr($request->description, 0, 250);
-                $job->meta_description              = $request->meta_description;
-                $job->short_summary                 = substr($request->description, 0, 175);
-                $job->job_type                      = $request->job_type;
-                $job->job_nature                    = $request->job_nature;
-                $job->job_hours                     = $request->job_hours;
-                $job->job_environment               = json_encode($request->job_environment);
-                $job->years_of_experience           = $request->years_of_experience;
-                $job->known_languages               = json_encode($request->known_languages);
-                $job->job_start_date                = $job_start_date;
-                $job->application_start_date        = $application_start_date;
-                $job->application_end_date          = $application_end_date;
-                $job->is_published                  = $request->is_published;
-                $job->meta_title                    = $request->meta_title;
-                $job->meta_keywords                 = $request->meta_keywords;
-                $job->published_at                  = $published_at;
-                $job->save();
-                if($job)
-                {
-                    $user_package->update(['used_job_ads'=>($user_package->used_job_ads + 1)]);
-
-
-                    foreach ($request->tags as $key => $tag) {
-                        if(JobTag::where('title', $tag)->where('job_id', $job->id)->count()<1)
-                        {
-                            $jobTag = new JobTag;
-                            $jobTag->job_id     = $job->id;
-                            $jobTag->title      = $tag;
-                            $jobTag->user_id    = $user_id;
-                            $jobTag->save();
-                        }
-                    }
-
-                    foreach ($request->nice_to_have_skills as $key => $nice_to_have) {
-                        if(JobTag::where('nice_to_have', $nice_to_have)->where('job_id', $job->id)->count()<1)
-                        {
-                            $jobTag = new JobTag;
-                            $jobTag->job_id         = $job->id;
-                            $jobTag->nice_to_have   = $nice_to_have;
-                            $jobTag->user_id        = $user_id;
-                            $jobTag->save();
-                        }
-                    }
-
-                    if($request->is_published == true)
-                    { 
-                        $users = User::where('user_type_id',2)->get();
-                        $title = 'New Job Posted';
-                        $body =  'New Job '.$job->title.' Posted by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'  '.AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY'));
-                        $type = 'Job Posted';
-                        pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'landing_screen');
-                        // event(new JobPostNotification($job->id));
-                    }
-
-                    foreach ($request->known_languages as $key => $lang) {
-                        if(LangForDDL::where('name', $lang)->count() < 1)
-                        {
-                            $langddl = new LangForDDL;
-                            $langddl->name  = $lang;
-                            $langddl->save();
-                        }
+                foreach ($request->known_languages as $key => $lang) {
+                    if(LangForDDL::where('name', $lang)->count() < 1)
+                    {
+                        $langddl = new LangForDDL;
+                        $langddl->name  = $lang;
+                        $langddl->save();
                     }
                 }
             }
