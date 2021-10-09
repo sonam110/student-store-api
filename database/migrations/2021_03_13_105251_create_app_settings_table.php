@@ -24,6 +24,7 @@ class CreateAppSettingsTable extends Migration
             $table->text('description')->nullable();
             $table->string('logo_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
             $table->string('logo_thumb_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
+            $table->string('invite_url')->nullable();
             $table->string('copyright_text')->nullable();
             $table->string('fb_ur')->nullable();
             $table->string('twitter_url')->nullable();
