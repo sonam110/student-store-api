@@ -40,7 +40,7 @@ class AbuseController extends Controller
             $contactUs->job_id                          = !empty($request->job_id) ? $request->job_id : NULL;
             $contactUs->reason_id_for_abuse             = $request->reason_id_for_abuse;
             $contactUs->reason_for_abuse                = $request->reason_for_abuse;
-            $contactUs->status              			= $request->status;
+            $contactUs->status              			= 'pending';
             $contactUs->save();
 
             if(!empty($request->products_services_book_id))
