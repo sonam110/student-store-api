@@ -128,7 +128,7 @@
                     <table>
                         <tr class="heading">
                             <td colspan="2">
-                                <center><span class="uppercase">Order Information</span></center>
+                                <center><span class="uppercase">Invoice</span></center>
                             </td>
                         </tr>
                         <tr>

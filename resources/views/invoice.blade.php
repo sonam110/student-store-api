@@ -173,7 +173,17 @@
                     <center>Total</center>
                 </td>
             </tr>
+            @php
+                $student_store_commission = 0;
+                $cool_company_commission = 0;
+                $amount_transferred_to_vendor = 0;
+            @endphp
             @foreach($order->orderItems as $item)
+            @php
+                $student_store_commission += $item->student_store_commission;
+                $cool_company_commission += $item->cool_company_commission;
+                $amount_transferred_to_vendor += $item->amount_transferred_to_vendor;
+            @endphp
             <tr class="item">
                 <td>
                     {{($item->productsServicesBook) ? $item->productsServicesBook->title : ''}}
@@ -202,21 +212,30 @@
             @endforeach
             <tr class="total">
                 <td></td>
-                <td colspan="2"><strong>SubTotal:</strong> </td>
+                <td colspan="2"><strong>Total Student Store Commission:</strong> </td>
                 <td>
-                   <center>{{$order->sub_total}} Kr</center>
+                   <strong><center>{{ $student_store_commission }} Kr</center></strong>
+                </td>
+            </tr>
+
+            <tr class="total">
+                <td></td>
+                <td colspan="2"><strong>Total Cool Company Commission:</strong> </td>
+                <td>
+                   <strong><center>{{ $cool_company_commission }} Kr</center></strong>
+                </td>
+            </tr>
+
+            <tr class="total">
+                <td></td>
+                <td colspan="2"><strong>Total Amount Transferred to Vendor:</strong> </td>
+                <td>
+                   <strong><center>{{ $amount_transferred_to_vendor }} Kr</center></strong>
                 </td>
             </tr>
             <tr class="total">
                 <td></td>
-                <td colspan="2"><strong>VAT:</strong> </td>
-                <td>
-                   <center>{{$order->vat}} Kr</center>
-                </td>
-            </tr>
-            <tr class="total">
-                <td></td>
-                <td colspan="2"><strong>Total:</strong> </td>
+                <td colspan="2"><strong>Total Order Amount:</strong> </td>
                 <td>
                    <strong><center>{{$order->grand_total}} Kr</center></strong>
                 </td>
