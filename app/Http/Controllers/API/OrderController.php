@@ -119,7 +119,7 @@ class OrderController extends Controller
 		DB::beginTransaction();
 		try
 		{
-
+			$delivery_code = NULL;
 			$shipping_charge = 0;
 
 			$getLastOrder = Order::select('order_number')->orderBy('created_at','DESC')->first();
@@ -208,7 +208,7 @@ class OrderController extends Controller
 							}
 						}
 
-						$delivery_code = NULL;
+						
 						if($productsServicesBook->delivery_type == 'pickup_from_location')
 						{
 							$delivery_code = rand(100000, 999999);
