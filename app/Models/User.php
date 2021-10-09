@@ -36,6 +36,7 @@ use App\Models\CoolCompanyAssignment;
 use App\Models\CoolCompanyFreelancer;
 use App\Models\VendorFundTransfer;
 use App\Models\ChatList;
+use App\Models\CartDetail;
 use mervick\aesEverywhere\AES256;
 use Laravel\Cashier\Billable;
 
@@ -318,6 +319,11 @@ class User extends Authenticatable
     public function jobs()
     {
         return $this->hasMany(Job::class, 'user_id', 'id');
+    }
+
+    public function cartDetails()
+    {
+        return $this->hasMany(CartDetail::class, 'user_id', 'id');
     }
 
     public function coolCompanyFreelancer()

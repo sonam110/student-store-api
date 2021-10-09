@@ -113,7 +113,8 @@ class UserResource extends JsonResource
                     'user_events'                       => $this->events,
                     'user_jobs'                         => $this->jobs,
                     'unread_notification'               => $this->unreadNotifications->count(),
-                    'cool_company_freelancer'           => $this->coolCompanyFreelancer
+                    'cool_company_freelancer'           => $this->coolCompanyFreelancer,
+                    'cart_count'                        => $this->cartDetails->count()
                    
                 ];
         }
@@ -169,7 +170,8 @@ class UserResource extends JsonResource
                     'user_events'                       => $this->events,
                     'user_jobs'                         => $this->jobs,
                     'unread_notification'               => $this->unreadNotifications->count(),
-                    'cool_company_freelancer'           => $this->coolCompanyFreelancer
+                    'cool_company_freelancer'           => $this->coolCompanyFreelancer,
+                    'cart_count'                        => $this->cartDetails->count()
                 ];
         }
         
