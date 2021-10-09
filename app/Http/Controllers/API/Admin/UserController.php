@@ -160,6 +160,13 @@ class UserController extends Controller
 		// $user->guardian_contact_number 				= $request->guardian_contact_number;
 		// $user->is_guardian_email_verified 			= $request->is_guardian_email_verified;
 		// $user->is_guardian_contact_number_verified 	= $request->is_guardian_contact_number_verified;
+		$user->show_email 						= $request->show_email;
+		$user->show_contact_number 				= $request->show_contact_number;
+
+		$user->bank_account_type 	= $request->bank_account_type;
+		$user->bank_name 			= $request->bank_name;
+		$user->bank_account_num 	= $request->bank_account_num;
+		$user->bank_identifier_code = $request->bank_identifier_code;
 		
 		if($user->save())
 		{

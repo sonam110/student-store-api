@@ -233,6 +233,7 @@
                    <strong><center>{{ $amount_transferred_to_vendor }} Kr</center></strong>
                 </td>
             </tr>
+            
             <tr class="total">
                 <td></td>
                 <td colspan="2"><strong>Total Order Amount:</strong> </td>
