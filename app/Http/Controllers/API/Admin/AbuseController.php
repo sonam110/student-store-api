@@ -89,7 +89,7 @@ class AbuseController extends Controller
             }
             if(!empty($request->status))
             {
-                $abuses->whereIn('abuses.status',$request->status);
+                $abuses->where('abuses.status',$request->status);
             }
             if(!empty($request->reason))
             {
