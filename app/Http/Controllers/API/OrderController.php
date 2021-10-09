@@ -533,6 +533,7 @@ class OrderController extends Controller
 		$ask_for_cancellation = $orderItem->ask_for_cancellation;
 		$reason_id_for_cancellation_request = $orderItem->reason_id_for_cancellation_request;
 		$reason_id_for_cancellation_request_decline = $orderItem->reason_id_for_cancellation_request_decline;
+		$delivery_code = $orderItem->delivery_code;
 
 
 		if($request->item_status == 'resolved_to_customer')
@@ -551,9 +552,7 @@ class OrderController extends Controller
 
 		if($request->item_status == 'delivered') 
 		{
-			$orderItemDelivered = OrderItem::where('order_item_id', $id)->first();
-
-			if(!empty($request->delivery_code) && $request->delivery_code != $orderItemDelivered->delivery_code)
+			if(!empty($request->delivery_code) && $request->delivery_code != $delivery_code)
 			{
 				return response()->json(prepareResult(true, 'Delivery code not matched.', getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
 			}
