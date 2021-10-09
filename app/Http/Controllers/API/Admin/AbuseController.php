@@ -87,6 +87,10 @@ class AbuseController extends Controller
             {
                 $abuses->whereIn('abuses.user_id',$request->user_id);
             }
+            if(!empty($request->reason))
+            {
+                $abuses->where('abuses.reason_for_abuse','like','%'.$request->reason.'%');
+            }
             if(!empty($request->user_name))
             {
                 $abuses->join('users', function ($join) {
