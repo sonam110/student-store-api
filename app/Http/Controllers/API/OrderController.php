@@ -554,7 +554,7 @@ class OrderController extends Controller
 		{
 			if(!empty($request->delivery_code) && $request->delivery_code != $delivery_code)
 			{
-				return response()->json(prepareResult(true, 'Delivery code not matched.', getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
+				return response()->json(prepareResult(true, [], 'Delivery code not matched.'), config('http_response.internal_server_error'));
 			}
 		}
 		
