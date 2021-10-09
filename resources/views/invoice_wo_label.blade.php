@@ -130,7 +130,7 @@
                     <table>
                         <tr class="heading">
                             <td colspan="2">
-                                <center><span class="uppercase">{{getLangByLabelGroups('invoice','Order_Information')}}</span></center>
+                                <center><span class="uppercase">Order Information</span></center>
                             </td>
                         </tr>
                         <tr>
@@ -138,7 +138,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                <strong>{{getLangByLabelGroups('invoice','Buyer_Info')}}</strong><br>
+                                <strong>Buyer Info</strong><br>
                                 {{\mervick\aesEverywhere\AES256::decrypt($order->first_name, env('ENCRYPTION_KEY'))}} {{ !empty($order->last_name) ? \mervick\aesEverywhere\AES256::decrypt($order->last_name, env('ENCRYPTION_KEY')) : ''}} <br>
                                 {{ !empty($order->contact_number) ? \mervick\aesEverywhere\AES256::decrypt($order->contact_number, env('ENCRYPTION_KEY')) : ''}}
                                 <br>
@@ -148,8 +148,8 @@
                                 @endif
                             </td>
                             <td>
-                                {{getLangByLabelGroups('invoice','Order_No')}}#{{$order->order_number}}<br>
-                                {{getLangByLabelGroups('invoice','Date')}} {{date('Y-m-d', strtotime($order->created_at))}}
+                                Order No. :#{{$order->order_number}}<br>
+                                Date: {{date('Y-m-d', strtotime($order->created_at))}}
                             </td>
                         </tr>
                     </table>
@@ -158,19 +158,19 @@
 
             <tr class="heading">
                 <td>
-                    {{getLangByLabelGroups('invoice','Item')}}
+                    Item
                 </td>
 
                 <td>
-                    <center>{{getLangByLabelGroups('invoice','Quantity')}}</center>
+                    <center>Quantity</center>
                 </td>
 
                 <td>
-                    <center>{{getLangByLabelGroups('invoice','Price')}}</center>
+                    <center>Price</center>
                 </td>
 
                 <td>
-                    <center>{{getLangByLabelGroups('invoice','Total')}}</center>
+                    <center>Total</center>
                 </td>
             </tr>
             @php
@@ -212,7 +212,7 @@
             @endforeach
             <tr class="total">
                 <td></td>
-                <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Total_Student_Store_Commission')}}</strong> </td>
+                <td colspan="2"><strong>Total Student Store Commission:</strong> </td>
                 <td>
                    <strong><center>{{ $student_store_commission }} Kr</center></strong>
                 </td>
@@ -220,7 +220,7 @@
 
             <tr class="total">
                 <td></td>
-                <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Total_Cool_Company_Commission')}}</strong> </td>
+                <td colspan="2"><strong>Total Cool Company Commission:</strong> </td>
                 <td>
                    <strong><center>{{ $cool_company_commission }} Kr</center></strong>
                 </td>
@@ -228,7 +228,7 @@
 
             <tr class="total">
                 <td></td>
-                <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Total_Amount_Transferred_to_Vendor')}}</strong> </td>
+                <td colspan="2"><strong>Total Amount Transferred to Vendor:</strong> </td>
                 <td>
                    <strong><center>{{ $amount_transferred_to_vendor }} Kr</center></strong>
                 </td>
@@ -236,7 +236,7 @@
             
             <tr class="total">
                 <td></td>
-                <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Total_Order_Amount')}}</strong> </td>
+                <td colspan="2"><strong>Total Order Amount:</strong> </td>
                 <td>
                    <strong><center>{{$order->grand_total}} Kr</center></strong>
                 </td>

@@ -129,7 +129,7 @@
 					<section id="Profile">
 						<article>
 							<div class="sectionTitle">
-								<h1>{{getLangByLabelGroups('pdf','Career_Objective')}}</h1>
+								<h1>Career Objective</h1>
 							</div>
 							<div class="sectionContent">
 								<p>{{$user->userCvDetail->other_description}} </p>
@@ -140,10 +140,10 @@
 					<section id="Profile">
 						<article>
 							<div class="sectionTitle">
-								<h1>{{getLangByLabelGroups('pdf','Personal_Profile')}}</h1>
+								<h1>Personal Profile</h1>
 							</div>
 							<div class="sectionContent">
-								<p>{{getLangByLabelGroups('pdf','Personal_Profile_text')}} </p>
+								<p>God began to called me to ministry as a while I was on a mission trip to Guatemal with my church. Since then I have pursued his call on my life serving the kingdom by leading ministries, preaching and teaching, pursuing further theological studies, working in support roles, and, as the church confirmed my call, becoming an ordained minister. I am convicted that real change of the heart does not happed through the power of human speech, but only through the power of the living Word coming into close contact with human hearts through reading, speaking, proclaiming, and teaching. </p>
 							</div>
 						</article>
 						<div class="clear"></div>
@@ -170,7 +170,7 @@
 					</section> -->
 					<section id="Education">
 						<div class="sectionTitle">
-							<h1>{{getLangByLabelGroups('pdf','Education')}}</h1>
+							<h1>Education</h1>
 						</div>
 						<div class="sectionContent">
 							<ul>
@@ -186,7 +186,7 @@
 					</section>
 					<section id="Work">
 						<div class="sectionTitle">
-							<h1>{{getLangByLabelGroups('pdf','Work_Experience')}}</h1>
+							<h1>Work Experience</h1>
 						</div>
 						<div class="sectionContent">
 							@forelse($user->userWorkExperiences as $experiences)
@@ -209,7 +209,7 @@
 					</section>
 					<section>
 						<div class="sectionTitle">
-							<h1>{{getLangByLabelGroups('pdf','Key_Skills')}}</h1>
+							<h1>Key Skills</h1>
 						</div>
 						<div class="sectionContent">
 							<ul class="keySkills">
@@ -228,42 +228,42 @@
 
 					<section>
 						<div class="sectionTitle">
-							<h1>{{getLangByLabelGroups('pdf','Hobbies')}}</h1>
+							<h1>Hobbies</h1>
 						</div>
 						<div class="sectionContent">
 							<ul class="keySkills">
-								<li>{{getLangByLabelGroups('pdf','Web_Surfing')}}</li>
-								<li>{{getLangByLabelGroups('pdf','Playing_Outdoor_games')}}</li>
+								<li>Web Surfing</li>
+								<li>Playing Outdoor games.</li>
 							</ul>
 						</div>
 					</section>
 
 					<section>
 						<div class="sectionTitle">
-							<h1>{{getLangByLabelGroups('pdf','Personal_Details')}}</h1>
+							<h1>Personal Details</h1>
 						</div>
 						<div class="sectionContent">
 							<table>
 								<tr>
-									<th>{{getLangByLabelGroups('pdf','Contact')}}</th>
+									<th>Contact</th>
 									<td>: {{\mervick\aesEverywhere\AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'))}}</td>
 								</tr>
 								<tr>
-									<th>{{getLangByLabelGroups('pdf','Email')}}</th>
+									<th>Email</th>
 									<td>: {{\mervick\aesEverywhere\AES256::decrypt($user->email, env('ENCRYPTION_KEY'))}}</td>
 								</tr>
 								<tr>
-									<th>{{getLangByLabelGroups('pdf','Address')}}</th>
+									<th>Address</th>
 									<td>: {{$user->defaultAddress->country}},   
 										{{$user->defaultAddress->state}},
 										{{$user->defaultAddress->city}}</td>
 								</tr>
 								<tr>
-									<th>{{getLangByLabelGroups('pdf','Languages_Known')}}</th>
+									<th>Languages Known</th>
 									<td>: {{implode(',',$languagesKnown)}}</td>
 								</tr>
 								<tr>
-									<th>{{getLangByLabelGroups('pdf','Date_of_birth')}}</th>
+									<th>Date of birth</th>
 									<td>: {{\Carbon\Carbon::parse(\mervick\aesEverywhere\AES256::decrypt($user->dob, env('ENCRYPTION_KEY')))->format('d M, Y')}}</td>
 								</tr>
 							</table>

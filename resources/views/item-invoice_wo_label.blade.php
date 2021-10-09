@@ -128,13 +128,13 @@
                     <table>
                         <tr class="heading">
                             <td colspan="2">
-                                <center><span class="uppercase">{{getLangByLabelGroups('invoice','Invoice')}}</span></center>
+                                <center><span class="uppercase">Invoice</span></center>
                             </td>
                         </tr>
                         <tr>
                             <td width="50%">
                                 <br><br>
-                                <strong>{{getLangByLabelGroups('invoice','Seller_Info')}}</strong><br>
+                                <strong>Seller Info</strong><br>
                                 @if($order->productsServicesBook)
                                     @php $seller = $order->productsServicesBook->user @endphp
                                 @elseif($order->contestApplication)
@@ -155,11 +155,11 @@
                                 @endif
                             </td>
                             <td width="50%">
-                                <strong>{{getLangByLabelGroups('invoice','Order_No.')}}</strong> #{{$order->order->order_number}}<br>
-                                <strong>{{getLangByLabelGroups('invoice','Date')}}</strong> {{date('Y-m-d', strtotime($order->order->created_at))}}
+                                <strong>Order No.</strong> :#{{$order->order->order_number}}<br>
+                                <strong>Date:</strong> {{date('Y-m-d', strtotime($order->order->created_at))}}
 
                                 <br><br>
-                                <strong>{{getLangByLabelGroups('invoice','Buyer Info')}}</strong><br>
+                                <strong>Buyer Info</strong><br>
                                 {{\mervick\aesEverywhere\AES256::decrypt($order->order->first_name, env('ENCRYPTION_KEY'))}} {{ !empty($order->order->last_name) ? \mervick\aesEverywhere\AES256::decrypt($order->order->last_name, env('ENCRYPTION_KEY')) : ''}} <br>
                                 {{ !empty($order->order->contact_number) ? \mervick\aesEverywhere\AES256::decrypt($order->order->contact_number, env('ENCRYPTION_KEY')) : ''}}
                                 <br>
@@ -172,20 +172,20 @@
             </tr>
 
             <tr class="heading">
-               <td>
-                    {{getLangByLabelGroups('invoice','Item')}}
+                <td>
+                    Item
                 </td>
 
                 <td>
-                    <center>{{getLangByLabelGroups('invoice','Quantity')}}</center>
+                    <center>Quantity</center>
                 </td>
 
                 <td>
-                    <center>{{getLangByLabelGroups('invoice','Price')}}</center>
+                    <center>Price</center>
                 </td>
 
                 <td>
-                    <center>{{getLangByLabelGroups('invoice','Total')}}</center>
+                    <center>Total</center>
                 </td>
             </tr>
 
@@ -217,7 +217,7 @@
 
             <tr class="total">
                 <td></td>
-                <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Total')}}:</strong> </td>
+                <td colspan="2"><strong>Total:</strong> </td>
                 <td>
                    <strong><center>{{$order->quantity * $order->price}} Kr</center></strong>
                 </td>
@@ -226,7 +226,7 @@
             @if(\Auth::user()->user_type_id==1)
                 <tr class="total">
                     <td></td>
-                    <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Student_Store_Commission')}}</strong> </td>
+                    <td colspan="2"><strong>Student Store Commission:</strong> </td>
                     <td>
                        <strong><center>{{ $order->student_store_commission }} Kr</center></strong>
                     </td>
@@ -234,7 +234,7 @@
 
                 <tr class="total">
                     <td></td>
-                    <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Cool_Company_Commission')}}</strong> </td>
+                    <td colspan="2"><strong>Cool Company Commission:</strong> </td>
                     <td>
                        <strong><center>{{ $order->cool_company_commission }} Kr</center></strong>
                     </td>
@@ -242,7 +242,7 @@
 
                 <tr class="total">
                     <td></td>
-                    <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Payable_Amount_to_Vendor')}}</strong> </td>
+                    <td colspan="2"><strong>Payable Amount to Vendor:</strong> </td>
                     <td>
                        <strong><center>{{ $order->amount_transferred_to_vendor }} Kr</center></strong>
                     </td>
