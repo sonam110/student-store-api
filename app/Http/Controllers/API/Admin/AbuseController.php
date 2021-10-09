@@ -87,6 +87,10 @@ class AbuseController extends Controller
             {
                 $abuses->whereIn('abuses.user_id',$request->user_id);
             }
+            if(!empty($request->status))
+            {
+                $abuses->whereIn('abuses.status',$request->status);
+            }
             if(!empty($request->reason))
             {
                 $abuses->where('abuses.reason_for_abuse','like','%'.$request->reason.'%');
