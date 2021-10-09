@@ -97,11 +97,11 @@ class UserController extends Controller
 		$user->profile_pic_thumb_path     = env('CDN_DOC_THUMB_URL').basename($request->profile_pic_path);
 		$user->user_type_id         = $request->user_type_id;
 		$user->language_id          = $request->language_id;
-		$user->is_verified          = true;
-		$user->is_agreed_on_terms   = true;
-		$user->is_prime_user        = true;
-		$user->is_deleted           = false;
-		$user->status               = true;
+		// $user->is_verified          = true;
+		// $user->is_agreed_on_terms   = true;
+		// $user->is_prime_user        = true;
+		// $user->is_deleted           = false;
+		// $user->status               = true;
 		$user->last_login           = now();
 		
 		if($user->save())

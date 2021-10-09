@@ -148,8 +148,6 @@ class UserController extends Controller
 		$user->dob                  				= $dob;
 		$user->profile_pic_path     				= $request->profile_pic_path;
 		$user->profile_pic_thumb_path     			= env('CDN_DOC_THUMB_URL').basename($request->profile_pic_path);
-		$user->is_email_verified 					= $request->is_email_verified;
-		$user->is_contact_number_verified 			= $request->is_contact_number_verified;
 		$user->cp_first_name 						= $request->cp_first_name;
 		$user->cp_last_name 						= $request->cp_last_name;
 		$user->cp_email 							= $request->cp_email;
