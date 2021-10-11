@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Job;
 use App\Models\JobApplication; 
 use App\Models\JobTag;
+use App\Models\LangForDDL;
 use App\Http\Resources\JobResource;
 use App\Http\Resources\JobApplicationResource;
 use Illuminate\Support\Facades\Validator;
@@ -155,7 +156,7 @@ class JobController extends Controller
             $job->save();
             if($job)
             {
-                $user_package->update(['used_job_ads'=>($user_package->used_job_ads + 1)]);
+                //$user_package->update(['used_job_ads'=>($user_package->used_job_ads + 1)]);
 
 
                 foreach ($request->tags as $key => $tag) {

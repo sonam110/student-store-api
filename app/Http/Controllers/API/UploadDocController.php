@@ -17,13 +17,13 @@ class UploadDocController extends Controller
         {
             $validation = \Validator::make($request->all(),[ 
                 'file'     => 'required|array|max:20000|min:1',
-                "file.*"  => "required|min:1|mimes:doc,docx,png,jpeg,jpg,pdf,svg,mp4",
+                "file.*"  => "required|min:1|mimes:doc,docx,png,jpeg,jpg,pdf,svg,mp4,tif,tiff,bmp,gif,eps,raw,jfif,webp",
             ]);
         }
         else
         {
             $validation = \Validator::make($request->all(),[ 
-                'file'     => 'required|max:10000|mimes:doc,docx,png,jpeg,jpg,pdf,svg,mp4',
+                'file'     => 'required|max:10000|mimes:doc,docx,png,jpeg,jpg,pdf,svg,mp4,tif,tiff,bmp,gif,eps,raw,jfif,webp',
             ]);
         }
         if ($validation->fails()) {
@@ -35,7 +35,7 @@ class UploadDocController extends Controller
             $destinationPath = 'uploads/';
             $thumbDestinationPath = 'uploads/thumbs/';
             $fileArray = array();
-            $formatCheck = ['tif','tiff','bmp','gif','eps','raw','jfif'];
+            $formatCheck = ['tif','tiff','bmp','gif','eps','raw','jfif','webp'];
 
             if($request->is_multiple==1)
             {
