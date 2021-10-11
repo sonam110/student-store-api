@@ -67,6 +67,7 @@ class JobController extends Controller
     public function store(Request $request)
     {
         $validation = Validator::make($request->all(), [
+            'user_id'           => 'required',
             'language_id'       => 'required',
             'address_detail_id' => 'required',
             'title'             => 'required',
@@ -229,6 +230,7 @@ class JobController extends Controller
     public function update(Request $request, Job $job)
     {
         $validation = Validator::make($request->all(), [
+            'user_id'           => 'required',
             'language_id'       => 'required',
             'address_detail_id' => 'required',
             'title'             => 'required',
@@ -259,14 +261,14 @@ class JobController extends Controller
                 $published_at = $job->published_at;
             }
 
-            if(!empty($request->user_id))
+            /*if(!empty($request->user_id))
             {
                 $user_id = $request->user_id;
             }
             else
             {
                 $user_id = Auth::id();
-            }
+            }*/
 
             $job_start_date = date("Y-m-d", strtotime($request->job_start_date));
             $application_start_date = date("Y-m-d", strtotime($request->application_start_date));
