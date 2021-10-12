@@ -40,7 +40,11 @@ class ContactUsController extends Controller
             $contactUs->images                          = $request->images ? json_encode($request->images) : Null;
             $contactUs->save();
 
-            $emailTemplate = EmailTemplate::where('template_for','contact-us')->first();
+            $emailTemplate = EmailTemplate::where('template_for','contact-us')->where('language_id',env('APP_DEFAULT_LANGUAGE'))->first();
+            if(empty($emailTemplate))
+            {
+                EmailTemplate::where('template_for','contact-us')->first();
+            }
 
             $body = $emailTemplate->body;
 

@@ -218,7 +218,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	//   'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
 	// ]);
 
-	$refund = \Stripe\Refund::create([
+	$data = \Stripe\Refund::create([
 		'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
 	  	'payment_intent' => $transaction->transaction_id,
 	]);

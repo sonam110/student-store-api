@@ -408,7 +408,11 @@ class OrderController extends Controller
 
 				//Mail-start-buyer
 
-                $emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
+                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id',$order->user->language_id)->first();
+                if(empty($emailTemplate))
+                {
+                	$emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
+                }
 
                 $email_body = $emailTemplate->body;
 
@@ -425,7 +429,7 @@ class OrderController extends Controller
                 	'order_details' => $order,
                 ];
                 
-                Mail::to(AES256::decrypt($order->user->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
+                Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
                 //mail-end
 
 
@@ -644,7 +648,11 @@ class OrderController extends Controller
 
 			///to Buyer
 
-			$emailTemplate = EmailTemplate::where('template_for','order_replacement_request')->first();
+			$emailTemplate = EmailTemplate::where('template_for','order_replacement_request')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','order_replacement_request')->first();
+			}
 
 			$mail_body = $emailTemplate->body;
 
@@ -727,7 +735,11 @@ class OrderController extends Controller
 
 			///to Buyer
 
-			$emailTemplate = EmailTemplate::where('template_for','order_replaced')->first();
+			$emailTemplate = EmailTemplate::where('template_for','order_replaced')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','order_replaced')->first();
+			}
 
 			$mail_body = $emailTemplate->body;
 
@@ -802,7 +814,11 @@ class OrderController extends Controller
 
 			///to Buyer
 
-			$emailTemplate = EmailTemplate::where('template_for','order_return_request')->first();
+			$emailTemplate = EmailTemplate::where('template_for','order_return_request')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','order_return_request')->first();
+			}
 
 			$mail_body = $emailTemplate->body;
 
@@ -853,7 +869,12 @@ class OrderController extends Controller
 
 			///to Buyer
 
-			$emailTemplate = EmailTemplate::where('template_for','order_returned')->first();
+
+			$emailTemplate = EmailTemplate::where('template_for','order_returned')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','order_returned')->first();
+			}
 
 			$mail_body = $emailTemplate->body;
 
@@ -1144,7 +1165,11 @@ class OrderController extends Controller
 
 			///to Buyer
 
-			$emailTemplate = EmailTemplate::where('template_for','order_confirmed')->first();
+			$emailTemplate = EmailTemplate::where('template_for','order_confirmed')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','order_confirmed')->first();
+			}
 
 			$mail_body = $emailTemplate->body;
 
@@ -1172,7 +1197,11 @@ class OrderController extends Controller
 			//Mail start
 			///to Buyer
 
-			$emailTemplate = EmailTemplate::where('template_for','order_shipped')->first();
+			$emailTemplate = EmailTemplate::where('template_for','order_shipped')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','order_shipped')->first();
+			}
 
 			$mail_body = $emailTemplate->body;
 
@@ -1200,7 +1229,11 @@ class OrderController extends Controller
 			//Mail start
 			///to Buyer
 
-			$emailTemplate = EmailTemplate::where('template_for','order_delivered')->first();
+			$emailTemplate = EmailTemplate::where('template_for','order_delivered')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','order_delivered')->first();
+			}
 
 			$mail_body = $emailTemplate->body;
 
@@ -1227,7 +1260,12 @@ class OrderController extends Controller
 			//Mail start
 			///to Buyer
 
-			$emailTemplate = EmailTemplate::where('template_for','order_completed')->first();
+
+			$emailTemplate = EmailTemplate::where('template_for','order_completed')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','order_completed')->first();
+			}
 
 			$mail_body = $emailTemplate->body;
 
@@ -1255,7 +1293,12 @@ class OrderController extends Controller
 			//Mail start
 			///to Buyer
 
-			$emailTemplate = EmailTemplate::where('template_for','order_canceled')->first();
+			
+			$emailTemplate = EmailTemplate::where('template_for','order_canceled')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','order_canceled')->first();
+			}
 
 			$mail_body = $emailTemplate->body;
 
