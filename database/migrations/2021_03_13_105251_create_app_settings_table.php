@@ -31,7 +31,8 @@ class CreateAppSettingsTable extends Migration
             $table->string('insta_url')->nullable();
             $table->string('linked_url')->nullable();
             $table->string('support_email')->nullable();
-            $table->bigInteger('support_contact_number')->nullable();
+            $table->string('support_contact_number')->nullable();
+            $table->text('address')->nullable();
             $table->string('single_rewards_pt_value')->nullable();
             $table->string('customer_rewards_pt_value')->nullable();
             $table->longText('reward_points_policy')->nullable();

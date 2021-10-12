@@ -27,6 +27,7 @@ use App\Models\Slider;
 use App\Models\EmailTemplate;
 use App\Models\ProductImage;
 use App\Models\ServiceProviderDetail;
+use App\Models\PaymentGatewaySetting;
 use App\Models\Contest;
 use Stripe;
 use App\Mail\ForgotPasswordMail;
@@ -191,7 +192,13 @@ class FrontController extends Controller
 	{
 		try
 		{
-			$appSetting = AppSetting::first();
+			$stripeSetting = PaymentGatewaySetting::first();
+			$appSetting['app_setting'] = AppSetting::first();
+			$appSetting['stripe_setting'] = [
+				'payment_gateway_name' 		=> AES256::encrypt($stripeSetting->payment_gateway_name, env('ENCRYPTION_KEY')),
+				'payment_gateway_key' 		=> AES256::encrypt($stripeSetting->payment_gateway_key, env('ENCRYPTION_KEY')),
+				'payment_gateway_secret' 	=> AES256::encrypt($stripeSetting->payment_gateway_secret, env('ENCRYPTION_KEY'))
+			];
 			return response(prepareResult(false, $appSetting, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}
 		catch (\Throwable $exception) 
@@ -597,13 +604,19 @@ class FrontController extends Controller
         dd($createProduct);*/
 
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-		$cancelSubscription = $stripe->subscriptions->cancel(
+		/*$cancelSubscription = $stripe->subscriptions->cancel(
 		  	'sub_1JhYEPD6j8NkE89KA5XVE8jO',
 		  	[]
 		);
 
-		return str_replace('Stripe\Subscription JSON: ', '', $cancelSubscription);
+		return str_replace('Stripe\Subscription JSON: ', '', $cancelSubscription);*/
 
+		$klarna = \Stripe\PaymentIntent::create([
+		  'payment_method_types' => ['klarna'],
+		  'amount' => 1089,
+		  'currency' => 'USD',
+		]);
+		dd($klarna);
 	}
 
 	public function strReplaceAssoc(array $replace, $subject) { 

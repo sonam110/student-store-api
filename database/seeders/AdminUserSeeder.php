@@ -48,18 +48,29 @@ class AdminUserSeeder extends Seeder
 
     	DB::table('app_settings')->truncate();
     	$appSetting             				= new AppSetting();
-    	$appSetting->reward_point_setting_id	= $rewardPointSetting->id;
-    	$appSetting->app_name					= "Student Store";
-    	$appSetting->description				= "";
-        $appSetting->logo_path                  = env('CDN_DOC_URL').'uploads/logo.png';
-    	$appSetting->logo_thumb_path			= env('CDN_DOC_THUMB_URL').'logo.png';
-    	$appSetting->copyright_text				= "";
-    	$appSetting->fb_ur						= "";
-    	$appSetting->twitter_url				= "";
-    	$appSetting->insta_url					= "";
-    	$appSetting->linked_url					= "";
-    	$appSetting->support_email				= 'info@studentstore.com';
-    	$appSetting->support_contact_number 	= '9876543212';
+    	$appSetting->reward_point_setting_id   => $rewardPointSetting->id;
+        $appSetting->app_name   => 'Student Store';
+        $appSetting->description    => '';
+        $appSetting->logo_path  => env('CDN_DOC_URL').'uploads/logo.png';
+        $appSetting->logo_thumb_path    => env('CDN_DOC_THUMB_URL').'logo.png';
+        $appSetting->invite_url => 'https://studentstore.se/';
+        $appSetting->copyright_text => '';
+        $appSetting->fb_ur  => '';
+        $appSetting->twitter_url    => '';
+        $appSetting->insta_url  => '';
+        $appSetting->linked_url => '';
+        $appSetting->support_email  => 'info@noahmtrix.se';
+        $appSetting->support_contact_number => '+4670 985 12 02';
+        $appSetting->address    => 'Döbelnsgatan 93506 38 borås';
+        $appSetting->customer_rewards_pt_value  => '5';
+        $appSetting->single_rewards_pt_value    => '10';
+        $appSetting->reward_points_policy   => '';
+        $appSetting->vat    => '25';
+        $appSetting->meta_title => 'Welcome to Student Store';
+        $appSetting->meta_keywords  => 'Welcome to Student Store';
+        $appSetting->meta_description   => 'Welcome to Student Store';
+        $appSetting->coolCompanyVatRateId   => '7';
+        $appSetting->coolCompanyCommission  => '2.5';
     	$appSetting->save();
 
 
@@ -79,15 +90,20 @@ class AdminUserSeeder extends Seeder
         $userType->description          = 'Limited access';
         $userType->save();
 
+        $userType = new UserType;
+        $userType->title                = 'Buyer';
+        $userType->description          = 'Limited access';
+        $userType->save();
+
     	DB::table('users')->truncate();
     	$user 							= new User();
     	$user->user_type_id      		= '1';
     	$user->language_id      		= '1';
-    	$user->first_name          		= 'Student-Store-Admin';
-    	$user->last_name          		= '';
+    	$user->first_name          		= 'Student-Store';
+    	$user->last_name          		= 'Admin';
     	$user->email         			= 'admin@gmail.com';
     	$user->email_verified_at 		= date('Y-m-d H:i:s');
-    	$user->password      			= \Hash::make('12345678');   
+    	$user->password      			= \Hash::make('StudentStore!@#');   
         $user->profile_pic_path         = env('CDN_DOC_URL').'uploads/noimage.jpg';     
     	$user->profile_pic_thumb_path	= env('CDN_DOC_THUMB_URL').'noimage.jpg'; 	
         $user->gender       			= 'male';

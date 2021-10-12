@@ -15,38 +15,38 @@ class CategorySeeder extends Seeder
     public function run()
     {
         $moduleType1 = new ModuleType;
-        $moduleType1->title                = 'Job';
+        $moduleType1->title               = 'Job';
         $moduleType1->slug                = 'job';
         $moduleType1->description         = 'module type 1 description';
-        $moduleType1->status               = true;
+        $moduleType1->status              = true;
         $moduleType1->save();
 
         $moduleType2 = new ModuleType;
-        $moduleType2->title                = 'Service';
+        $moduleType2->title               = 'Service';
         $moduleType2->slug                = 'service';
         $moduleType2->description         = 'module type 2 description';
-        $moduleType2->status               = true;
+        $moduleType2->status              = true;
         $moduleType2->save();
 
         $moduleType3 = new ModuleType;
-        $moduleType3->title                = 'Product';
+        $moduleType3->title               = 'Product';
         $moduleType3->slug                = 'product';
         $moduleType3->description         = 'module type 3 description';
-        $moduleType3->status               = true;
+        $moduleType3->status              = true;
         $moduleType3->save();
 
         $moduleType4 = new ModuleType;
-        $moduleType4->title                = 'Book';
+        $moduleType4->title               = 'Book';
         $moduleType4->slug                = 'book';
         $moduleType4->description         = 'module type 4 description';
-        $moduleType4->status               = true;
+        $moduleType4->status              = true;
         $moduleType4->save();
 
         $moduleType5 = new ModuleType;
-        $moduleType5->title                = 'Contest';
+        $moduleType5->title               = 'Contest';
         $moduleType5->slug                = 'contest';
         $moduleType5->description         = 'module type 5 description';
-        $moduleType5->status               = true;
+        $moduleType5->status              = true;
         $moduleType5->save();
 
         //Jobs
