@@ -193,7 +193,7 @@ class FrontController extends Controller
 		try
 		{
 			$stripeSetting = PaymentGatewaySetting::first();
-			$appSetting['app_setting'] = AppSetting::first();
+			$appSetting = AppSetting::first();
 			$appSetting['stripe_setting'] = [
 				'payment_gateway_name' 		=> AES256::encrypt($stripeSetting->payment_gateway_name, env('ENCRYPTION_KEY')),
 				'payment_gateway_key' 		=> AES256::encrypt($stripeSetting->payment_gateway_key, env('ENCRYPTION_KEY')),
