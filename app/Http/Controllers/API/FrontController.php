@@ -370,7 +370,7 @@ class FrontController extends Controller
 	public function payout()
 	{ 	
 		//acct_1F0knGLBmnAF4Rxg -aman
-		\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_key);
+		\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
 
 		/*
 		$account = \Stripe\Customer::create(
@@ -479,7 +479,7 @@ class FrontController extends Controller
 		*/
 
 		
-		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
+		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 
 		/*
 		$users = $stripe->accounts->all(['limit' => 3]);
@@ -609,7 +609,7 @@ class FrontController extends Controller
 
         dd($createProduct);*/
 
-        \Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_key);
+        \Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
 		/*$cancelSubscription = $stripe->subscriptions->cancel(
 		  	'sub_1JhYEPD6j8NkE89KA5XVE8jO',
 		  	[]

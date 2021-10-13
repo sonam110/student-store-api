@@ -1534,7 +1534,7 @@ class OrderController extends Controller
 		$total = $sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount;
 
 					
-		\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_key);
+		\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
 
 		$customer_id = $request->customer_id;
 		$ephemeralKey = \Stripe\EphemeralKey::create(
@@ -1559,7 +1559,7 @@ class OrderController extends Controller
 
 	public function createStripeSubscription(Request $request)
 	{
-		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
+		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 		$subscription = $stripe->subscriptions->create([
 		  'customer' => Auth::user()->stripe_customer_id,
 		  'items' => [
@@ -1586,7 +1586,7 @@ class OrderController extends Controller
 			$user_package->canceled_date = date('Y-m-d');
 			$user_package->save();
 
-			$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
+			$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 			$cancelSubscription = $stripe->subscriptions->cancel(
 			  	$request->subscription_id,
 			  	[]

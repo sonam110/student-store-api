@@ -55,7 +55,7 @@ class PaymentCardDetailController extends Controller
         DB::beginTransaction();
         try
         {
-            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
             $checkUser = User::find(Auth::id());
             $customerId = $checkUser->stripe_customer_id;
             if(empty($customerId))
@@ -162,7 +162,7 @@ class PaymentCardDetailController extends Controller
         DB::beginTransaction();
         try
         {
-            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
             $checkUser = User::find(Auth::id());
             $customerId = $checkUser->stripe_customer_id;
             if(empty($customerId))
@@ -246,7 +246,7 @@ class PaymentCardDetailController extends Controller
      */
     public function destroy(PaymentCardDetail $paymentCardDetail)
     {
-        $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
+        $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
         $checkUser = User::find(Auth::id());
         $customerId = $checkUser->stripe_customer_id;
         if(!empty($paymentCardDetail->stripe_payment_method_id))

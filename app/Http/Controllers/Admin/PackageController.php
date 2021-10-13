@@ -70,7 +70,7 @@ class PackageController extends Controller
         DB::beginTransaction();
         try
         {
-            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 
             $createProduct = $stripe->products->create([
                 'images'    => [$this->appsetting->logo_path],
@@ -169,7 +169,7 @@ class PackageController extends Controller
         DB::beginTransaction();
         try
         {
-            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 
             if(empty($package->stripe_plan_id))
             {
@@ -282,7 +282,7 @@ class PackageController extends Controller
             return response()->json(prepareResult(true, ['package subscribed'], getLangByLabelGroups('messages','messages_can\'t_delete')), config('http_response.success'));
         }
         if(!empty($package->stripe_plan_id)) {
-            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
             $stripe->plans->delete(
                 $package->stripe_plan_id,
                 []

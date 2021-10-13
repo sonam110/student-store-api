@@ -25,7 +25,7 @@ class StripeController extends Controller
             $user = User::select('stripe_account_id','stripe_status')->find(Auth::id());
             if($user->stripe_status=='1' || $user->stripe_status==null)
             {
-                \Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_key);
+                \Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
                 $account = \Stripe\Account::create([
                   'type' => 'standard',
                 ]);
@@ -61,7 +61,7 @@ class StripeController extends Controller
             $user = User::select('stripe_account_id','stripe_status')->find(Auth::id());
             if(($user->stripe_status=='2' || $user->stripe_status=='4') && (!empty($user->stripe_account_id)))
             {
-                \Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_key);
+                \Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
                 $account_links = \Stripe\AccountLink::create([
                   'account'     => $user->stripe_account_id,
                   'refresh_url' => env('STRIPE_REFRESH_URL'),
