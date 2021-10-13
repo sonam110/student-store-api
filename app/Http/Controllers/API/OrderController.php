@@ -1602,7 +1602,7 @@ class OrderController extends Controller
 	            return response()->json(prepareResult(true, $info, "Error while creating klarna session"), config('http_response.internal_server_error'));
 	        }
 	        curl_close($curl);
-	        return response()->json(prepareResult(false, $response, "Session successfully created."), config('http_response.success'));
+	        return response()->json(prepareResult(false, json_decode($response, true), "Session successfully created."), config('http_response.success'));
 		} else {
 			\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
 
