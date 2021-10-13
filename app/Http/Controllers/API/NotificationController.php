@@ -125,4 +125,9 @@ class NotificationController extends Controller
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
     }
+
+    public function pushNotificationKlarna(Request $request)
+    {
+        return response()->json(prepareResult(false, [], 'Klarna notification pushed'), config('http_response.success'));
+    }
 }

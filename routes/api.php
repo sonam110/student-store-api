@@ -86,6 +86,9 @@ Route::get('/get-student-contest-landing-page', [App\Http\Controllers\API\Landin
 Route::post('/get-contests-filter', [App\Http\Controllers\API\LandingPageController::class, 'contestFilter']);
 
 
+Route::post('/push-notification-klarna', [App\Http\Controllers\API\NotificationController::class, 'pushNotificationKlarna']);
+
+
 
 
 
@@ -225,11 +228,10 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/reason-for-action', [App\Http\Controllers\API\OrderController::class,'reasonForAction']);
 
 	Route::post('/create-stripe-intent', [App\Http\Controllers\API\OrderController::class,'createStripeIntent']);
-	Route::post('/cancel-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'cancelStripeSubscription']);
 	Route::post('/create-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'createStripeSubscription']);
+	Route::post('/cancel-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'cancelStripeSubscription']);
 
 	//Klarna
-	Route::post('/create-customer-token-klarna', [App\Http\Controllers\API\KlarnaPaymentController::class,'createCustomerTokenKlarna']);
 
 	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\RatingAndFeedbackController');
 	Route::get('/rating-and-feedback-approve/{id}', [App\Http\Controllers\API\RatingAndFeedbackController::class,'approve']);
