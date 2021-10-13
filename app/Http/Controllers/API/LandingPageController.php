@@ -1360,7 +1360,7 @@ class LandingPageController extends Controller
         {
             $applied = false;
         }
-        $job = Job::with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
+        $job = Job::with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path,avg_rating','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
         $job['favourite_job'] = $favouriteJob;
         $job['favourite_id'] = $favouriteId;
         $job['is_applied'] = $applied;

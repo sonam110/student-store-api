@@ -167,7 +167,7 @@ class JobController extends Controller
                         $title = 'New Job Posted';
                         $body =  'New Job '.$job->title.' Posted by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'  '.AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY'));
                         $type = 'Job Posted';
-                        pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'landing_screen');
+                        pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'student-landing');
                         // event(new JobPostNotification($job->id));
                     }
 
@@ -772,7 +772,7 @@ class JobController extends Controller
 
             
             $type = 'Job Action';
-            pushNotification($title,$body,Auth::user(),$type,true,'creator','job',$getJob->id,'student-landing');
+            pushNotification($title,$body,Auth::user(),$type,true,'creator','job',$getJob->id,'service-provider-landing');
 
             DB::commit();
             return response()->json(prepareResult(false, $getJob, getLangByLabelGroups('messages','messages_job_'.$request->action)), config('http_response.created'));

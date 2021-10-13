@@ -188,7 +188,7 @@ class JobController extends Controller
                     $title = 'New Job Posted';
                     $body =  'New Job '.$job->title.' Posted by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'  '.AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY'));
                     $type = 'Job Posted';
-                    pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'landing_screen');
+                    pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'student-landing');
                     // event(new JobPostNotification($job->id));
                 }
 

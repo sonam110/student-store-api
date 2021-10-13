@@ -1474,6 +1474,7 @@ class OrderController extends Controller
 	{
 		$sub_total = 0;
 		$shipping_charge = 0;
+		$itemInfo = [];
 		foreach ($request->items as $key => $orderedItem) {
 			if(!empty($orderedItem['product_id']))
 			{
@@ -1499,6 +1500,20 @@ class OrderController extends Controller
 						$shipping_charge = $shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']);
 					}
 				}
+
+				//For klarna
+				$itemInfo[] = [
+	        		'type'      => 'physical',
+	                'reference' => $orderedItem['product_id'],
+	                'name'      => $orderedItem['title'],
+	                'quantity'  => $orderedItem['quantity'],
+	                'unit_price'=> $price,
+	                'tax_rate'  => 0,
+	                'total_amount'          => $price,
+	                'total_discount_amount' => 0,
+	                'total_tax_amount'      => 0,
+	                'image_url' => $orderedItem['cover_image']
+	        	];
 				
 			}
 			elseif(!empty($orderedItem['contest_id']))
@@ -1512,6 +1527,20 @@ class OrderController extends Controller
 				{
 					$price = $productsServicesBook->subscription_fees;
 				}
+
+				//For klarna
+				$itemInfo[] = [
+	        		'type'      => 'physical',
+	                'reference' => $orderedItem['contest_id'],
+	                'name'      => $orderedItem['title'],
+	                'quantity'  => $orderedItem['quantity'],
+	                'unit_price'=> $price,
+	                'tax_rate'  => 0,
+	                'total_amount'          => $price,
+	                'total_discount_amount' => 0,
+	                'total_tax_amount'      => 0,
+	                'image_url' => $orderedItem['cover_image']
+	        	];
 			}
 			else
 			{
@@ -1533,28 +1562,72 @@ class OrderController extends Controller
 
 		$total = $sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount;
 
-					
-		\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
+		if($request->payment_method=='klarna') {
+			$url = env('KLARNA_URL').'/payments/v1/sessions';
+	        $username = $this->paymentInfo->klarna_username;
+	        $password = $this->paymentInfo->klarna_password;
+	        $auth     = base64_encode($username.":".$password);
 
-		$customer_id = $request->customer_id;
-		$ephemeralKey = \Stripe\EphemeralKey::create(
-		    ['customer' 		=> $customer_id],
-		    ['stripe_version' 	=> '2020-08-27']
-		);
+	        
 
-		$paymentIntent = \Stripe\PaymentIntent::create([
-		    'amount' 	=> ($total) * 100,
-		    'currency' 	=> $this->paymentInfo->stripe_currency,
-		    'customer' 	=> $customer_id
-		]);
+	        $data = [
+	            'purchase_country'  => 'SE',
+	            'purchase_currency' => 'SEK',
+	            'locale'            => 'sv-SE',
+	            'order_amount'      => $total,
+	            'order_tax_amount'  => 0,
+	            'order_lines'       => $itemInfo
+	        ];
+	        $postData = json_encode($data);
 
-		$returnObj = [
-			'paymentIntent' 	=> $paymentIntent->client_secret,
-		    'ephemeralKey' 		=> $ephemeralKey->secret,
-		    'customer' 			=> $customer_id,
-		    'payable_amount' 	=> $total,
-		];
-		return response(prepareResult(false, $returnObj, 'Order Intent create'), config('http_response.success'));
+	        $curl = curl_init();
+	        curl_setopt_array($curl, array(
+	          CURLOPT_URL => $url,
+	          CURLOPT_RETURNTRANSFER => true,
+	          CURLOPT_ENCODING => '',
+	          CURLOPT_MAXREDIRS => 10,
+	          CURLOPT_TIMEOUT => 0,
+	          CURLOPT_FOLLOWLOCATION => true,
+	          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	          CURLOPT_CUSTOMREQUEST => 'POST',
+	          CURLOPT_POSTFIELDS => $postData,
+	          CURLOPT_HTTPHEADER => array(
+	            'Authorization: Basic '.$auth,
+	            'Content-Type: application/json',
+	          ),
+	        ));
+
+	        $response = curl_exec($curl);
+	        if(curl_errno($curl)>0)
+	        {
+	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+	            return response()->json(prepareResult(true, $info, "Error while creating klarna session"), config('http_response.internal_server_error'));
+	        }
+	        curl_close($curl);
+	        return response()->json(prepareResult(false, $response, "Session successfully created."), config('http_response.success'));
+		} else {
+			\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
+
+			$customer_id = $request->customer_id;
+			$ephemeralKey = \Stripe\EphemeralKey::create(
+			    ['customer' 		=> $customer_id],
+			    ['stripe_version' 	=> '2020-08-27']
+			);
+
+			$paymentIntent = \Stripe\PaymentIntent::create([
+			    'amount' 	=> ($total) * 100,
+			    'currency' 	=> $this->paymentInfo->stripe_currency,
+			    'customer' 	=> $customer_id
+			]);
+
+			$returnObj = [
+				'paymentIntent' 	=> $paymentIntent->client_secret,
+			    'ephemeralKey' 		=> $ephemeralKey->secret,
+			    'customer' 			=> $customer_id,
+			    'payable_amount' 	=> $total,
+			];
+			return response(prepareResult(false, $returnObj, 'Order Intent create'), config('http_response.success'));
+		}
 	}
 
 	public function createStripeSubscription(Request $request)
