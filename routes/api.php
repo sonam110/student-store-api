@@ -229,6 +229,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/create-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'createStripeSubscription']);
 
 	//Klarna
+	Route::post('/create-customer-token-klarna', [App\Http\Controllers\API\KlarnaPaymentController::class,'createCustomerTokenKlarna']);
 
 	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\RatingAndFeedbackController');
 	Route::get('/rating-and-feedback-approve/{id}', [App\Http\Controllers\API\RatingAndFeedbackController::class,'approve']);

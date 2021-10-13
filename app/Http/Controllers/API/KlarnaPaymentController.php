@@ -5,40 +5,50 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PaymentGatewaySetting;
+use mervick\aesEverywhere\AES256;
+use Auth;
+use App\Models\User;
 
 class KlarnaPaymentController extends Controller
 {
     function __construct()
     {
         $this->paymentInfo = PaymentGatewaySetting::first();
+        $username       = $this->paymentInfo->klarna_username;
+        $password       = $this->paymentInfo->klarna_password;
+        $this->auth     = base64_encode($username.":".$password);
     }
 
     public function createKlarnaSession(Request $request)
     {
-        $url = env('KLARNA_URL').'/payments/v1/sessions';
-        $username = $this->paymentInfo->klarna_username;
-        $password = $this->paymentInfo->klarna_password;
-        $auth     = base64_encode($username.":".$password);
+        $user = User::find(Auth::id());
+        $url  = env('KLARNA_URL').'/payments/v1/authorizations/'.$request->auth_token.'/customer-token';
+
+        $given_name = AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'));
+        $family_name = (!empty(AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')))) ? AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')) : null;
+        $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+        $phone = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
+        $street_address = $user->defaultAddress->full_address;
+        $postal_code = $user->defaultAddress->zip_code;
+        $city = $user->defaultAddress->city;
 
         $data = [
             'purchase_country'  => 'SE',
-            'purchase_currency' => 'SEK',
-            'locale'            => 'sv-SE',
-            'order_amount'      => 10,
-            'order_tax_amount'  => 10,
-            'order_lines'       => 10,
-            'order_amount'      => [
-                'type'      => 'physical',
-                'reference' => '19-402',
-                'name'      => 'Battery Power Pack',
-                'quantity'  => 1,
-                'unit_price'=> 10,
-                'tax_rate'  => 0,
-                'total_amount'          => 10,
-                'total_discount_amount' => 0,
-                'total_tax_amount'      => 0,
-                'image_url' => 'https://www.exampleobjects.com/logo.png',
-                'product_url' => 'https://www.estore.com/products/f2a8d7e34'
+            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
+            'billing_address'   => [
+                'given_name'    => $given_name,
+                'family_name'   => $family_name,
+                'email'         => $email,
+                'phone'         => $phone,
+                'street_address'=> $street_address,
+                'postal_code'   => $postal_code,
+                'city'          => $city,
+                'country'       => 'SE'
+            ],
+            'description'       => 'Student Store',
+            'intended_use'      => 'subscription',
+            'merchant_urls'     => [
+                'confirmation'  => 'https://www.example.com/confirmation.html'
             ]
         ];
         $postData = json_encode($data);

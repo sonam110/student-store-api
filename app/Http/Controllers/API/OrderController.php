@@ -1571,7 +1571,7 @@ class OrderController extends Controller
 	        $data = [
 	            'purchase_country'  => 'SE',
 	            'purchase_currency' => 'SEK',
-	            'locale'            => 'sv-SE',
+	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
 	            'order_amount'      => $total,
 	            'order_tax_amount'  => 0,
 	            'order_lines'       => $itemInfo
