@@ -14,12 +14,12 @@ use Str;
 use DB;
 use Auth;
 use App\Models\EmailTemplate;
+use App\Models\NotificationTemplate;
 use Mail;
 use App\Mail\AbuseMail;
 
 class AbuseController extends Controller
 {
-
     public function store(Request $request)
     {        
         $validation = Validator::make($request->all(), [
@@ -43,31 +43,50 @@ class AbuseController extends Controller
             $contactUs->status              			= 'pending';
             $contactUs->save();
 
+            
+
+
             if(!empty($request->products_services_book_id))
             {
                 $product = ProductsServicesBook::find($request->products_services_book_id);
+                $product_type = $product->type;
                 $module = 'Product';
-                $body =  'An Abuse has been reported for the '.$product->type.' '.$product->title.' .';
             }
             elseif(!empty($request->contest_id))
             {
                 $product = Contest::find($request->contest_id);
+                $product_type = $product->type;
                 $module = 'Contest';
-                $body =  'An Abuse has been reported for the '.$product->type.' '.$product->title.' .';
             }
             else
             {
                 $product = Job::find($request->job_id);
                 $module = 'Job';
-                $body =  'An Abuse has been reported for the job '.$product->title.' .';
+                $product_type = 'job';
             }
 
-            
+            $notificationTemplate = NotificationTemplate::where('template_for','abuse_reported')->where('language_id',$product->user->language_id)->first();
+            if(empty($notificationTemplate))
+            {
+                NotificationTemplate::where('template_for','abuse_reported')->first();
+            }
 
-            $title = 'Abuse Reported';
+            $body = $notificationTemplate->body;
+
+            $arrayVal = [
+                '{{product_title}}' => $product->title,
+                '{{product_type}}' => $product_type,
+            ];
+
+            $title = $notificationTemplate->title;
+            $body = strReplaceAssoc($arrayVal, $body);
+
+
             
-                
             $type = 'Abuse';
+
+            $template_for = 'abuse_reported';
+
             pushNotification($title,$body,$product->user,$type,true,'buyer',$module,$product->id,'Abuse-list');
 
             DB::commit();

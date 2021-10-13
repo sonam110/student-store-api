@@ -17,6 +17,7 @@ use App\Models\ContestTag;
 use App\Models\UserPackageSubscription;
 use App\Models\OrderItem;
 use App\Models\Abuse;
+use App\Models\NotificationTemplate;
 use App\Models\RatingAndFeedback;
 
 class ContestController extends Controller
@@ -226,10 +227,28 @@ class ContestController extends Controller
                }
 
                 $users = $users->get();
-                $title = 'New Contest Posted';
-                $body =  'New Contest '.$contest->title.' Posted.';
-                $type = 'Contest Posted';
-                pushMultipleNotification($title,$body,$users,$type,true,'buyer','contest',$contest->id,'landing_screen');
+
+                foreach ($users as $key => $user) {
+                    $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->where('language_id',$user->language_id)->first();
+                    if(empty($notificationTemplate))
+                    {
+                        NotificationTemplate::where('template_for','new_contest_posted')->first();
+                    }
+
+                    $body = $notificationTemplate->body;
+
+                    $arrayVal = [
+                        '{{contest_title}}' => $contest->title,
+                    ];
+                    
+
+                    $title = $notificationTemplate->title;
+                    $body = strReplaceAssoc($arrayVal, $body);
+                    $type = 'Contest Posted';
+                    pushNotification($title,$body,$user,$type,true,'buyer','contest',$contest->id,'landing_screen');
+                }
+
+                
 
                 // Notification End
                 
