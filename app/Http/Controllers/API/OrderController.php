@@ -1568,8 +1568,6 @@ class OrderController extends Controller
 	        $password = $this->paymentInfo->klarna_password;
 	        $auth     = base64_encode($username.":".$password);
 
-	        
-
 	        $data = [
 	            'purchase_country'  => 'SE',
 	            'purchase_currency' => 'SEK',
