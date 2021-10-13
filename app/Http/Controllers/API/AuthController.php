@@ -26,6 +26,7 @@ use App\Models\OtpVerification;
 use App\Mail\RegistrationMail;
 use mervick\aesEverywhere\AES256;
 use Stripe;
+use App\Models\PaymentGatewaySetting;
 
 class AuthController extends Controller
 {

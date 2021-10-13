@@ -12,12 +12,14 @@ use Auth;
 use App\Models\UserPackageSubscription;
 use Stripe;
 use App\Models\AppSetting;
+use App\Models\PaymentGatewaySetting;
 
 class PackageController extends Controller
 {
     function __construct()
     {
         $this->appsetting = AppSetting::select('logo_path')->first();
+        $this->paymentInfo = PaymentGatewaySetting::first();
     }
 
     public function index(Request $request)
@@ -68,7 +70,7 @@ class PackageController extends Controller
         DB::beginTransaction();
         try
         {
-            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
 
             $createProduct = $stripe->products->create([
                 'images'    => [$this->appsetting->logo_path],
@@ -85,7 +87,7 @@ class PackageController extends Controller
 
             $plan = $stripe->plans->create([
                 'amount'          => $amount * 100,
-                'currency'        => env('STRIPE_CURRENCY'),
+                'currency'        => $this->paymentInfo->stripe_currency,
                 'interval'        => 'day',
                 'interval_count'  => $request->duration,
                 'product'         => $createProduct->id,
@@ -167,7 +169,7 @@ class PackageController extends Controller
         DB::beginTransaction();
         try
         {
-            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
 
             if(empty($package->stripe_plan_id))
             {
@@ -186,7 +188,7 @@ class PackageController extends Controller
 
                 $plan = $stripe->plans->create([
                     'amount'          => $amount * 100,
-                    'currency'        => env('STRIPE_CURRENCY'),
+                    'currency'        => $this->paymentInfo->stripe_currency,
                     'interval'        => 'day',
                     'interval_count'  => $request->duration,
                     'product'         => $createProduct->id,
@@ -220,7 +222,7 @@ class PackageController extends Controller
 
                     $plan = $stripe->plans->create([
                         'amount'          => $request->subscription * 100,
-                        'currency'        => env('STRIPE_CURRENCY'),
+                        'currency'        => $this->paymentInfo->stripe_currency,
                         'interval'        => 'day',
                         'interval_count'  => $request->duration,
                         'product'         => $createProduct->id,
@@ -280,7 +282,7 @@ class PackageController extends Controller
             return response()->json(prepareResult(true, ['package subscribed'], getLangByLabelGroups('messages','messages_can\'t_delete')), config('http_response.success'));
         }
         if(!empty($package->stripe_plan_id)) {
-            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
             $stripe->plans->delete(
                 $package->stripe_plan_id,
                 []

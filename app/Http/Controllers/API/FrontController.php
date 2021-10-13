@@ -42,6 +42,7 @@ class FrontController extends Controller
 {
 	function __construct()
     {
+        $this->paymentInfo = PaymentGatewaySetting::first();
         $this->appsetting = AppSetting::first();
     }
 
@@ -197,7 +198,11 @@ class FrontController extends Controller
 			$appSetting['stripe_setting'] = [
 				'payment_gateway_name' 		=> AES256::encrypt($stripeSetting->payment_gateway_name, env('ENCRYPTION_KEY')),
 				'payment_gateway_key' 		=> AES256::encrypt($stripeSetting->payment_gateway_key, env('ENCRYPTION_KEY')),
-				'payment_gateway_secret' 	=> AES256::encrypt($stripeSetting->payment_gateway_secret, env('ENCRYPTION_KEY'))
+				'payment_gateway_secret' 	=> AES256::encrypt($stripeSetting->payment_gateway_secret, env('ENCRYPTION_KEY')),
+				'stripe_currency' 			=> AES256::encrypt($stripeSetting->stripe_currency, env('ENCRYPTION_KEY')),
+				'klarna_username' 			=> AES256::encrypt($stripeSetting->klarna_username, env('ENCRYPTION_KEY')),
+				'klarna_password' 			=> AES256::encrypt($stripeSetting->klarna_password, env('ENCRYPTION_KEY')),
+				'swish_access_token' 		=> AES256::encrypt($stripeSetting->swish_access_token, env('ENCRYPTION_KEY')),
 			];
 			return response(prepareResult(false, $appSetting, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}
@@ -363,8 +368,9 @@ class FrontController extends Controller
 	}
 
 	public function payout()
-	{ 	//acct_1F0knGLBmnAF4Rxg -aman
-		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+	{ 	
+		//acct_1F0knGLBmnAF4Rxg -aman
+		\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_key);
 
 		/*
 		$account = \Stripe\Customer::create(
@@ -473,7 +479,7 @@ class FrontController extends Controller
 		*/
 
 		
-		$stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
 
 		/*
 		$users = $stripe->accounts->all(['limit' => 3]);
@@ -584,7 +590,7 @@ class FrontController extends Controller
 
         $plan = $stripe->plans->create([
             'amount'          => 1000,
-            'currency'        => env('STRIPE_CURRENCY'),
+            'currency'        => $this->paymentInfo->stripe_currency,
             'interval'        => 'day',
             'interval_count'  => 30,
             'product'         => $createProduct->id,
@@ -603,7 +609,7 @@ class FrontController extends Controller
 
         dd($createProduct);*/
 
-        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+        \Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_key);
 		/*$cancelSubscription = $stripe->subscriptions->cancel(
 		  	'sub_1JhYEPD6j8NkE89KA5XVE8jO',
 		  	[]

@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\User;
 use Stripe;
 use Log;
+use App\Models\PaymentGatewaySetting;
 
 class StripeFundTransferred extends Command
 {
@@ -42,7 +43,8 @@ class StripeFundTransferred extends Command
      */
     public function handle()
     {
-        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+        $paymentInfo = PaymentGatewaySetting::first();
+        \Stripe\Stripe::setApiKey($paymentInfo->payment_gateway_key);
 
         $today          = new \DateTime();
         $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
@@ -88,7 +90,7 @@ class StripeFundTransferred extends Command
                 {
                     $payout = \Stripe\Transfer::create([
                       "amount"          => $totalAmountForPaid * 100,
-                      "currency"        => env('STRIPE_CURRENCY', 'SEK'),
+                      "currency"        => $paymentInfo->stripe_currency,
                       "destination"     => $userInfo->stripe_account_id,
                       "transfer_group"  => "ORDER_PAYMENT_TILL_".$before15Days
                     ]);

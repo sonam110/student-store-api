@@ -10,5 +10,5 @@ class PaymentGatewaySetting extends Model
 {
     use HasFactory, Uuid;
 
-    protected $fillable = ['payment_gateway_name','payment_gateway_key', 'payment_gateway_secret'];
+    protected $fillable = ['payment_gateway_name','payment_gateway_key', 'payment_gateway_secret','stripe_currency','klarna_username','klarna_password','swish_access_token'];
 }

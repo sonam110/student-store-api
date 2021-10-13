@@ -19,6 +19,10 @@ class CreatePaymentGatewaySettingsTable extends Migration
             $table->string('payment_gateway_name')->nullable();
             $table->string('payment_gateway_key')->nullable();
             $table->string('payment_gateway_secret')->nullable();
+            $table->string('stripe_currency')->default('SEK')->nullable();
+            $table->string('klarna_username')->nullable();
+            $table->string('klarna_password')->nullable();
+            $table->string('swish_access_token')->nullable();
             $table->timestamps();
         });
     }

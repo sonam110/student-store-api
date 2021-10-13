@@ -67,6 +67,11 @@ class AppSettingController extends Controller
             $appSetting->coolCompanyVatRateId       = $request->cool_company_vat_rate_id;
             $appSetting->coolCompanyCommission      = $request->coolCompanyCommission;
             $appSetting->invite_url                 = $request->invite_url;
+            $appSetting->is_job_mod_enabled         = $request->is_job_mod_enabled;
+            $appSetting->is_product_mod_enabled     = $request->is_product_mod_enabled;
+            $appSetting->is_service_mod_enabled     = $request->is_service_mod_enabled;
+            $appSetting->is_book_mod_enabled        = $request->is_book_mod_enabled;
+            $appSetting->is_contest_mod_enabled     = $request->is_contest_mod_enabled;
             $appSetting->save();
             return response()->json(prepareResult(false, new AppSettingResource($appSetting), getLangByLabelGroups('messages','message_updated')), config('http_response.success'));
         }

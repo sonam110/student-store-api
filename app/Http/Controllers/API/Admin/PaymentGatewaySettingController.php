@@ -46,6 +46,10 @@ class PaymentGatewaySettingController extends Controller
             $paymentGatewaySetting->payment_gateway_name        = $request->payment_gateway_name;
             $paymentGatewaySetting->payment_gateway_key         = $request->payment_gateway_key;
             $paymentGatewaySetting->payment_gateway_secret      = $request->payment_gateway_secret;
+            $paymentGatewaySetting->stripe_currency      = $request->stripe_currency;
+            $paymentGatewaySetting->klarna_username      = $request->klarna_username;
+            $paymentGatewaySetting->klarna_password      = $request->klarna_password;
+            $paymentGatewaySetting->swish_access_token      = $request->swish_access_token;
             $paymentGatewaySetting->save();
             return response()->json(prepareResult(false, $paymentGatewaySetting, getLangByLabelGroups('messages','message_updated')), config('http_response.success'));
         }

@@ -35,9 +35,15 @@ use mervick\aesEverywhere\AES256;
 use PDF;
 use App\Models\UserPackageSubscription;
 use Stripe;
+use App\Models\PaymentGatewaySetting;
 
 class OrderController extends Controller
 {
+	function __construct()
+    {
+        $this->paymentInfo = PaymentGatewaySetting::first();
+    }
+
 	public function index(Request $request)
 	{
 		try
@@ -1528,7 +1534,7 @@ class OrderController extends Controller
 		$total = $sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount;
 
 					
-		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+		\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_key);
 
 		$customer_id = $request->customer_id;
 		$ephemeralKey = \Stripe\EphemeralKey::create(
@@ -1538,7 +1544,7 @@ class OrderController extends Controller
 
 		$paymentIntent = \Stripe\PaymentIntent::create([
 		    'amount' 	=> ($total) * 100,
-		    'currency' 	=> env('STRIPE_CURRENCY'),
+		    'currency' 	=> $this->paymentInfo->stripe_currency,
 		    'customer' 	=> $customer_id
 		]);
 
@@ -1553,7 +1559,7 @@ class OrderController extends Controller
 
 	public function createStripeSubscription(Request $request)
 	{
-		$stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
 		$subscription = $stripe->subscriptions->create([
 		  'customer' => Auth::user()->stripe_customer_id,
 		  'items' => [
@@ -1580,7 +1586,7 @@ class OrderController extends Controller
 			$user_package->canceled_date = date('Y-m-d');
 			$user_package->save();
 
-			$stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+			$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
 			$cancelSubscription = $stripe->subscriptions->cancel(
 			  	$request->subscription_id,
 			  	[]

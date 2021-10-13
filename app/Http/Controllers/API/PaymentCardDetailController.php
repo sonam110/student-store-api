@@ -13,9 +13,15 @@ use DB;
 use Auth;
 use Stripe;
 use mervick\aesEverywhere\AES256;
+use App\Models\PaymentGatewaySetting;
 
 class PaymentCardDetailController extends Controller
 {
+    function __construct()
+    {
+        $this->paymentInfo = PaymentGatewaySetting::first();
+    }
+
     public function index()
     {
         try
@@ -49,7 +55,7 @@ class PaymentCardDetailController extends Controller
         DB::beginTransaction();
         try
         {
-            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
             $checkUser = User::find(Auth::id());
             $customerId = $checkUser->stripe_customer_id;
             if(empty($customerId))
@@ -156,7 +162,7 @@ class PaymentCardDetailController extends Controller
         DB::beginTransaction();
         try
         {
-            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
             $checkUser = User::find(Auth::id());
             $customerId = $checkUser->stripe_customer_id;
             if(empty($customerId))
@@ -240,7 +246,7 @@ class PaymentCardDetailController extends Controller
      */
     public function destroy(PaymentCardDetail $paymentCardDetail)
     {
-        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+        $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_key);
         $checkUser = User::find(Auth::id());
         $customerId = $checkUser->stripe_customer_id;
         if(!empty($paymentCardDetail->stripe_payment_method_id))
