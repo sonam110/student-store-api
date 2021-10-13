@@ -48,7 +48,7 @@ class AppSettingController extends Controller
             $appSetting->single_rewards_pt_value    = $request->single_rewards_pt_value;
             $appSetting->customer_rewards_pt_value  = $request->customer_rewards_pt_value;
             $appSetting->app_name                   = $request->app_name;
-            $appSetting->org_number                   = $request->org_number;
+            $appSetting->org_number                 = $request->org_number;
             $appSetting->description                = $request->description;
             $appSetting->logo_path                  = $request->logo_path;
             $appSetting->copyright_text             = $request->copyright_text;
