@@ -169,10 +169,25 @@ class MessageController extends Controller
 
             // Notification Start
 
-            $title = 'New Message';
-            $body =  $request->message;
             $user = User::find($receiver_id);
             $type = 'Chat message';
+
+            $notificationTemplate = NotificationTemplate::where('template_for','new_message')->where('language_id',$user->language_id)->first();
+            if(empty($notificationTemplate))
+            {
+                NotificationTemplate::where('template_for','new_message')->first();
+            }
+
+            $body = $notificationTemplate->body;
+
+            $arrayVal = [
+                '{{message}}' => $request->message,
+            ];
+            
+
+            $title = $notificationTemplate->title;
+            $body = strReplaceAssoc($arrayVal, $body);
+
             pushNotification($title,$body,$user,$type,false,$user_type,$module,$chatList->id,'messages');
 
             // Notification End
