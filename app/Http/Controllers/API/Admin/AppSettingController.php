@@ -58,6 +58,7 @@ class AppSettingController extends Controller
             $appSetting->linked_url                 = $request->linked_url;
             $appSetting->support_email              = $request->support_email;
             $appSetting->support_contact_number     = $request->support_contact_number;
+            $appSetting->address                    = $request->address;
             $appSetting->reward_points_policy       = $request->reward_points_policy;
             $appSetting->meta_title                 = $request->meta_title;
             $appSetting->meta_keywords              = $request->meta_keywords;
