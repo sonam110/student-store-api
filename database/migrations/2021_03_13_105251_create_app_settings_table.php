@@ -21,6 +21,7 @@ class CreateAppSettingsTable extends Migration
             $table->foreign('reward_point_setting_id')->references('id')->on('reward_point_settings')->onDelete('cascade');
 
             $table->string('app_name')->nullable();
+            $table->string('org_number')->nullable();
             $table->text('description')->nullable();
             $table->string('logo_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
             $table->string('logo_thumb_path')->default('https://www.nrtsms.com/images/no-image.png')->nullable();
