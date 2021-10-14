@@ -498,16 +498,16 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->service_online_link      = $request->service_online_link;
             $productsServicesBook->service_languages        = json_encode($request->service_languages);
             $productsServicesBook->tags             = json_encode($request->tags);
-            $productsServicesBook->is_promoted      = $request->is_promoted;
+            // $productsServicesBook->is_promoted      = $request->is_promoted;
             $productsServicesBook->meta_title                 = $request->meta_title;
             $productsServicesBook->meta_keywords              = $request->meta_keywords;
             $productsServicesBook->is_reward_point_applicable   = $request->is_reward_point_applicable;
             $productsServicesBook->reward_points                = $request->reward_points;
-            if($request->is_promoted==1)
-            {
-                $productsServicesBook->promotion_start_at       = $request->promotion_start_at;
-                $productsServicesBook->promotion_end_at = $request->promotion_end_at;
-            }
+            // if($request->is_promoted==1)
+            // {
+            //     $productsServicesBook->promotion_start_at       = $request->promotion_start_at;
+            //     $productsServicesBook->promotion_end_at = $request->promotion_end_at;
+            // }
             $productsServicesBook->is_published     = $request->is_published;
             $productsServicesBook->published_at     = ($request->is_published==1) ? date('Y-m-d H:i:s') : null;
             if($productsServicesBook->save())
@@ -567,6 +567,9 @@ class ProductsServicesBookController extends Controller
 
     public function action($productsServicesBook_id, Request $request)
     {
+        $validation = Validator::make($request->all(), [
+                
+        ]);
         if($request->action=='update-status')
         {
             $validation = Validator::make($request->all(), [

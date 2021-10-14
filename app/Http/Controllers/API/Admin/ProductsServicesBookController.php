@@ -312,14 +312,14 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->tags                     = json_encode($request->tags);
             $productsServicesBook->meta_title               = $request->meta_title;
             $productsServicesBook->meta_keywords            = $request->meta_keywords;
-            $productsServicesBook->is_promoted              = $request->is_promoted;
+            /*$productsServicesBook->is_promoted              = $request->is_promoted;*/
             $productsServicesBook->is_reward_point_applicable   = $request->is_reward_point_applicable;
             $productsServicesBook->reward_points                = $request->reward_points;
-            if($request->is_promoted==1)
+            /*if($request->is_promoted==1)
             {
                 $productsServicesBook->promotion_start_at   = $request->promotion_start_at;
                 $productsServicesBook->promotion_end_at     = $request->promotion_end_at;
-            }
+            }*/
             $productsServicesBook->is_published             = $request->is_published;
             $productsServicesBook->published_at             = ($request->is_published==1) ? date('Y-m-d H:i:s') : null;
             if($productsServicesBook->save())
@@ -376,18 +376,22 @@ class ProductsServicesBookController extends Controller
             $validation = Validator::make($request->all(), [
                 'status'    => 'required'
             ]);
+            if ($validation->fails()) {
+                return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+            }
         }
         if($request->action=='publish') 
         {
             $validation = Validator::make($request->all(), [
                 'is_published'    => 'required|boolean'
             ]);
+            if ($validation->fails()) {
+                return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+            }
             
         }
 
-        if ($validation->fails()) {
-            return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-        }
+        
 
         DB::beginTransaction();
         try
