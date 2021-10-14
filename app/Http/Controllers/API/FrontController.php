@@ -383,7 +383,13 @@ class FrontController extends Controller
 				->merge(env('APP_LOGO'), .2, true)
 				->generate(route('user-qr', [$qrCodeNumber]), public_path('uploads/qr/'.$qrCodeNumber.'.png'));
 
+				echo 'QR code: '.$user->qr_code_number.' image generated.<br>';
 			}
+			else
+			{
+				echo 'imagick extension not enabaled..<br>';
+			}
+			
 		}
 		
 		die;
