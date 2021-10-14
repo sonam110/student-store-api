@@ -370,18 +370,22 @@ class FrontController extends Controller
 
 	public function payout()
 	{ 	
-
-		$qrCodeNumber = User::QR_NUMBER_PREFIX.User::QR_NUMBER_SEPRATOR.(User::QR_NUMBER_START + User::count());
-		if (extension_loaded('imagick'))
+		$users = User::get();
+		foreach($users as $user)
 		{
-			QrCode::size(500)
-			->format('png')
-			->errorCorrection('H')
-			->gradient(34, 195, 80, 100, 3, 48,'diagonal')
-			->merge(env('APP_LOGO'), .2, true)
-			->generate(route('user-qr', [$qrCodeNumber]), public_path('uploads/qr/'.$qrCodeNumber.'.png'));
+			$qrCodeNumber = User::QR_NUMBER_PREFIX.User::QR_NUMBER_SEPRATOR.$user->qr_code_number;
+			if (extension_loaded('imagick'))
+			{
+				QrCode::size(500)
+				->format('png')
+				->errorCorrection('H')
+				->gradient(34, 195, 80, 100, 3, 48,'diagonal')
+				->merge(env('APP_LOGO'), .2, true)
+				->generate(route('user-qr', [$qrCodeNumber]), public_path('uploads/qr/'.$qrCodeNumber.'.png'));
 
+			}
 		}
+		
 		die;
 		//acct_1F0knGLBmnAF4Rxg -aman
 		\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
