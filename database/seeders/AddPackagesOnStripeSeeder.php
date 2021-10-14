@@ -23,7 +23,7 @@ class AddPackagesOnStripeSeeder extends Seeder
         $packages = Package::orderBy('module','ASC')->get();
             foreach($packages as $package)
             {
-                if($package->subscription>0 && $package->price>0)
+                if($package->subscription>0 || $package->price>0)
                 {
                     $stripe = new \Stripe\StripeClient($paymentInfo->payment_gateway_secret);
 
