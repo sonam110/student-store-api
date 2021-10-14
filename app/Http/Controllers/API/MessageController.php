@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\ProductsServicesBook;
 use App\Models\Job;
 use App\Models\Contest;
+use App\Models\NotificationTemplate;
 use Auth;
 
 class MessageController extends Controller
