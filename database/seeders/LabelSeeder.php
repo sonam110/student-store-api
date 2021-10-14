@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Label;
 use App\Models\LabelGroup;
+use DB;
 
 class LabelSeeder extends Seeder
 {
@@ -15,6 +16,10 @@ class LabelSeeder extends Seeder
      */
     public function run()
     {
+      DB::table('labels')->truncate();
+      DB::table('label_groups')->truncate();
+
+      
         $labels = [
         "tabBarLabels" => [
             "my_cv" => "My CV",
