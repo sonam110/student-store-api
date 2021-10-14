@@ -19,8 +19,8 @@ class LabelSeeder extends Seeder
       DB::table('labels')->truncate();
       DB::table('label_groups')->truncate();
 
-      
-        $labels = [
+
+      $labels = [
         "tabBarLabels" => [
             "my_cv" => "My CV",
             "jobs" => "Jobs",
@@ -65,7 +65,7 @@ class LabelSeeder extends Seeder
             "sign_up_text" => "You don't have an account? Sign up",
             "terms_and_policy" => "Terms of Use, Privacy Policy",
             "welcome_text" => "Welcome to Student Store",
-      "contact_us" =>'Contact Us',
+        "contact_us" =>'Contact Us',
         ],
         "SignUp" => [
             "continue_as_service_provider" => "Continue As Service Provider",
@@ -2323,16 +2323,16 @@ class LabelSeeder extends Seeder
 
             foreach ($label as $key1 => $value) 
             {
-              if(Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',3)->count() > 0)
+              if(Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->count() > 0)
               {
-                $label = Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',3)->first();
+                $label = Label::where('label_group_id',$labelGroup->id)->where('label_name',$key1)->where('language_id',1)->first();
               }
               else
               {
                 $label = new Label;
               }
               $label->label_group_id         = $labelGroup->id;
-              $label->language_id            = 3;
+              $label->language_id            = 1;
               $label->label_name             = $key1;
               $label->label_value            = $value;
               $label->status                 = 1;
