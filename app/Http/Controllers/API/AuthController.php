@@ -146,6 +146,10 @@ class AuthController extends Controller
 
 		try
 		{
+			if(User::where('guardian_email', $request->email)->whereNotNull('guardian_email')->count()>0)
+			{
+				return response()->json(prepareResult(true, 'Duplicate entry', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			}
 			return response()->json(prepareResult(false, ['email'=>$request->email], getLangByLabelGroups('messages','message_email_validated')), config('http_response.success'));
 		}
 		catch (\Throwable $exception)
@@ -158,12 +162,10 @@ class AuthController extends Controller
 	{
 		// return $request->all();
 		$validation = \Validator::make($request->all(),[ 
-			'first_name'      			=> 'required',
-			'email'          			=> 'required|unique:users',
-			'contact_number'    		=> 'required|unique:users',
-			'guardian_email'    		=> 'nullable|unique:users',
-			'guardian_contact_number'   => 'nullable|unique:users',
-			'password'      			=> 'required',
+			'first_name'      	=> 'required',
+			'email'          	=> 'required|unique:users',
+			'contact_number'    => 'required|unique:users',
+			'password'      	=> 'required',
 		]);
 
 		if ($validation->fails()) {
