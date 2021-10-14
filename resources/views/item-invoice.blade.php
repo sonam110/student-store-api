@@ -150,8 +150,9 @@
                                 {{\mervick\aesEverywhere\AES256::decrypt($seller->first_name, env('ENCRYPTION_KEY'))}} {{ !empty($seller->last_name) ? \mervick\aesEverywhere\AES256::decrypt($seller->last_name, env('ENCRYPTION_KEY')) : ''}} <br>
                                 {{ !empty($seller->contact_number) ? \mervick\aesEverywhere\AES256::decrypt($seller->contact_number, env('ENCRYPTION_KEY')) : ''}}
                                 <br>
-
-                                {{$seller->user->defaultAddress->full_address}}
+                                    @if(!empty($seller))
+                                    {{$seller->defaultAddress->full_address}}
+                                    @endif
                                 @endif
                             </td>
                             <td width="50%">
