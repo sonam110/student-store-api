@@ -151,7 +151,7 @@
                                 {{ !empty($seller->contact_number) ? \mervick\aesEverywhere\AES256::decrypt($seller->contact_number, env('ENCRYPTION_KEY')) : ''}}
                                 <br>
 
-                                {{$order->order->full_address}}
+                                {{$seller->user->defaultAddress->full_address}}
                                 @endif
                             </td>
                             <td width="50%">

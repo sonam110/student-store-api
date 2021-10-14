@@ -370,7 +370,7 @@ class FrontController extends Controller
 
 	public function payout()
 	{ 	
-		$users = User::get();
+		/*$users = User::get();
 		foreach($users as $user)
 		{
 			$qrCodeNumber = User::QR_NUMBER_PREFIX.User::QR_NUMBER_SEPRATOR.$user->qr_code_number;
@@ -392,7 +392,7 @@ class FrontController extends Controller
 			
 		}
 		
-		die;
+		die;*/
 		//acct_1F0knGLBmnAF4Rxg -aman
 		\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
 
@@ -641,12 +641,12 @@ class FrontController extends Controller
 
 		return str_replace('Stripe\Subscription JSON: ', '', $cancelSubscription);*/
 
-		$klarna = \Stripe\PaymentIntent::create([
+		/*$klarna = \Stripe\PaymentIntent::create([
 		  'payment_method_types' => ['klarna'],
 		  'amount' => 1089,
 		  'currency' => 'USD',
 		]);
-		dd($klarna);
+		dd($klarna);*/
 	}
 
 	public function strReplaceAssoc(array $replace, $subject) { 

@@ -66,8 +66,8 @@ class UploadDocController extends Controller
                         if(in_array($extension, $formatCheck))
                         {
                             $sourceFilePath = public_path().'/'.$destinationPath.$fileName;
-                            $destinationPath = public_path().'/'.$thumbDestinationPath.$fileName;
-                            \File::copy($sourceFilePath,$destinationPath);
+                            $destinationPathCopy = public_path().'/'.$thumbDestinationPath.$fileName;
+                            \File::copy($sourceFilePath,$destinationPathCopy);
                         }
                     }
                     
@@ -106,8 +106,8 @@ class UploadDocController extends Controller
                     if(in_array($extension, $formatCheck))
                     {
                         $sourceFilePath = public_path().'/'.$destinationPath.$fileName;
-                        $destinationPath = public_path().'/'.$thumbDestinationPath.$fileName;
-                        \File::copy($sourceFilePath,$destinationPath);
+                        $destinationPathCopy = public_path().'/'.$thumbDestinationPath.$fileName;
+                        \File::copy($sourceFilePath,$destinationPathCopy);
                     }
                 }
                 $fileInfo = [
