@@ -40,7 +40,7 @@ class NotificationController extends Controller
             
             if($request->mark_all_as_read == 'true' || $request->mark_all_as_read == 1)
             {
-                Notification::where('user_id',Auth::id())->update(['read_status' => '1']);
+                Notification::where('user_id',Auth::id())->update(['read_status' => 1]);
             }
             
             return response(prepareResult(false, NotificationResource::collection($notifications), getLangByLabelGroups('messages','message_notification_list')), config('http_response.success'));
