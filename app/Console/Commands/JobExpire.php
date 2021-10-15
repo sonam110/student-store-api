@@ -38,7 +38,7 @@ class JobExpire extends Command
      */
     public function handle()
     {
-        $jobs = Job::where('application_end_date','<=',date('Y-m-d'))->get();
+        $jobs = Job::where('application_end_date','<=',date('Y-m-d'))->where('job_status', '!=','3')->get();
           foreach($jobs as $job) {
             $job->update(['job_status' => '3']);
             // Notification Start
@@ -47,7 +47,7 @@ class JobExpire extends Command
             $body =  'Status for Job '.$job->title.' is updated to expired.';
             $user = $job->user;
             $type = 'Job Expired';
-            pushNotification($title,$body,$user,$type,true,'seller','job',$job->id,'created');
+            pushNotification($title,$body,$user,$type,true,'seller','job',$job->id,'posted-jobs');
           }
     }
 }
