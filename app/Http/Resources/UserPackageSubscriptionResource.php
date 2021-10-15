@@ -20,6 +20,7 @@ class UserPackageSubscriptionResource extends JsonResource
             'package'                           => $this->package,
             'package_valid_till'                => $this->package_valid_till,
             'subscription_status'               => $this->subscription_status,
+            'payby'                             => $this->payby,
             'remark'                            => $this->remark
         ];
     }

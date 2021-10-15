@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+//Stripe Webhook
+Route::post('/stripe/webhook', [App\Http\Controllers\WebhookController::class,'stripeWebhook']);
+
 Route::get('/initial-screen', [App\Http\Controllers\API\LandingPageController::class,'initialScreen']);
 
 Route::get('/packages', [App\Http\Controllers\API\PackageController::class, 'index']);

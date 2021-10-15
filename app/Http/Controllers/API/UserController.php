@@ -172,7 +172,7 @@ class UserController extends Controller
     {
     	try
 		{
-			$userPackageSubscription = UserPackageSubscription::select('id','package_id','user_id')->find($id);
+			$userPackageSubscription = UserPackageSubscription::select('id','package_id','user_id','payby')->find($id);
 			// return $userPackageSubscription;
 			$userPackageSubscription['order_item_id'] = OrderItem::where('package_id',$userPackageSubscription->package_id)->where('user_id',$userPackageSubscription->user_id)->orderBy('created_at','desc')->first()->id;
 			$userPackageSubscription['order_id'] = OrderItem::where('package_id',$userPackageSubscription->package_id)->where('user_id',$userPackageSubscription->user_id)->orderBy('created_at','desc')->first()->order_id; 

@@ -23,6 +23,7 @@ class CreateUserPackageSubscriptionsTable extends Migration
             $table->foreign('package_id')->references('id')->on('packages')->onDelete('cascade');
 
             $table->string('subscription_id', 150)->nullable();
+            $table->string('payby', 50)->nullable()->comment('stripe,klarna,swish');
             $table->boolean('is_canceled')->nullable()->default(0);
             $table->string('canceled_date')->nullable();
             $table->longText('response_request')->nullable();

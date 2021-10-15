@@ -233,6 +233,7 @@ class UserProfileController extends Controller
 			$userPackageSubscription 						= new UserPackageSubscription;
 			$userPackageSubscription->user_id 				= Auth::id();
 			$userPackageSubscription->subscription_id 		= $request->subscription_id;
+			$userPackageSubscription->payby 				= $request->payby;
 			$userPackageSubscription->package_id 			= $user_package;
 			$userPackageSubscription->package_valid_till	= date('Y-m-d',strtotime('+'.$package->duration .'days'));
 			$userPackageSubscription->subscription_status 	= 1;

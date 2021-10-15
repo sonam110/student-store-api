@@ -6,12 +6,15 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\ContestOnHold;
 use App\Console\Commands\ContestStart;
-use App\Console\Commands\OrderStatus;
-use App\Console\Commands\ResumePdfGenerate;
+// use App\Console\Commands\ResumePdfGenerate;
 use App\Console\Commands\SubscribedPackageExpire;
 use App\Console\Commands\ContestExpire;
 use App\Console\Commands\JobExpire;
+use App\Console\Commands\OrderStatus;
 use App\Console\Commands\RewardPointsCredit;
+use App\Console\Commands\CoolCompanyCreateAssignment;
+use App\Console\Commands\CoolCompanyRegFreelancer;
+use App\Console\Commands\StripeFundTransferred;
 
 
 class Kernel extends ConsoleKernel
@@ -24,11 +27,14 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         ContestOnHold::class,
         ContestStart::class,
-        ResumePdfGenerate::class,
+        // ResumePdfGenerate::class,
         SubscribedPackageExpire::class,
         ContestExpire::class,
         JobExpire::class,
+        OrderStatus::class,
         RewardPointsCredit::class,
+        CoolCompanyCreateAssignment::class,
+        CoolCompanyRegFreelancer::class,
 
     ];
 
@@ -43,11 +49,11 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('contests:onHold')->dailyAt('23:59');
         $schedule->command('contests:start')->dailyAt('00:01');
-        $schedule->command('order:status')->hourly();
-        $schedule->command('resumePdf:generate')->dailyAt('00:01');
+        // $schedule->command('resumePdf:generate')->dailyAt('00:01');
         $schedule->command('subscribedPackage:expire')->dailyAt('00:01');
         $schedule->command('contest:expire')->dailyAt('00:01');
         $schedule->command('job:expire')->dailyAt('00:01');
+        $schedule->command('order:status')->hourly();
         $schedule->command('rewardPoints:credit')->dailyAt('00:01');
         $schedule->command('create:freelancer')->hourly();
         $schedule->command('create:assignment')->everyMinute();

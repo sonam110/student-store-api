@@ -1738,6 +1738,14 @@ class OrderController extends Controller
 
 	public function createStripeSubscription(Request $request)
 	{
+		//cancel Subcription if exist
+		$checkPackage = Package::where('stripe_plan_id', $request->stripe_plan_id)->first();
+		if($checkPackage)
+		{
+			$user_package = UserPackageSubscription::where('package_id', $checkPackage->id)->where('user_id', Auth::id())->whereNotNull('subscription_id')->where('payby','stripe')->orderBy('auto_id', 'DESC')->first();
+		}
+
+
 		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 		$subscription = $stripe->subscriptions->create([
 		  'customer' => Auth::user()->stripe_customer_id,
@@ -1753,6 +1761,22 @@ class OrderController extends Controller
 			'status' 			=> $subscription->status,
 			'hosted_invoice_url'=> $subscription->latest_invoice->hosted_invoice_url,
 		];
+		if($subscription->status=='active') 
+		{
+			//if success then unsubscribe same package which is already subscribed
+			if($user_package)
+			{
+				$user_package->is_canceled = 1;
+				$user_package->canceled_date = date('Y-m-d');
+				$user_package->save();
+
+				$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
+				$cancelSubscription = $stripe->subscriptions->cancel(
+				  	$user_package->subscription_id,
+				  	[]
+				);
+			}
+		}
 		return response(prepareResult(false, $returnObj, 'Cancel Subscription'), config('http_response.success'));
 	}
 

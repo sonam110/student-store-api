@@ -111,6 +111,12 @@ return [
             'path' => storage_path('logs/payment-transferred.log'),
             'level' => 'info',
         ],
+
+        'webhook' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/webhook.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];
