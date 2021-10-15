@@ -1720,19 +1720,23 @@ class LandingPageController extends Controller
     public function contestDetail(Request $request, $id)
     {
         $contest = Contest::find($id);
-        if(ContestApplication::where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->first())
+        if($contest)
         {
-            $applied = true;
+            if(ContestApplication::where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->first())
+            {
+                $applied = true;
+            }
+            else
+            {
+                $applied = false;
+            }
+            $contest = Contest::with('user:id,first_name,last_name,profile_pic_path,show_email,show_contact_number','cancellationRanges','categoryMaster','subCategory','user.defaultAddress','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')->withCount('contestApplications')->find($contest->id);
+            $contest['is_applied'] = $applied;
+            $contest['latitude'] = $contest->addressDetail? $contest->addressDetail->latitude:null;
+            $contest['longitude'] = $contest->addressDetail?$contest->addressDetail->longitude:null;
+            return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_list')), config('http_response.success'));
         }
-        else
-        {
-            $applied = false;
-        }
-        $contest = Contest::with('user:id,first_name,last_name,profile_pic_path,show_email,show_contact_number','cancellationRanges','categoryMaster','subCategory','user.defaultAddress','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')->withCount('contestApplications')->find($contest->id);
-        $contest['is_applied'] = $applied;
-        $contest['latitude'] = $contest->addressDetail? $contest->addressDetail->latitude:null;
-        $contest['longitude'] = $contest->addressDetail?$contest->addressDetail->longitude:null;
-        return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_list')), config('http_response.success'));
+        return response()->json(prepareResult(true, 'Record Not found', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
     }
 
 
