@@ -334,7 +334,11 @@ class OrderController extends Controller
 						$orderItem->product_type					= $productsServicesBook->type;
 						$orderItem->note_to_seller                   = $orderedItem['note_to_seller'];
 
-						ProductsServicesBook::where('id',$orderedItem['product_id'])->update(['quantity' => $productsServicesBook->quantity - $orderedItem['quantity']]);
+						$checkItemType = ProductsServicesBook::select('type')->find($orderedItem['product_id']);
+						if($checkItemType->type=='product')
+						{
+							ProductsServicesBook::where('id',$orderedItem['product_id'])->update(['quantity' => $productsServicesBook->quantity - $orderedItem['quantity']]);
+						}	
 					}
 					elseif(!empty($orderedItem['contest_application_id']))
 					{
