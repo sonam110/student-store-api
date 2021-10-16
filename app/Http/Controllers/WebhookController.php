@@ -59,7 +59,7 @@ class WebhookController extends Controller
             $subscriptionSchedule = $event->data->object;
             //$this->completeOrderInDatabase()
             //$this->sendMail();
-            Log::channel('webhook')->info('success');
+            Log::channel('webhook')->info('aborted');
             Log::channel('webhook')->info($subscriptionSchedule);
         } 
         elseif ($event->type == "subscription_schedule.canceled")

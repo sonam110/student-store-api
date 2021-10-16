@@ -1742,7 +1742,7 @@ class OrderController extends Controller
 		$checkPackage = Package::where('stripe_plan_id', $request->stripe_plan_id)->first();
 		if($checkPackage)
 		{
-			$user_package = UserPackageSubscription::where('package_id', $checkPackage->id)->where('user_id', Auth::id())->whereNotNull('subscription_id')->where('payby','stripe')->orderBy('auto_id', 'DESC')->first();
+			$user_package = UserPackageSubscription::where('package_id', $checkPackage->id)->where('user_id', Auth::id())->whereNotNull('subscription_id')->where('payby','stripe')->where('is_canceled', 0)->orderBy('auto_id', 'DESC')->first();
 		}
 
 
