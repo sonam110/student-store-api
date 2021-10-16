@@ -21,9 +21,12 @@ class UserResource extends JsonResource
         $educationDetails = [];
         $workExperiences = [];
         $cvDetail = [];
-        if($this->userEducationDetails->count() > 0)
+        if($this->userEducationDetails)
         {
-            $educationDetails = UserEducationDetailResource::collection($this->userEducationDetails);
+            if($this->userEducationDetails->count() > 0)
+            {
+                $educationDetails = UserEducationDetailResource::collection($this->userEducationDetails);
+            }
         }
 
         if($this->userWorkExperiences->count() > 0)

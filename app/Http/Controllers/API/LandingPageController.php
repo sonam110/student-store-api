@@ -139,6 +139,10 @@ class LandingPageController extends Controller
     public function productDetail(Request $request,$id)
     {
         $productsServicesBook = ProductsServicesBook::find($id);
+        if(!$productsServicesBook)
+        {
+            return response()->json(prepareResult(true, 'Data Not Found.','Data Not Found.' , config('http_response.not_found'));
+        }
         if($request->view_count == true)
         {
             $productsServicesBook->update(['view_count' => $productsServicesBook->view_count + 1]);
