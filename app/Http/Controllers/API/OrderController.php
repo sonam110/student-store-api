@@ -549,6 +549,25 @@ class OrderController extends Controller
 		$reason_id_for_cancellation_request = $orderItem->reason_id_for_cancellation_request;
 		$reason_id_for_cancellation_request_decline = $orderItem->reason_id_for_cancellation_request_decline;
 		$delivery_code = $orderItem->delivery_code;
+		$orderQuantity = $orderItem->quantity;
+
+		//////////////////////////////////////////
+		//////////Stock Update Start/////////////
+		if($request->item_status=='canceled' || $request->item_status=='resolved_to_customer' || $request->item_status=='returned' || $request->item_status=='cancelation_request_accepted') 
+		{
+			$productsServicesBookId = $orderItem->products_services_book_id;
+			if(!empty($productsServicesBookId))
+			{
+				$updateStock = ProductsServicesBook::select('id','quantity','type')->find($productServiceId);
+				if($updateStock->type!='service')
+				{
+					$updateStock->quantity = $updateStock->quantity + $orderItem->quantity;
+					$updateStock->save();
+				}
+			}
+		}
+		//////////////////////////////////////////
+		//////////Stock Update End/////////////
 
 
 		if($request->item_status == 'resolved_to_customer')

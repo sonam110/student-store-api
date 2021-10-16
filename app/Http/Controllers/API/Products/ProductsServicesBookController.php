@@ -208,7 +208,12 @@ class ProductsServicesBookController extends Controller
                 $productsServicesBook->is_on_offer                  = $request->is_on_offer;
                 $productsServicesBook->discount_type                = $request->discount_type;
                 $productsServicesBook->discount_value               = $request->discount_value;
-                $productsServicesBook->quantity                     = $request->quantity;
+                if($type == 'service') {
+                    $qty = 1000;
+                } else {
+                    $qty = $request->quantity;
+                }
+                $productsServicesBook->quantity                     = $qty;
                 $productsServicesBook->short_summary                = $request->short_summary;
                 $productsServicesBook->description                  = $request->description;
                 $productsServicesBook->attribute_details    = ($request->attribute_details=='[]') ? null : $request->attribute_details;
@@ -455,6 +460,7 @@ class ProductsServicesBookController extends Controller
                 $is_used_item = '0';
             }
 
+            $type = $productsServicesBook->type;
 
             $productsServicesBook->address_detail_id    = $request->address_detail_id;
             $productsServicesBook->category_master_id   = $request->category_master_id;
@@ -471,7 +477,12 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->is_on_offer      = $request->is_on_offer;
             $productsServicesBook->discount_type    = $request->discount_type;
             $productsServicesBook->discount_value   = $request->discount_value;
-            $productsServicesBook->quantity         = $request->quantity;
+            if($type == 'service') {
+                $qty = 1000;
+            } else {
+                $qty = $request->quantity;
+            }
+            $productsServicesBook->quantity         = $qty;
             $productsServicesBook->short_summary    = $request->short_summary;
             $productsServicesBook->description      = $request->description;
             $productsServicesBook->attribute_details= $request->attribute_details;
