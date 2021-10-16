@@ -47,12 +47,13 @@ class CoolCompanyRegFreelancer extends Command
         $tokenExpired = time();
         
         $getStudentList = StudentDetail::select('users.id','users.first_name','users.last_name','users.email','users.qr_code_number','users.social_security_number','users.bank_account_num','users.bank_identifier_code','users.bank_name','users.bank_account_type')
-            ->where('student_details.cool_company_id', null)
+            ->join('users', 'users.id','=','student_details.user_id')
+            ->whereNull('student_details.cool_company_id')
             ->where('users.user_type_id', '2')
             ->where('users.status', '1')
             ->where('users.is_email_verified', 1)
             ->where('users.is_contact_number_verified', 1)
-            ->join('users', 'users.id','=','student_details.user_id')
+            ->whereNotNull('users.bank_account_num')
             ->get();
         foreach($getStudentList as $student)
         {
@@ -188,10 +189,17 @@ class CoolCompanyRegFreelancer extends Command
             die;
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
         if($response_code==200 || $response_code==201)
         {
+            curl_close($curl);
             return $response;
+        }
+        else
+        {
+            Log::channel('customlog')->error('Getting error while create a freelancer.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
+            curl_close($curl);
         }
         return false;
     }
