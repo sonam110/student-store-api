@@ -31,11 +31,15 @@ class WebhookController extends Controller
         {
             Log::channel('webhook')->info('Invalid payload');
             Log::channel('webhook')->info($payload);
+            http_response_code(400);
+            exit();
         }
         catch(\Stripe\Exception\SignatureVerificationException $e)
         {
             Log::channel('webhook')->info('Invalid signature');
             Log::channel('webhook')->info($e);
+            http_response_code(400);
+            exit();
         }
 
         /*
@@ -78,6 +82,7 @@ class WebhookController extends Controller
         }
         Log::channel('webhook')->info('payload');
         Log::channel('webhook')->info($payload);
+        http_response_code(200);
     }
 
     private function abortedSubscription($subscription_id) 
@@ -85,13 +90,13 @@ class WebhookController extends Controller
         $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
         if($subscribedPackage)
         {
-            $user_package->is_canceled = 1;
-            $user_package->canceled_date = date('Y-m-d');
-            $user_package->save();
+            $subscribedPackage->is_canceled = 1;
+            $subscribedPackage->canceled_date = date('Y-m-d');
+            $subscribedPackage->save();
 
             $title = 'Package Subscription Canceled';
             $body =  'Your '.$subscribedPackage->package->module.' module '.getLangByLabelGroups('packages', $subscribedPackage->package->type_of_package).' package is successfully canceled.';
-            $user = $user_package->user;
+            $user = $subscribedPackage->user;
             $type = 'Package';
             $user_type = 'buyer';
             $module = 'profile';
@@ -100,23 +105,12 @@ class WebhookController extends Controller
         }
     }
 
-    private function abortedSubscription($subscription_id) 
+    private function completedSubscription($subscription_id) 
     {
         $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
         if($subscribedPackage)
         {
-            $user_package->is_canceled = 1;
-            $user_package->canceled_date = date('Y-m-d');
-            $user_package->save();
-
-            $title = 'Package Subscription Canceled';
-            $body =  'Your '.$subscribedPackage->package->module.' module '.getLangByLabelGroups('packages', $subscribedPackage->package->type_of_package).' package is successfully canceled.';
-            $user = $user_package->user;
-            $type = 'Package';
-            $user_type = 'buyer';
-            $module = 'profile';
-            pushNotification($title,$body,$user,$type,true,$user_type,$module,'no-data','package');
-            Log::channel('webhook')->info('Subscription canceled. User Package Subscription Id: '. $subscribedPackage->id);
+            
         }
     }
 }

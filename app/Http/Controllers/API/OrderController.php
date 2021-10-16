@@ -1796,6 +1796,15 @@ class OrderController extends Controller
 			);
 			$user_package->response_request = str_replace('Stripe\Subscription JSON: ', '', $cancelSubscription);
 			$user_package->save();
+
+			$title = 'Package Subscription Canceled';
+            $body =  'Your '.$user_package->package->module.' module '.getLangByLabelGroups('packages', $user_package->package->type_of_package).' package is successfully canceled.';
+            $user = $user_package->user;
+            $type = 'Package';
+            $user_type = 'buyer';
+            $module = 'profile';
+            pushNotification($title,$body,$user,$type,true,$user_type,$module,'no-data','package');
+
 			return response(prepareResult(false, $user_package->response_request, 'Cancel Subscription'), config('http_response.success'));
 		}
 		return response()->json(prepareResult(true, 'Subscription id not found.', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
