@@ -208,5 +208,34 @@ class MessageController extends Controller
         return response()->json(prepareResult(false, $chat, getLangByLabelGroups('messages','message_updated')), config('http_response.created'));
     }
 
-
+    public function chatListCount(Request $request)
+    {
+        $chatList = ChatList::select('chat_lists.id')
+                    ->join('contact_lists', 'contact_lists.id', '=', 'chat_lists.contact_list_id');
+        if($request->prodOrCont=='1')
+        {
+            $record = $chatList->whereNotNull('contact_lists.contest_id')
+                    ->where(function ($query) {
+                        $query->where('chat_lists.sender_id', '=', Auth::id())
+                              ->orWhere('chat_lists.receiver_id', '=', Auth::id());
+                    });
+        }
+        else
+        {
+            if($request->userType=='buyer')
+            {
+                $record = $chatList->whereNotNull('contact_lists.products_services_book_id')
+                    ->where('contact_lists.buyer_id', Auth::id())
+                    ->where('chat_lists.receiver_id', Auth::id());
+            }
+            else 
+            {
+                $record = $chatList->whereNotNull('contact_lists.products_services_book_id')
+                    ->where('contact_lists.seller_id', Auth::id())
+                    ->where('chat_lists.receiver_id', Auth::id());
+            }
+        }
+        $count = $record->where('chat_lists.status', 'unread')->count();
+        return response()->json(prepareResult(false, $count, 'Unreaed message count'), config('http_response.success'));
+    }
 }

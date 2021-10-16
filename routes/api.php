@@ -113,6 +113,8 @@ Route::apiResource('/upload-doc', 'App\Http\Controllers\API\UploadDocController'
 Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('logout',[App\Http\Controllers\API\AuthController::class,'logout']);
 
+	Route::post('chat-list-count',[App\Http\Controllers\API\MessageController::class,'chatListCount']);
+
 	Route::get('/generate-invoice/{order_id}', 'App\Http\Controllers\API\OrderController@generateInvoice');
 	Route::get('/generate-item-invoice/{order_item_id}', 'App\Http\Controllers\API\OrderController@generateItemInvoice');
     
