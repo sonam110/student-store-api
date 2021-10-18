@@ -80,9 +80,10 @@ class ServiceProviderTypeDetailController extends Controller
 	}
 
 
-	public function show(ServiceProviderTypeDetail $serviceProviderTypeDetail)
+	public function show($id)
 	{
-		return response()->json(prepareResult(false, new ServiceProviderTypeDetailResource($serviceProviderTypeDetail), getLangByLabelGroups('messages','message_service_provider_type_list')), config('http_response.success'));
+		$serviceProviderType = ServiceProviderType::with('serviceProviderTypeDetails')->find($id);
+		return response()->json(prepareResult(false, $serviceProviderType, getLangByLabelGroups('messages','message_service_provider_type_list')), config('http_response.success'));
 	}
 
 

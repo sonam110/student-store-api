@@ -79,9 +79,10 @@ class RegistrationTypeDetailController extends Controller
 	}
 
 
-	public function show(RegistrationTypeDetail $registrationTypeDetail)
+	public function show($id)
 	{
-		return response()->json(prepareResult(false, new RegistrationTypeDetailResource($registrationTypeDetail), getLangByLabelGroups('messages','message_service_provider_type_list')), config('http_response.success'));
+		$registrationType = RegistrationType::with('registrationTypeDetails')->find($id);
+		return response()->json(prepareResult(false, $registrationType, 'Registration Type retrieved successfully.'), config('http_response.success'));
 	}
 
 
