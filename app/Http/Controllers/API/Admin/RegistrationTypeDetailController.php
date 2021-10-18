@@ -40,9 +40,9 @@ class RegistrationTypeDetailController extends Controller
 		{
 			if($value['language_id']=='1')
 			{
-				if(RegistrationType::where('title', $value['title'])->count() > 0)
+				if(RegistrationType::where('slug', Str::slug($value['title']))->count() > 0)
 				{
-					$registrationType = RegistrationType::where('title' ,$value['title'])->first();
+					$registrationType = RegistrationType::where('slug' ,Str::slug($value['title']))->first();
 				}
 				else
 				{
@@ -59,9 +59,9 @@ class RegistrationTypeDetailController extends Controller
 
 		foreach ($request->registration_type as $key => $value) 
 		{
-			if(RegistrationTypeDetail::where('title', $value['title'])->where('language_id', $value['language_id'])->count() > 0)
+			if(RegistrationTypeDetail::where('slug', Str::slug($value['title']))->where('language_id', $value['language_id'])->count() > 0)
 			{
-				$registrationTypeDetail = RegistrationTypeDetail::where('title' ,$value['title'])->where('language_id', $value['language_id'])->first();
+				$registrationTypeDetail = RegistrationTypeDetail::where('slug' ,Str::slug($value['title']))->where('language_id', $value['language_id'])->first();
 			}
 			else
 			{
