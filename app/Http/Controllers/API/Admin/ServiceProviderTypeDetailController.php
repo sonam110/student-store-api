@@ -114,9 +114,9 @@ class ServiceProviderTypeDetailController extends Controller
 
 		foreach ($request->service_provider_type as $key => $value) 
 		{
-			if(ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('title', $value['title'])->where('language_id', $value['language_id'])->count() > 0)
+			if(!empty($value['id']))
 			{
-				$serviceProviderTypeDetail = ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('title' ,$value['title'])->where('language_id', $value['language_id'])->first();
+				$serviceProviderTypeDetail = ServiceProviderTypeDetail::find($value['id']);
 			}
 			else
 			{
@@ -135,11 +135,11 @@ class ServiceProviderTypeDetailController extends Controller
 
 
 
-	public function destroy(ServiceProviderType $serviceProviderType)
+	public function serviceProviderTypeDelete($id)
 	{
-		if(ServiceProviderDetail::where('service_provider_type_id', $serviceProviderType->id)->count()<1)
+		if(ServiceProviderDetail::where('service_provider_type_id', $id)->count()<1)
 		{
-			$serviceProviderType->delete();
+			ServiceProviderType::find($id)->delete();
 			return response()->json(prepareResult(false, [], "Deleted successfully."), config('http_response.success'));
 		}
 		return response()->json(prepareResult(true, [], "This registration type cannot be removed because some users are registered with it."), config('http_response.bad_request'));

@@ -334,11 +334,14 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/labels-import', [App\Http\Controllers\API\Admin\LabelController::class, 'labelsImport']);
 	Route::apiResource('/service-provider-type-detail', 'App\Http\Controllers\API\Admin\ServiceProviderTypeDetailController');
 	Route::post('/service-provider-type-update', [App\Http\Controllers\API\Admin\ServiceProviderTypeDetailController::class, 'serviceProviderTypeUpdate']);
+	Route::get('/service-provider-type-delete/{id}', [App\Http\Controllers\API\Admin\ServiceProviderTypeDetailController::class, 'serviceProviderTypeDelete']);
+
 	Route::post('/service-provider-type-filter', [App\Http\Controllers\API\Admin\ServiceProviderTypeDetailController::class, 'serviceProviderTypeFilter']);
 
 
 	Route::apiResource('/registration-type-detail', 'App\Http\Controllers\API\Admin\RegistrationTypeDetailController');
 	Route::post('/registration-type-detail-update', [App\Http\Controllers\API\Admin\RegistrationTypeDetailController::class, 'registrationTypeDetailUpdate']);
+	Route::get('/registration-type-delete/{id}', [App\Http\Controllers\API\Admin\RegistrationTypeDetailController::class, 'registrationTypeDestroy']);
 	Route::post('/registration-type-filter', [App\Http\Controllers\API\Admin\RegistrationTypeDetailController::class, 'registrationTypeFilter']);
 
 	Route::apiResource('/page', 'App\Http\Controllers\API\Admin\PageController');
