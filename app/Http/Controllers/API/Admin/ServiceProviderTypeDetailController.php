@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ServiceProviderDetail;
 use App\Models\ServiceProviderType;
 use App\Models\ServiceProviderTypeDetail;
 use App\Http\Resources\ServiceProviderTypeDetailResource;
@@ -34,7 +35,30 @@ class ServiceProviderTypeDetailController extends Controller
 	}
 
 	public function store(Request $request)
-	{        
+	{   
+
+		foreach ($request->registration_type as $key => $value) 
+		{
+			if($value['language_id']=='1')
+			{
+				if(RegistrationType::where('title', $value['title'])->count() > 0)
+				{
+					$registrationType = RegistrationType::where('title' ,$value['title'])->first();
+				}
+				else
+				{
+					$registrationType = new RegistrationType;
+				}
+
+				$registrationType->title	= $value['title'];
+				$registrationType->slug     = Str::slug($value['title']);
+				$registrationType->status   = 1;
+				$registrationType->save();
+				break;
+			}
+		}
+
+	    
 		$validation = Validator::make($request->all(), [
 			'title'  => 'required'
 		]);
@@ -143,9 +167,47 @@ class ServiceProviderTypeDetailController extends Controller
 
 
 
-	// public function destroy(ServiceProviderTypeDetail $serviceProviderTypeDetail)
-	// {
-	// 	$serviceProviderTypeDetail->delete();
-	// 	return response()->json(prepareResult(false, [], "Deleted successfully."), config('http_response.success'));
-	// }
+	public function destroy(ServiceProviderTypeDetail $serviceProviderTypeDetail)
+	{
+		if(ServiceProviderDetail::where('service_provider_type_id', $serviceProviderTypeDetail->id)->count()<1)
+		{
+			$serviceProviderTypeDetail->delete();
+			return response()->json(prepareResult(false, [], "Deleted successfully."), config('http_response.success'));
+		}
+		return response()->json(prepareResult(true, [], "This registration type cannot be removed because some users are registered with it."), config('http_response.bad_request'));
+
+		
+		return response()->json(prepareResult(false, [], "Deleted successfully."), config('http_response.success'));
+	}
+
+	public function serviceProviderTypeFilter(Request $request)
+	{
+		try
+		{
+			$serviceProviderTypes = ServiceProviderType::with('serviceProviderTypeDetails');
+			if(!empty($request->registration_type_id))
+			{
+				$records = $serviceProviderTypes->where('registration_type_id', $request->registration_type_id);
+			}
+
+			if(!empty($request->title))
+			{
+				$records = $serviceProviderTypes->where('title', 'LIKE','%'.$request->title.'%');
+			}
+
+			if(!empty($request->per_page_record))
+			{
+			    $records = $serviceProviderTypes->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			}
+			else
+			{
+			    $records = $serviceProviderTypes->get();
+			}
+			return response(prepareResult(false, $records, "Service Provider Types retrieved successfully."), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
 }

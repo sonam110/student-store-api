@@ -345,6 +345,11 @@ class ContestController extends Controller
             return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
         }
 
+        if($contest->status=='completed')
+        {
+            return response()->json(prepareResult(false, $job, getLangByLabelGroups('messages','message_contest_completed_cannot_update')), config('http_response.success'));
+        }
+
         DB::beginTransaction();
         try
         {

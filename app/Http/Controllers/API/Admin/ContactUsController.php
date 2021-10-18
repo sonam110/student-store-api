@@ -33,7 +33,6 @@ class ContactUsController extends Controller
     {
         try
         {
-            
             ContactUs::find($id)->delete();
             return response(prepareResult(false, [], getLangByLabelGroups('messages','message_contact_us_deleted')), config('http_response.success'));
         }

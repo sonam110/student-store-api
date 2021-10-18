@@ -2011,6 +2011,8 @@ class LabelSeeder extends Seeder
    "swedish" => "Swedish" 
    ], 
    "messages" => [
+   "message_job_expired_cannot_update" => "Job is expired. cannot update.", 
+   "message_contest_completed_cannot_update" => "Contest is completed. cannot update.", 
    "message_rated_successfully" => "Rated Successfully", 
    "message_valid_rating" => "Please give a valid rating", 
    "message_enter_valid_reason" => "Please enter a valid reason.", 

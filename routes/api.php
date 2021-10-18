@@ -333,7 +333,13 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::apiResource('/label', 'App\Http\Controllers\API\Admin\LabelController');
 	Route::post('/labels-import', [App\Http\Controllers\API\Admin\LabelController::class, 'labelsImport']);
 	Route::apiResource('/service-provider-type-detail', 'App\Http\Controllers\API\Admin\ServiceProviderTypeDetailController');
+	Route::post('/service-provider-type-filter', [App\Http\Controllers\API\Admin\ServiceProviderTypeDetailController::class, 'serviceProviderTypeFilter']);
+
+
 	Route::apiResource('/registration-type-detail', 'App\Http\Controllers\API\Admin\RegistrationTypeDetailController');
+	Route::post('/registration-type-detail-update', [App\Http\Controllers\API\Admin\RegistrationTypeDetailController::class, 'registrationTypeDetailUpdate']);
+	Route::post('/registration-type-filter', [App\Http\Controllers\API\Admin\RegistrationTypeDetailController::class, 'registrationTypeFilter']);
+
 	Route::apiResource('/page', 'App\Http\Controllers\API\Admin\PageController');
 	Route::apiResource('/faq', 'App\Http\Controllers\API\Admin\FAQController');
 	Route::apiResource('/email-template', 'App\Http\Controllers\API\Admin\EmailTemplateController');

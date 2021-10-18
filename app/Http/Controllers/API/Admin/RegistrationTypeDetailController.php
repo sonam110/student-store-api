@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrationType;
 use App\Models\RegistrationTypeDetail;
+use App\Models\ServiceProviderDetail;
 use App\Http\Resources\RegistrationTypeDetailResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -35,57 +36,46 @@ class RegistrationTypeDetailController extends Controller
 
 	public function store(Request $request)
 	{        
-		$validation = Validator::make($request->all(), [
-			'title'  => 'required'
-		]);
+		foreach ($request->registration_type as $key => $value) 
+		{
+			if($value['language_id']=='1')
+			{
+				if(RegistrationType::where('title', $value['title'])->count() > 0)
+				{
+					$registrationType = RegistrationType::where('title' ,$value['title'])->first();
+				}
+				else
+				{
+					$registrationType = new RegistrationType;
+				}
 
-		if ($validation->fails()) {
-			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+				$registrationType->title	= $value['title'];
+				$registrationType->slug     = Str::slug($value['title']);
+				$registrationType->status   = 1;
+				$registrationType->save();
+				break;
+			}
 		}
 
-		DB::beginTransaction();
-		try
+		foreach ($request->registration_type as $key => $value) 
 		{
-			$language_id 	= $request->language_id;
-			$title 			= $request->title;
-			$slug 			= Str::slug($request->title);
-
-			$registrationType = RegistrationType::where('title',$title)->first();
-
-			if($registrationType)
+			if(RegistrationTypeDetail::where('title', $value['title'])->where('language_id', $value['language_id'])->count() > 0)
 			{
-				if(RegistrationTypeDetail::where('slug',$registrationType->slug)->where('language_id',$language_id)->count() > 0)
-				{
-					return response()->json(prepareResult(true, [], "Dublicate Entry."), config('http_response.bad_request'));
-				}
+				$registrationTypeDetail = RegistrationTypeDetail::where('title' ,$value['title'])->where('language_id', $value['language_id'])->first();
 			}
 			else
 			{
-				$registrationType 						= new RegistrationType;
-				$registrationType->title     			= $title;
-				$registrationType->slug     			= $slug;
-				$registrationType->status    			= $request->status;
-				$registrationType->save();
+				$registrationTypeDetail = new RegistrationTypeDetail;
+			}
 
-			}           	
-
-
-			$sptDetail = new RegistrationTypeDetail;
-			$sptDetail->registration_type_id 		= $registrationType->id;
-			$sptDetail->language_id            		= $language_id;
-			$sptDetail->title      					= $request->language_title;
-			$sptDetail->slug     					= $registrationType->slug;
-			$sptDetail->description                 = $request->description;
-			$sptDetail->status                 		= $request->status;
-			$sptDetail->save();
-			DB::commit();
-			return response()->json(prepareResult(false, new RegistrationTypeDetailResource($sptDetail), getLangByLabelGroups('messages','message_service_provider_type_created')), config('http_response.created'));
+			$registrationTypeDetail->language_id 	= $value['language_id'];
+			$registrationTypeDetail->registration_type_id 	= $registrationType->id;
+			$registrationTypeDetail->title	= $value['title'];
+			$registrationTypeDetail->slug     = Str::slug($value['title']);
+			$registrationTypeDetail->status   = 1;
+			$registrationTypeDetail->save();
 		}
-		catch (\Throwable $exception)
-		{
-			DB::rollback();
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-		}
+		return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_registration_type_detail_created')), config('http_response.created'));
 	}
 
 
@@ -96,55 +86,82 @@ class RegistrationTypeDetailController extends Controller
 
 
 
-	public function update(Request $request,RegistrationTypeDetail $registrationTypeDetail)
+	public function registrationTypeDetailUpdate(Request $request)
 	{
-		$validation = Validator::make($request->all(), [
-			'title' => 'required'
-		]);
-
-		if ($validation->fails()) {
-			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+		foreach ($request->registration_type as $key => $value) 
+		{
+			if($value['language_id']=='1')
+			{
+				$findDetailData = RegistrationTypeDetail::find($value['id']);
+				$registrationType = RegistrationType::find($findDetailData->registration_type_id);
+				if($registrationType)
+				{
+					$registrationType->title	= $value['title'];
+					$registrationType->slug     = Str::slug($value['title']);
+					$registrationType->status   = 1;
+					$registrationType->save();
+					break;
+				}
+			}
 		}
 
-		DB::beginTransaction();
-		try
+		foreach ($request->registration_type as $key => $value) 
 		{
-			$language_id 	= $request->language_id;
-			$title 			= $request->title;
-			$slug 			= Str::slug($request->title);
+			if(!empty($value['id']))
+			{
+				$registrationTypeDetail = RegistrationTypeDetail::find($value['id']);
+			}
+			else
+			{
+				$registrationTypeDetail = new RegistrationTypeDetail;
+			}
 
-			$registrationType = RegistrationType::where('id',$registrationTypeDetail->registration_type_id)->first();
-
-			
-			$registrationType->title     			= $title;
-			$registrationType->slug     			= $slug;
-			$registrationType->status    			= $request->status;
-			$registrationType->save();
-
+			$registrationTypeDetail->language_id 	= $value['language_id'];
 			$registrationTypeDetail->registration_type_id 	= $registrationType->id;
-			$registrationTypeDetail->language_id            = $language_id;
-			$registrationTypeDetail->title      			= $request->language_title;
-			$registrationTypeDetail->slug     				= $registrationType->slug;
-			$registrationTypeDetail->description            = $request->description;
-			$registrationTypeDetail->status                 = $request->status;
+			$registrationTypeDetail->title	= $value['title'];
+			$registrationTypeDetail->slug     = Str::slug($value['title']);
+			$registrationTypeDetail->status   = 1;
 			$registrationTypeDetail->save();
-
-			
-			DB::commit();
-			return response()->json(prepareResult(false, new RegistrationTypeDetailResource($registrationTypeDetail), getLangByLabelGroups('messages','message_service_provider_type_updated')), config('http_response.success'));
 		}
-		catch (\Throwable $exception)
-		{
-			DB::rollback();
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-		}
+		return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_registration_type_detail_created')), config('http_response.created'));
 	}
 
 
+	
+	public function destroy(RegistrationTypeDetail $registrationTypeDetail)
+	{
+		if(ServiceProviderDetail::where('registration_type_id', $registrationTypeDetail->id)->count()<1)
+		{
+			$registrationTypeDetail->delete();
+			return response()->json(prepareResult(false, [], "Deleted successfully."), config('http_response.success'));
+		}
+		return response()->json(prepareResult(true, [], "This registration type cannot be removed because some users are registered with it."), config('http_response.bad_request'));
+	}
+	
 
-	// public function destroy(RegistrationTypeDetail $registrationTypeDetail)
-	// {
-	// 	$registrationTypeDetail->delete();
-	// 	return response()->json(prepareResult(false, [], "Deleted successfully."), config('http_response.success'));
-	// }
+	public function registrationTypeFilter(Request $request)
+	{
+		try
+		{
+			$registrationTypes = RegistrationType::with('registrationTypeDetails');
+			if(!empty($request->title))
+			{
+				$records = $registrationTypes->where('title', 'LIKE','%'.$request->title.'%');
+			}
+
+			if(!empty($request->per_page_record))
+			{
+			    $records = $registrationTypes->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			}
+			else
+			{
+			    $records = $registrationTypes->get();
+			}
+			return response(prepareResult(false, $records, "Registration Types retrieved successfully."), config('http_response.success'));
+		}
+		catch (\Throwable $exception) 
+		{
+			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
 }
