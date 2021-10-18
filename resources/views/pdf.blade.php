@@ -112,7 +112,7 @@
 		<div id="drag" class="cv instaFade breakFastBurrito" style="padding: 0px">
 			<div class="mainDetails">
 				<div id="headshot" class="">
-					<img src="{{$user->profile_pic_thumb_path}}" title="{{$user->first_name}} {{$user->last_name}}" alt="{{$user->first_name}} {{$user->last_name}}" />
+					<img src="{{$user->profile_pic_thumb_path}}" />
 				</div>
 				<div id="name">
 					<h1 class=" delayTwo">{{\mervick\aesEverywhere\AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'))}} {{\mervick\aesEverywhere\AES256::decrypt($user->last_name, env('ENCRYPTION_KEY'))}}</h1>
@@ -140,10 +140,18 @@
 					<section id="Profile">
 						<article>
 							<div class="sectionTitle">
-								<h1>{{getLangByLabelGroups('pdf','Personal_Profile')}}</h1>
+								<h1>{{getLangByLabelGroups('job_environment','title')}}</h1>
 							</div>
 							<div class="sectionContent">
-								<p>{{getLangByLabelGroups('pdf','Personal_Profile_text')}} </p>
+								<ul class="keySkills">
+									<?php 
+										$preferred_job_env = json_decode($user->userCvDetail->preferred_job_env);
+									?>
+									@forelse($preferred_job_env as $env)
+									<li>{{getLangByLabelGroups('job_environment', $env)}}</li>
+									@empty
+									@endforelse
+								</ul>
 							</div>
 						</article>
 						<div class="clear"></div>
@@ -226,17 +234,7 @@
 						<div class="clear"></div>
 					</section>
 
-					<section>
-						<div class="sectionTitle">
-							<h1>{{getLangByLabelGroups('pdf','Hobbies')}}</h1>
-						</div>
-						<div class="sectionContent">
-							<ul class="keySkills">
-								<li>{{getLangByLabelGroups('pdf','Web_Surfing')}}</li>
-								<li>{{getLangByLabelGroups('pdf','Playing_Outdoor_games')}}</li>
-							</ul>
-						</div>
-					</section>
+					
 
 					<section>
 						<div class="sectionTitle">
