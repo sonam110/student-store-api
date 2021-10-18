@@ -201,7 +201,7 @@
 							<article>
 								<strong>{{$experiences->title}}</strong>
 								<p style="margin-bottom: 0px">{{$experiences->employer_name}}, {{$experiences->country}}, {{$experiences->city}}</p>
-								<p class="subDetails">{{\Carbon\Carbon::parse($experiences->from_date)->format('M Y')}} - {{\Carbon\Carbon::parse($experiences->to_date)->format('M Y')}}</p>
+								<p class="subDetails" style="margin-bottom: 5px">{{\Carbon\Carbon::parse($experiences->from_date)->format('M Y')}} - {{\Carbon\Carbon::parse($experiences->to_date)->format('M Y')}}</p>
 								<p>{{$experiences->activities_and_responsibilities}}</p>
 							</article>
 							@empty
