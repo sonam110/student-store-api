@@ -1346,6 +1346,10 @@ class LandingPageController extends Controller
     public function jobDetail(Request $request, $id)
     {
         $job = Job::find($id);
+        if(!$job)
+        {
+            return response(prepareResult(true, 'Data Not Found.', 'Data Not Found.'), config('http_response.not_found'));
+        }
         if($fav = FavouriteJob::where('job_id',$job->id)->where('sa_id',Auth::id())->first())
         {
             $favouriteJob = true;

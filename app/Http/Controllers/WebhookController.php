@@ -75,7 +75,8 @@ class WebhookController extends Controller
             //Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "subscription_schedule.created")
-        {            
+        { 
+            
             $subscriptionSchedule = $event->data->object;
             Log::channel('webhook')->info('created');
             Log::channel('webhook')->info($subscriptionSchedule);

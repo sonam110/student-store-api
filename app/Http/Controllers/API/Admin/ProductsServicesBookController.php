@@ -84,14 +84,15 @@ class ProductsServicesBookController extends Controller
     public function store(Request $request)
     {
         $validation = Validator::make($request->all(), [
+            'user_id'           => 'required',
             'title'             => 'required',
             'price'             => 'required',
             'description'       => 'required'
         ]);
 
         if ($validation->fails()) {
-            \Log::info($request->all());
-            \Log::info($validation);
+            //\Log::info($request->all());
+            //\Log::info($validation);
             return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
         }
         DB::beginTransaction();
@@ -255,14 +256,7 @@ class ProductsServicesBookController extends Controller
         DB::beginTransaction();
         try
         { 
-        	if(!empty($request->user_id))
-        	{
-        	    $user_id = $request->user_id;
-        	}
-        	else
-        	{
-        	    $user_id = Auth::id();
-        	}
+        	$user_id = $productsServicesBook->user_id;
 
         	if(!empty($request->is_used_item))
             {
