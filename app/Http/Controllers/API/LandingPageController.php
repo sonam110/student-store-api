@@ -77,8 +77,12 @@ class LandingPageController extends Controller
 
     public function userDetail($user_id)
     {   
-        $user = User::find($user_id);    
-        return response()->json(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
+        $user = User::find($user_id);
+        if($user)
+        {
+            return response()->json(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
+        }    
+        return response(prepareResult(true, 'Data Not Found.', 'Data Not Found.'), config('http_response.not_found'));
     }
 
 
