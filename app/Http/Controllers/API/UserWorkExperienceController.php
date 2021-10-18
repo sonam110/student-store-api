@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 use Str;
 use DB;
 use Auth;
+use PDF;
+use mervick\aesEverywhere\AES256;
 
 class UserWorkExperienceController extends Controller
 {
@@ -71,7 +73,15 @@ class UserWorkExperienceController extends Controller
             $userWorkExperience->city                           = $request->city;
             $userWorkExperience->status                         = true;
             $userWorkExperience->save();
+
+
             DB::commit();
+
+            $destinationPath = 'uploads/';
+            $cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
+
+            createResume($cv_name,Auth::user());
+            
             return response()->json(prepareResult(false, new UserWorkExperienceResource($userWorkExperience), getLangByLabelGroups('messages','message_work_experience_created')), config('http_response.created'));
         }
         catch (\Throwable $exception)
@@ -130,7 +140,14 @@ class UserWorkExperienceController extends Controller
             $userWorkExperience->city                           = $request->city;
             $userWorkExperience->status                         = true;
             $userWorkExperience->save();
+
             DB::commit();
+
+            $destinationPath = 'uploads/';
+            $cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
+
+            createResume($cv_name,Auth::user());
+
             return response()->json(prepareResult(false, new UserWorkExperienceResource($userWorkExperience), getLangByLabelGroups('messages','message_work_experience_updated')), config('http_response.success'));
         }
         catch (\Throwable $exception)
