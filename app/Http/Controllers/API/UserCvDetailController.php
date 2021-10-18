@@ -52,7 +52,7 @@ class UserCvDetailController extends Controller
 		$userCvDetail->is_published         = $request->is_published;
 		$userCvDetail->published_at         = $published_at;
 		$userCvDetail->cv_url				= $request->cv_url;
-		// $userCvDetail->generated_cv_file	= env('CDN_DOC_URL').$destinationPath.$cv_name;
+		$userCvDetail->generated_cv_file	= env('CDN_DOC_URL').$destinationPath.$cv_name;
 		$userCvDetail->cv_update_status 		= 1;
 		$userCvDetail->total_experience     = $request->total_experience;
 		if($userCvDetail->save())
@@ -62,7 +62,7 @@ class UserCvDetailController extends Controller
 			{
 				//createResume($cv_name,Auth::user());
 				$cvDetail = Auth::user()->userCvDetail;
-				$cvDetail->generated_cv_file = env('CDN_DOC_URL').$destinationPath.$cv_name;
+				// $cvDetail->generated_cv_file = env('CDN_DOC_URL').$destinationPath.$cv_name;
 				$cvDetail->cv_update_status = 0;
 				$cvDetail->save();
 			}
