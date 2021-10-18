@@ -128,11 +128,11 @@ class RegistrationTypeDetailController extends Controller
 
 
 	
-	public function destroy(RegistrationTypeDetail $registrationTypeDetail)
+	public function destroy(RegistrationType $registrationType)
 	{
-		if(ServiceProviderDetail::where('registration_type_id', $registrationTypeDetail->id)->count()<1)
+		if(ServiceProviderDetail::where('registration_type_id', $registrationType->id)->count()<1)
 		{
-			$registrationTypeDetail->delete();
+			$registrationType->delete();
 			return response()->json(prepareResult(false, [], "Deleted successfully."), config('http_response.success'));
 		}
 		return response()->json(prepareResult(true, [], "This registration type cannot be removed because some users are registered with it."), config('http_response.bad_request'));

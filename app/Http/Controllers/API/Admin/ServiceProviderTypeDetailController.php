@@ -36,81 +36,47 @@ class ServiceProviderTypeDetailController extends Controller
 
 	public function store(Request $request)
 	{   
-
-		foreach ($request->registration_type as $key => $value) 
+		foreach ($request->service_provider_type as $key => $value) 
 		{
 			if($value['language_id']=='1')
 			{
-				if(RegistrationType::where('title', $value['title'])->count() > 0)
+				if(ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('title', $value['title'])->count() > 0)
 				{
-					$registrationType = RegistrationType::where('title' ,$value['title'])->first();
+					$serviceProviderType = ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('title' ,$value['title'])->first();
 				}
 				else
 				{
-					$registrationType = new RegistrationType;
+					$serviceProviderType = new ServiceProviderType;
 				}
 
-				$registrationType->title	= $value['title'];
-				$registrationType->slug     = Str::slug($value['title']);
-				$registrationType->status   = 1;
-				$registrationType->save();
+				$serviceProviderType->registration_type_id	= $request->registration_type_id;
+				$serviceProviderType->title	= $value['title'];
+				$serviceProviderType->slug     = Str::slug($value['title']);
+				$serviceProviderType->status   = 1;
+				$serviceProviderType->save();
 				break;
 			}
 		}
 
-	    
-		$validation = Validator::make($request->all(), [
-			'title'  => 'required'
-		]);
-
-		if ($validation->fails()) {
-			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-		}
-
-		DB::beginTransaction();
-		try
+		foreach ($request->service_provider_type as $key => $value) 
 		{
-			$language_id 	= $request->language_id;
-			$title 			= $request->title;
-			$slug 			= Str::slug($request->title);
-
-			$serviceProviderType = ServiceProviderType::where('title',$title)->first();
-
-			if($serviceProviderType)
+			if(ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('title', $value['title'])->where('language_id', $value['language_id'])->count() > 0)
 			{
-				if(ServiceProviderTypeDetail::where('slug',$serviceProviderType->slug)->where('language_id',$language_id)->count() > 0)
-				{
-					return response()->json(prepareResult(true, [], "Dublicate Entry."), config('http_response.bad_request'));
-				}
+				$serviceProviderTypeDetail = ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('title' ,$value['title'])->where('language_id', $value['language_id'])->first();
 			}
 			else
 			{
-				$serviceProviderType 						= new ServiceProviderType;
-				$serviceProviderType->registration_type_id  = $request->registration_type_id;
-				$serviceProviderType->title     			= $title;
-				$serviceProviderType->slug     				= $slug;
-				$serviceProviderType->status    			= $request->status;
-				$serviceProviderType->save();
+				$serviceProviderTypeDetail = new ServiceProviderTypeDetail;
+			}
 
-			}           	
-
-
-			$sptDetail = new ServiceProviderTypeDetail;
-			$sptDetail->service_provider_type_id 	= $serviceProviderType->id;
-			$sptDetail->language_id            		= $language_id;
-			$sptDetail->title      					= $request->language_title;
-			$sptDetail->slug     					= $serviceProviderType->slug;
-			$sptDetail->description                 = $request->description;
-			$sptDetail->status                 		= $request->status;
-			$sptDetail->save();
-			DB::commit();
-			return response()->json(prepareResult(false, new ServiceProviderTypeDetailResource($sptDetail), getLangByLabelGroups('messages','message_service_provider_type_created')), config('http_response.created'));
+			$serviceProviderTypeDetail->service_provider_type_id 	= $serviceProviderType->id;
+			$serviceProviderTypeDetail->language_id 	= $value['language_id'];
+			$serviceProviderTypeDetail->title	= $value['title'];
+			$serviceProviderTypeDetail->slug     = Str::slug($value['title']);
+			$serviceProviderTypeDetail->status   = 1;
+			$serviceProviderTypeDetail->save();
 		}
-		catch (\Throwable $exception)
-		{
-			DB::rollback();
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-		}
+		return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_service_provider_type_created')), config('http_response.created'));
 	}
 
 
@@ -121,57 +87,58 @@ class ServiceProviderTypeDetailController extends Controller
 
 
 
-	public function update(Request $request,ServiceProviderTypeDetail $serviceProviderTypeDetail)
+	public function serviceProviderTypeUpdate(Request $request)
 	{
-		$validation = Validator::make($request->all(), [
-			'title' => 'required'
-		]);
+		foreach ($request->service_provider_type as $key => $value) 
+		{
+			if($value['language_id']=='1')
+			{
+				if(ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('title', $value['title'])->count() > 0)
+				{
+					$serviceProviderType = ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('title' ,$value['title'])->first();
+				}
+				else
+				{
+					$serviceProviderType = new ServiceProviderType;
+				}
 
-		if ($validation->fails()) {
-			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+				$serviceProviderType->registration_type_id	= $request->registration_type_id;
+				$serviceProviderType->title	= $value['title'];
+				$serviceProviderType->slug     = Str::slug($value['title']);
+				$serviceProviderType->status   = 1;
+				$serviceProviderType->save();
+				break;
+			}
 		}
 
-		DB::beginTransaction();
-		try
+		foreach ($request->service_provider_type as $key => $value) 
 		{
-			$language_id 	= $request->language_id;
-			$title 			= $request->title;
-			$slug 			= Str::slug($request->title);
-
-			$serviceProviderType = ServiceProviderType::where('id',$serviceProviderTypeDetail->service_provider_type_id)->first();
-
-			$serviceProviderType->registration_type_id  = $request->registration_type_id;
-			$serviceProviderType->title     			= $title;
-			$serviceProviderType->slug     				= $slug;
-			$serviceProviderType->status    			= $request->status;
-			$serviceProviderType->save();
+			if(ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('title', $value['title'])->where('language_id', $value['language_id'])->count() > 0)
+			{
+				$serviceProviderTypeDetail = ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('title' ,$value['title'])->where('language_id', $value['language_id'])->first();
+			}
+			else
+			{
+				$serviceProviderTypeDetail = new ServiceProviderTypeDetail;
+			}
 
 			$serviceProviderTypeDetail->service_provider_type_id 	= $serviceProviderType->id;
-			$serviceProviderTypeDetail->language_id            		= $language_id;
-			$serviceProviderTypeDetail->title      					= $request->language_title;
-			$serviceProviderTypeDetail->slug     					= $serviceProviderType->slug;
-			$serviceProviderTypeDetail->description                 = $request->description;
-			$serviceProviderTypeDetail->status                 		= $request->status;
+			$serviceProviderTypeDetail->language_id 	= $value['language_id'];
+			$serviceProviderTypeDetail->title	= $value['title'];
+			$serviceProviderTypeDetail->slug     = Str::slug($value['title']);
+			$serviceProviderTypeDetail->status   = 1;
 			$serviceProviderTypeDetail->save();
-
-			
-			DB::commit();
-			return response()->json(prepareResult(false, new ServiceProviderTypeDetailResource($serviceProviderTypeDetail), getLangByLabelGroups('messages','message_service_provider_type_updated')), config('http_response.success'));
 		}
-		catch (\Throwable $exception)
-		{
-			DB::rollback();
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-		}
+		return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_service_provider_type_updated')), config('http_response.created'));
 	}
 
 
 
-	public function destroy(ServiceProviderTypeDetail $serviceProviderTypeDetail)
+	public function destroy(ServiceProviderType $serviceProviderType)
 	{
-		if(ServiceProviderDetail::where('service_provider_type_id', $serviceProviderTypeDetail->id)->count()<1)
+		if(ServiceProviderDetail::where('service_provider_type_id', $serviceProviderType->id)->count()<1)
 		{
-			$serviceProviderTypeDetail->delete();
+			$serviceProviderType->delete();
 			return response()->json(prepareResult(false, [], "Deleted successfully."), config('http_response.success'));
 		}
 		return response()->json(prepareResult(true, [], "This registration type cannot be removed because some users are registered with it."), config('http_response.bad_request'));
