@@ -15,6 +15,7 @@ use Str;
 use DB;
 use Auth;
 use App\Models\LangForDDL;
+use mervick\aesEverywhere\AES256;
 
 class UserCvDetailController extends Controller
 {
@@ -36,8 +37,10 @@ class UserCvDetailController extends Controller
 			$published_at = null;
 		}
 
+
+
 		$destinationPath = 'uploads/';
-		$cv_name = Str::slug(substr(Auth::user()->first_name, 0, 15)).'-'.Str::slug(substr(Auth::user()->last_name, 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
+		$cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
 		$userCvDetail = UserCvDetail::firstOrNew(['user_id' =>  Auth::id()]);
 	    $userCvDetail->user_id         		= Auth::id();
 		$userCvDetail->address_detail_id    = $request->address_detail_id;
@@ -57,7 +60,7 @@ class UserCvDetailController extends Controller
 			//Create CV pdf
 			if(Auth::user()->userWorkExperiences->count() > 0 && Auth::user()->userEducationDetails->count() > 0)
 			{
-				createResume($cv_name,Auth::user());
+				//createResume($cv_name,Auth::user());
 				$cvDetail = Auth::user()->userCvDetail;
 				$cvDetail->generated_cv_file = env('CDN_DOC_URL').$destinationPath.$cv_name;
 				$cvDetail->cv_update_status = 0;
@@ -91,6 +94,8 @@ class UserCvDetailController extends Controller
                     $langddl->save();
                 }
             }
+
+            createResume($cv_name,Auth::user());
 
 			return response(prepareResult(false, $userCvDetail, getLangByLabelGroups('messages','message_user_cv_detail_updated')), config('http_response.created'));
 		}
