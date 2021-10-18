@@ -40,9 +40,9 @@ class ServiceProviderTypeDetailController extends Controller
 		{
 			if($value['language_id']=='1')
 			{
-				if(ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('title', $value['title'])->count() > 0)
+				if(ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('slug', Str::slug($value['title']))->count() > 0)
 				{
-					$serviceProviderType = ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('title' ,$value['title'])->first();
+					$serviceProviderType = ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('slug' ,Str::slug($value['title']))->first();
 				}
 				else
 				{
@@ -60,9 +60,9 @@ class ServiceProviderTypeDetailController extends Controller
 
 		foreach ($request->service_provider_type as $key => $value) 
 		{
-			if(ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('title', $value['title'])->where('language_id', $value['language_id'])->count() > 0)
+			if(ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('slug', Str::slug($value['title']))->where('language_id', $value['language_id'])->count() > 0)
 			{
-				$serviceProviderTypeDetail = ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('title' ,$value['title'])->where('language_id', $value['language_id'])->first();
+				$serviceProviderTypeDetail = ServiceProviderTypeDetail::where('service_provider_type_id', $serviceProviderType->id)->where('slug' ,Str::slug($value['title']))->where('language_id', $value['language_id'])->first();
 			}
 			else
 			{
@@ -94,9 +94,9 @@ class ServiceProviderTypeDetailController extends Controller
 		{
 			if($value['language_id']=='1')
 			{
-				if(ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('title', $value['title'])->count() > 0)
+				if(ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('slug', Str::slug($value['title']))->count() > 0)
 				{
-					$serviceProviderType = ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('title' ,$value['title'])->first();
+					$serviceProviderType = ServiceProviderType::where('registration_type_id', $request->registration_type_id)->where('slug' ,Str::slug($value['title']))->first();
 				}
 				else
 				{
