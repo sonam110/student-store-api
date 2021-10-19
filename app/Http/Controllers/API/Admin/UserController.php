@@ -328,7 +328,7 @@ class UserController extends Controller
     {
         try
         {
-        	$users = User::where('users.user_type_id','!=', '1')->orderBy('users.created_at','desc');
+        	$users = User::select('users.*')->where('users.user_type_id','!=', '1')->orderBy('users.created_at','desc');
 
 
         	if(!empty($request->name))

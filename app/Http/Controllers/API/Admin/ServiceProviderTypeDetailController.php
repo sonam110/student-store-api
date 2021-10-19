@@ -152,7 +152,7 @@ class ServiceProviderTypeDetailController extends Controller
 	{
 		try
 		{
-			$serviceProviderTypes = ServiceProviderType::with('serviceProviderTypeDetails');
+			$serviceProviderTypes = ServiceProviderType::with('serviceProviderTypeDetails','registrationType:id,title');
 			if(!empty($request->registration_type_id))
 			{
 				$records = $serviceProviderTypes->where('registration_type_id', $request->registration_type_id);
