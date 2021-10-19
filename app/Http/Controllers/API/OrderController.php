@@ -445,10 +445,26 @@ class OrderController extends Controller
                 //mail-end
 
 
-				$paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);
+                $paymentCardDetail = false;
+                if(isset($request->transaction_detail['payment_card_detail_id']) || !empty($request->transaction_detail['payment_card_detail_id']))
+                {
+                	$paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);
+                }
+				
 				$transactionDetail = new TransactionDetail;
 				$transactionDetail->order_id                 	= $order->id;
-				$transactionDetail->payment_card_detail_id   	= $request->transaction_detail['payment_card_detail_id'];
+
+				if($paymentCardDetail)
+				{
+					$transactionDetail->payment_card_detail_id   	= $request->transaction_detail['payment_card_detail_id'];
+					$transactionDetail->card_number              	= $paymentCardDetail->card_number;
+					$transactionDetail->card_type                	= $paymentCardDetail->card_type;
+					$transactionDetail->card_cvv                 	= $paymentCardDetail->card_cvv;
+					$transactionDetail->card_expiry              	= $paymentCardDetail->card_expiry;
+					$transactionDetail->card_holder_name         	= $paymentCardDetail->card_holder_name;
+				}
+
+				
                 $transactionDetail->transaction_id           	= $request->transaction_detail['transaction_id'];
 
                 $transactionDetail->description              	= $request->transaction_detail['description'];
@@ -466,12 +482,6 @@ class OrderController extends Controller
 
                 $transactionDetail->transaction_timestamp    	= $request->transaction_detail['transaction_timestamp'];
                 $transactionDetail->currency       		     	= $request->transaction_detail['currency'];
-                
-				$transactionDetail->card_number              	= $paymentCardDetail->card_number;
-				$transactionDetail->card_type                	= $paymentCardDetail->card_type;
-				$transactionDetail->card_cvv                 	= $paymentCardDetail->card_cvv;
-				$transactionDetail->card_expiry              	= $paymentCardDetail->card_expiry;
-				$transactionDetail->card_holder_name         	= $paymentCardDetail->card_holder_name;
 				$transactionDetail->save();
 			}
 
@@ -1683,8 +1693,6 @@ class OrderController extends Controller
 	        ));
 
 	        $response = curl_exec($curl);
-	        Log::info('response');
-	        Log::info($response);
 	        if(curl_errno($curl)>0)
 	        {
 	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
@@ -1738,7 +1746,7 @@ class OrderController extends Controller
 	            return response()->json(prepareResult(true, $info, "Error while creating klarna session"), config('http_response.internal_server_error'));
 	        }
 	        curl_close($curl);
-	        return response()->json(prepareResult(false, json_decode($response, true), "Session successfully created."), config('http_response.success'));
+	        return response()->json(prepareResult(false, json_decode($response, true), "Payment successfully completed."), config('http_response.success'));
 		} else {
 			\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
 
