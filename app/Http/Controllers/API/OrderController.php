@@ -1639,6 +1639,7 @@ class OrderController extends Controller
 	        $city = $user->defaultAddress->city;
 
 	        $data = [
+	            'purchase_currency' => 'SEK',
 	            'purchase_country'  => 'SE',
 	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
 	            'billing_address'   => [
