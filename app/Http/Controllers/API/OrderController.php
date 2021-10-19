@@ -37,6 +37,7 @@ use PDF;
 use App\Models\UserPackageSubscription;
 use Stripe;
 use App\Models\PaymentGatewaySetting;
+use Log;
 
 class OrderController extends Controller
 {
