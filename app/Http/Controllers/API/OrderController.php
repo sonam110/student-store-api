@@ -1585,13 +1585,12 @@ class OrderController extends Controller
 
 		$total = $sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount;
 
+		$url = env('KLARNA_URL').'/payments/v1/sessions';
+        $username = $this->paymentInfo->klarna_username;
+        $password = $this->paymentInfo->klarna_password;
+        $auth     = base64_encode($username.":".$password);
 		if($request->payment_method=='create_klarna_session') {
-			$url = env('KLARNA_URL').'/payments/v1/sessions';
-	        $username = $this->paymentInfo->klarna_username;
-	        $password = $this->paymentInfo->klarna_password;
-	        $auth     = base64_encode($username.":".$password);
-
-	        $data = [
+			$data = [
 	            'purchase_country'  => 'SE',
 	            'purchase_currency' => 'SEK',
 	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
@@ -1663,7 +1662,7 @@ class OrderController extends Controller
 
 	        $postData = json_encode($data);
 	        Log::info($postData);
-	        
+
 	        $curl = curl_init();
 	        curl_setopt_array($curl, array(
 	          CURLOPT_URL => $url,
