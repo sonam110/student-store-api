@@ -1074,12 +1074,20 @@ class ProductsServicesBookController extends Controller
         try
         {
             $searchType = $request->searchType; 
+            $type = 'product';
+            if(!empty($request->type))
+            {
+                $type = $request->type;
+            }
             $products = ProductsServicesBook::where('is_used_item', '1')
-                                ->where('type','product')
                                 //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
                                 ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+            if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random') 
+            {
+                $products->where('products_services_books.type', $type);
+            }
             if($searchType=='filter')
             {
                 
