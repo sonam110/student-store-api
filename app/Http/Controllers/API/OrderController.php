@@ -1641,16 +1641,16 @@ class OrderController extends Controller
 	        $data = [
 	            'purchase_country'  => 'SE',
 	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
-	            // 'billing_address'   => [
-	            //     'given_name'    => $given_name,
-	            //     'family_name'   => $family_name,
-	            //     'email'         => $email,
-	            //     'phone'         => $phone,
-	            //     'street_address'=> $street_address,
-	            //     'postal_code'   => $postal_code,
-	            //     'city'          => $city,
-	            //     'country'       => 'SE'
-	            // ],
+	            'billing_address'   => [
+	                'given_name'    => $given_name,
+	                'family_name'   => $family_name,
+	                'email'         => $email,
+	                'phone'         => $phone,
+	                'street_address'=> $street_address,
+	                'postal_code'   => $postal_code,
+	                'city'          => $city,
+	                'country'       => 'SE'
+	            ],
 	            'description'       => 'Student Store',
 	            'intended_use'      => 'subscription',
 	            'merchant_urls'     => [
@@ -1662,7 +1662,7 @@ class OrderController extends Controller
 	        ];
 
 	        $postData = json_encode($data);
-	        Log::info($postData);
+	        
 
 	        $curl = curl_init();
 	        curl_setopt_array($curl, array(
@@ -1682,6 +1682,8 @@ class OrderController extends Controller
 	        ));
 
 	        $response = curl_exec($curl);
+	        Log::info('response');
+	        Log::info($response);
 	        if(curl_errno($curl)>0)
 	        {
 	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
