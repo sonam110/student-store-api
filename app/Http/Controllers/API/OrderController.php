@@ -1641,16 +1641,16 @@ class OrderController extends Controller
 	        $data = [
 	            'purchase_country'  => 'SE',
 	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
-	            'billing_address'   => [
-	                'given_name'    => $given_name,
-	                'family_name'   => $family_name,
-	                'email'         => $email,
-	                'phone'         => $phone,
-	                'street_address'=> $street_address,
-	                'postal_code'   => $postal_code,
-	                'city'          => $city,
-	                'country'       => 'SE'
-	            ],
+	            // 'billing_address'   => [
+	            //     'given_name'    => $given_name,
+	            //     'family_name'   => $family_name,
+	            //     'email'         => $email,
+	            //     'phone'         => $phone,
+	            //     'street_address'=> $street_address,
+	            //     'postal_code'   => $postal_code,
+	            //     'city'          => $city,
+	            //     'country'       => 'SE'
+	            // ],
 	            'description'       => 'Student Store',
 	            'intended_use'      => 'subscription',
 	            'merchant_urls'     => [
@@ -1660,8 +1660,10 @@ class OrderController extends Controller
 	                'push'          => env('APP_URL').'api/push-notification-klarna',
 	            ]
 	        ];
-	        $postData = json_encode($data);
 
+	        $postData = json_encode($data);
+	        Log::info($postData);
+	        
 	        $curl = curl_init();
 	        curl_setopt_array($curl, array(
 	          CURLOPT_URL => $url,
