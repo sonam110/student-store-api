@@ -841,7 +841,7 @@ class JobController extends Controller
             }
             else
             {
-                $jobApplications = JobApplication::whereIn('job_id',$jobs)->orderBy('created_at','DESC')->with('user:id, first_name, last_name,gender, dob, email, contact_number, profile_pic_path, status','user.cvDetail')->get();
+                $jobApplications = JobApplication::whereIn('job_id',$jobs)->orderBy('created_at','DESC')->with('user:id, first_name, last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail')->get();
             }
             return response(prepareResult(false, $jobApplications, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
         }
@@ -1048,7 +1048,7 @@ class JobController extends Controller
                     $count = 0;
                     foreach ($newRec as $key => $job_users_id) {
                         foreach ($job_users_id as $userkey => $user) {
-                            $applicantsUser[$count] = ['user' => User::select('id','first_name','last_name','gender','dob','email','contact_number','profile_pic_path')->with('cvDetail','defaultAddress')->where('users.id', $user)
+                            $applicantsUser[$count] = ['user' => User::select('id','first_name','last_name','gender','dob','email','contact_number','profile_pic_path','profile_pic_thumb_path')->with('cvDetail','defaultAddress')->where('users.id', $user)
                             ->first()];
                             $applicantsUser[$count]['job'] = Job::select('id','title')->where('sp_jobs.id', $key)
                             ->first();
