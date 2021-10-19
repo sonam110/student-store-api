@@ -446,7 +446,7 @@ class OrderController extends Controller
 
 
                 $paymentCardDetail = false;
-                if(isset($request->transaction_detail['payment_card_detail_id']) || !empty($request->transaction_detail['payment_card_detail_id']))
+                if(!empty($request->transaction_detail['payment_card_detail_id']))
                 {
                 	$paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);
                 }
