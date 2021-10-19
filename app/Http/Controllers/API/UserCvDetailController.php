@@ -105,5 +105,23 @@ class UserCvDetailController extends Controller
 		}
 	}
 
-	
+	public function downloadResume($user_id)
+	{
+		$findUser = User::where('user_type_id', '2')->find($user_id);
+		if($findUser)
+		{
+			$destinationPath = 'uploads/';
+	        $cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
+
+	        $resumeDownloadPath = env('CDN_DOC_URL').$destinationPath.$cv_name;
+
+	        createResume($cv_name,Auth::user());
+	        return response()->json(prepareResult(false, $resumeDownloadPath, 'Download Resume'), config('http_response.success'));
+		}
+		else
+		{
+			return response()->json(prepareResult(true, 'User not found.', 'User not found.'), config('http_response.not_found'));
+		}
+		
+	}
 }

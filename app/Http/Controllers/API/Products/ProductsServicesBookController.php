@@ -812,6 +812,11 @@ class ProductsServicesBookController extends Controller
             ->where('products_services_books.is_published', '1')
             ->where('products_services_books.quantity','>' ,'0')
             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+            if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random') 
+            {
+                $products->where('products_services_books.type', $type);
+            }
+            
             if($searchType=='filter')
             {
                 if(empty($request->search))

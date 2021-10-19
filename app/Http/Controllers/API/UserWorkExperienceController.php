@@ -77,10 +77,10 @@ class UserWorkExperienceController extends Controller
 
             DB::commit();
 
-            $destinationPath = 'uploads/';
-            $cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
+            // $destinationPath = 'uploads/';
+            // $cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
 
-            createResume($cv_name,Auth::user());
+            // createResume($cv_name,Auth::user());
             
             return response()->json(prepareResult(false, new UserWorkExperienceResource($userWorkExperience), getLangByLabelGroups('messages','message_work_experience_created')), config('http_response.created'));
         }
@@ -143,10 +143,10 @@ class UserWorkExperienceController extends Controller
 
             DB::commit();
 
-            $destinationPath = 'uploads/';
-            $cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
+            // $destinationPath = 'uploads/';
+            // $cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
 
-            createResume($cv_name,Auth::user());
+            // createResume($cv_name,Auth::user());
 
             return response()->json(prepareResult(false, new UserWorkExperienceResource($userWorkExperience), getLangByLabelGroups('messages','message_work_experience_updated')), config('http_response.success'));
         }
