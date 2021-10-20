@@ -54,9 +54,9 @@ class ProductsImport implements ToModel,WithHeadingRow
 
         $language = [];
         $languageVal = [];
-        if(isset($row['service_languages']) && !empty($row['service_languages']))
+        if(isset($row['languages']) && !empty($row['languages']))
         {
-            foreach (explode(',', $row['service_languages']) as $key => $lang) 
+            foreach (explode(',', $row['languages']) as $key => $lang) 
             {
                 $language[] = $lang;
             }
@@ -138,26 +138,39 @@ class ProductsImport implements ToModel,WithHeadingRow
             $products->category_master_id        = $this->data['category_master_id'];
             $products->sub_category_slug         = $this->data['sub_category_slug'];
             $products->type                      = $row['type'];
-            $products->title                     = $row['service_name'];
-            $products->slug                      = Str::slug($row['service_name']);
+            $products->title                     = $row['book_name'];
+            $products->slug                      = Str::slug($row['book_name']);
+            $products->gtin_isbn                 = $row['isbn_number'];
+            $products->sku                       = $row['sku'];
             $products->basic_price_wo_vat        = $row['actual_price'] - (($row['actual_price'] * $getCat->vat)/100);
             $products->price                     = $row['actual_price'];
             $products->is_on_offer               = ($row['is_on_offer']=='Yes') ? 1 : 0;
             $products->discount_type             = $row['discount_type'];
             $products->discount_value            = $discountValue;
             $products->discounted_price          = $discountAmount;
-            $products->quantity                  = 1000;
-            $products->short_summary             = Str::limit(strip_tags($row['service_description']), 250);
-            $products->description               = $row['service_description'];
-            $products->service_type              = $row['service_type'];
-            $products->service_period_time       = $row['service_period_time'];
-            $products->service_period_time_type  = $row['service_period_time_type'];
-            $products->service_online_link       = $row['service_online_link'];
+            $products->quantity                  = $row['quantity'];
+            $products->short_summary             = Str::limit(strip_tags($row['book_description']), 250);
+            $products->description               = $row['book_description'];
+            $products->is_used_item              = $this->data['is_used_item'];
+            $products->item_condition            = ($this->data['is_used_item'] == 1) ? @$row['item_condition'] : null;
+
+            $products->deposit_amount            = @$row['deposit_amount'];
+            $products->delivery_type             = $row['delivery_type'];
+            $products->sell_type                 = $row['sell_type'];
+            $products->author                    = $row['author'];
+            $products->published_year            = $row['published_year'];
+            $products->publisher                 = $row['publisher'];
+            $products->no_of_pages               = $row['no_of_pages'];
+            $products->suitable_age              = $row['suitable_age'];
+            $products->dimension_length          = $row['dimension_length'];
+            $products->dimension_width           = $row['dimension_width'];
+            $products->dimension_height          = $row['dimension_height'];
+            $products->weight                    = $row['weight'];
             $products->service_languages         = $languageVal;
             $products->tags                      = $tagVal;
-            $products->meta_title                = $row['service_name'];
+            $products->meta_title                = $row['book_name'];
             $products->meta_keywords             = $row['tags'];
-            $products->meta_description          = Str::limit(strip_tags($row['service_description']), 250);
+            $products->meta_description          = Str::limit(strip_tags($row['book_description']), 250);
             $products->save();
         }
 

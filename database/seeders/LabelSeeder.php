@@ -3290,7 +3290,9 @@ class LabelSeeder extends Seeder
         "total" => "Total :", 
         "use_my_reward_points" => "Use my reward points", 
         "vat" => "VAT", 
-        "you_can_add_notes_to_your_order" => "you can add notes to your order" 
+        "you_can_add_notes_to_your_order" => "you can add notes to your order",
+        "confirm" => "Confirm",
+        "authorize" => "Authorize" 
         ], 
         "product_my_orders" => [
         "ask_for_cancel" => "Ask For Cancellation", 
@@ -3325,7 +3327,9 @@ class LabelSeeder extends Seeder
         "tracking_number" => "Tracking No.", 
         "type" => "Type", 
         "under_process" => "Under Process", 
-        "used" => "Used : " 
+        "used" => "Used : " ,
+        "packages" => "Packages",
+        "contest" => "Contest"
         ], 
         "product_myorders_detail" => [
         "accept" => "Accept", 
@@ -3441,7 +3445,9 @@ class LabelSeeder extends Seeder
         "total" => "Total :", 
         "use_my_reward_points" => "Use my reward points", 
         "vat" => "VAT", 
-        "you_can_add_notes_to_your_order" => "you can add notes to your order" 
+        "you_can_add_notes_to_your_order" => "you can add notes to your order",
+        "confirm" => "Confirm",
+        "authorize" => "Authorize" 
         ], 
         "product_status" => [
         "Pending", 
@@ -6275,7 +6281,9 @@ class LabelSeeder extends Seeder
         "total" => "Total :", 
         "use_my_reward_points" => "Använd mina belöningspoäng", 
         "vat" => "MOMS", 
-        "you_can_add_notes_to_your_order" => "du kan lägga till anteckningar i din beställning" 
+        "you_can_add_notes_to_your_order" => "du kan lägga till anteckningar i din beställning",
+        "confirm" => "Confirm",
+        "authorize" => "Authorize"
         ], 
         "product_my_orders" => [
         "ask_for_cancel" => "Be om avbokning", 
@@ -6310,7 +6318,9 @@ class LabelSeeder extends Seeder
         "tracking_number" => "Spårningsnummer.", 
         "type" => "Typ", 
         "under_process" => "under bearbeta", 
-        "used" => "Begagnade : " 
+        "used" => "Begagnade : " ,
+        "packages" => "Packages",
+        "contest" => "Contest"
         ], 
         "product_myorders_detail" => [
         "accept" => "Acceptera", 
@@ -6425,7 +6435,9 @@ class LabelSeeder extends Seeder
         "total" => "Total :", 
         "use_my_reward_points" => "Använd mina belöningspoäng", 
         "vat" => "MOMS", 
-        "you_can_add_notes_to_your_order" => "du kan lägga till anteckningar i din beställning" 
+        "you_can_add_notes_to_your_order" => "du kan lägga till anteckningar i din beställning",
+        "confirm" => "Confirm",
+        "authorize" => "Authorize"
         ], 
         "product_status" => [
         "I väntan på", 
