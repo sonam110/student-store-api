@@ -780,7 +780,7 @@ class ProductsServicesBookController extends Controller
     {
         $data = [
             'user_id'               => $request->user_id, 
-            'is_used_item'          => $request->is_used_item, 
+            'is_used_item'          => (User::find($request->user_id)->user_type_id==2) ? 1 : 0, 
             'address_detail_id'     => $request->address_detail_id, 
             'category_master_id'    => $request->category_master_id, 
             'sub_category_slug'     => $request->sub_category_slug
