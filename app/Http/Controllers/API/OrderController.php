@@ -1705,9 +1705,6 @@ class OrderController extends Controller
 	        return response()->json(prepareResult(false, $responseDecode, "Session successfully created."), config('http_response.success'));
 		} elseif($request->payment_method=='place_order_from_klarna_customer_token') {
 			$url = env('KLARNA_URL').'/customer-token/v1/tokens/'.$request->customerToken.'/order';
-	        $username = $this->paymentInfo->klarna_username;
-	        $password = $this->paymentInfo->klarna_password;
-	        $auth     = base64_encode($username.":".$password);
 
 	        $data = [
 	        	'merchant_reference1' 	=>  '45aa52f387871e3a210645d4',
@@ -1755,9 +1752,14 @@ class OrderController extends Controller
 	        return response()->json(prepareResult(false, $returnData, "Payment successfully completed."), config('http_response.success'));
 		} elseif($request->payment_method=='place_order_towards_klarna') {
 			$url = env('KLARNA_URL').'/payments/v1/authorizations/'.$request->auth_token.'/order';
-	        $username = $this->paymentInfo->klarna_username;
-	        $password = $this->paymentInfo->klarna_password;
-	        $auth     = base64_encode($username.":".$password);
+
+	        $given_name = AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'));
+	        $family_name = (!empty(AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')))) ? AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')) : null;
+	        $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+	        $phone = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
+	        $street_address = $user->defaultAddress->full_address;
+	        $postal_code = $user->defaultAddress->zip_code;
+	        $city = $user->defaultAddress->city;
 
 	        $data = [
 	            'purchase_currency' => 'SEK',
