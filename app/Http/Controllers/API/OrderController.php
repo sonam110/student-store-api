@@ -1752,7 +1752,7 @@ class OrderController extends Controller
 	        return response()->json(prepareResult(false, $returnData, "Payment successfully completed."), config('http_response.success'));
 		} elseif($request->payment_method=='place_order_towards_klarna') {
 			$user = User::find(Auth::id());
-			
+
 			$url = env('KLARNA_URL').'/payments/v1/authorizations/'.$request->auth_token.'/order';
 
 	        $given_name = AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'));
@@ -1777,7 +1777,7 @@ class OrderController extends Controller
 	            //     'city'          => $city,
 	            //     'country'       => 'SE'
 	            // ],
-	            'order_amount'      => $total,
+	            'order_amount'      => $total * 100,
 	            'order_tax_amount'  => 0,
 	            'order_lines'       => $itemInfo,
 	            'merchant_urls'     => [
