@@ -180,7 +180,7 @@ class OrderController extends Controller
 					if(!empty($orderedItem['product_id']))
 					{
 						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
-						$vat_percent = $productsServicesBook->categoryMaster->title;
+						$vat_percent = $productsServicesBook->categoryMaster->vat;
 						if($productsServicesBook->is_on_offer == 1)
 						{
 							$price = $productsServicesBook->discounted_price;
@@ -234,7 +234,7 @@ class OrderController extends Controller
 					{
 						$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
 						$productsServicesBook = Contest::find($contest_id);
-						$vat_percent = $productsServicesBook->categoryMaster->title;
+						$vat_percent = $productsServicesBook->categoryMaster->vat;
 						if($productsServicesBook->is_on_offer == 1)
 						{
 							$price = $productsServicesBook->discounted_price;
@@ -321,7 +321,7 @@ class OrderController extends Controller
 					}
 					else
 					{
-						$discount = $productsServicesBook->discount_value.'Rupees';
+						$discount = $productsServicesBook->discount_value;
 					} 
 
 					$sub_total = $sub_total + ($price * $orderedItem['quantity']);
