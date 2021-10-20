@@ -1767,16 +1767,16 @@ class OrderController extends Controller
 	            'purchase_currency' => 'SEK',
 	            'purchase_country'  => 'SE',
 	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
-	            'billing_address'   => [
-	                'given_name'    => $given_name,
-	                'family_name'   => $family_name,
-	                'email'         => $email,
-	                'phone'         => $phone,
-	                'street_address'=> $street_address,
-	                'postal_code'   => $postal_code,
-	                'city'          => $city,
-	                'country'       => 'SE'
-	            ],
+	            // 'billing_address'   => [
+	            //     'given_name'    => $given_name,
+	            //     'family_name'   => $family_name,
+	            //     'email'         => $email,
+	            //     'phone'         => $phone,
+	            //     'street_address'=> $street_address,
+	            //     'postal_code'   => $postal_code,
+	            //     'city'          => $city,
+	            //     'country'       => 'SE'
+	            // ],
 	            'order_amount'      => $total,
 	            'order_tax_amount'  => 0,
 	            'order_lines'       => $itemInfo,

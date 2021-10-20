@@ -36,7 +36,7 @@ class CreateSpJobsTable extends Migration
             $table->string('job_nature',30)->nullable()->comment('per_day:per day, per_week:per week, per_month:per month');
             $table->bigInteger('job_hours')->nullable()->comment('if job_type is: part_time, one_time, contract');
             $table->string('job_environment',30)->nullable()->comment('at_office: at office, online: online');
-            $table->string('years_of_experience',10)->nullable();
+            $table->double('years_of_experience')->nullable();
             $table->string('known_languages')->nullable()->comment('comma sepreated');
             $table->longText('description')->nullable();
             $table->longText('duties_and_responsibilities')->nullable();
