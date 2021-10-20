@@ -119,8 +119,10 @@
                 </div>
                 <div class="bioDetails">
                     <div style="text-align: center;">{{\Carbon\Carbon::parse(\mervick\aesEverywhere\AES256::decrypt($user->dob, env('ENCRYPTION_KEY')))->format('M d, Y')}}</div>
+                    @if($user->userCvDetail->addressDetail)
                     <div style="text-align: center;">Citizenship: {{$user->userCvDetail->addressDetail->country}}</div>
                     <div style="text-align: center;">{{$user->userCvDetail->addressDetail->city}}</div>
+                    @endif
                 </div>
                 <div class="clear"></div>
             </div>
