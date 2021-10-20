@@ -404,11 +404,11 @@ class JobController extends Controller
                 }
                 if(!empty($request->min_years_of_experience))
                 {
-                    $jobs->where('years_of_experience', '>=', $request->min_years_of_experience);
+                    $jobs->where('sp_jobs.years_of_experience', '>=', $request->min_years_of_experience);
                 }
                 if(!empty($request->max_years_of_experience))
                 {
-                    $jobs->where('years_of_experience', '<=', $request->max_years_of_experience);
+                    $jobs->where('sp_jobs.years_of_experience', '<=', $request->max_years_of_experience);
                 }
                 if(!empty($request->known_languages))
                 {

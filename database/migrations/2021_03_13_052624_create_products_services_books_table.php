@@ -64,7 +64,7 @@ class CreateProductsServicesBooksTable extends Migration
             $table->string('dimension_height', 10)->nullable();
             $table->string('weight', 10)->nullable();
 
-            $table->string('service_type',50)->nullable()->comment('online, offline');
+            $table->string('service_type',50)->nullable()->comment('online,at_customer,at_center');
             $table->string('delivery_type',50)->nullable()->comment('deliver_to_location, pickup_from_location');
             $table->integer('service_period_time')->nullable()->comment('number');
             $table->string('service_period_time_type', 50)->nullable()->comment('type: hours, days, weeks, months');
