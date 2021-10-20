@@ -130,7 +130,7 @@ class ProductsImport implements ToModel,WithHeadingRow
         }
 
         //Book
-        elseif($row['type']=='service' && $row['actual_price']> 0)
+        elseif($row['type']=='book' && $row['actual_price']> 0)
         {
             $products = new ProductsServicesBook;
             $products->user_id                   = $this->data['user_id'];
