@@ -778,7 +778,12 @@ class ProductsServicesBookController extends Controller
 
     public function productsImport(Request $request) 
     {
-        $data = ['address_detail_id'=>$request->address_detail_id, 'category_master_id'=>$request->category_master_id, 'sub_category_slug'=>$request->sub_category_slug];
+        $data = [
+            'user_id'               => $request->user_id, 
+            'address_detail_id'     => $request->address_detail_id, 
+            'category_master_id'    => $request->category_master_id, 
+            'sub_category_slug'     => $request->sub_category_slug
+        ];
         $import = Excel::import(new ProductsImport($data),request()->file('file'));
 
         return response(prepareResult(false, [], getLangByLabelGroups('messages','messages_products_services_book_imported')), config('http_response.success'));
@@ -847,11 +852,11 @@ class ProductsServicesBookController extends Controller
                 
                 if(!empty($request->min_price))
                 {
-                    $products->where('products_services_books.discounted_price', '>=', $request->min_price);
+                    $products->where('products_services_books.price', '>=', $request->min_price);
                 }
                 if(!empty($request->max_price))
                 {
-                    $products->where('products_services_books.discounted_price', '<=', $request->max_price);
+                    $products->where('products_services_books.price', '<=', $request->max_price);
                 }
                 if(!empty($request->sell_type))
                 {
@@ -905,7 +910,7 @@ class ProductsServicesBookController extends Controller
                 }
                 if(!empty($request->suitable_age))
                 {
-                    $products->where('products_services_books.suitable_age', $request->suitable_age);
+                    $products->where('products_services_books.suitable_age',$request->suitable_age);
                 }
                 if(!empty($request->attributes_data))
                 {

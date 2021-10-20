@@ -569,7 +569,7 @@ class OrderController extends Controller
 			$productsServicesBookId = $orderItem->products_services_book_id;
 			if(!empty($productsServicesBookId))
 			{
-				$updateStock = ProductsServicesBook::select('id','quantity','type')->find($productServiceId);
+				$updateStock = ProductsServicesBook::select('id','quantity','type')->find($productsServicesBookId);
 				if($updateStock->type!='service')
 				{
 					$updateStock->quantity = $updateStock->quantity + $orderItem->quantity;

@@ -31,28 +31,28 @@ class ProductsImport implements ToModel,WithHeadingRow
     {
         $getCat = CategoryMaster::select('vat')->find($this->data['category_master_id']);
         $discountAmount = 0;
-        if($row['discount_type']==0) {
-            $discountAmount = $row['price'] - $row['discount_value'];
-        } elseif($row['discount_type']==1) {
-            $discountAmount = $row['price'] - (($row['price'] * $row['discount_value'])/100);
+        if($row['discount_type']=='fixed_amount') {
+            $discountAmount = $row['actual_price'] - $row['discount_value'];
+        } elseif($row['discount_type']=='percentage') {
+            $discountAmount = $row['actual_price'] - (($row['actual_price'] * $row['discount_value'])/100);
         }
 
-        if(($row['type']=='product' || $row['type']=='service' || $row['type']=='book') && $row['price']> 0)
+        if($row['type']=='product') && $row['actual_price']> 0)
         {
             $products = ProductsServicesBook::create([
-                'user_id'                   => Auth::id(),
+                'user_id'                   => $this->data['user_id'],
                 'address_detail_id'         => $this->data['address_detail_id'],
                 'category_master_id'        => $this->data['category_master_id'],
                 'sub_category_slug'         => $this->data['sub_category_slug'],
                 'type'                      => $row['type'],
-                'brand'                     => $row['brand'],
+                'brand'                     => $row['brand_name'],
+                'title'                     => $row['product_name'],
+                'slug'                      => Str::slug($row['product_name']),
+                'gtin_isbn'                 => $row['gtin_number'],
                 'sku'                       => $row['sku'],
-                'gtin_isbn'                 => $row['gtin_isbn'],
-                'title'                     => $row['title'],
-                'slug'                      => Str::slug($row['title']),
-                'basic_price_wo_vat'        => $row['price'] - (($row['price'] * $getCat->vat)/100),
-                'price'                     => $row['price'],
-                'is_on_offer'               => $row['is_on_offer'],
+                'basic_price_wo_vat'        => $row['actual_price'] - (($row['actual_price'] * $getCat->vat)/100),
+                'price'                     => $row['actual_price'],
+                'is_on_offer'               => ($row['is_on_offer']=='Yes') ? '1' : '0',
                 'discount_type'             => $row['discount_type'],
                 'discount_value'            => $row['discount_value'],
                 'discounted_price'          => $discountAmount,
