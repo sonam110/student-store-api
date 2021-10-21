@@ -1083,20 +1083,20 @@ class OrderController extends Controller
 				$body =  'Replacement request of ordered product '.$orderItem->title.' has been Declined.';
 				$emailTemplate = EmailTemplate::where('template_for','order_replacement_declined')->first();
 			}
-			// elseif(!empty($request->reason_for_review_decline))
-			// {
-			// 	$type = 'dispute';
+			elseif(!empty($request->reason_for_review_decline))
+			{
+				$type = 'dispute';
 
-			// 	$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
-			// 	$orderItemDispute->dispute_status                = $request->item_status;
-			// 	$orderItemDispute->reason_id_for_review_decline  = $request->reason_id;
-			// 	$orderItemDispute->reason_for_review_decline     = $request->reason_for_review_decline;
-			// 	$orderItemDispute->review_images                 = $request->review_images;
-			// 	$orderItemDispute->save();
+				$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
+				$orderItemDispute->dispute_status                = $request->item_status;
+				$orderItemDispute->reason_id_for_review_decline  = $request->reason_id;
+				$orderItemDispute->reason_for_review_decline     = $request->reason_for_review_decline;
+				$orderItemDispute->review_images                 = $request->review_images;
+				$orderItemDispute->save();
 
-			// 	$title = 'Dispute Review Declined';
-			// 	$body =  'Dispute reviewed by seller on Ordered product '.$orderItem->title.' has been Declined by user.';
-			// }
+				$title = 'Dispute Review Declined';
+				$body =  'Dispute reviewed by seller on Ordered product '.$orderItem->title.' has been Declined by user.';
+			}
 		}
 
 		if($request->item_status == 'ask_to_cancel')
