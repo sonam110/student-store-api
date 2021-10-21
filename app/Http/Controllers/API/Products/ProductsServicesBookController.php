@@ -794,6 +794,7 @@ class ProductsServicesBookController extends Controller
 
     public function companyProductsFilter(Request $request)
     {
+
         //for all type of filter
         //\DB::enableQueryLog();
 
@@ -853,16 +854,18 @@ class ProductsServicesBookController extends Controller
                 
                 if(!empty($request->min_price))
                 {
-                    $products->where(function ($query) {
-                        $query->where('products_services_books.price', '>=', $request->min_price)
-                              ->orWhere('products_services_books.discounted_price', '>=', $request->min_price);
+                    $min_price = $request->min_price;
+                    $products->where(function ($query) use ($min_price) {
+                        $query->where('products_services_books.price', '>=', $min_price)
+                              ->orWhere('products_services_books.discounted_price', '>=', $min_price);
                     });
                 }
                 if(!empty($request->max_price))
                 {
-                    $products->where(function ($query) {
-                        $query->where('products_services_books.price', '<=', $request->max_price)
-                              ->orWhere('products_services_books.discounted_price', '<=', $request->max_price);
+                    $max_price = $request->max_price;
+                    $products->where(function ($query) use ($max_price) {
+                        $query->where('products_services_books.price', '<=', $max_price)
+                              ->orWhere('products_services_books.discounted_price', '<=', $max_price);
                     });
                 }
                 if(!empty($request->sell_type))
