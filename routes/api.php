@@ -237,6 +237,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/create-stripe-intent', [App\Http\Controllers\API\OrderController::class,'createStripeIntent']);
 	Route::post('/create-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'createStripeSubscription']);
 	Route::post('/cancel-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'cancelStripeSubscription']);
+	Route::get('/temp-order-delete/{id}', [App\Http\Controllers\API\OrderController::class,'tempOrderDelete']);
 
 	//Klarna
 

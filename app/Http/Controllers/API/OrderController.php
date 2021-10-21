@@ -1979,6 +1979,12 @@ class OrderController extends Controller
 
 	public function tempOrderDelete($id)
 	{
-
+		$checkTempOrder = TempOrder::where('user_id', Auth::id())->find($id);
+		if($checkTempOrder)
+		{
+			$checkTempOrder->delete();
+			return response(prepareResult(false, 'Temp Order deleted', 'Temp Order deleted'), config('http_response.success'));
+		}
+		return response()->json(prepareResult(true, 'Temp Order not found.', 'Temp Order not found.'), config('http_response.not_found'));
 	}
 }
