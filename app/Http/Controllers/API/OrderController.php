@@ -1826,7 +1826,7 @@ class OrderController extends Controller
 
 			$tempOrderSave = new TempOrder;
 			$tempOrderSave->user_id = Auth::id();
-			$tempOrderSave->request_param = $request->all();
+			$tempOrderSave->request_param = json_encode($request->all());
 			$tempOrderSave->save();
 
 	      	$temp_order_id = $tempOrderSave->id;
