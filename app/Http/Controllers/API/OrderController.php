@@ -541,6 +541,7 @@ class OrderController extends Controller
 	public function orderItemStatusUpdate(Request $request, $id)
 	{
 		
+		$title = null;
         // pending->confirmed->shipped->delivered->completed->replacement_initiated->replacement_acccepted->replacement_completed->return_initiated->return_confirmed->return_declined->return_completed
 		$orderItem = OrderItem::find($id);
 		$expected_delivery_date = $orderItem->expected_delivery_date;
@@ -1782,6 +1783,65 @@ class OrderController extends Controller
 	            'order_lines'       => $itemInfo,
 	            'merchant_urls'     => [
 	                'confirmation'  => env('FRONT_APP_URL').'confirmation',
+	            ]
+	        ];
+	        $postData = json_encode($data);
+
+	        $curl = curl_init();
+	        curl_setopt_array($curl, array(
+	          CURLOPT_URL => $url,
+	          CURLOPT_RETURNTRANSFER => true,
+	          CURLOPT_ENCODING => '',
+	          CURLOPT_MAXREDIRS => 10,
+	          CURLOPT_TIMEOUT => 0,
+	          CURLOPT_FOLLOWLOCATION => true,
+	          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	          CURLOPT_CUSTOMREQUEST => 'POST',
+	          CURLOPT_POSTFIELDS => $postData,
+	          CURLOPT_HTTPHEADER => array(
+	            'Authorization: Basic '.$auth,
+	            'Content-Type: application/json',
+	          ),
+	        ));
+
+	        $response = curl_exec($curl);
+	        if(curl_errno($curl)>0)
+	        {
+	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+	            return response()->json(prepareResult(true, $info, "Error while placing klarna order"), config('http_response.internal_server_error'));
+	        }
+	        curl_close($curl);
+	        $returnData = [
+	        	'created' 	=> time(),
+	        	'amount'	=> $total,
+	        	'currency'	=> 'SEK',
+	        	'klarna_response' => json_decode($response, true)
+	        ];
+	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
+		} elseif($request->payment_method=='place_order_towards_klarna_web') {
+			$user = User::find(Auth::id());
+
+			$url = env('KLARNA_URL').'/checkout/v3/orders';
+
+			$tempOrderSave = new TempOrder;
+			$tempOrderSave->user_id = Auth::id();
+			$tempOrderSave->request_param = $request->all();
+			$tempOrderSave->save();
+
+	      	$temp_order_id = $tempOrderSave->id;
+
+	        $data = [
+	            'purchase_currency' => 'SEK',
+	            'purchase_country'  => 'SE',
+	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
+	            'order_amount'      => $total * 100,
+	            'order_tax_amount'  => 0,
+	            'order_lines'       => $itemInfo,
+	            'merchant_urls'     => [
+	                'terms'         => env('FRONT_APP_URL').'page/return-policy',
+	                'checkout'      => env('FRONT_APP_URL').'cart?order_id='.$temp_order_id,
+	                'confirmation'  => env('FRONT_APP_URL').'confirmation?order_id='.$temp_order_id,
+	                'push'          => env('APP_URL').'api/push-notification-klarna?order_id='.$temp_order_id,
 	            ]
 	        ];
 	        $postData = json_encode($data);
