@@ -37,6 +37,7 @@ use PDF;
 use App\Models\UserPackageSubscription;
 use Stripe;
 use App\Models\PaymentGatewaySetting;
+use App\Models\TempOrder;
 use Log;
 
 class OrderController extends Controller
@@ -1974,5 +1975,10 @@ class OrderController extends Controller
 			return response(prepareResult(false, $user_package->response_request, 'Cancel Subscription'), config('http_response.success'));
 		}
 		return response()->json(prepareResult(true, 'Subscription id not found.', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
+	}
+
+	public function tempOrderDelete($id)
+	{
+
 	}
 }
