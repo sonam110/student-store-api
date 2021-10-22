@@ -1598,11 +1598,13 @@ class OrderController extends Controller
 
 		$total = $sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount;
 
-		$url = env('KLARNA_URL').'/payments/v1/sessions';
+		
         $username = $this->paymentInfo->klarna_username;
         $password = $this->paymentInfo->klarna_password;
         $auth     = base64_encode($username.":".$password);
 		if($request->payment_method=='create_klarna_session') {
+			$url = env('KLARNA_URL').'/payments/v1/sessions';
+			
 			$data = [
 	            'purchase_country'  => 'SE',
 	            'purchase_currency' => 'SEK',
@@ -1638,6 +1640,48 @@ class OrderController extends Controller
 	        }
 	        curl_close($curl);
 	        return response()->json(prepareResult(false, json_decode($response, true), "Session successfully created."), config('http_response.success'));
+		} elseif($request->payment_method=='create_klarna_session_web') {
+			$url = env('KLARNA_URL').'/payments/v1/sessions';
+			
+			$data = [
+	            'purchase_country'  => 'SE',
+	            'purchase_currency' => 'SEK',
+	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
+	            'order_amount'      => $total * 100,
+	            'order_tax_amount'  => 0,
+	            'order_lines'       => $itemInfo
+	        ];
+	        $postData = json_encode($data);
+
+	        $curl = curl_init();
+	        curl_setopt_array($curl, array(
+	          CURLOPT_URL => $url,
+	          CURLOPT_RETURNTRANSFER => true,
+	          CURLOPT_ENCODING => '',
+	          CURLOPT_MAXREDIRS => 10,
+	          CURLOPT_TIMEOUT => 0,
+	          CURLOPT_FOLLOWLOCATION => true,
+	          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	          CURLOPT_CUSTOMREQUEST => 'POST',
+	          CURLOPT_POSTFIELDS => $postData,
+	          CURLOPT_HTTPHEADER => array(
+	            'Authorization: Basic '.$auth,
+	            'Content-Type: application/json',
+	          ),
+	        ));
+
+	        $response = curl_exec($curl);
+	        if(curl_errno($curl)>0)
+	        {
+	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+	            return response()->json(prepareResult(true, $info, "Error while creating klarna session"), config('http_response.internal_server_error'));
+	        }
+	        curl_close($curl);
+	        $returnObj = [
+	        	'klarna_response' => json_decode($response, true),
+	        	'klarna_reequest' => $postData
+	        ];
+	        return response()->json(prepareResult(false, $returnObj, "Web Session successfully created."), config('http_response.success'));
 		} elseif($request->payment_method=='create_klarna_customer_token') {
 			$user = User::find(Auth::id());
 	        $url  = env('KLARNA_URL').'/payments/v1/authorizations/'.$request->auth_token.'/customer-token';

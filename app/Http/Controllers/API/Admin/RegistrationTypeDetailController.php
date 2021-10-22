@@ -144,7 +144,7 @@ class RegistrationTypeDetailController extends Controller
 	{
 		try
 		{
-			$registrationTypes = RegistrationType::with('registrationTypeDetails');
+			$registrationTypes = RegistrationType::with('registrationTypeDetails')->withCount('serviceProviderTypes');
 			if(!empty($request->title))
 			{
 				$records = $registrationTypes->where('title', 'LIKE','%'.$request->title.'%');
