@@ -32,6 +32,7 @@ class StripeController extends Controller
 
                 $user->stripe_account_id = $account['id'];
                 $user->stripe_status = '2';
+                $user->stripe_create_timestamp = time();
                 $user->save();
 
                 if($user)

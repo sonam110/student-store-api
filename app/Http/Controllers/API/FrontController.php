@@ -647,6 +647,13 @@ class FrontController extends Controller
 		  'currency' => 'USD',
 		]);
 		dd($klarna);*/
+
+		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
+		$accountStatus = $stripe->accounts->retrieve(
+		  'acct_1JnRWxRYOavc3Px5',
+		  []
+		);
+		dd($accountStatus->verification->disabled_reason);
 	}
 
 	public function strReplaceAssoc(array $replace, $subject) { 
