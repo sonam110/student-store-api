@@ -15,6 +15,7 @@ use App\Console\Commands\RewardPointsCredit;
 use App\Console\Commands\CoolCompanyCreateAssignment;
 use App\Console\Commands\CoolCompanyRegFreelancer;
 use App\Console\Commands\StripeFundTransferred;
+use App\Console\Commands\StripeAccountStatusCheck;
 
 
 class Kernel extends ConsoleKernel
@@ -35,6 +36,7 @@ class Kernel extends ConsoleKernel
         RewardPointsCredit::class,
         CoolCompanyCreateAssignment::class,
         CoolCompanyRegFreelancer::class,
+        StripeAccountStatusCheck::class,
 
     ];
 
@@ -57,6 +59,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('rewardPoints:credit')->dailyAt('00:01');
         $schedule->command('create:freelancer')->hourly();
         $schedule->command('create:assignment')->everyMinute();
+        $schedule->command('stripe:account')->hourly();
         
     }
 

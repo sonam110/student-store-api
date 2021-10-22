@@ -22,7 +22,7 @@ class StripeController extends Controller
     {
         try
         {
-            $user = User::select('id','stripe_account_id','stripe_status')->find(Auth::id());
+            $user = User::select('id','stripe_account_id','stripe_status','stripe_create_timestamp')->find(Auth::id());
             if($user->stripe_status=='1' || $user->stripe_status==null)
             {
                 \Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
@@ -73,6 +73,41 @@ class StripeController extends Controller
                 return response(prepareResult(false, $account_links, getLangByLabelGroups('messages','message__address_detail_list')), config('http_response.success'));
             }
             return response()->json(prepareResult(true, 'Account already activated.', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+        catch (\Throwable $exception) 
+        {
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
+    public function checkStripeAccountCurrentStatus($user_id, $account_id)
+    {
+        try
+        {
+            $user = User::select('id','stripe_account_id','stripe_status')->where('stripe_account_id', $account_id)->find($user_id);
+            if($user)
+            {
+                $stripe = new \Stripe\StripeClient($paymentInfo->payment_gateway_key);
+                $accountStatus = $stripe->accounts->retrieve(
+                  $user->stripe_account_id,
+                  []
+                );
+                if(is_null($accountStatus->verification->disabled_reason))
+                {
+                    $user->stripe_status = '3';
+                    $message = 'Account is activated.';
+                }
+                else
+                {
+                    $user->stripe_status = '4';
+                    $message = 'Account is under verification.';
+                }
+                $user->stripe_create_timestamp = date('Y-m-d H:i:s');
+                $user->save();
+
+                return response(prepareResult(false, $message, getLangByLabelGroups('messages','message__address_detail_list')), config('http_response.success'));
+            }
+            return response()->json(prepareResult(true, 'Account not found.', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
         catch (\Throwable $exception) 
         {
