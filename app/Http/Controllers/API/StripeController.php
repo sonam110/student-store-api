@@ -87,7 +87,7 @@ class StripeController extends Controller
             $user = User::select('id','stripe_account_id','stripe_status')->where('stripe_account_id', $account_id)->find($user_id);
             if($user)
             {
-                $stripe = new \Stripe\StripeClient($paymentInfo->payment_gateway_key);
+                $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
                 $accountStatus = $stripe->accounts->retrieve(
                   $user->stripe_account_id,
                   []
