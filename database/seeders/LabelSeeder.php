@@ -285,7 +285,12 @@ class LabelSeeder extends Seeder
         "upload_files_here" => "Upload Images", 
         "used_product" => "Used Product", 
         "weight" => "Weight", 
-        "width" => "Width" 
+        "width" => "Width",
+        "width" => "Bredd",
+        "companies" => "Companies",
+        "students" => "Students",
+        "both" => "Both",
+        "data_of" => "Listings of",
         ], 
         "add_to_cart" => [
         "add_new_address" => "Add New Address", 
@@ -4612,7 +4617,11 @@ class LabelSeeder extends Seeder
         "tap_to_make_cover" => "knacka på bilden för att ställa in som omslagsbild", 
         "used_product" => "Begagnad produkt", 
         "weight" => "vikt", 
-        "width" => "Bredd" 
+        "width" => "Bredd",
+        "companies" => "Companies",
+        "students" => "Students",
+        "both" => "Both",
+        "data_of" => "Listings of",
         ], 
         "add_to_cart" => [
         "add_new_address" => "Lägg till ny adress", 
