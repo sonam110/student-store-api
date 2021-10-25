@@ -821,7 +821,15 @@ class ProductsServicesBookController extends Controller
             
             if($request->is_used_item!='both')
             {
-                $products->where('products_services_books.is_used_item', $is_used_item);
+                if($request->is_used_item==1)
+                {
+                    $products->where('products_services_books.is_used_item', '1');
+                }
+                else
+                {
+                    $products->where('products_services_books.is_used_item', '0');
+                }
+                
             }
 
             if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random') 
