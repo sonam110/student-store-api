@@ -801,7 +801,7 @@ class ProductsServicesBookController extends Controller
         
         try
         {
-            $is_used_item = false;
+            $is_used_item = 'Both';
             if($request->is_used_item=='yes' || $request->is_used_item==1)
             {
                 $is_used_item = 1;
