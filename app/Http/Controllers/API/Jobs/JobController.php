@@ -462,16 +462,16 @@ class JobController extends Controller
                 if(!empty($request->city))
                 {
                     $cities = $request->city;
-                    $jobs->join('address_details', function ($join) use ($request, $cities) {
-                        $join->on('sp_jobs.address_detail_id', '=', 'address_details.id')
-                        ->Where(function ($query) use($cities) {
-                             for ($i = 0; $i < count($cities); $i++)
-                             {
-                                $query->orwhere('full_address', 'LIKE',  '%' . $cities[$i] .'%');
-                             }      
-                        });
-                        //->whereIn('city', $request->city);
+                    $jobs->where(function($query) use ($request) {
+                        foreach ($request->city as $key => $city) {
+                            if ($key === 0) {
+                                $query->where('address_details.full_address', 'LIKE', '%'.$city.'%');
+                                continue;
+                            }
+                            $query->orWhere('address_details.full_address', 'LIKE', '%'.$city.'%');
+                        }
                     });
+                    //->whereIn('city', $request->city);
                 }
                 // $jobs->where('application_start_date','<=', date('Y-m-d'))
                 //     ->where('application_end_date','>=', date('Y-m-d'));
