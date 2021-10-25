@@ -801,16 +801,11 @@ class ProductsServicesBookController extends Controller
         
         try
         {
-            $is_used_item = 'Both';
-            if($request->is_used_item=='yes' || $request->is_used_item==1)
+            $is_used_item = false;
+            if(!empty($request->is_used_item))
             {
-                $is_used_item = 1;
+                $is_used_item = $request->is_used_item;
             }
-            elseif($request->is_used_item=='no' || $request->is_used_item==0)
-            {
-                $is_used_item = 0;
-            }
-
             $type = 'product';
             if(!empty($request->type))
             {
@@ -820,16 +815,10 @@ class ProductsServicesBookController extends Controller
             $products = ProductsServicesBook::select('products_services_books.*')
             //->where('products_services_books.user_id', '!=', Auth::id())
             ->where('products_services_books.status', '2')
+            ->where('products_services_books.is_used_item', $is_used_item)
             ->where('products_services_books.is_published', '1')
             ->where('products_services_books.quantity','>' ,'0')
             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
-            
-            
-            if($request->is_used_item=='yes' || $request->is_used_item=='no' || $request->is_used_item==1 || $request->is_used_item==0)
-            {
-                $products->where('products_services_books.is_used_item', $is_used_item);
-            }
-
             if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random') 
             {
                 $products->where('products_services_books.type', $type);
@@ -982,16 +971,12 @@ class ProductsServicesBookController extends Controller
                 	 $products = ProductsServicesBook::select('products_services_books.*')
 					            //->where('products_services_books.user_id', '!=', Auth::id())
 					            ->where('products_services_books.status', '2')
+					            ->where('products_services_books.is_used_item', $is_used_item)
 					            ->where('products_services_books.type', $type)
 					            ->where('products_services_books.is_published', '1')
                                 ->where('products_services_books.quantity','>' ,'0')
                 	 			->withCount('orderItems')->orderBy('order_items_count','desc')
-					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
-                    
-                    if($request->is_used_item=='yes' || $request->is_used_item=='no' || $request->is_used_item==1 || $request->is_used_item==0)
-                    {
-                        $products->where('products_services_books.is_used_item', $is_used_item);
-                    }
+					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                 }
             }
             elseif($searchType=='topRated')
