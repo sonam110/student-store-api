@@ -1070,7 +1070,15 @@ class LandingPageController extends Controller
     {  
         try
         {
-            
+            $is_used_item = false;
+            if($request->is_used_item=='yes' || $request->is_used_item==1)
+            {
+                $is_used_item = 1;
+            }
+            elseif($request->is_used_item=='no' || $request->is_used_item==0)
+            {
+                $is_used_item = 0;
+            }
             $type = 'book';
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','products_services_books.discounted_price','products_services_books.deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug')
@@ -1080,17 +1088,23 @@ class LandingPageController extends Controller
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
             ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
-            if($request->is_used_item=='yes' || $request->is_used_item==1)
+            
+            if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random') 
             {
-                $products->where('products_services_books.is_used_item', 1);
-            }
-            elseif($request->is_used_item=='no' || $request->is_used_item==0)
-            {
-                $products->where('products_services_books.is_used_item', 0);
+                $products->where('products_services_books.is_used_item', $is_used_item);
             }
 
             if($searchType=='filter')
             {
+                if($request->is_used_item=='yes' || $request->is_used_item==1)
+                {
+                    $products->where('products_services_books.is_used_item', 1);
+                }
+                elseif($request->is_used_item=='no' || $request->is_used_item==0)
+                {
+                    $products->where('products_services_books.is_used_item', 0);
+                }
+
                 if(!empty($request->title))
                 {
                     $products->where('products_services_books.title', 'LIKE', '%'.$request->title.'%');
