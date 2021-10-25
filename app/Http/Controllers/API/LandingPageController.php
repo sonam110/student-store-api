@@ -1479,10 +1479,18 @@ class LandingPageController extends Controller
                 }*/
                 if(!empty($request->city))
                 {
-                    // $jobs->where('sp_jobs.city', $request->city);
                     $jobs->join('address_details', function ($join) use ($request) {
                         $join->on('sp_jobs.address_detail_id', '=', 'address_details.id')
-                        ->whereIn('city', $request->city);
+                        ->where(function($query) use ($request) {
+                            foreach ($request->city as $key => $city) {
+                                if ($key === 0) {
+                                    $query->where('address_details.full_address', 'LIKE', '%'.$city.'%');
+                                    continue;
+                                }
+                                $query->orWhere('address_details.full_address', 'LIKE', '%'.$city.'%');
+                            }
+                        });
+                        //->whereIn('city', $request->city);
                     });
                 }
                 // $jobs->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
