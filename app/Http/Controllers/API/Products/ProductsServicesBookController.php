@@ -798,14 +798,8 @@ class ProductsServicesBookController extends Controller
         //for all type of filter
         //\DB::enableQueryLog();
 
-        
         try
         {
-            $is_used_item = false;
-            if(!empty($request->is_used_item))
-            {
-                $is_used_item = $request->is_used_item;
-            }
             $type = 'product';
             if(!empty($request->type))
             {
@@ -821,7 +815,7 @@ class ProductsServicesBookController extends Controller
             
             if($request->is_used_item!='both')
             {
-                if($request->is_used_item==1)
+                if($request->is_used_item=='yes')
                 {
                     $products->where('products_services_books.is_used_item', '1');
                 }
@@ -991,7 +985,15 @@ class ProductsServicesBookController extends Controller
 					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
                         if($request->is_used_item!='both')
                         {
-                            $products->where('products_services_books.is_used_item', $is_used_item);
+                            if($request->is_used_item=='yes')
+                            {
+                                $products->where('products_services_books.is_used_item', '1');
+                            }
+                            else
+                            {
+                                $products->where('products_services_books.is_used_item', '0');
+                            }
+                            
                         }
                 }
             }
@@ -1368,7 +1370,7 @@ class ProductsServicesBookController extends Controller
     public function productLandingPage(Request $request)
     {
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'product';
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
@@ -1376,7 +1378,7 @@ class ProductsServicesBookController extends Controller
         $company_product_promotions = $this->companyProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'product';
         $content->searchType = 'bestSelling';
         $content->per_page_record = '5';
@@ -1384,7 +1386,7 @@ class ProductsServicesBookController extends Controller
         $company_product_best_selling = $this->companyProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'product';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
@@ -1392,7 +1394,7 @@ class ProductsServicesBookController extends Controller
         $company_product_top_rated = $this->companyProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'product';
         $content->searchType = 'random';
         $content->per_page_record = '5';
@@ -1400,7 +1402,7 @@ class ProductsServicesBookController extends Controller
         $company_product_random = $this->companyProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'product';
         $content->searchType = 'latest';
         $content->per_page_record = '5';
@@ -1410,7 +1412,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1418,7 +1420,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1426,7 +1428,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1434,7 +1436,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1442,7 +1444,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1451,7 +1453,7 @@ class ProductsServicesBookController extends Controller
 
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1459,7 +1461,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1467,7 +1469,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1475,7 +1477,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1483,7 +1485,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1523,7 +1525,7 @@ class ProductsServicesBookController extends Controller
     public function studentProductLandingPage(Request $request)
     {
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'product';
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
@@ -1531,7 +1533,7 @@ class ProductsServicesBookController extends Controller
         $student_product_promotions = $this->studentProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'product';
         $content->searchType = 'bestSelling';
         $content->per_page_record = '5';
@@ -1539,7 +1541,7 @@ class ProductsServicesBookController extends Controller
         $student_product_best_selling = $this->studentProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'product';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
@@ -1547,7 +1549,7 @@ class ProductsServicesBookController extends Controller
         $student_product_top_rated = $this->studentProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'product';
         $content->searchType = 'random';
         $content->per_page_record = '5';
@@ -1555,7 +1557,7 @@ class ProductsServicesBookController extends Controller
         $student_product_random = $this->studentProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'product';
         $content->searchType = 'latest';
         $content->per_page_record = '5';
@@ -1565,7 +1567,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1573,7 +1575,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1581,7 +1583,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1589,7 +1591,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1597,7 +1599,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'service';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1605,7 +1607,7 @@ class ProductsServicesBookController extends Controller
 
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1613,7 +1615,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1621,7 +1623,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1629,7 +1631,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1637,7 +1639,7 @@ class ProductsServicesBookController extends Controller
         
         $content = new Request();
         $content->type = 'book';
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
@@ -1700,11 +1702,6 @@ class ProductsServicesBookController extends Controller
     {  
         try
         {
-            $is_used_item = false;
-            if(!empty($request->is_used_item))
-            {
-                $is_used_item = $request->is_used_item;
-            }
             $type = 'book';
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::select('products_services_books.*')
@@ -1717,7 +1714,15 @@ class ProductsServicesBookController extends Controller
 
             if($request->is_used_item!='both')
             {
-                $products->where('products_services_books.is_used_item', $is_used_item);
+                if($request->is_used_item=='yes')
+                {
+                    $products->where('products_services_books.is_used_item', '1');
+                }
+                else
+                {
+                    $products->where('products_services_books.is_used_item', '0');
+                }
+                
             }
 
             if($searchType=='filter')
@@ -1862,8 +1867,16 @@ class ProductsServicesBookController extends Controller
                                 ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
                     if($request->is_used_item!='both')
                     {
-                        $products->where('products_services_books.is_used_item', $is_used_item);
-                    } 
+                        if($request->is_used_item=='yes')
+                        {
+                            $products->where('products_services_books.is_used_item', '1');
+                        }
+                        else
+                        {
+                            $products->where('products_services_books.is_used_item', '0');
+                        }
+                        
+                    }
                 }
             }
             elseif($searchType=='topRated')
@@ -1899,7 +1912,7 @@ class ProductsServicesBookController extends Controller
     public function bookLandingPage(Request $request)
     {
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'book';
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
@@ -1907,7 +1920,7 @@ class ProductsServicesBookController extends Controller
         $company_book_promotions = $this->companyBooksFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'book';
         $content->searchType = 'bestSelling';
         $content->per_page_record = '5';
@@ -1915,7 +1928,7 @@ class ProductsServicesBookController extends Controller
         $company_book_best_selling = $this->companyBooksFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'book';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
@@ -1923,7 +1936,7 @@ class ProductsServicesBookController extends Controller
         $company_book_top_rated = $this->companyBooksFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'book';
         $content->searchType = 'random';
         $content->per_page_record = '5';
@@ -1931,7 +1944,7 @@ class ProductsServicesBookController extends Controller
         $company_book_random = $this->companyBooksFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 0;
+        $content->is_used_item = 'no';
         $content->type = 'book';
         $content->searchType = 'latest';
         $content->per_page_record = '5';
@@ -2027,7 +2040,7 @@ class ProductsServicesBookController extends Controller
     public function studentBookLandingPage(Request $request)
     {
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'book';
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
@@ -2035,7 +2048,7 @@ class ProductsServicesBookController extends Controller
         $student_book_promotions = $this->studentBooksFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'book';
         $content->searchType = 'bestSelling';
         $content->per_page_record = '5';
@@ -2043,7 +2056,7 @@ class ProductsServicesBookController extends Controller
         $student_book_best_selling = $this->studentBooksFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'book';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
@@ -2051,7 +2064,7 @@ class ProductsServicesBookController extends Controller
         $student_book_top_rated = $this->studentBooksFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'book';
         $content->searchType = 'random';
         $content->per_page_record = '5';
@@ -2059,7 +2072,7 @@ class ProductsServicesBookController extends Controller
         $student_book_random = $this->studentBooksFilter($content);
         
         $content = new Request();
-        $content->is_used_item = 1;
+        $content->is_used_item = 'yes';
         $content->type = 'book';
         $content->searchType = 'latest';
         $content->per_page_record = '5';
