@@ -1088,23 +1088,14 @@ class LandingPageController extends Controller
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
             ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
-            
-            if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random') 
+                
+            if($request->is_used_item=='yes' || $request->is_used_item=='no' || $request->is_used_item==1 || $request->is_used_item==0)
             {
                 $products->where('products_services_books.is_used_item', $is_used_item);
             }
 
             if($searchType=='filter')
             {
-                if($request->is_used_item=='yes' || $request->is_used_item==1)
-                {
-                    $products->where('products_services_books.is_used_item', 1);
-                }
-                elseif($request->is_used_item=='no' || $request->is_used_item==0)
-                {
-                    $products->where('products_services_books.is_used_item', 0);
-                }
-
                 if(!empty($request->title))
                 {
                     $products->where('products_services_books.title', 'LIKE', '%'.$request->title.'%');
