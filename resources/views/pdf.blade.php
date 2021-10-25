@@ -4,16 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <title>{{\mervick\aesEverywhere\AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'))}} {{\mervick\aesEverywhere\AES256::decrypt($user->last_name, env('ENCRYPTION_KEY'))}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
     <style type="text/css">
     body {
-        font-family: "Adobe Caslon Pro", "Minion Pro", serif;
+        font-family: 'Cairo', sans-serif;
         font-size: 12pt;
+        background: url("{{asset('assets/bg-resume.png')}}");
+        background-size: contain;
+        background-position: top top;
+        background-repeat: no-repeat;
+        background-color: #fff;
     }
     .left-section{
         width:35%;
         margin-right:2%;
         float: left;
-        background: #f5f5f5;
+        height: 100%;
+        color: #fff;
     }
     .right-section {
         width:65%;
@@ -23,8 +32,18 @@
     .clearfix{
         clear:both
     }
+    .left-content-section{
+        width:55%;
+        float: left;
+    }
+    .right-content-section {
+        width:40%;
+        float: right;
+        font-size: 13px;
+        text-align: right;
+        vertical-align: top;
+    }
     header {
-        font-family: "Trajan Pro", serif;
         padding-bottom: 10px;
     }
 
@@ -47,7 +66,6 @@
     }
 
     section h2 {
-        font-family: "Trajan Pro", serif;
         font-size: 14pt;
     }
 
@@ -137,19 +155,25 @@
         margin-bottom: 10px;
     }
     .header-bg {
-        background: url("https://api.studentstore.se/assets/bg-resume.png");
+        background: url("https://www.studentstore.se/dist/0990796f574e99ec4ff0aa191485d37d.png");
         background-size: contain;
         background-position: top top;
         background-repeat: no-repeat;
+        background-color: #00b4e1;
+        color: #fff;
+    }
+    .float-right {
+        float: right;
+        text-align: right;
     }
 </style>
 </head>
 
 <body>
 
-    <div class="left-section">
+    <div class="left-section ">
         <div class="text-center p-5">
-            <header id="info" class="header-bg">
+            <header id="info" class="">
                 <h2>
                     {{\mervick\aesEverywhere\AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'))}} {{\mervick\aesEverywhere\AES256::decrypt($user->last_name, env('ENCRYPTION_KEY'))}}
                 </h2>
@@ -214,8 +238,9 @@
                     </div>
                 </div>
 
+                @if($user->userCvDetail)
                 <section id="skills">
-                    <h3 class="text-left">{{getLangByLabelGroups('pdf','Languages_Known')}}</h3>
+                    <h3 class="text-left">{{getLangByLabelGroups('add_new_vacancy','languages')}}</h3>
                     <div class="skillstable">
                         <div class="tablerow text-left">
                             <?php 
@@ -229,31 +254,45 @@
                         </div>
                     </div>
                 </section>
+                @endif
             </header>
 
         </div>
     </div>
     <div class="right-section">
+        @if($user->userCvDetail)
         <section>
+            <h2>{{getLangByLabelGroups('pdf','Career_Objective')}}</h2>
             <div class="justified">{{$user->userCvDetail->other_description}}</div>
         </section>
+        @endif
 
+        @if($user->userEducationDetails)
         <section>
             <h2>{{getLangByLabelGroups('pdf','Education')}}</h2>
             <ul>
                 @forelse($user->userEducationDetails as $education)
                 <li>
+                    <div class="left-content-section"> 
                     <strong>
                         {{$education->title}}
                     </strong> <br>
-                    {{$education->country}} <br>
-                    {{\Carbon\Carbon::parse($education->from_date)->format('M Y')}} - 
-                    @if(!empty($education->to_date)) {{\Carbon\Carbon::parse($education->to_date)->format('M Y')}} @else {{getLangByLabelGroups('education_and_training','ongoing')}} @endif
+                        {{$education->country}}
+                    </div>
+                    <div class="right-content-section"> 
+                        <section>
+                            {{\Carbon\Carbon::parse($education->from_date)->format('M Y')}} - 
+                            @if($education->ongoing==0) {{\Carbon\Carbon::parse($education->to_date)->format('M Y')}} @else {{getLangByLabelGroups('education_and_training','ongoing')}} @endif
+                        </section>
+                    </div>
+                    <br>
+                    
                 </li>
                 @empty
                 @endforelse
             </ul>
         </section>
+        @endif
 
         <div class="clearfix"></div>
 
@@ -264,8 +303,12 @@
             <section>
                 <div class="jobtable">
                     <div class="tablerow">
-                        <span class="jobtitle"><strong>{{$experiences->title}}</strong></span>
-                        <span class="right">{{\Carbon\Carbon::parse($experiences->from_date)->format('M Y')}} - @if(!empty($experiences->to_date)) {{\Carbon\Carbon::parse($experiences->to_date)->format('M Y')}} @else {{getLangByLabelGroups('education_and_training','ongoing')}} @endif</span>
+                        <div class="left-content-section"> 
+                            <span class="jobtitle"><strong>{{$experiences->title}}</strong></span>
+                        </div>
+                        <div class="right-content-section">
+                            {{\Carbon\Carbon::parse($experiences->from_date)->format('M Y')}} - @if($experiences->currently_working==0) {{\Carbon\Carbon::parse($experiences->to_date)->format('M Y')}} @else {{getLangByLabelGroups('education_and_training','ongoing')}} @endif
+                        </div>
                     </div>
                     <div class="tablerow">
                         <span>{{$experiences->employer_name}}, {{$experiences->country}}, {{$experiences->city}}</span>
@@ -279,6 +322,7 @@
             @endforelse
         </section>
 
+        @if($user->userCvDetail)
         <section>
             <h2>{{getLangByLabelGroups('job_environment','title')}}</h2>
             <ul>
@@ -291,11 +335,13 @@
                 @endforelse
             </ul>
         </section>
+        @endif
 
         <div class="clearfix"></div>
 
         <!-- <div class="pagebreak"></div> -->
 
+        @if($user->userCvDetail)
         <section id="skills">
             <h2>{{getLangByLabelGroups('pdf','Key_Skills')}}</h2>
             <div class="skillstable">
@@ -312,6 +358,7 @@
                 </div>
             </div>
         </section>
+        @endif
     </div>
     <div class="clearfix"></div>
     

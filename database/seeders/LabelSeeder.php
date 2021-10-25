@@ -2492,7 +2492,10 @@ class LabelSeeder extends Seeder
         "messages_products_order_exists" => "Can not be deleted. Order Exists.", 
         "password_changed_successfully" => "Password Changed Successfully", 
         "please_select_all_winners_for_this_contest" => "Please select all winners for this contest", 
-        "verify_your_email_address" => "Verify your email address" 
+        "verify_your_email_address" => "Verify your email address",
+        "message_submitted" =>  "Submitted Successfully.",
+        "message_shared" =>  "Shared Successfully",
+        "message_participated" =>  "Participated Successfully",
         ], 
         "messages_screen" => [
         "date" => "Date : ", 
@@ -5832,7 +5835,10 @@ class LabelSeeder extends Seeder
         "message_your_link_is_expired" => "Din länk har gått ut", 
         "password_changed_successfully" => "lösenordet ändrat framgångsrikt", 
         "please_select_all_winners_for_this_contest" => "Välj alla vinnare för denna tävling", 
-        "verify_your_email_address" => "Verifiera din e-postadress" 
+        "verify_your_email_address" => "Verifiera din e-postadress",
+        "message_submitted" =>  "Submitted Successfully.",
+        "message_shared" =>  "Shared Successfully",
+        "message_participated" =>  "Participated Successfully",
         ], 
         "messages_screen" => [
         "date" => "Date : ", 
