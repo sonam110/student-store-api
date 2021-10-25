@@ -246,7 +246,11 @@ class LandingPageController extends Controller
     {
         try
         {
-
+            $is_used_item = false;
+            if(!empty($request->is_used_item))
+            {
+                $is_used_item = $request->is_used_item;
+            }
             $type = 'product';
             if(!empty($request->type))
             {
@@ -260,13 +264,9 @@ class LandingPageController extends Controller
             ->where('products_services_books.is_published', '1')
             ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
 
-            if($request->is_used_item=='yes' || $request->is_used_item==1)
+            if($request->is_used_item!='both')
             {
-                $products->where('products_services_books.is_used_item', 1);
-            }
-            elseif($request->is_used_item=='no' || $request->is_used_item==0)
-            {
-                $products->where('products_services_books.is_used_item', 0);
+                $products->where('products_services_books.is_used_item', $is_used_item);
             }
 
             if($searchType=='filter')
@@ -404,12 +404,15 @@ class LandingPageController extends Controller
                      $products = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')
                                 // ->where('products_services_books.user_id', '!=', Auth::id())
                                 ->where('products_services_books.status', '2')
-                                ->where('products_services_books.is_used_item', $is_used_item)
                                 ->where('products_services_books.type', $type)
                                 ->where('products_services_books.quantity','>' ,'0')
                                 ->where('products_services_books.is_published', '1')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                    if($request->is_used_item!='both')
+                    {
+                        $products->where('products_services_books.is_used_item', $is_used_item);
+                    } 
                 }
             }
             elseif($searchType=='topRated')
@@ -780,7 +783,7 @@ class LandingPageController extends Controller
     public function productLandingPage(Request $request)
     {
         $content = new Request();
-        $content->is_used_item =0;
+        $content->is_used_item = 0;
         $content->type = 'product';
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
@@ -788,7 +791,7 @@ class LandingPageController extends Controller
         $company_product_promotions = $this->companyProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item =0;
+        $content->is_used_item = 0;
         $content->type = 'product';
         $content->searchType = 'bestSelling';
         $content->per_page_record = '5';
@@ -796,7 +799,7 @@ class LandingPageController extends Controller
         $company_product_best_selling = $this->companyProductsFilter($content);
         
         $content = new Request();
-        $content->is_used_item =0;
+        $content->is_used_item = 0;
         $content->type = 'product';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
@@ -1071,13 +1074,9 @@ class LandingPageController extends Controller
         try
         {
             $is_used_item = false;
-            if($request->is_used_item=='yes' || $request->is_used_item==1)
+            if(!empty($request->is_used_item))
             {
-                $is_used_item = 1;
-            }
-            elseif($request->is_used_item=='no' || $request->is_used_item==0)
-            {
-                $is_used_item = 0;
+                $is_used_item = $request->is_used_item;
             }
             $type = 'book';
             $searchType = $request->searchType; 
@@ -1088,8 +1087,8 @@ class LandingPageController extends Controller
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
             ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
-                
-            if($request->is_used_item=='yes' || $request->is_used_item=='no' || $request->is_used_item==1 || $request->is_used_item==0)
+
+            if($request->is_used_item!='both')
             {
                 $products->where('products_services_books.is_used_item', $is_used_item);
             }
@@ -1233,15 +1232,11 @@ class LandingPageController extends Controller
                                 ->where('products_services_books.is_published', '1')
                                 ->where('products_services_books.quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
-                        if($request->is_used_item=='yes' || $request->is_used_item==1)
-                        {
-                            $products->where('products_services_books.is_used_item', 1);
-                        }
-                        elseif($request->is_used_item=='no' || $request->is_used_item==0)
-                        {
-                            $products->where('products_services_books.is_used_item', 0);
-                        }
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                    if($request->is_used_item!='both')
+                    {
+                        $products->where('products_services_books.is_used_item', $is_used_item);
+                    } 
                 }
             }
             elseif($searchType=='topRated')
