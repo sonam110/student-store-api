@@ -349,6 +349,11 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/registration-type-filter', [App\Http\Controllers\API\Admin\RegistrationTypeDetailController::class, 'registrationTypeFilter']);
 
 	Route::apiResource('/page', 'App\Http\Controllers\API\Admin\PageController');
+
+	Route::get('/page-content', 'App\Http\Controllers\API\Admin\PageController@pageContent');
+	Route::post('/create-page-content', 'App\Http\Controllers\API\Admin\PageController@createPageContent');
+
+
 	Route::apiResource('/faq', 'App\Http\Controllers\API\Admin\FAQController');
 	Route::apiResource('/email-template', 'App\Http\Controllers\API\Admin\EmailTemplateController');
 	Route::apiResource('/sms-template', 'App\Http\Controllers\API\Admin\SmsTemplateController');

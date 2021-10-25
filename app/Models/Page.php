@@ -6,6 +6,7 @@ use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Language;
+use App\Models\PageContent;
 
 class Page extends Model
 {
@@ -19,5 +20,10 @@ class Page extends Model
     public function language()
     {
         return $this->belongsTo(Language::class, 'language_id', 'id');
+    }
+
+    public function pageContents()
+    {
+        return $this->hasMany(PageContent::class, 'page_id', 'id');
     }
 }

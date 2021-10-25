@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Models\PageContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
@@ -12,12 +13,6 @@ use DB;
 
 class PageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
     public function index(Request $request)
     {
         try
@@ -37,13 +32,6 @@ class PageController extends Controller
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
 
     public function store(Request $request)
     {        
@@ -93,24 +81,10 @@ class PageController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Page  $page
-     * @return \Illuminate\Http\Response
-     */
     public function show(Page $page)
     {
         return response()->json(prepareResult(false, $page, getLangByLabelGroups('messages','message_page_list')), config('http_response.success'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Page  $page
-     * @return \Illuminate\Http\Response
-     */
     
     public function update(Request $request,Page $page)
     {
@@ -148,16 +122,62 @@ class PageController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param \App\Page $page
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     */
     public function destroy(Page $page)
     {
         $page->delete();
         return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_page_deleted')), config('http_response.success'));
+    }
+
+
+    public function pageContent(Request $request)
+    {
+        try
+        {
+            if(!empty($request->per_page_record))
+            {
+                $pageContent = PageContent::with('language:id,title','page:id,title,slug,language_id')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+            }
+            else
+            {
+                $pageContent = PageContent::with('language:id,title','page:id,title,slug,language_id')->get();
+            }
+            return response(prepareResult(false, $pageContent, getLangByLabelGroups('messages','message_page_list')), config('http_response.success'));
+        }
+        catch (\Throwable $exception) 
+        {
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
+    public function createPageContent(Request $request)
+    {
+        DB::beginTransaction();
+        try
+        {
+            $message = getLangByLabelGroups('messages','message_page_updated');
+            $pageContent = PageContent::where('language_id', $request->language_id)->where('page_id', $request->page_id)->first();
+            if(!$pageContent) {
+                $pageContent = new PageContent;
+                $message = $message = getLangByLabelGroups('messages','message_page_created');
+            }
+            $pageContent->language_id = $request->language_id;
+            $pageContent->page_id = $request->page_id;
+            $pageContent->title = $request->title;
+            $pageContent->section_name = $request->section_name;
+            $pageContent->description = $request->description;
+            $pageContent->image_path = $request->image_path;
+            $pageContent->icon_name = $request->icon_name;
+            $pageContent->button_text = $request->button_text;
+            $pageContent->button_link = $request->button_link;
+            $pageContent->save();
+
+            DB::commit();
+            return response()->json(prepareResult(false, $pageContent, $message), config('http_response.success'));
+        }
+        catch (\Throwable $exception)
+        {
+            DB::rollback();
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
     }
 }

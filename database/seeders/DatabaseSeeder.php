@@ -24,5 +24,6 @@ class DatabaseSeeder extends Seeder
         $this->call(CategorySeeder::class);
         $this->call(LangForDDLSeerder::class);
         $this->call(NotificationTemplateSeeder::class);
+        $this->call(PageContentSeeder::class);
     }
 }
