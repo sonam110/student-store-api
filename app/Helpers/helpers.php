@@ -47,7 +47,7 @@ function getLangByLabelGroups($groupName, $label_name)
 
 function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,$module,$id,$screen)
 {
-	$userDeviceInfo = UserDeviceInfo::where('user_id',$user->id)->orderBy('created_at', 'DESC')->first();
+	$userDeviceInfo = UserDeviceInfo::where('user_id',$user->id)->whereIn('platform',['Android','iOS'])->orderBy('created_at', 'DESC')->first();
 	if(!empty($userDeviceInfo))
 	{ 
 		if(!empty($userDeviceInfo->fcm_token))
@@ -142,7 +142,7 @@ function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,
 function pushMultipleNotification($title,$body,$users,$type,$save_to_database,$user_type,$module,$id,$screen)
 {
 	foreach ($users as $key => $user) {
-		$userDeviceInfo = UserDeviceInfo::where('user_id',$user->id)->latest()->first();
+		$userDeviceInfo = UserDeviceInfo::where('user_id',$user->id)->whereIn('platform',['Android','iOS'])->latest()->first();
 		if($userDeviceInfo)
 		{
 			
