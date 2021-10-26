@@ -9,7 +9,7 @@ use Stripe as ST;
 use App\Models\OrderItem;
 use App\Models\TransactionDetail;
 use App\Models\Refund;
-
+use Log;
 
 function prepareResult($error, $data, $msg)
 {
@@ -205,55 +205,109 @@ function createResume($fileName,$user)
 
 function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason)
 {
-	\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-	
+	$isRefunded = false;
 	$orderItem = OrderItem::find($refundOrderItemId);
 	$orderId = $orderItem->order->id;
 	$transaction = $orderItem->order->transaction;
-	$stripe = new \Stripe\StripeClient(
-	  env('STRIPE_SECRET')
-	);
-	// $data = $stripe->refunds->create([
-	//   'charge' => $transaction->transaction_id,
-	//   'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
-	// ]);
+	if($transaction->gateway_detail=='stripe')
+	{
+		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+		$stripe = new \Stripe\StripeClient(
+		  env('STRIPE_SECRET')
+		);
+		$data = \Stripe\Refund::create([
+			'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
+		  	'payment_intent' => $transaction->transaction_id,
+		]);
+		$isRefunded = true;
+	}
+	elseif($transaction->gateway_detail=='klarna')
+	{
+		$isRefunded = true;
+		$url = env('KLARNA_URL').'/ordermanagement/v1/orders/'.$transaction->transaction_id.'/refunds';
+			
+		$data = [
+            'purchase_country'  => 'SE',
+            'purchase_currency' => 'SEK',
+            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
+            'order_amount'      => $total * 100,
+            'order_tax_amount'  => 0,
+            'order_lines'       => $itemInfo
+        ];
+        $postData = json_encode($data);
 
-	$data = \Stripe\Refund::create([
-		'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
-	  	'payment_intent' => $transaction->transaction_id,
-	]);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => $postData,
+          CURLOPT_HTTPHEADER => array(
+            'Authorization: Basic '.$auth,
+            'Content-Type: application/json',
+          ),
+        ));
 
-	$refund = new Refund;
-	$refund->order_id   				= $orderId;
-	$refund->payment_card_detail_id   	= $transaction->payment_card_detail_id;
-	$refund->order_item_id   			= $refundOrderItemId;
-	$refund->transaction_id   			= $transaction->id;
-	$refund->refund_id   				= $data->id;
-	// $refund->object   					= $data->object;
-	$refund->amount   					= $data->amount / 100;
-	$refund->balance_transaction   		= $data->balance_transaction;
-	$refund->charge   					= $data->charge;
-	$refund->created   					= $data->created;
-	$refund->currency   				= $data->currency;
-	$refund->metadata   				= $data->metadata;
-	$refund->payment_intent   			= $data->payment_intent;
-	$refund->reason   					= $data->reason;
-	$refund->receipt_number   			= $data->receipt_number;
-	$refund->source_transfer_reversal   = $data->source_transfer_reversal;
-	$refund->status   					= $data->status;
-	$refund->transfer_reversal   		= $data->transfer_reversal;
-	$refund->gateway_detail   			= $transaction->gateway_detail;
-	$refund->transaction_type   		= $transaction->transaction_type;
-	$refund->transaction_mode   		= $transaction->transaction_mode;
-	$refund->card_number   				= $transaction->card_number;
-	$refund->card_type   				= $transaction->card_type;
-	$refund->card_cvv   				= $transaction->card_cvv;
-	$refund->card_expiry   				= $transaction->card_expiry;
-	$refund->card_holder_name   		= $transaction->card_holder_name;
-	$refund->quantity   				= $refundOrderItemQuantity;
-	$refund->price   					= $refundOrderItemPrice;
-	$refund->reason_for_refund   		= $refundOrderItemReason;
-	$refund->save();
+        $response = curl_exec($curl);
+        if(curl_errno($curl)>0)
+        {
+        	$isRefunded = false;
+            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+            Log::info('Payment not refunded. Please check Curl Log');
+            Log::info($info);
+        }
+        curl_close($curl);
+		
+	}
+	elseif($transaction->gateway_detail=='swish')
+	{
+		$isRefunded = true;
+	}
+	
+	if($isRefunded)
+	{
+		$refund = new Refund;
+		$refund->order_id   				= $orderId;
+		$refund->payment_card_detail_id   	= $transaction->payment_card_detail_id;
+		$refund->order_item_id   			= $refundOrderItemId;
+		$refund->transaction_id   			= $transaction->id;
+		$refund->refund_id   				= $data->id;
+		// $refund->object   					= $data->object;
+		$refund->amount   					= $data->amount / 100;
+		$refund->balance_transaction   		= $data->balance_transaction;
+		$refund->charge   					= $data->charge;
+		$refund->created   					= $data->created;
+		$refund->currency   				= $data->currency;
+		$refund->metadata   				= $data->metadata;
+		$refund->payment_intent   			= $data->payment_intent;
+		$refund->reason   					= $data->reason;
+		$refund->receipt_number   			= $data->receipt_number;
+		$refund->source_transfer_reversal   = $data->source_transfer_reversal;
+		$refund->status   					= $data->status;
+		$refund->transfer_reversal   		= $data->transfer_reversal;
+		$refund->gateway_detail   			= $transaction->gateway_detail;
+		$refund->transaction_type   		= $transaction->transaction_type;
+		$refund->transaction_mode   		= $transaction->transaction_mode;
+		$refund->card_number   				= $transaction->card_number;
+		$refund->card_type   				= $transaction->card_type;
+		$refund->card_cvv   				= $transaction->card_cvv;
+		$refund->card_expiry   				= $transaction->card_expiry;
+		$refund->card_holder_name   		= $transaction->card_holder_name;
+		$refund->quantity   				= $refundOrderItemQuantity;
+		$refund->price   					= $refundOrderItemPrice;
+		$refund->reason_for_refund   		= $refundOrderItemReason;
+		$refund->save();
+	}
+	else
+	{
+		Log::info('Payment not refunded. Please check Log');
+		Log::info($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+	}
 }
 
 function strReplaceAssoc(array $replace, $subject) 

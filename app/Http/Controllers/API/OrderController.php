@@ -1813,6 +1813,7 @@ class OrderController extends Controller
 	            'purchase_currency' => 'SEK',
 	            'purchase_country'  => 'SE',
 	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
+	            'auto_capture' 		=>  true,
 	            // 'billing_address'   => [
 	            //     'given_name'    => $given_name,
 	            //     'family_name'   => $family_name,
