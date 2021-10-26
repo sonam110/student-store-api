@@ -1857,11 +1857,15 @@ class OrderController extends Controller
 	            return response()->json(prepareResult(true, $info, "Error while placing klarna order"), config('http_response.internal_server_error'));
 	        }
 	        curl_close($curl);
+	        $klarna_response = json_decode($response, true);
+	        $getOrderInfo = $this->getKlarnaOrderInfo($klarna_response['order_id']);
+
 	        $returnData = [
 	        	'created' 	=> time(),
 	        	'amount'	=> $total,
 	        	'currency'	=> 'SEK',
-	        	'klarna_response' => json_decode($response, true)
+	        	'klarna_response' => $klarna_response,
+	        	'order_info'=> json_decode($getOrderInfo, true)
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
 		} elseif($request->payment_method=='place_order_towards_klarna_web') {
@@ -1915,12 +1919,17 @@ class OrderController extends Controller
 	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
 	            return response()->json(prepareResult(true, $info, "Error while placing klarna order"), config('http_response.internal_server_error'));
 	        }
+
+	        $klarna_response = json_decode($response, true);
+	        $getOrderInfo = $this->getKlarnaOrderInfo($klarna_response['order_id']);
+
 	        curl_close($curl);
 	        $returnData = [
 	        	'created' 	=> time(),
 	        	'amount'	=> $total,
 	        	'currency'	=> 'SEK',
-	        	'klarna_response' => json_decode($response, true)
+	        	'klarna_response' => $klarna_response,
+	        	'order_info'=> json_decode($getOrderInfo, true)
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
 		} else {
@@ -2031,5 +2040,31 @@ class OrderController extends Controller
 			return response(prepareResult(false, 'Temp Order deleted', 'Temp Order deleted'), config('http_response.success'));
 		}
 		return response()->json(prepareResult(true, 'Temp Order not found.', 'Temp Order not found.'), config('http_response.not_found'));
+	}
+
+	public function getKlarnaOrderInfo($klarna_transaction_id)
+	{
+		$url = env('KLARNA_URL').'/ordermanagement/v1/orders/'.$klarna_transaction_id;
+		$username = $this->paymentInfo->klarna_username;
+        $password = $this->paymentInfo->klarna_password;
+        $auth     = base64_encode($username.":".$password);
+        $curl = curl_init();
+	        curl_setopt_array($curl, array(
+	          CURLOPT_URL => $url,
+	          CURLOPT_RETURNTRANSFER => true,
+	          CURLOPT_ENCODING => '',
+	          CURLOPT_MAXREDIRS => 10,
+	          CURLOPT_TIMEOUT => 0,
+	          CURLOPT_FOLLOWLOCATION => true,
+	          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	          CURLOPT_CUSTOMREQUEST => 'GET',
+	          CURLOPT_HTTPHEADER => array(
+	            'Authorization: Basic '.$auth,
+	            'Content-Type: application/json',
+	          ),
+	        ));
+
+	        $response = curl_exec($curl);
+	        return $response;
 	}
 }
