@@ -9,6 +9,7 @@ use Stripe as ST;
 use App\Models\OrderItem;
 use App\Models\TransactionDetail;
 use App\Models\Refund;
+use App\Models\PaymentGatewaySetting;
 use Log;
 
 function prepareResult($error, $data, $msg)
@@ -209,7 +210,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	$orderItem = OrderItem::find($refundOrderItemId);
 	$orderId = $orderItem->order->id;
 	$transaction = $orderItem->order->transaction;
-	if($transaction->gateway_detail=='stripe')
+	if($transaction->gateway_detail=='stripe' && $transaction->transaction_status=='succeeded')
 	{
 		\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 		$stripe = new \Stripe\StripeClient(
@@ -219,19 +220,34 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 			'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
 		  	'payment_intent' => $transaction->transaction_id,
 		]);
+		$refund_id = $data->id;
 		$isRefunded = true;
 	}
-	elseif($transaction->gateway_detail=='klarna')
+	elseif($transaction->gateway_detail=='klarna' && $transaction->transaction_status=='ACCEPTED')
 	{
 		$isRefunded = true;
 		$url = env('KLARNA_URL').'/ordermanagement/v1/orders/'.$transaction->transaction_id.'/refunds';
-			
+		$paymentInfo = PaymentGatewaySetting::first();
+		$username = $paymentInfo->klarna_username;
+        $password = $paymentInfo->klarna_password;
+        $auth     = base64_encode($username.":".$password);
+
+		$itemInfo = [
+			"reference" 		=> $orderItem->id,
+			"type" 				=> $orderItem->product_type,
+			"quantity" 			=> $refundOrderItemQuantity,
+			"quantity_unit" 	=> "pcs.",
+			"name"	 			=> $orderItem->title,
+			"total_amount" 		=> $refundOrderItemPrice * $refundOrderItemQuantity * 100,
+			"unit_price" 		=> $refundOrderItemPrice * 100,
+			"total_discount_amount" => 0,
+			"tax_rate" 			=> 0,
+			"total_tax_amount"	=> 0
+		];
 		$data = [
-            'purchase_country'  => 'SE',
-            'purchase_currency' => 'SEK',
-            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
-            'order_amount'      => $total * 100,
-            'order_tax_amount'  => 0,
+            'refunded_amount'  	=> $refundOrderItemPrice * $refundOrderItemQuantity * 100,
+            'description' 		=> $refundOrderItemReason,
+            'reference'        	=> $orderItem->order->order_number,
             'order_lines'       => $itemInfo
         ];
         $postData = json_encode($data);
@@ -261,8 +277,12 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
             Log::info('Payment not refunded. Please check Curl Log');
             Log::info($info);
         }
+        else
+        {
+        	$jsonRes = json_decode($response, true);
+        	$refund_id = $jsonRes['refund_id'];
+        }
         curl_close($curl);
-		
 	}
 	elseif($transaction->gateway_detail=='swish')
 	{
@@ -276,20 +296,25 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 		$refund->payment_card_detail_id   	= $transaction->payment_card_detail_id;
 		$refund->order_item_id   			= $refundOrderItemId;
 		$refund->transaction_id   			= $transaction->id;
-		$refund->refund_id   				= $data->id;
-		// $refund->object   					= $data->object;
-		$refund->amount   					= $data->amount / 100;
-		$refund->balance_transaction   		= $data->balance_transaction;
-		$refund->charge   					= $data->charge;
-		$refund->created   					= $data->created;
-		$refund->currency   				= $data->currency;
-		$refund->metadata   				= $data->metadata;
-		$refund->payment_intent   			= $data->payment_intent;
-		$refund->reason   					= $data->reason;
-		$refund->receipt_number   			= $data->receipt_number;
-		$refund->source_transfer_reversal   = $data->source_transfer_reversal;
-		$refund->status   					= $data->status;
-		$refund->transfer_reversal   		= $data->transfer_reversal;
+		$refund->refund_id   				= $refund_id;
+
+		if($transaction->gateway_detail=='stripe')
+		{
+			// $refund->object   					= $data->object;
+			$refund->amount   					= $data->amount / 100;
+			$refund->balance_transaction   		= $data->balance_transaction;
+			$refund->charge   					= $data->charge;
+			$refund->created   					= $data->created;
+			$refund->currency   				= $data->currency;
+			$refund->metadata   				= $data->metadata;
+			$refund->payment_intent   			= $data->payment_intent;
+			$refund->reason   					= $data->reason;
+			$refund->receipt_number   			= $data->receipt_number;
+			$refund->source_transfer_reversal   = $data->source_transfer_reversal;
+			$refund->status   					= $data->status;
+			$refund->transfer_reversal   		= $data->transfer_reversal;
+		}
+		
 		$refund->gateway_detail   			= $transaction->gateway_detail;
 		$refund->transaction_type   		= $transaction->transaction_type;
 		$refund->transaction_mode   		= $transaction->transaction_mode;
