@@ -280,11 +280,11 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
         }
         else
         {
-        	$refund_id = request()->header('Refund-Id');
-        	$location = request()->header('Location');
-        	$transaction_id = request()->header('Transaction-Id');
-        	$jsonRes = json_decode($response, true);
-        	Log::info(request());
+        	// $refund_id = request()->header('Refund-Id');
+        	// $location = request()->header('Location');
+        	// $transaction_id = request()->header('Transaction-Id');
+        	$refund_id = '';
+        	Log::info(curl_getinfo($curl));
         }
         curl_close($curl);
 	}
@@ -317,6 +317,12 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 			$refund->source_transfer_reversal   = $data->source_transfer_reversal;
 			$refund->status   					= $data->status;
 			$refund->transfer_reversal   		= $data->transfer_reversal;
+		}
+		else
+		{
+			$refund->amount   					= $refundOrderItemPrice * $refundOrderItemQuantity;
+			$refund->created   					= time();
+			$refund->currency   				= 'SEK';
 		}
 		
 		$refund->gateway_detail   			= $transaction->gateway_detail;
