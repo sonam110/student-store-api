@@ -264,7 +264,7 @@ class FrontController extends Controller
 			{
 				$language_id = 1;
 			}
-			$page = Page::where('slug',$slug)->where('language_id',$language_id)->first();
+			$page = Page::where('slug',$slug)->where('language_id',$language_id)->with('pageContents')->first();
 			return response(prepareResult(false, $page, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}
 		catch (\Throwable $exception) 
