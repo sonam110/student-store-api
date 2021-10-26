@@ -232,7 +232,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
         $password = $paymentInfo->klarna_password;
         $auth     = base64_encode($username.":".$password);
 
-		$itemInfo = [
+		$itemInfo[] = [
 			"reference" 		=> $orderItem->id,
 			"type" 				=> $orderItem->product_type,
 			"quantity" 			=> $refundOrderItemQuantity,
@@ -251,6 +251,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
             'order_lines'       => $itemInfo
         ];
         $postData = json_encode($data);
+        Log::info($postData);
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
