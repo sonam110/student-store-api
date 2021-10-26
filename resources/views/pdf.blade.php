@@ -11,21 +11,21 @@
     body {
         font-family: 'Cairo', sans-serif;
         font-size: 12pt;
-        background: url("{{asset('assets/bg-resume.png')}}");
+        background: url("http://testing.3mad.in/bg-resume.png");
         background-size: contain;
         background-position: top top;
         background-repeat: no-repeat;
         background-color: #fff;
     }
     .left-section{
-        width:35%;
+        width:30%;
         margin-right:2%;
         float: left;
         height: 100%;
         color: #fff;
     }
     .right-section {
-        width:65%;
+        width:70%;
         float: left;
         margin-left: 15px;
     }

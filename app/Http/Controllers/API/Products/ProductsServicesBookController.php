@@ -826,7 +826,7 @@ class ProductsServicesBookController extends Controller
                 
             }
 
-            if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random') 
+            if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random' || $searchType=='popular') 
             {
                 $products->where('products_services_books.type', $type);
             }
@@ -1004,6 +1004,27 @@ class ProductsServicesBookController extends Controller
             elseif($searchType=='random')
             {
                 $products->inRandomOrder();
+            }
+            elseif($searchType=='popular')
+            {
+                $products->where('products_services_books.most_popular', '1')
+                ->where('products_services_books.most_popular_start_at','<=', date('Y-m-d'))
+                ->where('products_services_books.most_popular_end_at','>=', date('Y-m-d'));
+
+                if($products->count() <= 0)
+                {
+                    $products = ProductsServicesBook::select('products_services_books.*')
+                    ->join('users', function ($join) {
+                        $join->on('products_services_books.user_id', '=', 'users.id');
+                    })
+                    ->where('products_services_books.status', '2')
+                    ->where('products_services_books.is_published', '1')
+                    //->where('products_services_books.user_id', '!=', Auth::id())
+                    ->where('users.user_type_id','3')
+                    ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
+                    ->where('products_services_books.type','service')
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                }
             }
             if(!empty($request->per_page_record))
             {
@@ -1408,6 +1429,14 @@ class ProductsServicesBookController extends Controller
         $content->per_page_record = '5';
         $content->other_function = 'yes';
         $company_product_latest = $this->companyProductsFilter($content);
+
+        $content = new Request();
+        $content->is_used_item = 'no';
+        $content->type = 'product';
+        $content->searchType = 'popular';
+        $content->per_page_record = '5';
+        $content->other_function = 'yes';
+        $company_product_popular = $this->companyProductsFilter($content);
         
         
         $content = new Request();
@@ -1499,7 +1528,7 @@ class ProductsServicesBookController extends Controller
                     'company_product_top_rated'     => $company_product_top_rated,
                     'company_product_random'        => $company_product_random, 
                     'company_product_latest'        => $company_product_latest,
-                    'company_product_popular'       => $company_product_random 
+                    'company_product_popular'       => $company_product_popular 
                 ],
                 'services' => [
                     'company_service_promotions'    => $company_service_promotions, 
@@ -1563,6 +1592,15 @@ class ProductsServicesBookController extends Controller
         $content->per_page_record = '5';
         $content->other_function = 'yes';
         $student_product_latest = $this->studentProductsFilter($content);
+
+
+        $content = new Request();
+        $content->is_used_item = 'yes';
+        $content->type = 'product';
+        $content->searchType = 'popular';
+        $content->per_page_record = '5';
+        $content->other_function = 'yes';
+        $student_product_popular = $this->studentProductsFilter($content);
         
         
         $content = new Request();
@@ -1653,7 +1691,7 @@ class ProductsServicesBookController extends Controller
                     'student_product_top_rated'     => $student_product_top_rated,
                     'student_product_random'        => $student_product_random, 
                     'student_product_latest'        => $student_product_latest,
-                    'student_product_popular'       => $student_product_random 
+                    'student_product_popular'       => $student_product_popular 
                 ],
                 'services' => [
                     'student_service_promotions'    => $student_service_promotions, 
