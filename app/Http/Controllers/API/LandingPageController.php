@@ -298,12 +298,25 @@ class LandingPageController extends Controller
                 
                 if(!empty($request->min_price))
                 {
-                    $products->where('products_services_books.discounted_price', '>=', $request->min_price);
+                    $min_price = $request->min_price;
+                    
+                    $products->whereRaw("(CASE WHEN products_services_books.is_on_offer = 1 THEN products_services_books.discounted_price >= $min_price ELSE products_services_books.price >= $min_price END)");
+                    
                 }
                 if(!empty($request->max_price))
                 {
-                    $products->where('products_services_books.discounted_price', '<=', $request->max_price);
+                    $max_price = $request->max_price;
+                    $products->whereRaw("(CASE WHEN products_services_books.is_on_offer = 1 THEN products_services_books.discounted_price <= $max_price ELSE products_services_books.price <= $max_price END)");
                 }
+                
+                // if(!empty($request->min_price))
+                // {
+                //     $products->where('products_services_books.discounted_price', '>=', $request->min_price);
+                // }
+                // if(!empty($request->max_price))
+                // {
+                //     $products->where('products_services_books.discounted_price', '<=', $request->max_price);
+                // }
                 if(!empty($request->sell_type))
                 {
                     $products->where('products_services_books.sell_type', $request->sell_type);

@@ -862,18 +862,14 @@ class ProductsServicesBookController extends Controller
                 if(!empty($request->min_price))
                 {
                     $min_price = $request->min_price;
-                    $products->where(function ($query) use ($min_price) {
-                        $query->where('products_services_books.price', '>=', $min_price)
-                              ->orWhere('products_services_books.discounted_price', '>=', $min_price);
-                    })->where('products_services_books.discounted_price', '>', '0');
+                    
+                    $products->whereRaw("(CASE WHEN products_services_books.is_on_offer = 1 THEN products_services_books.discounted_price >= $min_price ELSE products_services_books.price >= $min_price END)");
+                    
                 }
                 if(!empty($request->max_price))
                 {
                     $max_price = $request->max_price;
-                    $products->where(function ($query) use ($max_price) {
-                        $query->where('products_services_books.price', '<=', $max_price)
-                              ->orWhere('products_services_books.discounted_price', '<=', $max_price);
-                    })->where('products_services_books.discounted_price', '>', '0');
+                    $products->whereRaw("(CASE WHEN products_services_books.is_on_offer = 1 THEN products_services_books.discounted_price <= $max_price ELSE products_services_books.price <= $max_price END)");
                 }
                 if(!empty($request->sell_type))
                 {
