@@ -234,7 +234,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 
 		$itemInfo[] = [
 			"reference" 		=> $orderItem->id,
-			"type" 				=> $orderItem->product_type,
+			'type'      		=> 'physical',
 			"quantity" 			=> $refundOrderItemQuantity,
 			"quantity_unit" 	=> "pcs.",
 			"name"	 			=> $orderItem->title,
