@@ -203,7 +203,6 @@ function createResume($fileName,$user)
 	return $pdf->save('uploads/'.$fileName);
 }
 
-
 function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason)
 {
 	$isRefunded = false;
@@ -277,12 +276,15 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
             $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
             Log::info('Payment not refunded. Please check Curl Log');
             Log::info($info);
+            die;
         }
         else
         {
+        	$refund_id = request()->header('Refund-Id');
+        	$location = request()->header('Location');
+        	$transaction_id = request()->header('Transaction-Id');
         	$jsonRes = json_decode($response, true);
-        	Log::info($jsonRes);
-        	$refund_id = $jsonRes['refund_id'];
+        	Log::info(request());
         }
         curl_close($curl);
 	}

@@ -1858,14 +1858,12 @@ class OrderController extends Controller
 	        }
 	        curl_close($curl);
 	        $klarna_response = json_decode($response, true);
-	        $getOrderInfo = $this->getKlarnaOrderInfo($klarna_response['order_id']);
 
 	        $returnData = [
 	        	'created' 	=> time(),
 	        	'amount'	=> $total,
 	        	'currency'	=> 'SEK',
-	        	'klarna_response' => $klarna_response,
-	        	'order_info'=> json_decode($getOrderInfo, true)
+	        	'klarna_response' => $klarna_response
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
 		} elseif($request->payment_method=='place_order_towards_klarna_web') {
@@ -1921,15 +1919,12 @@ class OrderController extends Controller
 	        }
 
 	        $klarna_response = json_decode($response, true);
-	        $getOrderInfo = $this->getKlarnaOrderInfo($klarna_response['order_id']);
-
 	        curl_close($curl);
 	        $returnData = [
 	        	'created' 	=> time(),
 	        	'amount'	=> $total,
 	        	'currency'	=> 'SEK',
-	        	'klarna_response' => $klarna_response,
-	        	'order_info'=> json_decode($getOrderInfo, true)
+	        	'klarna_response' => $klarna_response
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
 		} else {
