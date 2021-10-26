@@ -263,6 +263,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => 'POST',
           CURLOPT_POSTFIELDS => $postData,
+          CURLOPT_HEADER => 1,
           CURLOPT_HTTPHEADER => array(
             'Authorization: Basic '.$auth,
             'Content-Type: application/json',
