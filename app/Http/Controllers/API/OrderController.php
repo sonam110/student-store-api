@@ -2060,6 +2060,9 @@ class OrderController extends Controller
 	        ));
 
 	        $response = curl_exec($curl);
-	        return $response;
+	        $res = json_decode($response, true);
+	        //echo '<pre>';
+	        //print_r($res['refunds'][0]['refund_id']);
+	        return response(prepareResult(false, $res, 'Order Info'), config('http_response.success'));
 	}
 }

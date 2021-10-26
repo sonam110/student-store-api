@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 //Stripe Webhook
+Route::get('/klarna/order-info/{order_id}', [App\Http\Controllers\API\OrderController::class,'getKlarnaOrderInfo']);
 Route::post('/stripe/webhook', [App\Http\Controllers\WebhookController::class,'stripeWebhook']);
 
 Route::get('/initial-screen', [App\Http\Controllers\API\LandingPageController::class,'initialScreen']);

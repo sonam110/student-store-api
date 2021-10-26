@@ -10,7 +10,6 @@ use App\Models\OrderItem;
 use App\Models\TransactionDetail;
 use App\Models\Refund;
 use App\Models\PaymentGatewaySetting;
-use Log;
 
 function prepareResult($error, $data, $msg)
 {
@@ -203,6 +202,33 @@ function createResume($fileName,$user)
 	return $pdf->save('uploads/'.$fileName);
 }
 
+function getKlarnaOrderInfo($klarna_transaction_id)
+{
+	$url = env('KLARNA_URL').'/ordermanagement/v1/orders/'.$klarna_transaction_id;
+	$paymentInfo = PaymentGatewaySetting::first();
+	$username = $paymentInfo->klarna_username;
+    $password = $paymentInfo->klarna_password;
+    $auth     = base64_encode($username.":".$password);
+    $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+          CURLOPT_HTTPHEADER => array(
+            'Authorization: Basic '.$auth,
+            'Content-Type: application/json',
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        return $response;
+}
+
 function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason)
 {
 	$isRefunded = false;
@@ -263,7 +289,6 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => 'POST',
           CURLOPT_POSTFIELDS => $postData,
-          CURLOPT_HEADER => 1,
           CURLOPT_HTTPHEADER => array(
             'Authorization: Basic '.$auth,
             'Content-Type: application/json',
@@ -281,11 +306,9 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
         }
         else
         {
-        	// $refund_id = request()->header('Refund-Id');
-        	// $location = request()->header('Location');
-        	// $transaction_id = request()->header('Transaction-Id');
-        	$refund_id = '';
-        	Log::info(curl_getinfo($curl));
+        	$getOrderStatus = getKlarnaOrderInfo($transaction->transaction_id);
+        	$res = json_decode($getOrderStatus, true);
+        	$refund_id = $res['refunds'][0]['refund_id'];
         }
         curl_close($curl);
 	}
