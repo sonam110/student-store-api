@@ -108,7 +108,7 @@ Route::get('/sub-category-list/{catId}/{language_id}', [App\Http\Controllers\API
 Route::get('/attribute-list/{catId}/{language_id}', [App\Http\Controllers\API\CategoryController::class, 'attributeList']);
 Route::get('/brands/{catId}', [App\Http\Controllers\API\CategoryController::class, 'brands']);
 
-Route::apiResource('/upload-doc', 'App\Http\Controllers\API\UploadDocController')->only('store');
+Route::apiResource('/upload-doc', 'App\Http\Controllers\API\UploadDocController', ['as' => 'api'])->only('store');
 
 
 Route::group(['middleware' => 'auth:api'],function () {
@@ -129,7 +129,7 @@ Route::group(['middleware' => 'auth:api'],function () {
     Route::get('/contest-landing-page', [App\Http\Controllers\API\Contests\ContestController::class, 'contestLandingPage']);
     Route::get('/student-contest-landing-page', [App\Http\Controllers\API\Contests\ContestController::class, 'studentContestLandingPage']);
     
-	Route::apiResource('/user', 'App\Http\Controllers\API\UserController');
+	Route::apiResource('/user', 'App\Http\Controllers\API\UserController', ['as' => 'api']);
 	Route::get('/user-by-type/{id}', [App\Http\Controllers\API\UserController::class,'userByType']);
 	Route::post('/user/{id}/status-update', [App\Http\Controllers\API\UserController::class,'statusUpdate']);
 	Route::post('/service-providers-filter', [App\Http\Controllers\API\UserController::class, 'serviceProvidersFilter']);
@@ -140,10 +140,10 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/extra-detail-update', 'App\Http\Controllers\API\UserProfileController@extraDetailUpdate');
 	Route::post('/add-package', [App\Http\Controllers\API\UserProfileController::class,'addPackage']);
 	Route::post('/cv-detail-update', 'App\Http\Controllers\API\UserCvDetailController@cvDetailUpdate');
-	Route::apiResource('/address-detail', 'App\Http\Controllers\API\UserAddressDetailController');
-	Route::apiResource('/payment-card-detail', 'App\Http\Controllers\API\PaymentCardDetailController');
-	Route::apiResource('/user-work-experience', 'App\Http\Controllers\API\UserWorkExperienceController');
-	Route::apiResource('/user-education-detail', 'App\Http\Controllers\API\UserEducationDetailController');
+	Route::apiResource('/address-detail', 'App\Http\Controllers\API\UserAddressDetailController', ['as' => 'api']);
+	Route::apiResource('/payment-card-detail', 'App\Http\Controllers\API\PaymentCardDetailController', ['as' => 'api']);
+	Route::apiResource('/user-work-experience', 'App\Http\Controllers\API\UserWorkExperienceController', ['as' => 'api']);
+	Route::apiResource('/user-education-detail', 'App\Http\Controllers\API\UserEducationDetailController', ['as' => 'api']);
 	Route::get('/reward-points-detail', 'App\Http\Controllers\API\UserProfileController@rewardPointDetails');
 	Route::post('/language-update', 'App\Http\Controllers\API\UserProfileController@languageUpdate');
 	Route::post('/share-reward-points', 'App\Http\Controllers\API\UserProfileController@shareRewardPoints');
@@ -152,7 +152,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	
 	Route::get('/cool-company-freelancer', 'App\Http\Controllers\API\UserProfileController@coolCompanyFreelancer');
 
-	Route::apiResource('/shipping-condition', 'App\Http\Controllers\API\ShippingConditionController');
+	Route::apiResource('/shipping-condition', 'App\Http\Controllers\API\ShippingConditionController', ['as' => 'api']);
 
 	Route::get('/cvs-view/{id}', [App\Http\Controllers\API\UserProfileController::class,'cvsView']);
 	Route::get('/unread-notifications', [App\Http\Controllers\API\UserProfileController::class,'unreadNotifications']);
@@ -160,14 +160,14 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/earning-details', 'App\Http\Controllers\API\UserProfileController@earningDetails');
 
 	//Notification
-	Route::apiResource('/notification', 'App\Http\Controllers\API\NotificationController')->only('store','index','destroy','show');
+	Route::apiResource('/notification', 'App\Http\Controllers\API\NotificationController', ['as' => 'api'])->only('store','index','destroy','show');
 	Route::get('/notification/{id}/read', [App\Http\Controllers\API\NotificationController::class,'read']);
 	Route::get('/user-notification-delete', [App\Http\Controllers\API\NotificationController::class,'userNotificationDelete']);
 
-	Route::apiResource('/products-services-books', 'App\Http\Controllers\API\Products\ProductsServicesBookController');
+	Route::apiResource('/products-services-books', 'App\Http\Controllers\API\Products\ProductsServicesBookController', ['as' => 'api']);
 	Route::post('/products-services-books-action/{id}', [App\Http\Controllers\API\Products\ProductsServicesBookController::class, 'action']);
 	Route::post('/products-services-books-stock-update/{id}', [App\Http\Controllers\API\Products\ProductsServicesBookController::class, 'stockUpdate']);
-	Route::apiResource('/favourite-products', 'App\Http\Controllers\API\Products\FavouriteProductController')->only('index','store','destroy');
+	Route::apiResource('/favourite-products', 'App\Http\Controllers\API\Products\FavouriteProductController', ['as' => 'api'])->only('index','store','destroy');
 	Route::get('/all-products-by-user', [App\Http\Controllers\API\Products\ProductsServicesBookController::class, 'allProductsByUser']);
 	Route::get('/all-services-by-user', [App\Http\Controllers\API\Products\ProductsServicesBookController::class, 'allServicesByUser']);
 	Route::get('/all-books-by-user', [App\Http\Controllers\API\Products\ProductsServicesBookController::class, 'allBooksByUser']);
@@ -189,7 +189,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 
 	//Product Tags
 	//Tags
-	Route::apiResource('/product-service-book-tags', 'App\Http\Controllers\API\Products\ProductsServicesBookTagController')->only('index');
+	Route::apiResource('/product-service-book-tags', 'App\Http\Controllers\API\Products\ProductsServicesBookTagController', ['as' => 'api'])->only('index');
 	Route::post('product-tags/filter', [App\Http\Controllers\API\Products\ProductsServicesBookTagController::class, 'productTagsFilter']); //pagination
 
 	//Jobs
@@ -197,23 +197,23 @@ Route::group(['middleware' => 'auth:api'],function () {
 
 	Route::get('/jobs/sp-jobs-applications', [App\Http\Controllers\API\Jobs\JobController::class, 'jobSPJobsApplications']);
 
-	Route::apiResource('/jobs', 'App\Http\Controllers\API\Jobs\JobController');
+	Route::apiResource('/jobs', 'App\Http\Controllers\API\Jobs\JobController', ['as' => 'api']);
 	Route::post('/jobs-action/{id}', [App\Http\Controllers\API\Jobs\JobController::class, 'jobAction']);
 	
 	Route::post('/filter/jobs', [App\Http\Controllers\API\Jobs\JobController::class, 'jobFilter']);
 
-	Route::apiResource('/favourite-jobs', 'App\Http\Controllers\API\Jobs\FavouriteJobController')->only('index','store','destroy');
+	Route::apiResource('/favourite-jobs', 'App\Http\Controllers\API\Jobs\FavouriteJobController', ['as' => 'api'])->only('index','store','destroy');
 
 	Route::post('/filter/jobapplicant', [App\Http\Controllers\API\Jobs\JobController::class, 'applicantsFilter']); // pagination
 	
 	Route::get('/jobs/{id}/job-applications', [App\Http\Controllers\API\Jobs\JobController::class, 'jobApplications']); // pagination
 
 	//Tags
-	Route::apiResource('/job-tags', 'App\Http\Controllers\API\Jobs\JobTagController');
+	Route::apiResource('/job-tags', 'App\Http\Controllers\API\Jobs\JobTagController', ['as' => 'api']);
 	Route::post('job-tags/filter', [App\Http\Controllers\API\Jobs\JobTagController::class, 'jobTagsFilter']); //pagination
 
 	//Job Application
-	Route::apiResource('/job-application', 'App\Http\Controllers\API\Jobs\JobApplicationController')->only('store','index','destroy','show');
+	Route::apiResource('/job-application', 'App\Http\Controllers\API\Jobs\JobApplicationController', ['as' => 'api'])->only('store','index','destroy','show');
 	Route::post('/job-application/{id}/update-status', [App\Http\Controllers\API\Jobs\JobApplicationController::class,'statusUpdate']);
  
 	
@@ -225,9 +225,9 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/read-message/{id}', [App\Http\Controllers\API\MessageController::class,'readMessage']);
 
 
-	Route::apiResource('/cart-detail', 'App\Http\Controllers\API\CartDetailController');
+	Route::apiResource('/cart-detail', 'App\Http\Controllers\API\CartDetailController', ['as' => 'api']);
 	Route::get('/empty-cart', [App\Http\Controllers\API\CartDetailController::class,'emptyCart']);
-	Route::apiResource('/order', 'App\Http\Controllers\API\OrderController');
+	Route::apiResource('/order', 'App\Http\Controllers\API\OrderController', ['as' => 'api']);
 	Route::get('/all-orders-by-user', [App\Http\Controllers\API\OrderController::class,'allOrdersByUser']);
 	Route::get('/all-orders-for-user', [App\Http\Controllers\API\OrderController::class,'allOrdersForUser']);
 	Route::post('/order-status-update/{id}', [App\Http\Controllers\API\OrderController::class,'orderStatusUpdate']);
@@ -242,7 +242,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 
 	//Klarna
 
-	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\RatingAndFeedbackController');
+	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\RatingAndFeedbackController', ['as' => 'api']);
 	Route::get('/rating-and-feedback-approve/{id}', [App\Http\Controllers\API\RatingAndFeedbackController::class,'approve']);
 	Route::post('/gtin-isbn-search', [App\Http\Controllers\API\FrontController::class,'gtinIsbnSearch']);
 
@@ -253,11 +253,11 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/contests-action/{id}', [App\Http\Controllers\API\Contests\ContestController::class, 'contestAction']);
 	Route::post('/filter/contests', [App\Http\Controllers\API\Contests\ContestController::class, 'contestFilter']);
 	Route::get('/contests/{id}/contest-applications', [App\Http\Controllers\API\Contests\ContestController::class, 'contestApplications']); 
-	Route::apiResource('/contest-application', 'App\Http\Controllers\API\Contests\ContestApplicationController')->only('store','index','destroy','show');
+	Route::apiResource('/contest-application', 'App\Http\Controllers\API\Contests\ContestApplicationController', ['as' => 'api'])->only('store','index','destroy','show');
 	Route::post('/contest-application/{id}/update-status', [App\Http\Controllers\API\Contests\ContestApplicationController::class,'statusUpdate']);
-	Route::apiResource('/contest-tags', 'App\Http\Controllers\API\Contests\ContestTagController')->only('index');
+	Route::apiResource('/contest-tags', 'App\Http\Controllers\API\Contests\ContestTagController', ['as' => 'api'])->only('index');
 
-	Route::apiResource('/contest-winner', 'App\Http\Controllers\API\Contests\ContestWinnerController')->only('store');
+	Route::apiResource('/contest-winner', 'App\Http\Controllers\API\Contests\ContestWinnerController', ['as' => 'api'])->only('store');
 
 
 	
@@ -295,6 +295,10 @@ Route::group(['middleware' => 'auth:api'],function () {
 
 Route::post('/contact-us', [App\Http\Controllers\API\ContactUsController::class,'store']);
 
+
+#################################################################
+################### Admin #####################
+#################################################################
 Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin']],function () {
 	Route::post('/dashboard', [App\Http\Controllers\API\Admin\DashboardController::class, 'index']);
 	Route::post('/dashboard-sales-report', [App\Http\Controllers\API\Admin\DashboardController::class, 'salesReport']);
@@ -395,30 +399,30 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::get('/dispute-detail/{id}', [App\Http\Controllers\API\Admin\OrderItemDisputeController::class, 'show']);
 	Route::post('/dispute-resolved/{id}', [App\Http\Controllers\API\Admin\OrderItemDisputeController::class,'resolve']);
 
-	Route::apiResource('/contests', 'App\Http\Controllers\API\Admin\ContestController');
+	Route::apiResource('/contests', 'App\Http\Controllers\API\Admin\ContestController', ['as' => 'admin']);
 	// Route::get('/contests/{contest_id}', [App\Http\Controllers\API\Admin\ContestController::class, 'contestDetail']);
 	Route::post('/contests-action/{id}', [App\Http\Controllers\API\Admin\ContestController::class, 'contestAction']);
 	Route::get('/contest-delete/{id}', [App\Http\Controllers\API\Admin\ContestController::class, 'destroy']);
 	Route::post('/contests-multiple-status-update', [App\Http\Controllers\API\Admin\ContestController::class, 'multipleStatusUpdate']);
 	Route::post('/contests-multiple-publish-update', [App\Http\Controllers\API\Admin\ContestController::class, 'multiplePublishUpdate']);
-	Route::apiResource('/contest-application', 'App\Http\Controllers\API\Admin\ContestApplicationController')->only('index','show','destroy');
+	Route::apiResource('/contest-application', 'App\Http\Controllers\API\Admin\ContestApplicationController', ['as' => 'admin'])->only('index','show','destroy');
 	Route::post('/contests-filter', [App\Http\Controllers\API\Admin\ContestController::class, 'filter']);
 	Route::post('/contest-applicant-filter', [App\Http\Controllers\API\Admin\ContestApplicationController::class, 'applicantFilter']);
 	Route::post('/contest-application/{id}/update-status', [App\Http\Controllers\API\Admin\ContestApplicationController::class,'statusUpdate']);
 	Route::post('/contest-application/multiple-update-status', [App\Http\Controllers\API\Admin\ContestApplicationController::class,'multipleStatusUpdate']);
-	Route::apiResource('/contest-winner', 'App\Http\Controllers\API\Admin\ContestWinnerController')->only('index','show','destroy');
+	Route::apiResource('/contest-winner', 'App\Http\Controllers\API\Admin\ContestWinnerController', ['as' => 'admin'])->only('index','show','destroy');
 	Route::post('/contest-winner-filter', [App\Http\Controllers\API\Admin\ContestWinnerController::class, 'winnerFilter']);
 
 
 
-	Route::apiResource('/products-services-books', 'App\Http\Controllers\API\Admin\ProductsServicesBookController');
+	Route::apiResource('/products-services-books', 'App\Http\Controllers\API\Admin\ProductsServicesBookController', ['as' => 'admin']);
 	Route::post('/products-services-books-action/{id}', [App\Http\Controllers\API\Admin\ProductsServicesBookController::class, 'action']);
 	Route::post('/products-services-books-multiple-status-update', [App\Http\Controllers\API\Admin\ProductsServicesBookController::class, 'multipleStatusUpdate']);
 	Route::post('/products-services-books-multiple-publish-update', [App\Http\Controllers\API\Admin\ProductsServicesBookController::class, 'multiplePublishUpdate']);
 	Route::post('/products-services-books-filter', [App\Http\Controllers\API\Admin\ProductsServicesBookController::class, 'filter']);
 	Route::post('products-import', [App\Http\Controllers\API\Admin\ProductsServicesBookController::class,'productsImport']);
 
-	Route::apiResource('/order', 'App\Http\Controllers\API\Admin\OrderController')->only('index','show');
+	Route::apiResource('/order', 'App\Http\Controllers\API\Admin\OrderController', ['as' => 'admin'])->only('index','show');
 	Route::post('/order-filter', [App\Http\Controllers\API\Admin\OrderController::class, 'filter']);
 
 	Route::get('/contact-us', [App\Http\Controllers\API\Admin\ContactUsController::class, 'index']);
@@ -426,8 +430,8 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 	Route::post('/send-notification', [App\Http\Controllers\API\Admin\NotificationController::class, 'sendNotification']);
 
-	Route::apiResource('/transaction-details', 'App\Http\Controllers\API\Admin\TransactionDetailController')->only('index','show');
-	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\Admin\RatingAndFeedbackController')->only('index','show','destroy');
+	Route::apiResource('/transaction-details', 'App\Http\Controllers\API\Admin\TransactionDetailController', ['as' => 'admin'])->only('index','show');
+	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\Admin\RatingAndFeedbackController', ['as' => 'admin'])->only('index','show','destroy');
 	Route::post('/rating-and-feedback-status-update/{id}', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'statusUpdate']);
 	Route::post('/rating-and-feedback-multiple-status-update', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'multipleStatusUpdate']);
 	Route::post('/rating-and-feedback-filter', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'filter']);
@@ -448,19 +452,19 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/labels-export', [App\Http\Controllers\API\Admin\ExportController::class, 'labelsExport']);
 
 
-	Route::apiResource('/brand', 'App\Http\Controllers\API\Admin\BrandController');
+	Route::apiResource('/brand', 'App\Http\Controllers\API\Admin\BrandController', ['as' => 'admin']);
 	Route::post('/brands-import', [App\Http\Controllers\API\Admin\BrandController::class, 'brandsImport']);
 	Route::post('/brand-multiple-status-update', [App\Http\Controllers\API\Admin\BrandController::class,'multipleStatusUpdate']);
 
 
-	Route::apiResource('/abuse', 'App\Http\Controllers\API\Admin\AbuseController')->only('index','show','destroy');
+	Route::apiResource('/abuse', 'App\Http\Controllers\API\Admin\AbuseController', ['as' => 'admin'])->only('index','show','destroy');
 	Route::post('/abuse-status-update/{id}', [App\Http\Controllers\API\Admin\AbuseController::class,'statusUpdate']);
 	Route::post('/abuse-multiple-status-update', [App\Http\Controllers\API\Admin\AbuseController::class,'multipleStatusUpdate']);
 
-	Route::apiResource('/slider', 'App\Http\Controllers\API\Admin\SliderController')->only('index','store','destroy');
+	Route::apiResource('/slider', 'App\Http\Controllers\API\Admin\SliderController', ['as' => 'admin'])->only('index','store','destroy');
 
 
-	Route::apiResource('/subscriber', 'App\Http\Controllers\API\Admin\SubscriberController')->only('index','destroy');
+	Route::apiResource('/subscriber', 'App\Http\Controllers\API\Admin\SubscriberController', ['as' => 'admin'])->only('index','destroy');
 
 	//Fund transferred log
 	Route::post('/vendor-fund-transfer-list', [App\Http\Controllers\API\Admin\VendorFundLogController::class,'vendorFundTransferList']);
