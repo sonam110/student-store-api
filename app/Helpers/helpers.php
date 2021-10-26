@@ -280,6 +280,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
         else
         {
         	$jsonRes = json_decode($response, true);
+        	Log::info($jsonRes);
         	$refund_id = $jsonRes['refund_id'];
         }
         curl_close($curl);
