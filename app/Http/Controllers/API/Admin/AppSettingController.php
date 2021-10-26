@@ -69,6 +69,8 @@ class AppSettingController extends Controller
             $appSetting->coolCompanyVatRateId       = $request->cool_company_vat_rate_id;
             $appSetting->coolCompanyCommission      = $request->coolCompanyCommission;
             $appSetting->invite_url                 = $request->invite_url;
+            $appSetting->play_store_url             = $request->play_store_url;
+            $appSetting->app_store_url              = $request->app_store_url;
             $appSetting->is_job_mod_enabled         = $request->is_job_mod_enabled;
             $appSetting->is_product_mod_enabled     = $request->is_product_mod_enabled;
             $appSetting->is_service_mod_enabled     = $request->is_service_mod_enabled;
