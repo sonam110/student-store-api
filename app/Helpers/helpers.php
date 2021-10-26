@@ -270,47 +270,46 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 			"total_tax_amount"	=> 0
 		];
 		$data = [
-            'refunded_amount'  	=> $refundOrderItemPrice * $refundOrderItemQuantity * 100,
-            'description' 		=> $refundOrderItemReason,
-            'reference'        	=> $orderItem->order->order_number,
-            'order_lines'       => $itemInfo
-        ];
-        $postData = json_encode($data);
-        Log::info($postData);
+        'refunded_amount'  	=> $refundOrderItemPrice * $refundOrderItemQuantity * 100,
+        'description' 		=> $refundOrderItemReason,
+        'reference'        	=> $orderItem->order->order_number,
+        'order_lines'       => $itemInfo
+    ];
+    $postData = json_encode($data);
 
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-          CURLOPT_URL => $url,
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => '',
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => 'POST',
-          CURLOPT_POSTFIELDS => $postData,
-          CURLOPT_HTTPHEADER => array(
-            'Authorization: Basic '.$auth,
-            'Content-Type: application/json',
-          ),
-        ));
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => $url,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_ENCODING => '',
+      CURLOPT_MAXREDIRS => 10,
+      CURLOPT_TIMEOUT => 0,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => 'POST',
+      CURLOPT_POSTFIELDS => $postData,
+      CURLOPT_HTTPHEADER => array(
+        'Authorization: Basic '.$auth,
+        'Content-Type: application/json',
+      ),
+    ));
 
-        $response = curl_exec($curl);
-        if(curl_errno($curl)>0)
-        {
-        	$isRefunded = false;
-            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
-            Log::info('Payment not refunded. Please check Curl Log');
-            Log::info($info);
-            die;
-        }
-        else
-        {
-        	$getOrderStatus = getKlarnaOrderInfo($transaction->transaction_id);
-        	$res = json_decode($getOrderStatus, true);
-        	$refund_id = $res['refunds'][0]['refund_id'];
-        }
-        curl_close($curl);
+    $response = curl_exec($curl);
+    if(curl_errno($curl)>0)
+    {
+    	$isRefunded = false;
+        $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+        Log::info('Payment not refunded. Please check Curl Log');
+        Log::info($info);
+        die;
+    }
+    else
+    {
+    	$getOrderStatus = getKlarnaOrderInfo($transaction->transaction_id);
+    	$res = json_decode($getOrderStatus, true);
+    	$refund_id = $res['refunds'][0]['refund_id'];
+    }
+    curl_close($curl);
 	}
 	elseif($transaction->gateway_detail=='swish')
 	{
