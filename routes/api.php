@@ -36,8 +36,8 @@ Route::get('/cities/{stateId}', [App\Http\Controllers\API\CountryStateCityContro
 Route::get('/countryCities/{countryID}', [App\Http\Controllers\API\CountryStateCityController::class, 'countryCities']);
 Route::get('/citiesByCountryName/{countryName}', [App\Http\Controllers\API\CountryStateCityController::class, 'citiesByCountryName']);
 
-Route::get('/get-educational-institutes', [App\Http\Controllers\API\FrontController::class,'getEducationInstitutes'])->name('get-educational-institutes');
-Route::get('/get-job-tags', [App\Http\Controllers\API\FrontController::class,'getJobTags'])->name('get-educational-institutes');
+Route::get('/get-educational-institutes', [App\Http\Controllers\API\FrontController::class,'getEducationInstitutes']);
+Route::get('/get-job-tags', [App\Http\Controllers\API\FrontController::class,'getJobTags']);
 
 
 Route::get('/email-verification/{email}/{otp}', [App\Http\Controllers\API\AuthController::class,'emailVerification']);
@@ -55,8 +55,8 @@ Route::get('/get-service-provider-type', [App\Http\Controllers\API\FrontControll
 Route::get('/get-registration-type', [App\Http\Controllers\API\FrontController::class,'getRegistrationType']);
 Route::get('/user-qr/{qr_code}', [App\Http\Controllers\API\FrontController::class,'userQr'])->name('user-qr');
 Route::post('/label-by-group-name', [App\Http\Controllers\API\FrontController::class,'labelByGroupName'])->name('label-by-group-name');
-Route::post('/get-info-by-group-and-label-name', [App\Http\Controllers\API\FrontController::class,'getInfoByGroupAndLabelName'])->name('get-info-by-group-and-label-name');
-Route::post('/update-user-language', [App\Http\Controllers\API\FrontController::class,'updateUserLanguage'])->name('update-user-language');
+Route::post('/get-info-by-group-and-label-name', [App\Http\Controllers\API\FrontController::class,'getInfoByGroupAndLabelName']);
+Route::post('/update-user-language', [App\Http\Controllers\API\FrontController::class,'updateUserLanguage']);
 Route::get('/get-languages', [App\Http\Controllers\API\FrontController::class,'getLanguages'])->name('get-languages');
 Route::get('/get-labels', [App\Http\Controllers\API\FrontController::class,'getLabels'])->name('get-labels');
 Route::get('/get-language-list-for-ddl', [App\Http\Controllers\API\FrontController::class,'getLanguageListForDDL']);
