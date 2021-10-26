@@ -1022,7 +1022,7 @@ class ProductsServicesBookController extends Controller
                     //->where('products_services_books.user_id', '!=', Auth::id())
                     ->where('users.user_type_id','3')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
-                    ->where('products_services_books.type','service')
+                    ->where('products_services_books.type','product')
                     ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
                 }
             }
@@ -1102,6 +1102,27 @@ class ProductsServicesBookController extends Controller
             {
                 $products->inRandomOrder();
             }
+            elseif($searchType=='popular')
+            {
+                $products->where('products_services_books.most_popular', '1')
+                ->where('products_services_books.most_popular_start_at','<=', date('Y-m-d'))
+                ->where('products_services_books.most_popular_end_at','>=', date('Y-m-d'));
+
+                if($products->count() <= 0)
+                {
+                    $products = ProductsServicesBook::select('products_services_books.*')
+                    ->join('users', function ($join) {
+                        $join->on('products_services_books.user_id', '=', 'users.id');
+                    })
+                    ->where('products_services_books.status', '2')
+                    ->where('products_services_books.is_published', '1')
+                    //->where('products_services_books.user_id', '!=', Auth::id())
+                    ->where('users.user_type_id','3')
+                    ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
+                    ->where('products_services_books.type','service')
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                }
+            }
             if(!empty($request->per_page_record))
             {
                 $productsData = $products->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -1138,7 +1159,7 @@ class ProductsServicesBookController extends Controller
                                 ->where('status', '2')
                                 ->where('is_published', '1')
                                 ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
-            if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random') 
+            if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random' || $searchType=='popular') 
             {
                 $products->where('products_services_books.type', $type);
             }
@@ -1180,6 +1201,27 @@ class ProductsServicesBookController extends Controller
             elseif($searchType=='random')
             {
                 $products->inRandomOrder();
+            }
+            elseif($searchType=='popular')
+            {
+                $products->where('products_services_books.most_popular', '1')
+                ->where('products_services_books.most_popular_start_at','<=', date('Y-m-d'))
+                ->where('products_services_books.most_popular_end_at','>=', date('Y-m-d'));
+
+                if($products->count() <= 0)
+                {
+                    $products = ProductsServicesBook::select('products_services_books.*')
+                    ->join('users', function ($join) {
+                        $join->on('products_services_books.user_id', '=', 'users.id');
+                    })
+                    ->where('products_services_books.status', '2')
+                    ->where('products_services_books.is_published', '1')
+                    //->where('products_services_books.user_id', '!=', Auth::id())
+                    ->where('users.user_type_id','2')
+                    ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
+                    ->where('products_services_books.type','product')
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                }
             }
             if(!empty($request->per_page_record))
             {
@@ -1925,6 +1967,27 @@ class ProductsServicesBookController extends Controller
             {
                 $products->inRandomOrder();
             }
+            elseif($searchType=='popular')
+            {
+                $products->where('products_services_books.most_popular', '1')
+                ->where('products_services_books.most_popular_start_at','<=', date('Y-m-d'))
+                ->where('products_services_books.most_popular_end_at','>=', date('Y-m-d'));
+
+                if($products->count() <= 0)
+                {
+                    $products = ProductsServicesBook::select('products_services_books.*')
+                    ->join('users', function ($join) {
+                        $join->on('products_services_books.user_id', '=', 'users.id');
+                    })
+                    ->where('products_services_books.status', '2')
+                    ->where('products_services_books.is_published', '1')
+                    //->where('products_services_books.user_id', '!=', Auth::id())
+                    ->where('users.user_type_id','3')
+                    ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
+                    ->where('products_services_books.type','book')
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                }
+            }
             if(!empty($request->per_page_record))
             {
                 $productsData = $products->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -1988,6 +2051,14 @@ class ProductsServicesBookController extends Controller
         $content->per_page_record = '5';
         $content->other_function = 'yes';
         $company_book_latest = $this->companyBooksFilter($content);
+
+        $content = new Request();
+        $content->is_used_item = 'no';
+        $content->type = 'book';
+        $content->searchType = 'popular';
+        $content->per_page_record = '5';
+        $content->other_function = 'yes';
+        $company_book_popular = $this->companyBooksFilter($content);
         
         $returnObj = [
                 'books' => [
@@ -1996,7 +2067,7 @@ class ProductsServicesBookController extends Controller
                     'company_book_top_rated'     => $company_book_top_rated,
                     'company_book_random'        => $company_book_random, 
                     'company_book_latest'        => $company_book_latest,
-                    'company_book_popular'       => $company_book_random 
+                    'company_book_popular'       => $company_book_popular 
                 ]
             ];
         
@@ -2053,6 +2124,27 @@ class ProductsServicesBookController extends Controller
             elseif($searchType=='random')
             {
                 $products->inRandomOrder();
+            }
+            elseif($searchType=='popular')
+            {
+                $products->where('products_services_books.most_popular', '1')
+                ->where('products_services_books.most_popular_start_at','<=', date('Y-m-d'))
+                ->where('products_services_books.most_popular_end_at','>=', date('Y-m-d'));
+
+                if($products->count() <= 0)
+                {
+                    $products = ProductsServicesBook::select('products_services_books.*')
+                    ->join('users', function ($join) {
+                        $join->on('products_services_books.user_id', '=', 'users.id');
+                    })
+                    ->where('products_services_books.status', '2')
+                    ->where('products_services_books.is_published', '1')
+                    //->where('products_services_books.user_id', '!=', Auth::id())
+                    ->where('users.user_type_id','2')
+                    ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
+                    ->where('products_services_books.type','book')
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                }
             }
             if(!empty($request->per_page_record))
             {

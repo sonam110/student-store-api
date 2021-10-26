@@ -111,7 +111,7 @@ class UserCvDetailController extends Controller
 		if($findUser)
 		{
 			$destinationPath = 'uploads/';
-	        $cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
+	        $cv_name = Str::slug(substr(AES256::decrypt($findUser->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.$findUser->qr_code_number.'.pdf';
 
 	        $resumeDownloadPath = env('CDN_DOC_URL').$destinationPath.$cv_name;
 

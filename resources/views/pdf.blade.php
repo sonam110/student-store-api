@@ -11,7 +11,7 @@
     body {
         font-family: 'Cairo', sans-serif;
         font-size: 12pt;
-        background: url("http://testing.3mad.in/bg-resume.png");
+        background: url("http://testing.3mad.in/a4.png");
         background-size: contain;
         background-position: top top;
         background-repeat: no-repeat;
