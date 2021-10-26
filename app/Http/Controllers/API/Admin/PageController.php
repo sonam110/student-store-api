@@ -155,7 +155,7 @@ class PageController extends Controller
         try
         {
             $message = getLangByLabelGroups('messages','message_page_updated');
-            $pageContent = PageContent::where('language_id', $request->language_id)->where('page_id', $request->page_id)->first();
+            $pageContent = PageContent::where('language_id', $request->language_id)->where('page_id', $request->page_id)->where('section_name', $request->section_name)->first();
             if(!$pageContent) {
                 $pageContent = new PageContent;
                 $message = $message = getLangByLabelGroups('messages','message_page_created');

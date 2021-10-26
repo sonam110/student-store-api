@@ -865,7 +865,7 @@ class ProductsServicesBookController extends Controller
                     $products->where(function ($query) use ($min_price) {
                         $query->where('products_services_books.price', '>=', $min_price)
                               ->orWhere('products_services_books.discounted_price', '>=', $min_price);
-                    });
+                    })->where('products_services_books.discounted_price', '>', '0');
                 }
                 if(!empty($request->max_price))
                 {
@@ -873,7 +873,7 @@ class ProductsServicesBookController extends Controller
                     $products->where(function ($query) use ($max_price) {
                         $query->where('products_services_books.price', '<=', $max_price)
                               ->orWhere('products_services_books.discounted_price', '<=', $max_price);
-                    });
+                    })->where('products_services_books.discounted_price', '>', '0');
                 }
                 if(!empty($request->sell_type))
                 {
