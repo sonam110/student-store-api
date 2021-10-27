@@ -138,8 +138,12 @@ class CartDetailController extends Controller
             {
                 $module = 'product_service';
             }
-            pushNotification($title,$body,$user,$type,true,$user_type,$module,$cartDetail->id,'my-cart');
 
+            if($user->is_minor==1)
+            {
+                pushNotification($title,$body,$user,$type,true,$user_type,$module,$cartDetail->id,'my-cart');
+            }
+            
             // Notification End
             
             DB::commit();

@@ -312,7 +312,7 @@ class UserProfileController extends Controller
 	public function shareRewardPoints(Request $request)
 	{
 		$validation = \Validator::make($request->all(),[ 
-			'contact_number'       => 'required',
+			'contact_number'	=> 'required',
 			'reward_points'		=> 'required'
 		]);
 

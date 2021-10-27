@@ -147,6 +147,30 @@ class CoolCompanyController extends Controller
         return response(prepareResult(false, [], getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
     }
 
+    public function assignmentCurrentStatus(Request $request)
+    {
+        $access_token = null;
+        $tokenExpired = time();
+
+        if(empty($access_token) || time() > $tokenExpired)
+        {
+            $getToken = $this->getAccessToken();
+            if(!$getToken) {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+            $access_token   = $getToken['access_token'];
+            $tokenExpired   = $getToken['expire_time'];
+        }
+        $assignmentId = $request->assignmentId;
+        $timeReportId = $request->timeReportId;
+        $response = $this->checkAssignmentStatus($access_token, $assignmentId, $timeReportId);
+        if(!empty($response))
+        {
+            return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+        }
+        return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    }
+
     public function paymentCurrentStatus(Request $request)
     {
         $access_token = null;
@@ -255,6 +279,28 @@ class CoolCompanyController extends Controller
             $tokenExpired   = $getToken['expire_time'];
         }
         $response = $this->groupInvoiceById($access_token, $groupInvoiceId);
+        if(!empty($response))
+        {
+            return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+        }
+        return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    }
+
+    public function getGroupInvoiceReportById($groupInvoiceId)
+    {
+        $access_token = null;
+        $tokenExpired = time();
+
+        if(empty($access_token) || time() > $tokenExpired)
+        {
+            $getToken = $this->getAccessToken();
+            if(!$getToken) {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+            $access_token   = $getToken['access_token'];
+            $tokenExpired   = $getToken['expire_time'];
+        }
+        $response = $this->groupInvoiceReportById($access_token, $groupInvoiceId);
         if(!empty($response))
         {
             return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
@@ -420,6 +466,43 @@ class CoolCompanyController extends Controller
         return false;
     }
 
+    private function checkAssignmentStatus($accessToken, $assignmentId, $timeReportId)
+    {
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Assignments/'.$assignmentId.'/reports/'.$timeReportId;
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+          CURLOPT_HTTPHEADER => array(
+            'Accept-Language: en',
+            'Accept: application/json',
+            'Authorization: Bearer '.$accessToken,
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        if ($response === false) {
+            Log::channel('customlog')->error('Getting error while checking assignment status.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
+            die;
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==200 || $response_code==201)
+        {
+            return $response;
+        }
+        return false;
+    }
+
     private function checkPyamentStatus($accessToken, $assignmentId, $timeReportId)
     {
         $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Assignments/'.$assignmentId.'/reports/'.$timeReportId.'/payment';
@@ -517,7 +600,7 @@ class CoolCompanyController extends Controller
 
         $response = curl_exec($curl);
         if ($response === false) {
-            Log::channel('customlog')->error('Getting error while getting team member list.');
+            Log::channel('customlog')->error('Getting error while getting team member info.');
             $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
             Log::channel('customlog')->error($error);
             die;
@@ -554,7 +637,7 @@ class CoolCompanyController extends Controller
 
         $response = curl_exec($curl);
         if ($response === false) {
-            Log::channel('customlog')->error('Getting error while getting team member list.');
+            Log::channel('customlog')->error('Getting error while getting geoup invoice.');
             $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
             Log::channel('customlog')->error($error);
             die;
@@ -591,7 +674,44 @@ class CoolCompanyController extends Controller
 
         $response = curl_exec($curl);
         if ($response === false) {
-            Log::channel('customlog')->error('Getting error while checking payment status.');
+            Log::channel('customlog')->error('Getting error while checking group invoice by ID.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
+            die;
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==200 || $response_code==201)
+        {
+            return $response;
+        }
+        return false;
+    }
+
+    private function groupInvoiceReportById($accessToken, $groupInvoiceId)
+    {
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/GroupInvoice/'.$groupInvoiceId.'/reports';
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+          CURLOPT_HTTPHEADER => array(
+            'Accept-Language: en',
+            'Accept: application/json',
+            'Authorization: Bearer '.$accessToken,
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        if ($response === false) {
+            Log::channel('customlog')->error('Getting error while checking invoice report.');
             $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
             Log::channel('customlog')->error($error);
             die;

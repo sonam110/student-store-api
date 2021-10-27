@@ -479,9 +479,11 @@ Route::post('/subscriber', [App\Http\Controllers\API\SubscriberController::class
 
 Route::get('/get-team-member', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMember']);
 Route::get('/get-team-member/{teamMemberId}', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMemberInfo']);
+Route::post('/assignment-current-status', [App\Http\Controllers\API\CoolCompanyController::class,'assignmentCurrentStatus']);
 Route::post('/payment-current-status', [App\Http\Controllers\API\CoolCompanyController::class,'paymentCurrentStatus']);
 Route::get('/get-group-invoices', [App\Http\Controllers\API\CoolCompanyController::class,'getGroupInvoices']);
 Route::get('/get-group-invoice-by-id/{groupInvoiceId}', [App\Http\Controllers\API\CoolCompanyController::class,'getGroupInvoiceById']);
+Route::get('/get-group-invoice-report-by-id/{groupInvoiceId}', [App\Http\Controllers\API\CoolCompanyController::class,'getGroupInvoiceReportById']);
 // Route::get('/orders-export', [App\Http\Controllers\API\Admin\ExportController::class, 'ordersExport']);
 
 

@@ -171,9 +171,9 @@ class OrderController extends Controller
 			$order->used_reward_points 	= $request->used_reward_points;
 			$order->order_for 			= $request->order_for;
 			$order->reward_point_status = 'used';
+			$order->save();
 
-
-			if($order->save())
+			if($order)
 			{ 
 				Auth::user()->update(['reward_points'=>(Auth::user()->reward_points - $request->used_reward_points)]);
 				$sub_total = 0;
@@ -1512,6 +1512,7 @@ class OrderController extends Controller
 		$sub_total = 0;
 		$shipping_charge = 0;
 		$itemInfo = [];
+		$reward_point_value = AppSetting::first()->customer_rewards_pt_value * $request->used_reward_points * 100;
 		foreach ($request->items as $key => $orderedItem) {
 			if(!empty($orderedItem['product_id']))
 			{
@@ -1547,7 +1548,7 @@ class OrderController extends Controller
 	                'unit_price'=> $price * 100,
 	                'tax_rate'  => 0,
 	                'total_amount'          => $price * $orderedItem['quantity'] * 100,
-	                'total_discount_amount' => 0,
+	                'total_discount_amount' => $reward_point_value,
 	                'total_tax_amount'      => 0,
 	                'image_url' => $orderedItem['cover_image']
 	        	];
@@ -1573,7 +1574,7 @@ class OrderController extends Controller
 	                'unit_price'=> $price * 100,
 	                'tax_rate'  => 0,
 	                'total_amount'          => $price * $orderedItem['quantity'] * 100,
-	                'total_discount_amount' => 0,
+	                'total_discount_amount' => $reward_point_value,
 	                'total_tax_amount'      => 0,
 	                'image_url' => $orderedItem['cover_image']
 	        	];
