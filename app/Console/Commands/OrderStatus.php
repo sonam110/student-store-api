@@ -74,7 +74,7 @@ class OrderStatus extends Command
     			$from = \Carbon\Carbon::now();
     			$diff_in_hours = \Carbon\Carbon::parse($to)->diffInHours();
     			if($diff_in_hours > '24'){
-    				$orderItem->update(['item_status'=>'delivered']);
+    				$orderItem->update(['item_status'=>'completed']);
     				$title = 'Order Completed';
     				$body =  'Order for '.$orderItem->title.' has been Completed.';
     				$type = 'Order Status';

@@ -40,7 +40,7 @@ class ContestExpire extends Command
      */
     public function handle()
     {
-        $contests = Contest::where('application_end_date','<=',date('Y-m-d'))->where('status','verified')->get();
+        $contests = Contest::where('application_end_date','<',date('Y-m-d'))->where('status','verified')->get();
           foreach($contests as $contest) {
             $contest->update(['status' => 'expired']);
             // Notification Start
@@ -52,7 +52,7 @@ class ContestExpire extends Command
             pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
         }
 
-        $contests = Contest::where('start_date','<=',date('Y-m-d'))->whereIn('status',['verified','expired'])->get();
+        $contests = Contest::where('start_date','<',date('Y-m-d'))->whereIn('status',['verified','expired'])->get();
           foreach($contests as $contest) {
             $contest->update(['status' => 'completed']);
 

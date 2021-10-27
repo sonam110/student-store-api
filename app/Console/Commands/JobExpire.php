@@ -38,7 +38,7 @@ class JobExpire extends Command
      */
     public function handle()
     {
-        $jobs = Job::where('application_end_date','<=',date('Y-m-d'))->where('job_status', '!=','3')->get();
+        $jobs = Job::where('application_end_date','<',date('Y-m-d'))->where('job_status', '!=','3')->get();
           foreach($jobs as $job) {
             $job->update(['job_status' => '3']);
             // Notification Start
