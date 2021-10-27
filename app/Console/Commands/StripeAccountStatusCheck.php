@@ -41,7 +41,7 @@ class StripeAccountStatusCheck extends Command
      */
     public function handle()
     {
-        $paymentInfo = PaymentGatewaySetting::first();
+        $paymentInfo = PaymentGatewaySetting::select('id','payment_gateway_secret')->first();
         $timeCheck = date("Y-m-d H:i:s", strtotime('-3600 sec', time()));
         $users = User::select('id','stripe_account_id','stripe_status','stripe_create_timestamp')
                 ->whereNotNull('stripe_account_id')
@@ -50,7 +50,7 @@ class StripeAccountStatusCheck extends Command
                 ->get();
         foreach ($users as $key => $user) 
         {
-            $stripe = new \Stripe\StripeClient($paymentInfo->payment_gateway_key);
+            $stripe = new \Stripe\StripeClient($paymentInfo->payment_gateway_secret);
             $accountStatus = $stripe->accounts->retrieve(
               $user->stripe_account_id,
               []
