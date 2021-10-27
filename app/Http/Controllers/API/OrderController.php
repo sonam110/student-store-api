@@ -1547,7 +1547,7 @@ class OrderController extends Controller
 	                'quantity'  => $orderedItem['quantity'],
 	                'unit_price'=> $price * 100,
 	                'tax_rate'  => 0,
-	                'total_amount'          => $price * $orderedItem['quantity'] * 100,
+	                'total_amount'          => ($price * $orderedItem['quantity'] * 100) - $reward_point_value,
 	                'total_discount_amount' => $reward_point_value,
 	                'total_tax_amount'      => 0,
 	                'image_url' => $orderedItem['cover_image']
@@ -1573,7 +1573,7 @@ class OrderController extends Controller
 	                'quantity'  => $orderedItem['quantity'],
 	                'unit_price'=> $price * 100,
 	                'tax_rate'  => 0,
-	                'total_amount'          => $price * $orderedItem['quantity'] * 100,
+	                'total_amount'          => ($price * $orderedItem['quantity'] * 100) - $reward_point_value,
 	                'total_discount_amount' => $reward_point_value,
 	                'total_tax_amount'      => 0,
 	                'image_url' => $orderedItem['cover_image']
