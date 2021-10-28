@@ -101,8 +101,8 @@ class CoolCompanyCreateAssignment extends Command
                     'customUnitType'    => 'days',
                     'unitQuantity'=> $itemInfo->quantity,
                     'unitRate'    => $itemInfo->price - (($itemInfo->price * $itemInfo->vat_percent)/100),
-                    'totalHours'  => 24
-
+                    'totalHours'  => 24,
+                    'status'      => 'Approved'
                 ];
 
                 if(empty($access_token) || time() > $tokenExpired)
