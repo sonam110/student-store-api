@@ -17,7 +17,7 @@ class CreateFAQSTable extends Migration
             $table->bigInteger('auto_id');
             $table->uuid('id')->primary();
 
-            $table->string('module_type_id', 50);
+            $table->string('module_type_id', 50)->nullable();
             $table->foreign('module_type_id')->references('id')->on('module_types')->onDelete('cascade');
             $table->foreignId('language_id')->constrained()->onDelete('cascade');
             

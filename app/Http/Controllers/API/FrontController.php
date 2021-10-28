@@ -286,7 +286,7 @@ class FrontController extends Controller
 				$language_id = 1;
 			}
 
-			$faq = FAQ::where('language_id',$language_id)->get();
+			$faq = FAQ::where('language_id',$language_id)->orderBy('auto_id', 'ASC')->get();
 			return response(prepareResult(false, $faq, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}
 		catch (\Throwable $exception) 
