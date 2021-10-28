@@ -36,6 +36,10 @@ class CreateCoolCompanyAssignmentsTable extends Migration
             $table->date('start_assignment_date')->nullable();
             $table->longText('start_assignment_response')->nullable()->comment('if state change Start');
 
+            $table->boolean('is_complete_assignment')->default(0)->nullable();
+            $table->date('complete_assignment_date')->nullable();
+            $table->longText('complete_assignment_response')->nullable()->comment('if state change to Completed');
+
             $table->timestamps();
         });
     }

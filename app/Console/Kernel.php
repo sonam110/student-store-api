@@ -58,7 +58,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('order:status')->hourly();
         $schedule->command('rewardPoints:credit')->dailyAt('00:01');
         $schedule->command('create:freelancer')->hourly();
-        $schedule->command('create:assignment')->everyMinute();
+        $schedule->command('create:assignment')->dailyAt('02:00');
         $schedule->command('stripe:account')->hourly();
         
     }

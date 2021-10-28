@@ -158,7 +158,6 @@ class CoolCompanyCreateAssignment extends Command
                                 'createContinuation' => true,
                                 'assignmentId' => $resDecode['id'],
                                 'message' => 'Start assignment',
-                                'paymentFraction' => 0,
                                 'assignmentTeamMemberId' => $teamMemberId
                             ]
                         ];                        
@@ -178,6 +177,24 @@ class CoolCompanyCreateAssignment extends Command
                             $getAssignmentInfo->start_assignment_date = date('Y-m-d');
                             $getAssignmentInfo->start_assignment_response = $dataReport;
                             $getAssignmentInfo->save();
+                            if($getAssignmentInfo)
+                            {
+                                // Complete Assignment
+                                $completeData = [
+                                    'endDate' => date('Y-m-d H:i:s'),
+                                    'createContinuation'    => true,
+                                    'assignmentId'          => $resDecode['id'],
+                                    "message"               => "Complete assignment",
+                                    'assignmentTeamMemberId'=> $dataReport['teamMembers']['id']
+                                ]; 
+
+                                $completeAssignment = $this->completeAssignment($access_token, $getAssignmentInfo->assignmentId, $teamMemberId, $completeData);
+                                $completeDataReport = json_decode($completeAssignment, true);
+                                $getAssignmentInfo->is_complete_assignment = 1;
+                                $getAssignmentInfo->complete_assignment_date = date('Y-m-d');
+                                $getAssignmentInfo->complete_assignment_response = $completeDataReport;
+                                $getAssignmentInfo->save();
+                            }
                             Log::channel('customlog')->info('Assignment Start. Cool Company Start Assignment Id: '.$createAssignment->id);
                         }
                     }
@@ -272,6 +289,45 @@ class CoolCompanyCreateAssignment extends Command
         return false;
     }
 
+    private function startAssignment($accessToken, $assignmentId, $data)
+    {
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Assignments/'.$assignmentId.'/state';
+        $postData = json_encode($data);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'PATCH',
+          CURLOPT_POSTFIELDS => $postData,
+          CURLOPT_HTTPHEADER => array(
+            'Accept-Language: en',
+            'Accept: application/json',
+            'Authorization: Bearer '.$accessToken,
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        if ($response === false) {
+            Log::channel('customlog')->error('Getting error while start  assignment.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
+            die;
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==200 || $response_code==201)
+        {
+            return $response;
+        }
+        return false;
+    }
+
     private function approveAssignment($accessToken, $assignmentId, $timeReportId)
     {
         $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Assignments/'.$assignmentId.'/reports/'.$timeReportId.'/approve';
@@ -301,7 +357,46 @@ class CoolCompanyCreateAssignment extends Command
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
-        if($response_code==200 || $response_code==201)
+        if($response_code==200 || $response_code==201 || $response_code==204)
+        {
+            return $response;
+        }
+        return false;
+    }
+
+    private function completeAssignment($accessToken, $assignmentId, $teamMemberId, $completeData)
+    {
+        $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'api/v1/Assignments/'.$assignmentId.'/requests/'.$teamMemberId.'/complete';
+        $postData = json_encode($data);
+
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'PATCH',
+          CURLOPT_POSTFIELDS => $postData,
+          CURLOPT_HTTPHEADER => array(
+            'Accept-Language: en',
+            'Accept: application/json',
+            'Authorization: Bearer '.$accessToken,
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        if ($response === false) {
+            Log::channel('customlog')->error('Getting error while completing assignments.');
+            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            Log::channel('customlog')->error($error);
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==200 || $response_code==201 || $response_code==204)
         {
             return $response;
         }
