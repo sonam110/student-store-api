@@ -29,23 +29,34 @@ class ProductsImport implements ToModel,WithHeadingRow
     */
     public function model(array $row)
     {
+        $getUserInfo = User::select('user_type_id')->find($this->data['user_id']);
         $products = false;
         $getCat = CategoryMaster::select('vat')->find($this->data['category_master_id']);
-        $discountAmount = 0;
         $discountValue = 0;
-        if($row['discount_type']=='fixed_amount') {
-            $discountAmount = $row['actual_price'] - $row['discount_value'];
-            $discountValue = $row['discount_value'];
-        } elseif($row['discount_type']=='percentage') {
-            $discountAmount = $row['actual_price'] - (($row['actual_price'] * $row['discount_value'])/100);
-            $discountValue = $row['discount_value'];
+        $discountAmount = 0;
+        $is_on_offer = 0;
+        $discount_type = 0;
+        // $discountValue = 0;
+        // if($row['discount_type']=='fixed_amount') {
+        //     $discountAmount = $row['original_price_required'] - $row['discount_in_percentage_not_required'];
+        //     $discountValue = $row['discount_in_percentage_not_required'];
+        // } elseif($row['discount_type']=='percentage') {
+        //     $discountAmount = $row['original_price_required'] - (($row['original_price_required'] * $row['discount_in_percentage_not_required'])/100);
+        //     $discountValue = $row['discount_in_percentage_not_required'];
+        // }
+        if($row['discount_in_percentage_not_required']>0)
+        {
+            $discountAmount = $row['original_price_required'] - (($row['original_price_required'] * $row['discount_in_percentage_not_required'])/100);
+            $is_on_offer = 1;
+            $discount_type = 1;
+            $discountValue = $row['discount_in_percentage_not_required'];
         }
 
         $tag = [];
         $tagVal = [];
-        if(isset($row['tags']) && !empty($row['tags']))
+        if(isset($row['tags_required']) && !empty($row['tags_required']))
         {
-            foreach (explode(',', $row['tags']) as $key => $tags) 
+            foreach (explode(',', $row['tags_required']) as $key => $tags) 
             {
                 $tag[] = $tags;
             }
@@ -54,9 +65,9 @@ class ProductsImport implements ToModel,WithHeadingRow
 
         $language = [];
         $languageVal = [];
-        if(isset($row['languages']) && !empty($row['languages']))
+        if(isset($row['languages_required']) && !empty($row['languages_required']))
         {
-            foreach (explode(',', $row['languages']) as $key => $lang) 
+            foreach (explode(',', $row['languages_required']) as $key => $lang) 
             {
                 $language[] = $lang;
             }
@@ -64,121 +75,142 @@ class ProductsImport implements ToModel,WithHeadingRow
         }
 
         //Product
-        if($row['type']=='product' && $row['actual_price']> 0)
+        if($row['type_required']=='product' && $row['original_price_required']> 0)
         {
             $products = new ProductsServicesBook;
             $products->user_id                   = $this->data['user_id'];
             $products->address_detail_id         = $this->data['address_detail_id'];
             $products->category_master_id        = $this->data['category_master_id'];
             $products->sub_category_slug         = $this->data['sub_category_slug'];
-            $products->type                      = $row['type'];
-            $products->brand                     = $row['brand_name'];
-            $products->title                     = $row['product_name'];
-            $products->slug                      = Str::slug($row['product_name']);
-            $products->gtin_isbn                 = $row['gtin_number'];
-            $products->sku                       = $row['sku'];
-            $products->basic_price_wo_vat        = $row['actual_price'] - (($row['actual_price'] * $getCat->vat)/100);
-            $products->price                     = $row['actual_price'];
-            $products->is_on_offer               = ($row['is_on_offer']=='Yes') ? 1 : 0;
-            $products->discount_type             = $row['discount_type'];
+            $products->type                      = $row['type_required'];
+            $products->brand                     = $row['brand_name_required'];
+            $products->title                     = $row['product_name_required'];
+            $products->slug                      = Str::slug($row['product_name_required']);
+            if($getUserInfo->user_type_id=='2')
+            {
+                $products->gtin_isbn                 = $row['gtin_number_not_required'];
+                $products->sku                       = $row['sku_not_required'];
+                $products->is_used_item              = 1;
+                $products->item_condition            = $row['item_condition_required'];
+            }
+            else
+            {
+                $products->gtin_isbn                 = $row['gtin_number_required'];
+                $products->sku                       = $row['sku_required'];
+            }
+            
+            $products->basic_price_wo_vat        = $row['original_price_required'] - (($row['original_price_required'] * $getCat->vat)/100);
+            $products->price                     = $row['original_price_required'];
+            $products->is_on_offer               = $is_on_offer;
+            $products->discount_type             = $discount_type;
             $products->discount_value            = $discountValue;
             $products->discounted_price          = $discountAmount;
-            $products->quantity                  = $row['quantity'];
-            $products->short_summary             = Str::limit(strip_tags($row['product_description']), 250);
-            $products->description               = $row['product_description'];
-            $products->is_used_item              = $this->data['is_used_item'];
-            $products->item_condition            = ($this->data['is_used_item'] == 1) ? @$row['item_condition'] : null;
-            $products->delivery_type             = $row['delivery_type'];
+            $products->quantity                  = $row['quantity_required'];
+            $products->short_summary             = Str::limit(strip_tags($row['product_description_required']), 250);
+            $products->description               = $row['product_description_required'];
+            
+            $products->delivery_type             = $row['delivery_type_required'];
             $products->tags                      = $tagVal;
-            $products->meta_title                = $row['product_name'];
-            $products->meta_keywords             = $row['tags'];
-            $products->meta_description          = Str::limit(strip_tags($row['product_description']), 250);
+            $products->meta_title                = $row['product_name_required'];
+            $products->meta_keywords             = $row['tags_required'];
+            $products->meta_description          = Str::limit(strip_tags($row['product_description_required']), 250);
             //$products->'attribute_detail'      = $row['attribute_details'];
             $products->save();
         }
 
         //Service
-        elseif($row['type']=='service' && $row['actual_price']> 0)
+        elseif($row['type_required']=='service' && $row['original_price_required']> 0)
         {
             $products = new ProductsServicesBook;
             $products->user_id                   = $this->data['user_id'];
             $products->address_detail_id         = $this->data['address_detail_id'];
             $products->category_master_id        = $this->data['category_master_id'];
             $products->sub_category_slug         = $this->data['sub_category_slug'];
-            $products->type                      = $row['type'];
-            $products->title                     = $row['service_name'];
-            $products->slug                      = Str::slug($row['service_name']);
-            $products->basic_price_wo_vat        = $row['actual_price'] - (($row['actual_price'] * $getCat->vat)/100);
-            $products->price                     = $row['actual_price'];
-            $products->is_on_offer               = ($row['is_on_offer']=='Yes') ? 1 : 0;
-            $products->discount_type             = $row['discount_type'];
+            $products->type                      = $row['type_required'];
+            $products->title                     = $row['service_name_required'];
+            $products->slug                      = Str::slug($row['service_name_required']);
+            $products->basic_price_wo_vat        = $row['original_price_required'] - (($row['original_price_required'] * $getCat->vat)/100);
+            $products->price                     = $row['original_price_required'];
+            $products->is_on_offer               = $is_on_offer;
+            $products->discount_type             = $discount_type;
             $products->discount_value            = $discountValue;
             $products->discounted_price          = $discountAmount;
             $products->quantity                  = 1000;
-            $products->short_summary             = Str::limit(strip_tags($row['service_description']), 250);
-            $products->description               = $row['service_description'];
-            $products->service_type              = $row['service_type'];
-            $products->service_period_time       = $row['service_period_time'];
-            $products->service_period_time_type  = $row['service_period_time_type'];
-            $products->service_online_link       = $row['service_online_link'];
+            $products->short_summary             = Str::limit(strip_tags($row['service_description_required']), 250);
+            $products->description               = $row['service_description_required'];
+            $products->service_type              = $row['service_type_required'];
+            $products->service_period_time       = $row['service_period_time_required'];
+            $products->service_period_time_type  = $row['service_period_time_type_required'];
+            $products->service_online_link       = $row['service_online_link_not_required'];
             $products->service_languages         = $languageVal;
             $products->tags                      = $tagVal;
-            $products->meta_title                = $row['service_name'];
-            $products->meta_keywords             = $row['tags'];
-            $products->meta_description          = Str::limit(strip_tags($row['service_description']), 250);
+            $products->meta_title                = $row['service_name_required'];
+            $products->meta_keywords             = $row['tags_required'];
+            $products->meta_description          = Str::limit(strip_tags($row['service_description_required']), 250);
             $products->save();
         }
 
         //Book
-        elseif($row['type']=='book' && $row['actual_price']> 0)
+        elseif($row['type_required']=='book' && $row['original_price_required']> 0)
         {
             $products = new ProductsServicesBook;
             $products->user_id                   = $this->data['user_id'];
             $products->address_detail_id         = $this->data['address_detail_id'];
             $products->category_master_id        = $this->data['category_master_id'];
             $products->sub_category_slug         = $this->data['sub_category_slug'];
-            $products->type                      = $row['type'];
-            $products->title                     = $row['book_name'];
-            $products->slug                      = Str::slug($row['book_name']);
-            $products->gtin_isbn                 = $row['isbn_number'];
-            $products->sku                       = $row['sku'];
-            $products->basic_price_wo_vat        = $row['actual_price'] - (($row['actual_price'] * $getCat->vat)/100);
-            $products->price                     = $row['actual_price'];
-            $products->is_on_offer               = ($row['is_on_offer']=='Yes') ? 1 : 0;
-            $products->discount_type             = $row['discount_type'];
+            $products->type                      = $row['type_required'];
+            $products->title                     = $row['book_name_required'];
+            $products->slug                      = Str::slug($row['book_name_required']);
+
+            if($getUserInfo->user_type_id=='2')
+            {
+                $products->gtin_isbn                 = $row['isbn_number_not_required'];
+                $products->sku                       = $row['sku_not_required'];
+                $products->is_used_item              = 1;
+                $products->item_condition            = $row['item_condition_required'];
+            }
+            else
+            {
+                $products->gtin_isbn                 = $row['isbn_number_required'];
+                $products->sku                       = $row['sku_required'];
+            }
+
+            
+            $products->basic_price_wo_vat        = $row['original_price_required'] - (($row['original_price_required'] * $getCat->vat)/100);
+            $products->price                     = $row['original_price_required'];
+            $products->is_on_offer               = $is_on_offer;
+            $products->discount_type             = $discount_type;
             $products->discount_value            = $discountValue;
             $products->discounted_price          = $discountAmount;
-            $products->quantity                  = $row['quantity'];
-            $products->short_summary             = Str::limit(strip_tags($row['book_description']), 250);
-            $products->description               = $row['book_description'];
-            $products->is_used_item              = $this->data['is_used_item'];
-            $products->item_condition            = ($this->data['is_used_item'] == 1) ? @$row['item_condition'] : null;
-
-            $products->deposit_amount            = @$row['deposit_amount'];
-            $products->delivery_type             = $row['delivery_type'];
-            $products->sell_type                 = $row['sell_type'];
-            $products->author                    = $row['author'];
-            $products->published_year            = $row['published_year'];
-            $products->publisher                 = $row['publisher'];
-            $products->no_of_pages               = $row['no_of_pages'];
-            $products->suitable_age              = $row['suitable_age'];
-            $products->dimension_length          = $row['dimension_length'];
-            $products->dimension_width           = $row['dimension_width'];
-            $products->dimension_height          = $row['dimension_height'];
-            $products->weight                    = $row['weight'];
+            $products->quantity                  = $row['quantity_required'];
+            $products->short_summary             = Str::limit(strip_tags($row['book_description_required']), 250);
+            $products->description               = $row['book_description_required'];
+            
+            $products->deposit_amount            = @$row['deposit_amount_conditional'];
+            $products->delivery_type             = $row['delivery_type_required'];
+            $products->sell_type                 = $row['sell_type_required'];
+            $products->author                    = $row['author_required'];
+            $products->published_year            = $row['published_year_required'];
+            $products->publisher                 = $row['publisher_required'];
+            $products->no_of_pages               = $row['no_of_pages_required'];
+            $products->suitable_age              = $row['suitable_age_required'];
+            $products->dimension_length          = $row['dimension_length_required'];
+            $products->dimension_width           = $row['dimension_width_required'];
+            $products->dimension_height          = $row['dimension_height_required'];
+            $products->weight                    = $row['weight_required'];
             $products->service_languages         = $languageVal;
             $products->tags                      = $tagVal;
-            $products->meta_title                = $row['book_name'];
-            $products->meta_keywords             = $row['tags'];
-            $products->meta_description          = Str::limit(strip_tags($row['book_description']), 250);
+            $products->meta_title                = $row['book_name_required'];
+            $products->meta_keywords             = $row['tags_required'];
+            $products->meta_description          = Str::limit(strip_tags($row['book_description_required']), 250);
             $products->save();
         }
 
         if($products)
         {
-            if(isset($row['images']) && !empty($row['images']))
+            if(isset($row['images_required']) && !empty($row['images_required']))
             {
-                foreach (explode(',', $row['images']) as $key => $image) 
+                foreach (explode(',', $row['images_required']) as $key => $image) 
                 {
                     $cover = 0;
                     if($key==0)
@@ -202,7 +234,7 @@ class ProductsImport implements ToModel,WithHeadingRow
                     $allTypeTag->products_services_book_id  = $products->id;
                     $allTypeTag->user_id                    = $this->data['user_id'];
                     $allTypeTag->title                      = $tag;
-                    $allTypeTag->type                       = isset($row['type']);
+                    $allTypeTag->type                       = isset($row['type_required']);
                     $allTypeTag->save();
                 }
             }
