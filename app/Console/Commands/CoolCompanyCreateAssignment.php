@@ -152,7 +152,15 @@ class CoolCompanyCreateAssignment extends Command
 
                         // Start Assignment
                         $startData = [
-                            'action'   => 'Start'
+                            'action'   => 'Start',
+                            "completionOptions" =>  [
+                                'endDate' => date('Y-m-d H:i:s'),
+                                'createContinuation' => true,
+                                'assignmentId' => $resDecode['id'],
+                                'message' => 'Start assignment',
+                                'paymentFraction' => 0,
+                                'assignmentTeamMemberId' => $teamMemberId
+                            ]
                         ];                        
                         $getAssignmentInfo = CoolCompanyAssignment::select('cool_company_freelancer_id','assignmentId','is_start_assignment','start_assignment_date','start_assignment_response')->find($createAssignment->id);
                         $startAssignment = $this->startAssignment($access_token, $getAssignmentInfo->assignmentId, $startData);

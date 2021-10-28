@@ -1159,13 +1159,6 @@ class OrderController extends Controller
 			$refundOrderItemReason = 'cancellation';
 			refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
 
-			$orderTracking                  = new OrderTracking;
-			$orderTracking->order_item_id   = $orderItem->id;
-			$orderTracking->status          = 'canceled';
-			$orderTracking->comment         = '';
-			$orderTracking->type         	= 'delivery';
-			$orderTracking->save();
-
 		}
 		if($item_status == 'returned')
 		{
