@@ -24,11 +24,11 @@ class FAQController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $faqs = FAQ::with('language:id,title')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $faqs = FAQ::with('language:id,title')->orderBy('auto_id','ASC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $faqs = FAQ::with('language:id,title')->get();
+                $faqs = FAQ::with('language:id,title')->orderBy('auto_id','ASC')->get();
             }
             return response(prepareResult(false, $faqs, getLangByLabelGroups('messages','message_faq_list')), config('http_response.success'));
         }
