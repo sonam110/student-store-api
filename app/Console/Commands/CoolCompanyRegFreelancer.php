@@ -71,14 +71,18 @@ class CoolCompanyRegFreelancer extends Command
             } else {
                 $paymentAccountTypeId = 'PayPal';
             }
+            $first_name = AES256::decrypt($student->first_name, env('ENCRYPTION_KEY'));
+            $last_name = AES256::decrypt($student->last_name, env('ENCRYPTION_KEY'));
+            $email = AES256::decrypt($student->email, env('ENCRYPTION_KEY'));
+            $social_security_number = AES256::decrypt($student->social_security_number, env('ENCRYPTION_KEY'));
             $data = [
-                'firstName'   => $student->first_name,
-                'lastName'    => $student->last_name,
-                'email'       => $student->email,
+                'firstName'   => $first_name,
+                'lastName'    => $last_name,
+                'email'       => $email,
                 'externalId'  => $student->qr_code_number,
                 'workerTypeId'=> 0,
                 'icInfo'      => [      
-                    'socialNo'              => $student->social_security_number,
+                    'socialNo'              => $social_security_number,
                     'paymentAccountTypeId'  => $paymentAccountTypeId,
                     'bankAccountNo'         => $student->bank_account_num,
                     'bankIdentifierCode'    => $student->bank_identifier_code,
@@ -160,6 +164,7 @@ class CoolCompanyRegFreelancer extends Command
 
     private function createFreelancer($accessToken, $data)
     {
+        Log::info($data);
         $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Teammembers';
         $postData = json_encode($data);
         $curl = curl_init();
