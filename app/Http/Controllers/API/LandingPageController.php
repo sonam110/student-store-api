@@ -465,7 +465,7 @@ class LandingPageController extends Controller
                     //->where('products_services_books.user_id', '!=', Auth::id())
                     ->where('users.user_type_id','3')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
-                    ->where('products_services_books.type','product')
+                    ->where('products_services_books.type', $type)
                     ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
                 }
             }
