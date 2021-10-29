@@ -384,7 +384,7 @@ class LandingPageController extends Controller
                     }
                     $arrForSelecteds = [];
                     foreach ($result as $key => $value) {
-                        if($value['selected'])
+                        if(@$value['selected'])
                         {
                             $arrForSelecteds[] = $value;
                         }  
@@ -775,7 +775,7 @@ class LandingPageController extends Controller
                     }
                     $arrForSelecteds = [];
                     foreach ($result as $key => $value) {
-                        if($value['selected'])
+                        if(@$value['selected'])
                         {
                             $arrForSelecteds[] = $value;
                         }  
@@ -1277,7 +1277,7 @@ class LandingPageController extends Controller
                     }
                     $arrForSelecteds = [];
                     foreach ($result as $key => $value) {
-                        if($value['selected'])
+                        if(@$value['selected'])
                         {
                             $arrForSelecteds[] = $value;
                         }  
