@@ -409,6 +409,8 @@ class SearchController extends Controller
 		->orderBy('created_at','desc')
 		->with('categoryMaster:id,title','subCategory:title,slug')
 		->where('title','like', '%'.$request->search.'%')
+		->where('is_published', '1')
+		->where('status', '2')
 		->limit(10)
 		->get();
 
@@ -416,6 +418,8 @@ class SearchController extends Controller
 		->orderBy('created_at','desc')
 		->with('categoryMaster:id,title','subCategory:title,slug')
 		->where('title','like', '%'.$request->search.'%')
+		->where('is_published', '1')
+		->where('job_status', '1')
 		->limit(10)
 		->get();
 
@@ -424,6 +428,8 @@ class SearchController extends Controller
 		->orderBy('created_at','desc')
 		->with('categoryMaster:id,title','subCategory:title,slug')
 		->where('title','like', '%'.$request->search.'%')
+		->where('is_published', '1')
+		->where('status', 'verified')
 		->limit(10)
 		->get();
 
@@ -434,6 +440,8 @@ class SearchController extends Controller
 			->with('categoryMaster:id,title','subCategory:title,slug')
 			->where('title','like', '%'.$request->search.'%')
 			->where('type',$request->type)
+			->where('is_published', '1')
+			->where('status', '2')
 			->limit(10)
 			->get();
 
@@ -444,6 +452,8 @@ class SearchController extends Controller
 				->orderBy('created_at','desc')
 				->with('categoryMaster:id,title','subCategory:title,slug')
 				->where('title','like', '%'.$request->search.'%')
+				->where('is_published', '1')
+				->where('job_status', '1')
 				->limit(10)
 				->get();
 			}
@@ -454,6 +464,8 @@ class SearchController extends Controller
 				->with('categoryMaster:id,title','subCategory:title,slug')
 				->where('title','like', '%'.$request->search.'%')
 				->where('id',null)
+				->where('is_published', '1')
+				->where('job_status', '1')
 				->limit(10)
 				->get();
 			}
@@ -466,6 +478,8 @@ class SearchController extends Controller
 			->with('categoryMaster:id,title','subCategory:title,slug')
 			->where('title','like', '%'.$request->search.'%')
 			->where('type',$request->type)
+			->where('is_published', '1')
+			->where('status', 'verified')
 			->limit(10)
 			->get();
 		}

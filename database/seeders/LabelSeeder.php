@@ -2000,7 +2000,7 @@ class LabelSeeder extends Seeder
         "createLanguage" => "Create Language", 
         "language" => "Language", 
         "masters" => "Master Data", 
-        "module" => "Module\'\s Type" 
+        "module" => "Modules Type" 
         ], 
         "menu" => [
         " enter_otp" => "Enter Otp", 
