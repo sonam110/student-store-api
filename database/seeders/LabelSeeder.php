@@ -1704,6 +1704,8 @@ class LabelSeeder extends Seeder
         "invoice" => [
         "Buyer_Info" => "Buyer Info", 
         "Cool_Company_Commission" => "Total Cool Company Commission:", 
+        "rewards_point" => "Reward Point", 
+        "rewards_point_value" => "Reward Point Value", 
         "Date" => "Date:", 
         "Invoice" => "Invoice", 
         "Item" => "Item", 
@@ -5257,7 +5259,9 @@ class LabelSeeder extends Seeder
         ], 
         "invoice" => [
         "Buyer_Info" => "Köparinformation", 
-        "Cool_Company_Commission" => "Häftigt Företag Provision:", 
+        "Cool_Company_Commission" => "Häftigt Företag Provision:",
+        "rewards_point" => "Reward Point", 
+        "rewards_point_value" => "Reward Point Value",  
         "Date" => "Datum:", 
         "Invoice" => "Faktura", 
         "Item" => "Artikel", 

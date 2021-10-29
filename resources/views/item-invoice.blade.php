@@ -243,6 +243,18 @@
 
                 <tr class="total">
                     <td></td>
+                    <td colspan="2"><strong>{{getLangByLabelGroups('invoice','rewards_point')}} x {{getLangByLabelGroups('invoice','rewards_point_value')}}</strong>
+                        <small>
+                            {{ $order->earned_reward_points }} x  {{ $appsetting->single_rewards_pt_value }}
+                        </small> 
+                    </td>
+                    <td>
+                       <strong><center>{{ $order->earned_reward_points * $appsetting->single_rewards_pt_value }} Kr</center></strong>
+                    </td>
+                </tr>
+
+                <tr class="total">
+                    <td></td>
                     <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Payable_Amount_to_Vendor')}}</strong> </td>
                     <td>
                        <strong><center>{{ $order->amount_transferred_to_vendor }} Kr</center></strong>
