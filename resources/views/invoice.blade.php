@@ -177,12 +177,14 @@
                 $student_store_commission = 0;
                 $cool_company_commission = 0;
                 $amount_transferred_to_vendor = 0;
+                $total_earned_reward_points = 0;
             @endphp
             @foreach($order->orderItems as $item)
             @php
                 $student_store_commission += $item->student_store_commission;
                 $cool_company_commission += $item->cool_company_commission;
                 $amount_transferred_to_vendor += $item->amount_transferred_to_vendor;
+                $total_earned_reward_points += $item->earned_reward_points;
             @endphp
             <tr class="item">
                 <td>
@@ -225,6 +227,20 @@
                    <strong><center>{{ $cool_company_commission }} Kr</center></strong>
                 </td>
             </tr>
+
+            @if(\Auth::user()->user_type_id==1)
+            <tr class="total">
+                <td></td>
+                <td colspan="2"><strong>{{getLangByLabelGroups('invoice','rewards_point')}} x {{getLangByLabelGroups('invoice','rewards_point_value')}}</strong>
+                    <small>
+                        {{ $total_earned_reward_points }} x  {{ $appsetting->single_rewards_pt_value }}
+                    </small> 
+                </td>
+                <td>
+                   <strong><center>{{ $total_earned_reward_points * $appsetting->single_rewards_pt_value }} Kr</center></strong>
+                </td>
+            </tr>
+            @endif
 
             <tr class="total">
                 <td></td>
