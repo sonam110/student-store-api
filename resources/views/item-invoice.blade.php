@@ -245,7 +245,7 @@
                     <td></td>
                     <td colspan="2"><strong>{{getLangByLabelGroups('invoice','rewards_point')}} x {{getLangByLabelGroups('invoice','rewards_point_value')}}</strong>
                         <small>
-                            {{ $order->earned_reward_points }} x  {{ $appsetting->single_rewards_pt_value }}
+                            ({{ $order->earned_reward_points }} x  {{ $appsetting->single_rewards_pt_value }})
                         </small> 
                     </td>
                     <td>
