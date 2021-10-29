@@ -71,18 +71,14 @@ class CoolCompanyRegFreelancer extends Command
             } else {
                 $paymentAccountTypeId = 'PayPal';
             }
-            $first_name = AES256::decrypt($student->first_name, env('ENCRYPTION_KEY'));
-            $last_name = AES256::decrypt($student->last_name, env('ENCRYPTION_KEY'));
-            $email = AES256::decrypt($student->email, env('ENCRYPTION_KEY'));
-            $social_security_number = AES256::decrypt($student->social_security_number, env('ENCRYPTION_KEY'));
             $data = [
-                'firstName'   => $first_name,
-                'lastName'    => $last_name,
-                'email'       => $email,
+                'firstName'   => $student->first_name,
+                'lastName'    => $student->last_name,
+                'email'       => $student->email,
                 'externalId'  => $student->qr_code_number,
                 'workerTypeId'=> 0,
                 'icInfo'      => [      
-                    'socialNo'              => $social_security_number,
+                    'socialNo'              => $student->social_security_number,
                     'paymentAccountTypeId'  => $paymentAccountTypeId,
                     'bankAccountNo'         => $student->bank_account_num,
                     'bankIdentifierCode'    => $student->bank_identifier_code,
