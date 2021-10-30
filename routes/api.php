@@ -477,7 +477,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 
 Route::post('/subscriber', [App\Http\Controllers\API\SubscriberController::class,'store']);
 
-Route::get('/get-team-member', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMember']);
+Route::get('/get-team-members', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMember']);
 Route::get('/get-team-member/{teamMemberId}', [App\Http\Controllers\API\CoolCompanyController::class,'getTeamMemberInfo']);
 Route::post('/assignment-current-status', [App\Http\Controllers\API\CoolCompanyController::class,'assignmentCurrentStatus']);
 Route::post('/payment-current-status', [App\Http\Controllers\API\CoolCompanyController::class,'paymentCurrentStatus']);
