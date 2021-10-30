@@ -175,6 +175,7 @@ class AuthController extends Controller
 
 		//QR Code
 		$qrCodeNumber = User::QR_NUMBER_PREFIX.User::QR_NUMBER_SEPRATOR.(User::QR_NUMBER_START + User::count());
+		$addressDetail = null;
 		if (extension_loaded('imagick'))
 		{
 			QrCode::size(500)
@@ -263,7 +264,7 @@ class AuthController extends Controller
 		$user->last_login 				= now();
 		if($user->save())
 		{
-			$addressDetail = null;
+			
 			if(sizeof($request->address)>0 && !empty($request->address))
 			{
 				foreach ($request->address as $key => $address)
