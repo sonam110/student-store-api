@@ -160,7 +160,6 @@ class CoolCompanyRegFreelancer extends Command
 
     private function createFreelancer($accessToken, $data)
     {
-        Log::info($data);
         $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Teammembers';
         $postData = json_encode($data);
         $curl = curl_init();

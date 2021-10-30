@@ -586,7 +586,7 @@ class FrontController extends Controller
 		dd($allPaymentMethods);*/
 
 		/*$subscription = $stripe->subscriptions->create([
-		  'customer' => 'cus_KLWfeafgS59wL4',
+		  'customer' => 'cus_KLYQLFrNQ0qoP4',
 		  'items' => [
 		    ['price' => 'price_1JhY1FD6j8NkE89KlREv79q6'],
 		  ],

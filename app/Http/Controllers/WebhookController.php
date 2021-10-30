@@ -42,22 +42,6 @@ class WebhookController extends Controller
             exit();
         }
 
-        /*
-        // Handle the event
-        switch ($event->type) {
-          case 'subscription_schedule.aborted':
-            $subscriptionSchedule = $event->data->object;
-          case 'subscription_schedule.canceled':
-            $subscriptionSchedule = $event->data->object;
-          case 'subscription_schedule.completed':
-            $subscriptionSchedule = $event->data->object;
-          case 'subscription_schedule.created':
-            $subscriptionSchedule = $event->data->object;
-          // ... handle other event types
-          default:
-            echo 'Received unknown event type ' . $event->type;
-        */
-
         if ($event->type == "subscription_schedule.aborted" || $event->type == "subscription_schedule.canceled")
         {
             $subscriptionSchedule = $event->data->object;
