@@ -160,7 +160,7 @@
                                 <strong>{{getLangByLabelGroups('invoice','Date')}}</strong> {{date('Y-m-d', strtotime($order->order->created_at))}}
 
                                 <br><br>
-                                <strong>{{getLangByLabelGroups('invoice','Buyer Info')}}</strong><br>
+                                <strong>{{getLangByLabelGroups('invoice','Buyer_Info')}}</strong><br>
                                 {{\mervick\aesEverywhere\AES256::decrypt($order->order->first_name, env('ENCRYPTION_KEY'))}} {{ !empty($order->order->last_name) ? \mervick\aesEverywhere\AES256::decrypt($order->order->last_name, env('ENCRYPTION_KEY')) : ''}} <br>
                                 {{ !empty($order->order->contact_number) ? \mervick\aesEverywhere\AES256::decrypt($order->order->contact_number, env('ENCRYPTION_KEY')) : ''}}
                                 <br>
