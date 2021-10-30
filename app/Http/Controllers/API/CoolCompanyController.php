@@ -195,8 +195,10 @@ class CoolCompanyController extends Controller
         return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
     }
 
+    //Freelancers List
     public function getTeamMember()
     {
+        /*
         $access_token = null;
         $tokenExpired = time();
 
@@ -211,9 +213,11 @@ class CoolCompanyController extends Controller
         }
 
         $response = $this->teamMember($access_token);
+        */
+        $freelancers = CoolCompanyFreelancer::orderBy('auto_id', 'DESC')->get();
         if(!empty($response))
         {
-            return response(prepareResult(false, json_decode($response, true), getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
+            return response(prepareResult(false, $freelancers, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
         }
         return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
     }

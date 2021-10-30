@@ -29,6 +29,8 @@ class CreateUserDeviceInfosTable extends Migration
             $table->string('serial_number',100)->nullable();
             $table->string('system_ip_address',100)->nullable();
             $table->boolean('status')->default(false)->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

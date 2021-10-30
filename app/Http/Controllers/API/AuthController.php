@@ -263,23 +263,27 @@ class AuthController extends Controller
 		$user->last_login 				= now();
 		if($user->save())
 		{
-			foreach ($request->address as $key => $address)
+			$addressDetail = null;
+			if(sizeof($request->address)>0 && !empty($request->address))
 			{
-				$addressDetail = new AddressDetail;
-				$addressDetail->user_id 		= $user->id;
-				$addressDetail->latitude 		= $address['latitude'];
-				$addressDetail->longitude 		= $address['longitude'];
-				$addressDetail->country 		= $address['country'];
-				$addressDetail->state 			= $address['state'];
-				$addressDetail->city 			= $address['city'];
-				$addressDetail->full_address 	= $address['full_address'];
-				$addressDetail->zip_code 		= $address['zip_code'];
-				$addressDetail->address_type 	= $address['address_type'];
-				$addressDetail->is_default 		= $address['is_default'];
-				$addressDetail->status 			= 1;
-				$addressDetail->save();
+				foreach ($request->address as $key => $address)
+				{
+					$addressDetail = new AddressDetail;
+					$addressDetail->user_id 		= $user->id;
+					$addressDetail->latitude 		= $address['latitude'];
+					$addressDetail->longitude 		= $address['longitude'];
+					$addressDetail->country 		= $address['country'];
+					$addressDetail->state 			= $address['state'];
+					$addressDetail->city 			= $address['city'];
+					$addressDetail->full_address 	= $address['full_address'];
+					$addressDetail->zip_code 		= $address['zip_code'];
+					$addressDetail->address_type 	= $address['address_type'];
+					$addressDetail->is_default 		= $address['is_default'];
+					$addressDetail->status 			= 1;
+					$addressDetail->save();
+				}
 			}
-
+			
 			if($request->is_minor != "true" || $request->is_minor != 1)
 			{
 				foreach ($request->user_device_info as $key => $deviceInfo) 
@@ -358,7 +362,7 @@ class AuthController extends Controller
 				}
 			}
 
-			if($request->user_type_id == '4')
+			if($request->user_type_id == '4' || $request->user_type_id == '2')
 			{
 				// $otp = rand(1000,9999);
 				$otp = 1234;
@@ -387,25 +391,24 @@ class AuthController extends Controller
 
 				$arrayVal = [
 					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
-					'{{verification_link}}' => '<a href="'.env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp).'" style="background: linear-gradient(
-90deg,#1da89c 0,#1da89c);
-    border-color: #1da89c;display: inline-block;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #212529;
-    text-align: center;
-    text-decoration: none;
-    vertical-align: middle;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    background-color: transparent;
-    border: 1px solid transparent;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    border-radius: .25rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;">'.getLangByLabelGroups('messages','verify_your_email_address').'</a>',
+					'{{verification_link}}' => '<a href="'.env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp).'" style="background: linear-gradient(90deg,#1da89c 0,#1da89c);
+				    border-color: #1da89c;display: inline-block;
+				    font-weight: 400;
+				    line-height: 1.5;
+				    color: #212529;
+				    text-align: center;
+				    text-decoration: none;
+				    vertical-align: middle;
+				    cursor: pointer;
+				    -webkit-user-select: none;
+				    -ms-user-select: none;
+				    user-select: none;
+				    background-color: transparent;
+				    border: 1px solid transparent;
+				    padding: .375rem .75rem;
+				    font-size: 1rem;
+				    border-radius: .25rem;
+				    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;">'.getLangByLabelGroups('messages','verify_your_email_address').'</a>',
 
 				];
 				$body = $this->strReplaceAssoc($arrayVal, $body);
@@ -418,9 +421,7 @@ class AuthController extends Controller
 				Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
 
 				//------------------------Mail End-------------------------//
-			}
-
-			
+			}			
 
 			$accessToken = $user->createToken('authToken')->accessToken;
 
@@ -484,67 +485,66 @@ class AuthController extends Controller
 			$userDetail->year_of_establishment 		= $request->year_of_establishment;
 			$userDetail->status						= $user->status;
 		}
-		
-		if($userDetail->save())
+		$userDetail->save();
+		if($userDetail && $user->user_type_id == '3')
 		{
 			// $otp = rand(1000,9999);
-				$otp = 1234;
-				$email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+			$otp = 1234;
+			$email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
 
-				if(OtpVerification::where('mobile_number', $user->email)->where('otp_for', 'email_verification')->count()>0)
-				{
-					OtpVerification::where('mobile_number', $user->email)->where('otp_for', 'email_verification')->delete();
-				}
-				$otpStore = new OtpVerification;
-				$otpStore->mobile_number 	= $email;
-				$otpStore->otp 				= $otp;
-				$otpStore->otp_for 			= 'email_verification';
-				$otpStore->save();
+			if(OtpVerification::where('mobile_number', $user->email)->where('otp_for', 'email_verification')->count()>0)
+			{
+				OtpVerification::where('mobile_number', $user->email)->where('otp_for', 'email_verification')->delete();
+			}
+			$otpStore = new OtpVerification;
+			$otpStore->mobile_number 	= $email;
+			$otpStore->otp 				= $otp;
+			$otpStore->otp_for 			= 'email_verification';
+			$otpStore->save();
 
-				//------------------------Mail start-------------------------//
+			//------------------------Mail start-------------------------//
 
 
-				$emailTemplate = EmailTemplate::where('template_for','registration')->where('language_id',$user->language_id)->first();
-				if(empty($emailTemplate))
-				{
-					EmailTemplate::where('template_for','registration')->first();
-				}
+			$emailTemplate = EmailTemplate::where('template_for','registration')->where('language_id',$user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				EmailTemplate::where('template_for','registration')->first();
+			}
 
-				$body = $emailTemplate->body;
+			$body = $emailTemplate->body;
 
-				$arrayVal = [
-					'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
-					'{{verification_link}}' => '<a href="'.env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp).'" style="background: linear-gradient(
-90deg,#1da89c 0,#1da89c);
-    border-color: #1da89c;display: inline-block;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #212529;
-    text-align: center;
-    text-decoration: none;
-    vertical-align: middle;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    background-color: transparent;
-    border: 1px solid transparent;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    border-radius: .25rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;">'.getLangByLabelGroups('messages','verify_your_email_address').'</a>',
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
+				'{{verification_link}}' => '<a href="'.env('FRONT_APP_URL').'email-verification/'.base64_encode($email).'/'.base64_encode($otp).'" style="background: linear-gradient(90deg,#1da89c 0,#1da89c);
+			    border-color: #1da89c;display: inline-block;
+			    font-weight: 400;
+			    line-height: 1.5;
+			    color: #212529;
+			    text-align: center;
+			    text-decoration: none;
+			    vertical-align: middle;
+			    cursor: pointer;
+			    -webkit-user-select: none;
+			    -ms-user-select: none;
+			    user-select: none;
+			    background-color: transparent;
+			    border: 1px solid transparent;
+			    padding: .375rem .75rem;
+			    font-size: 1rem;
+			    border-radius: .25rem;
+			    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;">'.getLangByLabelGroups('messages','verify_your_email_address').'</a>',
 
-				];
-				$body = $this->strReplaceAssoc($arrayVal, $body);
-				
-				$details = [
-					'title' => $emailTemplate->subject,
-					'body' => $body
-				];
-				
-				Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
+			];
+			$body = $this->strReplaceAssoc($arrayVal, $body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $body
+			];
+			
+			Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new RegistrationMail($details));
 
-				//------------------------Mail End-------------------------//
+			//------------------------Mail End-------------------------//
 
 			$user['userDetail'] = $userDetail;
 			if($spDetail = ServiceProviderDetail::where('user_id',$request->user_id)->first())
@@ -600,6 +600,8 @@ class AuthController extends Controller
 				}
 				else
 				{
+					UserDeviceInfo::where('user_id', Auth::id())->delete();
+					
 					foreach ($request->user_device_info as $key => $deviceInfo) {
 						// UserDeviceInfo::where('user_id',Auth::id())->delete();
 
@@ -809,8 +811,8 @@ class AuthController extends Controller
 			{
 				$token = Auth::user()->token();
 				$token->revoke();
-		    	// UserDeviceInfo::where('user_id',Auth::id())->delete();
-		     //   	Auth::user()->AauthAcessToken()->delete();
+		    	UserDeviceInfo::where('user_id', Auth::id())->delete();
+
 				return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_logout_success')), config('http_response.created'));
 			}
 			catch (\Throwable $exception)
