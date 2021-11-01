@@ -180,6 +180,14 @@ class UserProfileController extends Controller
 		if($user->userType->title == 'Student')
 		{
 			$userDetail = StudentDetail::where('user_id',$user->id)->first();
+			if($userDetail)
+			{
+				$userDetail = StudentDetail::where('user_id',$user->id)->first();
+			}
+			else
+			{
+				$userDetail = new StudentDetail:;
+			}
 			$userDetail->user_id 					= Auth::id();
 			$userDetail->enrollment_no 				= $request->enrollment_no;
 			$userDetail->education_level 			= $request->education_level;
@@ -192,8 +200,16 @@ class UserProfileController extends Controller
 		}
 		elseif($user->userType->title == 'Service Provider')
 		{
-
 			$userDetail = ServiceProviderDetail::where('user_id',$user->id)->first();
+			if($userDetail)
+			{
+				$userDetail = ServiceProviderDetail::where('user_id',$user->id)->first();
+			}
+			else
+			{
+				$userDetail = new ServiceProviderDetail:;
+			}
+			
 			$userDetail->user_id 					= Auth::id();
 			$userDetail->registration_type_id 		= $request->registration_type_id;
 			$userDetail->service_provider_type_id 	= $request->service_provider_type_id;

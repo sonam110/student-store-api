@@ -2127,7 +2127,8 @@ class LabelSeeder extends Seeder
         "uploadFile" => "Please upload a file", 
         "verification_successful" => "Verification Successful", 
         "verified" => "Are you sure? you want to change the status as verified?", 
-        "will_be_send_to" => "Sending notification to" 
+        "will_be_send_to" => "Sending notification to",
+        "message_student_detail_incomplete" => "Please complete your information by updating your profile first" 
         ], 
         "messageTemplates" => [
         "message" => "Message", 
