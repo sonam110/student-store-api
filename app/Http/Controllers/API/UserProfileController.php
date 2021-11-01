@@ -186,7 +186,7 @@ class UserProfileController extends Controller
 			}
 			else
 			{
-				$userDetail = new StudentDetail:;
+				$userDetail = new StudentDetail;
 			}
 			$userDetail->user_id 					= Auth::id();
 			$userDetail->enrollment_no 				= $request->enrollment_no;
@@ -207,7 +207,7 @@ class UserProfileController extends Controller
 			}
 			else
 			{
-				$userDetail = new ServiceProviderDetail:;
+				$userDetail = new ServiceProviderDetail;
 			}
 			
 			$userDetail->user_id 					= Auth::id();
