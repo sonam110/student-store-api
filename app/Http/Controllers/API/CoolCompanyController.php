@@ -214,7 +214,7 @@ class CoolCompanyController extends Controller
 
         $response = $this->teamMember($access_token);
         */
-        $freelancers = CoolCompanyFreelancer::orderBy('auto_id', 'DESC')->get();
+        $freelancers = CoolCompanyFreelancer::with('user')->orderBy('auto_id', 'DESC')->get();
         return response(prepareResult(false, $freelancers, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
     }
 
