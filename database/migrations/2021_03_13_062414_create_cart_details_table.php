@@ -29,6 +29,7 @@ class CreateCartDetailsTable extends Migration
             $table->float('sub_total')->nullable();
             $table->string('item_status',100)->nullable();
             $table->text('note_to_seller')->nullable();
+            $table->longText('attribute_data')->nullable();
             $table->timestamps();
         });
     }

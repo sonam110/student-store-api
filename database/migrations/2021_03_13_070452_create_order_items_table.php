@@ -31,6 +31,7 @@ class CreateOrderItemsTable extends Migration
             $table->string('contest_type',50)->nullable();
             $table->string('title',100)->nullable();
             $table->string('sku',100)->nullable();
+            $table->longText('attribute_data')->nullable();
             $table->float('price')->nullable();
             $table->bigInteger('quantity')->nullable();
             $table->string('discount')->nullable();

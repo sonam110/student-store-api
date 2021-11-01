@@ -3272,6 +3272,7 @@ class LabelSeeder extends Seeder
         "zip" => "Zip" 
         ], 
         "product_my_cart" => [
+        "delivery_type" => "Delivery type",
         "apply" => "Apply", 
         "ask_parent" => "Ask Your Parent to Checkout", 
         "available_reward_points" => "Available reward points : ", 
@@ -6272,6 +6273,7 @@ class LabelSeeder extends Seeder
         "product_module" => [
         ], 
         "product_my_cart" => [
+        "delivery_type" => "Delivery type",
         "apply" => "Tillämpa", 
         "ask_parent" => "be er föräldrar att checka ut", 
         "available_reward_points" => "Tillgängliga belöningspoäng : ", 

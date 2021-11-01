@@ -13,7 +13,7 @@ class CartDetail extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'user_id','products_services_book_id','sku','price','discount','quantity','item_status','sub_total'
+        'user_id','products_services_book_id','sku','price','discount','quantity','item_status','sub_total','attribute_data'
     ];
 
 
