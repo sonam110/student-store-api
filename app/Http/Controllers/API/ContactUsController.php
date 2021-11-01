@@ -22,7 +22,8 @@ class ContactUsController extends Controller
     {        
         $validation = Validator::make($request->all(), [
             'message'  => 'required',
-            'email'  => 'required'
+            'email'  => 'required',
+            'message_for' => 'required'
         ]);
 
         if ($validation->fails()) {
@@ -33,6 +34,7 @@ class ContactUsController extends Controller
         try
         {
             $contactUs = new ContactUs;
+            $contactUs->message_for                     = $request->message_for;
             $contactUs->name                            = $request->name;
             $contactUs->phone                           = $request->phone;
             $contactUs->message                  		= $request->message;

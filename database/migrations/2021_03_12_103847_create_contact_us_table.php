@@ -22,6 +22,7 @@ class CreateContactUsTable extends Migration
 
             // $table->string('item_id')->nullable();
             // $table->string('item_type')->nullable();
+            $table->string('message_for');
             $table->string('name');
             $table->string('phone');
             $table->string('email');
