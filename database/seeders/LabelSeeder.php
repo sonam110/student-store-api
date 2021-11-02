@@ -3273,6 +3273,7 @@ class LabelSeeder extends Seeder
         "zip" => "Zip" 
         ], 
         "product_my_cart" => [
+        "note_to_seller" => "Note To Seller",
         "delivery_type" => "Delivery type",
         "apply" => "Apply", 
         "ask_parent" => "Ask Your Parent to Checkout", 
