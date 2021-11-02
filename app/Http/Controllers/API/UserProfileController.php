@@ -336,7 +336,7 @@ class UserProfileController extends Controller
 		{
 			return response()->json(prepareResult(true, ['yoh have only '.Auth::user()->reward_points.' reward points to share.'], getLangByLabelGroups('messages','message_less_reward_points')), config('http_response.internal_server_error'));
 		}
-		$receiver = User::where('contact_number',$request->contact_number)->first();
+		$receiver = User::where('contact_number',str_replace(' ','', $request->contact_number))->first();
 
 		if(!$receiver)
 		{
