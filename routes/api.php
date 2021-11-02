@@ -39,6 +39,7 @@ Route::get('/citiesByCountryName/{countryName}', [App\Http\Controllers\API\Count
 Route::get('/get-educational-institutes', [App\Http\Controllers\API\FrontController::class,'getEducationInstitutes']);
 Route::get('/get-job-tags', [App\Http\Controllers\API\FrontController::class,'getJobTags']);
 
+Route::get('/reason-for-action', [App\Http\Controllers\API\OrderController::class,'reasonForAction']);
 
 Route::get('/email-verification/{email}/{otp}', [App\Http\Controllers\API\AuthController::class,'emailVerification']);
 
@@ -233,7 +234,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/order-status-update/{id}', [App\Http\Controllers\API\OrderController::class,'orderStatusUpdate']);
 	Route::post('/order-item-status-update/{id}', [App\Http\Controllers\API\OrderController::class,'orderItemStatusUpdate']);
 	Route::get('/orders-count', [App\Http\Controllers\API\OrderController::class,'ordersCount']);
-	Route::get('/reason-for-action', [App\Http\Controllers\API\OrderController::class,'reasonForAction']);
+	
 
 	Route::post('/create-stripe-intent', [App\Http\Controllers\API\OrderController::class,'createStripeIntent']);
 	Route::post('/create-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'createStripeSubscription']);

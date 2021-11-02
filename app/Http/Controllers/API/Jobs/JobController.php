@@ -705,12 +705,19 @@ class JobController extends Controller
             $validation = Validator::make($request->all(), [
                 'job_status'    => 'required|boolean'
             ]);
+
+            if ($validation->fails()) {
+                return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+            }
         }
         if($request->action=='publish') 
         {
             $validation = Validator::make($request->all(), [
                 'is_published'    => 'required|boolean'
             ]);
+            if ($validation->fails()) {
+                return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+            }
         }
         if($request->action=='promote') 
         {
@@ -719,12 +726,12 @@ class JobController extends Controller
                 // 'promotion_start_date'  => 'required|date',
                 // 'promotion_end_date'    => 'required|date|after_or_equal:promotion_start_date',
             ]);
+            if ($validation->fails()) {
+                return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+            }
         }
 
-        if ($validation->fails()) {
-            return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-        }
-
+        
         DB::beginTransaction();
         try
         {
