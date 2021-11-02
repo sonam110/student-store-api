@@ -2140,6 +2140,7 @@ class LabelSeeder extends Seeder
         "seller" => "Seller" 
         ], 
         "messages" => [
+        "message_recurring_alert_text" => "Recurring subscribtion will start automatically for this package after you buy it",
         "account_is_blocked" => "Your account is blocked, please contact admin", 
         "message_about_company_required" => "About company required", 
         "message_account_blocked" => "Your account is blocked, please contact admin", 
@@ -3586,6 +3587,7 @@ class LabelSeeder extends Seeder
         "promotion_start_date" => "Promotion Start Date" 
         ], 
         "promotion_modal" => [
+        "confirm" => "Confirm", 
         "add_new_address" => "Add New Address", 
         "add_to_cart" => "Add To Cart", 
         "back" => "Back", 

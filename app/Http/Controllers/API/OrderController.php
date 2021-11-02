@@ -355,7 +355,7 @@ class OrderController extends Controller
                     
 					$orderItem->title							= $title;
 					$orderItem->sku							    = $productsServicesBook->sku;
-					$orderItem->attribute_data					= $orderItem->attribute_data;
+					$orderItem->attribute_data					= json_encode($orderItem->attribute_data);
 					$orderItem->price                           = $price;
 					$orderItem->earned_reward_points            = $earned_reward_points;
 					$orderItem->quantity						= $orderedItem['quantity'];
