@@ -26,7 +26,7 @@ class LabelsExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-    	$labels = Label::where('language_id',1)->get();
+    	$labels = Label::where('language_id',1)->orderBy('label_group_id', 'ASC')->get();
 
     	// return $labels;
 
