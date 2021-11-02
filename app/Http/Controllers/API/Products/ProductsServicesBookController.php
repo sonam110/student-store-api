@@ -243,7 +243,7 @@ class ProductsServicesBookController extends Controller
                 // $productsServicesBook->status                       = '2';//should be commented
                 $productsServicesBook->meta_title                   = $request->meta_title;
                 $productsServicesBook->meta_keywords                = $request->meta_keywords;
-                $productsServicesBook->is_promoted                  = $request->is_promoted;
+                $productsServicesBook->is_promoted                  = $request->promote;
                 if($request->is_promoted==1)
                 {
                     $productsServicesBook->promotion_start_at       = $request->promotion_start_at;
@@ -734,10 +734,10 @@ class ProductsServicesBookController extends Controller
 
             if($request->action=='all_boost') 
             {
-                if($getProductsServicesBook->is_promoted != $request->is_promoted)
+                if($getProductsServicesBook->is_promoted != $request->promote)
                 {
-                    $getProductsServicesBook->is_promoted = $request->is_promoted;
-                    if($request->is_promoted == true)
+                    $getProductsServicesBook->is_promoted = $request->promote;
+                    if($request->promote == true)
                     {
                         $getProductsServicesBook->promotion_start_at = date('Y-m-d');
                         $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
@@ -748,7 +748,7 @@ class ProductsServicesBookController extends Controller
                         if($user_package->no_of_boost == $user_package->used_no_of_boost)
                         {
                             DB::rollback();
-                            return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_no_of_boost_exhausted_error')), config('http_response.internal_server_error'));
+                            return response()->json(prepareResult(true, ['promotion Package Use Exhasted'], getLangByLabelGroups('messages','message_no_of_boost_exhausted_error')), config('http_response.internal_server_error'));
                         }
                         $getProductsServicesBook->promotion_end_at  = date('Y-m-d',strtotime('+'.$user_package->boost_no_of_days.'days'));
                         $user_package->update(['used_no_of_boost'=>($user_package->used_no_of_boost + 1)]);
@@ -786,7 +786,7 @@ class ProductsServicesBookController extends Controller
                         if($user_package->most_popular == $user_package->used_most_popular)
                         {
                             DB::rollback();
-                            return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_most_popular_exhausted_error')), config('http_response.internal_server_error'));
+                            return response()->json(prepareResult(true, ['Popular Package Use Exhasted'], getLangByLabelGroups('messages','message_most_popular_exhausted_error')), config('http_response.internal_server_error'));
                         }
                         $getProductsServicesBook->most_popular_end_at  = date('Y-m-d',strtotime('+'.$user_package->most_popular_no_of_days.'days'));
                         $user_package->update(['used_most_popular'=>$user_package->used_most_popular + 1]);
@@ -825,7 +825,7 @@ class ProductsServicesBookController extends Controller
                         if($user_package->top_selling == $user_package->used_top_selling)
                         {
                             DB::rollback();
-                            return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_top_selling_exhausted_error')), config('http_response.internal_server_error'));
+                            return response()->json(prepareResult(true, ['Top selling Package Use Exhasted'], getLangByLabelGroups('messages','message_top_selling_exhausted_error')), config('http_response.internal_server_error'));
                         }
                         $getProductsServicesBook->top_selling_end_at  = date('Y-m-d',strtotime('+'.$user_package->top_selling_no_of_days.'days'));
                         $user_package->update(['used_top_selling'=>$user_package->used_top_selling + 1]);
