@@ -20,7 +20,8 @@ class CreateContactUsTable extends Migration
             // $table->string('user_id', 50);
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            // $table->string('item_id')->nullable();
+            $table->string('reason_id')->nullable();
+            
             // $table->string('item_type')->nullable();
             $table->string('message_for');
             $table->string('name');

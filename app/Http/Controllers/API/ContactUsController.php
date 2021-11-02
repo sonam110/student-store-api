@@ -34,6 +34,7 @@ class ContactUsController extends Controller
         try
         {
             $contactUs = new ContactUs;
+            $contactUs->reason_id                       = $request->reason_id;
             $contactUs->message_for                     = $request->message_for;
             $contactUs->name                            = $request->name;
             $contactUs->phone                           = $request->phone;

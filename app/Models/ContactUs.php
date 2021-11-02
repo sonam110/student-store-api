@@ -12,7 +12,7 @@ class ContactUs extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'message_for','name','phone','email','message','images'
+        'reason_id', 'message_for','name','phone','email','message','images'
     ];
 
     // public function user()
