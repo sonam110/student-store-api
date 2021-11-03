@@ -98,6 +98,10 @@ class LandingPageController extends Controller
                                         ->where('products_services_books.is_published', '1')
                                         ->orderBy('products_services_books.created_at','DESC')
                                         ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            if($request->type=='product' || $request->type=='book')
+            {
+                $productsServicesBooks = $productsServicesBooks->where('quantity', '>', 0);
+            }
             if($request->type)
             {
                 $productsServicesBooks = $productsServicesBooks->where('type',$request->type);
