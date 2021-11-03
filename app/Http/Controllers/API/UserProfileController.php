@@ -366,8 +366,10 @@ class UserProfileController extends Controller
 
 			// Notification Start
 
+			
+
 			$title = 'Reward Points Shared';
-			$body =  $sender->first_name.' '.$sender->last_name.' has shared '.$request->reward_points.' reward points for you.';
+			$body =  AES256::decrypt($sender->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($sender->last_name, env('ENCRYPTION_KEY')).' has shared '.$request->reward_points.' reward points for you.';
 			$user = $receiver;
 			$type = 'Reward Points';
 			pushNotification($title,$body,$user,$type,true,'user','Reward Point',$sharedRewardPoint->id,'reward-points');
