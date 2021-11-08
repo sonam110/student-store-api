@@ -698,7 +698,7 @@ class ProductsServicesBookController extends Controller
                     $newAttribute = new RecursiveIteratorIterator(new RecursiveArrayIterator($request->all()), RecursiveIteratorIterator::SELF_FIRST);
                     $result = [];
                     foreach ($newAttribute as $key => $value) {
-                        if ($key === 'bucket_group_attributes' && $key) {
+                        if (($key === 'bucket_group_attributes' || $key === 'bucket_group_attributes_2') && $key) {
                             $result = array_merge($result, $value);
                         }
                     }
