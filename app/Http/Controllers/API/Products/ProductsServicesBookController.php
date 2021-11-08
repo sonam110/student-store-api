@@ -64,9 +64,6 @@ class ProductsServicesBookController extends Controller
             if($request->user_id)
             {
                 $products = ProductsServicesBook::where('user_id', $request->user_id)
-                    ->where('status', '2')
-                    ->where('is_published', '1')
-                    ->where('quantity', '>', 0)
                     ->where('type','product')
                     ->orderBy('created_at','DESC')
                     ->with('user.serviceProviderDetail','categoryMaster','subCategory','addressDetail','coverImage','productTags');
@@ -74,13 +71,17 @@ class ProductsServicesBookController extends Controller
             else
             {
                 $products = ProductsServicesBook::where('user_id', Auth::id())
-                    ->where('quantity', '>', 0)
-                    ->where('status', '2')
-                    ->where('is_published', '1')
                     ->where('type','product')
                     ->orderBy('created_at','DESC')
                     ->with('categoryMaster','subCategory','addressDetail','coverImage','productTags');
             }
+            if($request->type=='c')
+            {
+                $products = $products->where('status', '2')
+                ->where('is_published', '1')
+                ->where('quantity', '>', 0);
+            }
+
             if(!empty($request->per_page_record))
             {
                 $products = $products->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -103,11 +104,23 @@ class ProductsServicesBookController extends Controller
         {
             if($request->user_id)
             {
-                $products = ProductsServicesBook::where('user_id', $request->user_id)->where('type','service')->orderBy('created_at','DESC')->with('user.serviceProviderDetail','categoryMaster','subCategory','addressDetail','coverImage','productTags');
+                $products = ProductsServicesBook::where('user_id', $request->user_id)
+                    ->where('type','service')
+                    ->orderBy('created_at','DESC')
+                    ->with('user.serviceProviderDetail','categoryMaster','subCategory','addressDetail','coverImage','productTags');
             }
             else
             {
-                $products = ProductsServicesBook::where('user_id', Auth::id())->where('type','service')->orderBy('created_at','DESC')->with('categoryMaster','subCategory','addressDetail','coverImage','productTags');
+                $products = ProductsServicesBook::where('user_id', Auth::id())
+                    ->where('type','service')
+                    ->orderBy('created_at','DESC')
+                    ->with('categoryMaster','subCategory','addressDetail','coverImage','productTags');
+            }
+            if($request->type=='c')
+            {
+                $products = $products->where('status', '2')
+                ->where('is_published', '1')
+                ->where('quantity', '>', 0);
             }
             if(!empty($request->per_page_record))
             {
@@ -132,9 +145,6 @@ class ProductsServicesBookController extends Controller
             if($request->user_id)
             {
                 $products = ProductsServicesBook::where('user_id', $request->user_id)
-                    ->where('quantity', '>', 0)
-                    ->where('status', '2')
-                    ->where('is_published', '1')
                     ->where('type','book')
                     ->orderBy('created_at','DESC')
                     ->with('user.serviceProviderDetail','categoryMaster','subCategory','addressDetail','coverImage','productTags');
@@ -142,12 +152,15 @@ class ProductsServicesBookController extends Controller
             else
             {
                 $products = ProductsServicesBook::where('user_id', Auth::id())
-                    ->where('quantity', '>', 0)
-                    ->where('status', '2')
-                    ->where('is_published', '1')
                     ->where('type','book')
                     ->orderBy('created_at','DESC')
                     ->with('categoryMaster','subCategory','addressDetail','coverImage','productTags');
+            }
+            if($request->type=='c')
+            {
+                $products = $products->where('status', '2')
+                ->where('is_published', '1')
+                ->where('quantity', '>', 0);
             }
             if(!empty($request->per_page_record))
             {
