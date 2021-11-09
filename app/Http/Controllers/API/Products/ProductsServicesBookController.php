@@ -993,7 +993,7 @@ class ProductsServicesBookController extends Controller
                 }
                 if(!empty($request->brand))
                 {
-                    $products->where('products_services_books.brand', $request->brand);
+                    $products->whereIn('products_services_books.brand', $request->brand);
                 }
                 if(!empty($request->category_master_id))
                 {
