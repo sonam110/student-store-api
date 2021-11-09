@@ -16,16 +16,20 @@ class BrandController extends Controller
 {
 	public function index(Request $request)
 	{
-		try
+        try
 		{
             $brands = Brand::select('*');
             if(!empty($request->title))
             {
-                $brands = $brands->where('name', $request->title);
+                $brands = $brands->where('name', 'LIKE', '%'.$request->title.'%');
             }
-            if(!empty($request->status))
+            if($request->status==0)
             {
-                $brands = $brands->where('status', $request->status);
+                $brands = $brands->where('status', 0);
+            }
+            elseif($request->status==1)
+            {
+                $brands = $brands->where('status', 1);
             }
 
 			if(!empty($request->per_page_record))
