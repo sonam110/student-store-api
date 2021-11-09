@@ -192,6 +192,7 @@ class UserController extends Controller
 		{
 			$userDetail = StudentDetail::where('user_id',$user->id)->first();
 			if(!$userDetail)
+			{
 				$userDetail = new StudentDetail;
 			}
 			
