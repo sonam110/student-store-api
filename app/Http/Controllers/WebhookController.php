@@ -65,9 +65,36 @@ class WebhookController extends Controller
             Log::channel('webhook')->info('created');
             Log::channel('webhook')->info($subscriptionSchedule);
         }
+        elseif ($event->type == "customer.subscription.created")
+        { 
+            
+            $subscriptionSchedule = $event->data->object;
+            Log::channel('webhook')->info('customer.subscription.created');
+            Log::channel('webhook')->info($subscriptionSchedule);
+        }
         Log::channel('webhook')->info('payload');
         Log::channel('webhook')->info($payload);
         http_response_code(200);
+    }
+
+    private function customerSubscriptionCreated($subscription_id) 
+    {
+        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
+        if($subscribedPackage)
+        {
+            // $subscribedPackage->is_canceled = 1;
+            // $subscribedPackage->canceled_date = date('Y-m-d');
+            // $subscribedPackage->save();
+
+            // $title = 'Package Subscription Canceled';
+            // $body =  'Your '.$subscribedPackage->package->module.' module '.getLangByLabelGroups('packages', $subscribedPackage->package->type_of_package).' package is successfully canceled.';
+            // $user = $subscribedPackage->user;
+            // $type = 'Package';
+            // $user_type = 'buyer';
+            // $module = 'profile';
+            // pushNotification($title,$body,$user,$type,true,$user_type,$module,'no-data','package');
+            // Log::channel('webhook')->info('Subscription canceled. User Package Subscription Id: '. $subscribedPackage->id);
+        }
     }
 
     private function abortedSubscription($subscription_id) 

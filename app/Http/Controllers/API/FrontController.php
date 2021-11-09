@@ -369,7 +369,12 @@ class FrontController extends Controller
 	}
 
 	public function payout()
-	{ 	
+	{ 
+		/*$id = '04f770f9-9aad-4515-bebb-6fd6ca3fa812';
+		$user = DB::select(
+		    'call select_by_user_id(?)', [$id]
+		);
+		dd($user);*/
 		/*$users = User::get();
 		foreach($users as $user)
 		{
