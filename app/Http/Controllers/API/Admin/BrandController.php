@@ -23,11 +23,11 @@ class BrandController extends Controller
             {
                 $brands = $brands->where('name', 'LIKE', '%'.$request->title.'%');
             }
-            if($request->status==0)
+            if($request->status=='verified')
             {
                 $brands = $brands->where('status', 0);
             }
-            elseif($request->status==1)
+            elseif($request->status=='unverified')
             {
                 $brands = $brands->where('status', 1);
             }
