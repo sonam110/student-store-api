@@ -18,13 +18,23 @@ class BrandController extends Controller
 	{
 		try
 		{
+            $brands = Brand::select('*');
+            if(!empty($request->title))
+            {
+                $brands = $brands->where('name', $request->title);
+            }
+            if(!empty($request->status))
+            {
+                $brands = $brands->where('status', $request->status);
+            }
+
 			if(!empty($request->per_page_record))
 			{
-				$brands = Brand::simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+				$brands = $brands->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 			}
 			else
 			{
-				$brands = Brand::get();
+				$brands = $brands->get();
 			}
 			return response(prepareResult(false, $brands, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
 		}
