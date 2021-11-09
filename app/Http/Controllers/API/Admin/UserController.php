@@ -353,17 +353,21 @@ class UserController extends Controller
 
             	if($request->user_type_id == 2)
             	{
-            		$users->join('student_details', function ($join) {
-		                $join->on('users.id', '=', 'student_details.user_id');
-		            });
-		            if(!empty($request->education_level))
+            		if(!empty($request->education_level) || !empty($request->education_institution))
 		            {
-		            	$users->where('student_details.education_level', 'LIKE', '%'.$request->education_level.'%');
-		            }
-		            if(!empty($request->education_institution))
-		            {
-		            	$users->where('student_details.institute_name', 'LIKE', '%'.$request->education_institution.'%');
-		            }
+
+	            		$users->join('student_details', function ($join) {
+			                $join->on('users.id', '=', 'student_details.user_id');
+			            });
+			            if(!empty($request->education_level))
+			            {
+			            	$users->where('student_details.education_level', 'LIKE', '%'.$request->education_level.'%');
+			            }
+			            if(!empty($request->education_institution))
+			            {
+			            	$users->where('student_details.institute_name', 'LIKE', '%'.$request->education_institution.'%');
+			            }
+			        }
             	}
             	elseif($request->user_type_id == 3) 
             	{
