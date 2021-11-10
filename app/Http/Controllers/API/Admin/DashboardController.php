@@ -164,6 +164,20 @@ class DashboardController extends Controller
 				})
 				->where('products_services_books.user_id',$request->user_id)
 				->sum('cool_company_commission');
+
+				$data['amount_transferred_to_vendor'] = OrderItem::join('products_services_books',function ($join) {
+					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+				})
+				->where('products_services_books.user_id',$request->user_id)
+				->where('order_items.is_transferred_to_vendor', '1')
+				->sum('amount_transferred_to_vendor');
+
+				$data['pending_amount_transferred_to_vendor'] = OrderItem::join('products_services_books',function ($join) {
+					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+				})
+				->where('products_services_books.user_id',$request->user_id)
+				->where('order_items.is_transferred_to_vendor', '0')
+				->sum('amount_transferred_to_vendor');
 			}
 			else
 			{
@@ -197,6 +211,10 @@ class DashboardController extends Controller
 				$data['student_store_commission']  = OrderItem::sum('student_store_commission');
 
 				$data['cool_company_commission']= OrderItem::sum('cool_company_commission');
+
+				$data['amount_transferred_to_vendor']  = OrderItem::where('is_transferred_to_vendor', '1')->sum('amount_transferred_to_vendor');
+
+				$data['pending_amount_transferred_to_vendor']  = OrderItem::where('is_transferred_to_vendor', '0')->sum('amount_transferred_to_vendor');
 			}
 
 			return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
