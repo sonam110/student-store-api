@@ -152,6 +152,18 @@ class DashboardController extends Controller
 				->where('contests.user_id',$request->user_id)
 				->where('order_items.item_status','returned')
 				->count();
+
+				$data['student_store_commission'] = OrderItem::join('products_services_books',function ($join) {
+					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+				})
+				->where('products_services_books.user_id',$request->user_id)
+				->sum('student_store_commission');
+
+				$data['cool_company_commission'] = OrderItem::join('products_services_books',function ($join) {
+					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
+				})
+				->where('products_services_books.user_id',$request->user_id)
+				->sum('cool_company_commission');
 			}
 			else
 			{
@@ -181,6 +193,10 @@ class DashboardController extends Controller
 
 				$data['total_returned_items']   = OrderItem::select('order_items.id')->where('order_items.item_status','returned')
 				->count();
+
+				$data['student_store_commission']  = OrderItem::sum('student_store_commission');
+
+				$data['cool_company_commission']= OrderItem::sum('cool_company_commission');
 			}
 
 			return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
