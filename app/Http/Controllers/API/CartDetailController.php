@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\CartDetail;
+use App\Models\Language;
 use App\Http\Resources\CartDetailResource;
 use App\Models\ProductsServicesBook;
 use Illuminate\Http\Request;
@@ -15,17 +16,33 @@ use Auth;
 
 class CartDetailController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
 
     public function index()
     {
         try
         {
-            $cartDetails = CartDetail::where('user_id',Auth::id())->with('product.user','product.user.shippingConditions','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')->get();
+            $lang_id = $this->lang_id;
+
+            $cartDetails = CartDetail::where('user_id',Auth::id())->with('product.user','product.user.shippingConditions','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')
+                ->with(['product.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['product.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }])
+                ->get();
             return response(prepareResult(false, $cartDetails, getLangByLabelGroups('messages','message_cart_list')), config('http_response.success'));
         }
         catch (\Throwable $exception) 
@@ -123,7 +140,20 @@ class CartDetailController extends Controller
                 $cartDetail->note_to_seller             = $request->note_to_seller;
                 $cartDetail->save();
             }
-            $cartDetail =CartDetail::where('id', $cartDetail->id)->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')->first();
+            $lang_id = $this->lang_id;
+
+            $cartDetail =CartDetail::where('id', $cartDetail->id)->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')
+                ->with(['product.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['product.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }])
+            ->first();
 
             // Notification Start
 
@@ -193,7 +223,19 @@ class CartDetailController extends Controller
             $cartDetail->quantity					= $request->quantity;
             $cartDetail->save();
 
-            $cartDetail =CartDetail::where('id', $cartDetail->id)->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')->first();
+            $lang_id = $this->lang_id;
+            
+            $cartDetail =CartDetail::where('id', $cartDetail->id)->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')
+                ->with(['product.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['product.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }])->first();
             DB::commit();
             return response()->json(prepareResult(false, $cartDetail, getLangByLabelGroups('messages','message_cart_updated')), config('http_response.success'));
         }

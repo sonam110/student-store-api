@@ -6,17 +6,39 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\FavouriteProduct;
+use App\Models\Language;
 use Auth;
 use DB;
 
 class FavouriteProductController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
     public function index(Request $request)
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $query = FavouriteProduct::where('user_id', Auth::id())->orderBy('created_at','DESC')
-                    ->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags');
+                    ->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')
+                ->with(['product.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['product.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }]);
                     
             // if(Auth::user()->user_type_id=='2')
             // {

@@ -14,14 +14,24 @@ use App\Models\ContestApplication;
 use App\Models\ContestCancellationRange;
 use App\Models\UserPackageSubscription;
 use App\Models\ContestTag;
+use App\Models\Language;
 
 class ContestController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
     public function index(Request $request)
     {
         try
         {
-             if(!empty($request->per_page_record))
+            if(!empty($request->per_page_record))
             {
                 $contests = Contest::where('is_published', '1')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','cancellationRanges')->withCount('contestApplications')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
@@ -218,7 +228,20 @@ class ContestController extends Controller
             
             
             DB::commit();
-            $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','addressDetail','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')->find($contest->id);
+            $lang_id = $this->lang_id;
+
+            $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','addressDetail','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->find($contest->id);
             return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_created')), config('http_response.created'));
         }
         catch (\Throwable $exception)
@@ -232,8 +255,21 @@ class ContestController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $contest_id = $contest->id;
-            $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','contestWinners')->withCount('contestApplications')->find($contest->id);
+            $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','contestWinners')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->withCount('contestApplications')->find($contest->id);
 
             $diff_in_hours = \Carbon\Carbon::parse($contest->start_date)->diffInHours();
             $contest['cancel_button_enabled'] = false;
@@ -551,6 +587,8 @@ class ContestController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria contest
 
             $contests = Contest::select('contests.*')
@@ -558,7 +596,17 @@ class ContestController extends Controller
                     
                     // ->where('contests.is_published', '1')
                     ->orderBy('contests.created_at','DESC')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
             if(!empty($request->type))
             {
                 $contests->where('contests.type', $request->type);

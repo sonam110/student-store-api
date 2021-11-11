@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Str;
 use DB;
 use Auth;
+use App\Models\Language;
 use App\Models\FavouriteProduct;
 use App\Models\Notification;
 use App\Models\ProductImage;
@@ -36,6 +37,15 @@ use App\Models\ServiceProviderDetail;
 
 class LandingPageController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
     public function initialScreen()
     {
         $pspids = [];
@@ -90,6 +100,8 @@ class LandingPageController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $productsServicesBooks = ProductsServicesBook::select('products_services_books.*')
                                         ->join('users', function ($join) {
                                             $join->on('products_services_books.user_id', '=', 'users.id');
@@ -97,7 +109,17 @@ class LandingPageController extends Controller
                                         ->where('products_services_books.status', '2')
                                         ->where('products_services_books.is_published', '1')
                                         ->orderBy('products_services_books.created_at','DESC')
-                                        ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                                        ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                                        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                                            $q->select('id','category_master_id','title','slug')
+                                                ->where('language_id', $lang_id)
+                                                ->where('is_parent', '1');
+                                        }])
+                                        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                                            $q->select('id','category_master_id','title','slug')
+                                                ->where('language_id', $lang_id)
+                                                ->where('is_parent', '0');
+                                        }]);
             if($request->type=='product' || $request->type=='book')
             {
                 $productsServicesBooks = $productsServicesBooks->where('quantity', '>', 0);
@@ -146,6 +168,8 @@ class LandingPageController extends Controller
 
     public function productDetail(Request $request,$id)
     {
+        $lang_id = $this->lang_id;
+
         $productsServicesBook = ProductsServicesBook::find($id);
         if(!$productsServicesBook)
         {
@@ -186,9 +210,21 @@ class LandingPageController extends Controller
             $is_chat_initiated = false;
             $contactListId = null;
         }
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,email,contact_number,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','productImages','productTags')->with(['ratings.customer' => function($query){
-                $query->take(3);
-            }])->withCount('ratings')->find($id);
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,email,contact_number,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','productImages','productTags')
+        ->with(['ratings.customer' => function($query){
+            $query->take(3);
+        }])
+        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '1');
+        }])
+        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '0');
+        }])
+        ->withCount('ratings')->find($id);
         $productsServicesBook['favourite_products_services_book'] = $favouriteProductsServicesBook;
         $productsServicesBook['favourite_id'] = $favouriteId;
         $productsServicesBook['in_cart'] = $in_cart;
@@ -223,13 +259,25 @@ class LandingPageController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
             $similarProducts = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')
             ->where('id','!=', $request->product_id)
             ->where('sub_category_slug', $productsServicesBooks->sub_category_slug)
             ->orderBy('created_at','DESC')
             ->where('status', '2')
-            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }]);
             if(!empty($request->per_page_record))
             {
                 $similarProducts = $similarProducts->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -250,7 +298,8 @@ class LandingPageController extends Controller
     {
         try
         {
-            
+            $lang_id = $this->lang_id;
+
             $type = 'product';
             if(!empty($request->type))
             {
@@ -262,8 +311,19 @@ class LandingPageController extends Controller
             ->where('products_services_books.quantity','>' ,'0')
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
-            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
 
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }]);
+            
             if($request->is_used_item!='both')
             {
                 if($request->is_used_item=='yes')
@@ -429,7 +489,17 @@ class LandingPageController extends Controller
                                 ->where('products_services_books.quantity','>' ,'0')
                                 ->where('products_services_books.is_published', '1')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '1');
+                                }])
+                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '0');
+                                }]);
                     if($request->is_used_item!='both')
                     {
                         if($request->is_used_item=='yes')
@@ -470,7 +540,17 @@ class LandingPageController extends Controller
                     ->where('users.user_type_id','3')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
                     ->where('products_services_books.type', $type)
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
                 }
             }
             if(!empty($request->per_page_record))
@@ -499,6 +579,8 @@ class LandingPageController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; //filter, promotion, latest, closingSoon, random, criteria users
             $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','products_services_books.discounted_price','products_services_books.deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug')
             ->join('users', function ($join) {
@@ -509,7 +591,17 @@ class LandingPageController extends Controller
             // ->where('products_services_books.user_id', '!=', Auth::id())
             ->where('users.user_type_id','3')
             ->where('products_services_books.type','service')
-            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }]);
             if($searchType=='promotion')
             {
                 $products->where('products_services_books.is_promoted', '1')
@@ -538,7 +630,17 @@ class LandingPageController extends Controller
                     ->where('users.user_type_id','3')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
                     ->where('products_services_books.type','service')
-                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
                 }
             }
             elseif($searchType=='topRated')
@@ -574,6 +676,8 @@ class LandingPageController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','products_services_books.discounted_price','products_services_books.deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug')
             ->where('is_used_item', '1')
@@ -582,7 +686,17 @@ class LandingPageController extends Controller
                                 // ->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '1');
+                                }])
+                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '0');
+                                }]);
             if($searchType=='filter')
             {
                 
@@ -612,7 +726,17 @@ class LandingPageController extends Controller
                                 ->where('is_published', '1')
                                 ->where('quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '1');
+                                }])
+                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '0');
+                                }]); 
                 }
             }
             elseif($searchType=='topRated')
@@ -641,7 +765,17 @@ class LandingPageController extends Controller
                     ->where('users.user_type_id','2')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
                     ->where('products_services_books.type','product')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
                 }
             }
             if(!empty($request->per_page_record))
@@ -670,6 +804,8 @@ class LandingPageController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; //filter, promotion, latest, closingSoon, random, criteria users
             $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','products_services_books.discounted_price','products_services_books.deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug')
             ->join('users', function ($join) {
@@ -680,7 +816,17 @@ class LandingPageController extends Controller
             ->where('products_services_books.is_published', '1')
             ->where('users.user_type_id','2')
             ->where('products_services_books.type','service')
-            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }]);
             if($searchType=='filter')
             {
                 if(!empty($request->title))
@@ -823,7 +969,17 @@ class LandingPageController extends Controller
                     ->where('users.user_type_id','2')
                     ->where('products_services_books.type','service')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
-                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
                 }
             }
             elseif($searchType=='topRated')
@@ -859,6 +1015,7 @@ class LandingPageController extends Controller
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_product_promotions = $this->companyProductsFilter($content);
         
         $content = new Request();
@@ -867,6 +1024,7 @@ class LandingPageController extends Controller
         $content->searchType = 'bestSelling';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_product_best_selling = $this->companyProductsFilter($content);
         
         $content = new Request();
@@ -875,6 +1033,7 @@ class LandingPageController extends Controller
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_product_top_rated = $this->companyProductsFilter($content);
         
         $content = new Request();
@@ -883,6 +1042,7 @@ class LandingPageController extends Controller
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_product_random = $this->companyProductsFilter($content);
         
         $content = new Request();
@@ -891,6 +1051,7 @@ class LandingPageController extends Controller
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_product_latest = $this->companyProductsFilter($content);
 
         $content = new Request();
@@ -899,6 +1060,7 @@ class LandingPageController extends Controller
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_product_popular = $this->companyProductsFilter($content);
         
         
@@ -907,6 +1069,7 @@ class LandingPageController extends Controller
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_service_promotions = $this->companyServicesFilter($content);
         
         $content = new Request();
@@ -914,6 +1077,7 @@ class LandingPageController extends Controller
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_service_latest = $this->companyServicesFilter($content);
         
         $content = new Request();
@@ -921,6 +1085,7 @@ class LandingPageController extends Controller
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_service_popular = $this->companyServicesFilter($content);
         
         $content = new Request();
@@ -928,6 +1093,7 @@ class LandingPageController extends Controller
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_service_top_rated = $this->companyServicesFilter($content);
         
         $content = new Request();
@@ -935,6 +1101,7 @@ class LandingPageController extends Controller
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_service_random = $this->companyServicesFilter($content);
 
 
@@ -943,6 +1110,7 @@ class LandingPageController extends Controller
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_book_promotions = $this->companyBooksFilter($content);
         
         $content = new Request();
@@ -950,6 +1118,7 @@ class LandingPageController extends Controller
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_book_latest = $this->companyBooksFilter($content);
         
         $content = new Request();
@@ -957,6 +1126,7 @@ class LandingPageController extends Controller
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_book_popular = $this->companyBooksFilter($content);
         
         $content = new Request();
@@ -964,6 +1134,7 @@ class LandingPageController extends Controller
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_book_top_rated = $this->companyBooksFilter($content);
         
         $content = new Request();
@@ -971,6 +1142,7 @@ class LandingPageController extends Controller
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $company_book_random = $this->companyBooksFilter($content);
         
         
@@ -1012,6 +1184,7 @@ class LandingPageController extends Controller
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_product_promotions = $this->studentProductsFilter($content);
         
         $content = new Request();
@@ -1020,6 +1193,7 @@ class LandingPageController extends Controller
         $content->searchType = 'bestSelling';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_product_best_selling = $this->studentProductsFilter($content);
         
         $content = new Request();
@@ -1028,6 +1202,7 @@ class LandingPageController extends Controller
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_product_top_rated = $this->studentProductsFilter($content);
         
         $content = new Request();
@@ -1036,6 +1211,7 @@ class LandingPageController extends Controller
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_product_random = $this->studentProductsFilter($content);
         
         $content = new Request();
@@ -1044,6 +1220,7 @@ class LandingPageController extends Controller
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_product_latest = $this->studentProductsFilter($content);
 
         $content = new Request();
@@ -1052,6 +1229,7 @@ class LandingPageController extends Controller
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_product_popular = $this->studentProductsFilter($content);
         
         
@@ -1060,6 +1238,7 @@ class LandingPageController extends Controller
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_service_promotions = $this->studentServicesFilter($content);
         
         $content = new Request();
@@ -1067,6 +1246,7 @@ class LandingPageController extends Controller
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_service_latest = $this->studentServicesFilter($content);
         
         $content = new Request();
@@ -1074,6 +1254,7 @@ class LandingPageController extends Controller
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_service_popular = $this->studentServicesFilter($content);
         
         $content = new Request();
@@ -1081,6 +1262,7 @@ class LandingPageController extends Controller
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_service_top_rated = $this->studentServicesFilter($content);
         
         $content = new Request();
@@ -1088,6 +1270,7 @@ class LandingPageController extends Controller
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_service_random = $this->studentServicesFilter($content);
 
         $content = new Request();
@@ -1095,6 +1278,7 @@ class LandingPageController extends Controller
         $content->searchType = 'promotion';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_book_promotions = $this->studentBooksFilter($content);
         
         $content = new Request();
@@ -1102,6 +1286,7 @@ class LandingPageController extends Controller
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_book_latest = $this->studentBooksFilter($content);
         
         $content = new Request();
@@ -1109,6 +1294,7 @@ class LandingPageController extends Controller
         $content->searchType = 'popular';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_book_popular = $this->studentBooksFilter($content);
         
         $content = new Request();
@@ -1116,6 +1302,7 @@ class LandingPageController extends Controller
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_book_top_rated = $this->studentBooksFilter($content);
         
         $content = new Request();
@@ -1123,6 +1310,7 @@ class LandingPageController extends Controller
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $student_book_random = $this->studentBooksFilter($content);
         
         
@@ -1160,6 +1348,8 @@ class LandingPageController extends Controller
     {  
         try
         {
+            $lang_id = $this->lang_id;
+
             $type = 'book';
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','products_services_books.discounted_price','products_services_books.deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug')
@@ -1168,7 +1358,17 @@ class LandingPageController extends Controller
             ->where('products_services_books.quantity','>' ,'0')
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
-            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+            ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }]);
 
             if($request->is_used_item!='both')
             {
@@ -1322,7 +1522,17 @@ class LandingPageController extends Controller
                                 ->where('products_services_books.is_published', '1')
                                 ->where('products_services_books.quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '1');
+                                }])
+                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '0');
+                                }]);
                     if($request->is_used_item!='both')
                     {
                         if($request->is_used_item=='yes')
@@ -1363,7 +1573,17 @@ class LandingPageController extends Controller
                     ->where('users.user_type_id','3')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
                     ->where('products_services_books.type','book')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
                 }
             }
             if(!empty($request->per_page_record))
@@ -1392,6 +1612,8 @@ class LandingPageController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','products_services_books.discounted_price','products_services_books.deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug')
             ->where('is_used_item', '1')
@@ -1400,7 +1622,17 @@ class LandingPageController extends Controller
                                 // ->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
                                 ->where('is_published', '1')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail');
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '1');
+                                }])
+                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '0');
+                                }]);
             if($searchType=='filter')
             {
                 
@@ -1430,7 +1662,17 @@ class LandingPageController extends Controller
                                 ->where('is_published', '1')
                                 ->where('quantity','>' ,'0')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail'); 
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '1');
+                                }])
+                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '0');
+                                }]); 
                 }
             }
             elseif($searchType=='topRated')
@@ -1459,7 +1701,17 @@ class LandingPageController extends Controller
                     ->where('users.user_type_id','2')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
                     ->where('products_services_books.type','book')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
                 }
             }
             if(!empty($request->per_page_record))
@@ -1485,9 +1737,21 @@ class LandingPageController extends Controller
 
     public function getJobs(Request $request)
     {
+        $lang_id = $this->lang_id;
+
         $jobs = Job::where('is_published', '1')
                         ->where('job_status', '1')
                         ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','jobTags:id,job_id,title','addressDetail','isApplied','isFavourite','categoryMaster','subCategory')
+                        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '1');
+                        }])
+                        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '0');
+                        }])
                         ->where('application_start_date','<=', date('Y-m-d'))
                         ->where('application_end_date','>=', date('Y-m-d'))
                         ->inRandomOrder();
@@ -1505,6 +1769,8 @@ class LandingPageController extends Controller
 
     public function jobDetail(Request $request, $id)
     {
+        $lang_id = $this->lang_id;
+
         $job = Job::find($id);
         if(!$job)
         {
@@ -1528,7 +1794,18 @@ class LandingPageController extends Controller
         {
             $applied = false;
         }
-        $job = Job::with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path,avg_rating','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
+        $job = Job::with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path,avg_rating','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')
+        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '1');
+        }])
+        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '0');
+        }])
+        ->find($job->id);
         $job['favourite_job'] = $favouriteJob;
         $job['favourite_id'] = $favouriteId;
         $job['is_applied'] = $applied;
@@ -1541,11 +1818,23 @@ class LandingPageController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria job
             $jobs = Job::select('sp_jobs.id','sp_jobs.user_id', 'sp_jobs.address_detail_id', 'sp_jobs.title', 'sp_jobs.slug', 'sp_jobs.short_summary', 'sp_jobs.job_type', 'sp_jobs.job_nature', 'sp_jobs.years_of_experience', 'sp_jobs.job_environment', 'sp_jobs.category_master_id','sp_jobs.sub_category_slug','sp_jobs.job_hours')
                     ->where('sp_jobs.is_published', '1')
                     ->where('sp_jobs.job_status', '1')
-                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','jobTags:id,job_id,title','isApplied','isFavourite','addressDetail','categoryMaster','subCategory');
+                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','jobTags:id,job_id,title','isApplied','isFavourite','addressDetail','categoryMaster','subCategory')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
             if($searchType=='filter')
             {
                 if(!empty($request->category_master_id))
@@ -1837,24 +2126,28 @@ class LandingPageController extends Controller
         $content->searchType = 'promotions';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $jobs_promotions = $this->jobFilter($content);
         
         $content = new Request();
         $content->searchType = 'latest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $jobs_latest = $this->jobFilter($content);
         
         $content = new Request();
         $content->searchType = 'closingSoon';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $jobs_closing_soon = $this->jobFilter($content);
         
         $content = new Request();
         $content->searchType = 'random';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $jobs_random = $this->jobFilter($content);
         
         
@@ -1874,8 +2167,20 @@ class LandingPageController extends Controller
 
     public function getContests(Request $request)
     {
+        $lang_id = $this->lang_id;
+
         $contests = Contest::where('is_published', '1')
                         ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','cancellationRanges','isApplied','categoryMaster','subCategory')
+                        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '1');
+                        }])
+                        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '0');
+                        }])
                         ->withCount('contestApplications')
                         ->where('status', 'verified')
                         ->where('application_start_date','<=', date('Y-m-d'))
@@ -1895,6 +2200,8 @@ class LandingPageController extends Controller
 
     public function contestDetail(Request $request, $id)
     {
+        $lang_id = $this->lang_id;
+
         $contest = Contest::find($id);
         if($contest)
         {
@@ -1906,7 +2213,19 @@ class LandingPageController extends Controller
             {
                 $applied = false;
             }
-            $contest = Contest::with('user:id,first_name,last_name,profile_pic_path,show_email,show_contact_number','cancellationRanges','categoryMaster','subCategory','user.defaultAddress','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')->withCount('contestApplications')->find($contest->id);
+            $contest = Contest::with('user:id,first_name,last_name,profile_pic_path,show_email,show_contact_number','cancellationRanges','categoryMaster','subCategory','user.defaultAddress','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->withCount('contestApplications')
+            ->find($contest->id);
             $contest['is_applied'] = $applied;
             $contest['latitude'] = $contest->addressDetail? $contest->addressDetail->latitude:null;
             $contest['longitude'] = $contest->addressDetail?$contest->addressDetail->longitude:null;
@@ -1920,6 +2239,8 @@ class LandingPageController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria contest
             
             $user_type_id = '3';
@@ -1939,7 +2260,17 @@ class LandingPageController extends Controller
                     ->where('contests.status', 'verified')
                     ->where('application_start_date','<=', date('Y-m-d'))
                     ->where('application_end_date','>=', date('Y-m-d'))
-                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','isApplied','categoryMaster','subCategory');
+                    ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','isApplied','categoryMaster','subCategory')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
             if($searchType=='only_category_filter')
             {
                 if(!empty($request->category_master_id))
@@ -2078,6 +2409,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_promotions = $this->contestFilter($content);
 
         $content = new Request();
@@ -2085,6 +2417,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_most_popular = $this->contestFilter($content);
         
         $content = new Request();
@@ -2092,6 +2425,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_latest = $this->contestFilter($content);
         
         $content = new Request();
@@ -2099,6 +2433,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_closing_soon = $this->contestFilter($content);
         
         $content = new Request();
@@ -2106,6 +2441,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_random = $this->contestFilter($content);
 
         $content = new Request();
@@ -2113,6 +2449,7 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_promotions = $this->contestFilter($content);
 
         $content = new Request();
@@ -2120,6 +2457,7 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_most_popular = $this->contestFilter($content);
         
         $content = new Request();
@@ -2127,6 +2465,7 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_latest = $this->contestFilter($content);
         
         $content = new Request();
@@ -2134,6 +2473,7 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_closing_soon = $this->contestFilter($content);
         
         $content = new Request();
@@ -2141,6 +2481,7 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_random = $this->contestFilter($content);
         
         $returnObj = [
@@ -2171,6 +2512,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_promotions = $this->contestFilter($content);
 
         $content = new Request();
@@ -2179,6 +2521,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_most_popular = $this->contestFilter($content);
         
         $content = new Request();
@@ -2187,6 +2530,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_latest = $this->contestFilter($content);
         
         $content = new Request();
@@ -2195,6 +2539,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_closing_soon = $this->contestFilter($content);
         
         $content = new Request();
@@ -2203,6 +2548,7 @@ class LandingPageController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_random = $this->contestFilter($content);
         
         $content = new Request();
@@ -2211,6 +2557,7 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_promotions = $this->contestFilter($content);
 
         $content = new Request();
@@ -2219,6 +2566,7 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_most_popular = $this->contestFilter($content);
         
         $content = new Request();
@@ -2227,6 +2575,7 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_latest = $this->contestFilter($content);
         
         $content = new Request();
@@ -2235,6 +2584,7 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_closing_soon = $this->contestFilter($content);
         
         $content = new Request();
@@ -2243,9 +2593,8 @@ class LandingPageController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_random = $this->contestFilter($content);
-        
-        
         
         $returnObj = [
 

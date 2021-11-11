@@ -9,14 +9,37 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
 use DB;
+use App\Models\Language;
 
 class ContestWinnerController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
 	public function index(Request $request)
 	{
 		try
 		{
-            $contestWinners = ContestWinner::with('contest','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory')->orderBy('created_at','DESC');
+            $lang_id = $this->lang_id;
+
+            $contestWinners = ContestWinner::with('contest','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory')
+            ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->orderBy('created_at','DESC');
 			if(!empty($request->per_page_record))
 			{
 			   $contestWinners = $contestWinners->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -60,6 +83,8 @@ class ContestWinnerController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
         	$winners = ContestWinner::select('contest_winners.*')
         	        ->join('users', function ($join) {
         	            $join->on('contest_winners.user_id', '=', 'users.id');
@@ -67,7 +92,17 @@ class ContestWinnerController extends Controller
                     ->join('contests', function ($join) {
                         $join->on('contest_winners.contest_id', '=', 'contests.id');
                     })
-        	        ->with('contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail','user.defaultAddress');
+        	        ->with('contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail','user.defaultAddress')
+                    ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
                     
             if(!empty($request->user_id))
             {

@@ -19,20 +19,54 @@ use App\Models\OrderItem;
 use App\Models\Abuse;
 use App\Models\NotificationTemplate;
 use App\Models\RatingAndFeedback;
+use App\Models\Language;
 
 class ContestController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
     public function index(Request $request)
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             if(!empty($request->per_page_record))
             {
-                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')->withCount('contestApplications')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')
+                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }])
+                ->withCount('contestApplications')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')->withCount('contestApplications')->get();
+                $contests = Contest::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')
+                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }])
+                ->withCount('contestApplications')->get();
             }
             return response(prepareResult(false, $contests, getLangByLabelGroups('messages','messages_contest_list')), config('http_response.success'));
         }
@@ -254,7 +288,18 @@ class ContestController extends Controller
                 
             // }
             DB::commit();
-            $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','addressDetail','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')->find($contest->id);
+            $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','addressDetail','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->find($contest->id);
             return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_created')), config('http_response.created'));
         }
         catch (\Throwable $exception)
@@ -266,6 +311,8 @@ class ContestController extends Controller
 
     public function show(Contest $contest)
     {
+        $lang_id = $this->lang_id;
+
         if($contestApplication = ContestApplication::where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->first())
         {
             $applied = true;
@@ -307,6 +354,16 @@ class ContestController extends Controller
             $is_abuse_reported = false;
         }
         $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.defaultAddress:id,user_id,full_address','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','contestWinners')
+        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '1');
+        }])
+        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '0');
+        }])
         ->withCount('contestApplications','ratings')
         ->with(['ratings.customer' => function($query){
                         $query->take(3);
@@ -612,6 +669,8 @@ class ContestController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria contest
             
             $user_type_id = '3';
@@ -634,7 +693,17 @@ class ContestController extends Controller
                     ->where('contests.status', 'verified')
                     ->where('contests.application_start_date','<=', date('Y-m-d'))
                     ->where('contests.application_end_date','>=', date('Y-m-d'))
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
             if($searchType=='only_category_filter')
             {
                 if(!empty($request->category_master_id))
@@ -764,6 +833,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_promotions = $this->contestFilter($content);
 
         $content = new Request();
@@ -771,6 +841,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_most_popular = $this->contestFilter($content);
         
         $content = new Request();
@@ -778,6 +849,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_latest = $this->contestFilter($content);
         
         $content = new Request();
@@ -785,6 +857,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_closing_soon = $this->contestFilter($content);
         
         $content = new Request();
@@ -792,6 +865,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_random = $this->contestFilter($content);
 
         $content = new Request();
@@ -799,6 +873,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_promotions = $this->contestFilter($content);
 
         $content = new Request();
@@ -806,6 +881,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_most_popular = $this->contestFilter($content);
         
         $content = new Request();
@@ -813,6 +889,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_latest = $this->contestFilter($content);
         
         $content = new Request();
@@ -820,6 +897,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_closing_soon = $this->contestFilter($content);
         
         $content = new Request();
@@ -827,6 +905,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_random = $this->contestFilter($content);
         
         $returnObj = [
@@ -857,6 +936,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_promotions = $this->contestFilter($content);
 
         $content = new Request();
@@ -865,6 +945,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_most_popular = $this->contestFilter($content);
         
         $content = new Request();
@@ -873,6 +954,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_latest = $this->contestFilter($content);
         
         $content = new Request();
@@ -881,6 +963,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_closing_soon = $this->contestFilter($content);
         
         $content = new Request();
@@ -889,6 +972,7 @@ class ContestController extends Controller
         $content->type = 'contest';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $contests_random = $this->contestFilter($content);
         
         $content = new Request();
@@ -897,6 +981,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_promotions = $this->contestFilter($content);
 
         $content = new Request();
@@ -905,6 +990,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_most_popular = $this->contestFilter($content);
         
         $content = new Request();
@@ -913,6 +999,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_latest = $this->contestFilter($content);
         
         $content = new Request();
@@ -921,6 +1008,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_closing_soon = $this->contestFilter($content);
         
         $content = new Request();
@@ -929,6 +1017,7 @@ class ContestController extends Controller
         $content->type = 'event';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
         $events_random = $this->contestFilter($content);
         
         

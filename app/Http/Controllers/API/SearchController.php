@@ -7,9 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\Job;
 use App\Models\ProductsServicesBook;
 use App\Models\Contest;
+use App\Models\Language;
 
 class SearchController extends Controller
 {
+	function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
 	public function productSearch(Request $request)
 	{
 
@@ -283,6 +293,8 @@ class SearchController extends Controller
 
 	public function contestSearch(Request $request)
 	{
+		$lang_id = $this->lang_id;
+
 		$dataType = 'contest';
 		$dataOf = '3';
 		if(!empty($request->dataType))
@@ -310,6 +322,16 @@ class SearchController extends Controller
 			->where('contests.type',$dataType)
 			->orderBy('contests.created_at','desc')
 			->with('categoryMaster','subCategory')
+			->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->where('contests.title','like', '%'.$request->search.'%')
 			->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 		}
@@ -323,6 +345,16 @@ class SearchController extends Controller
 			->where('contests.type',$dataType)
 			->orderBy('contests.created_at','desc')
 			->with('categoryMaster','subCategory')
+			->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->where('contests.title','like', '%'.$request->search.'%')
 			->get();
 		}
@@ -403,11 +435,23 @@ class SearchController extends Controller
 
 	public function commonSearch(Request $request)
 	{
+		$lang_id = $this->lang_id;
+
 		$data = [];
 
 		$data['products'] = ProductsServicesBook::select('id','title','slug','type','category_master_id','sub_category_slug')
 		->orderBy('created_at','desc')
-		->with('categoryMaster:id,title','subCategory:title,slug')
+		->with('categoryMaster','subCategory')
+		->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '1');
+        }])
+        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '0');
+        }])
 		->where('title','like', '%'.$request->search.'%')
 		->where('is_published', '1')
 		->where('status', '2')
@@ -416,7 +460,17 @@ class SearchController extends Controller
 
 		$data['jobs'] = Job::select('id','title','slug','category_master_id','sub_category_slug')
 		->orderBy('created_at','desc')
-		->with('categoryMaster:id,title','subCategory:title,slug')
+		->with('categoryMaster','subCategory')
+		->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '1');
+        }])
+        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '0');
+        }])
 		->where('title','like', '%'.$request->search.'%')
 		->where('is_published', '1')
 		->where('job_status', '1')
@@ -426,7 +480,17 @@ class SearchController extends Controller
 
 		$data['contests'] = Contest::select('id','title','slug','type','category_master_id','sub_category_slug')
 		->orderBy('created_at','desc')
-		->with('categoryMaster:id,title','subCategory:title,slug')
+		->with('categoryMaster','subCategory')
+		->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '1');
+        }])
+        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '0');
+        }])
 		->where('title','like', '%'.$request->search.'%')
 		->where('is_published', '1')
 		->where('status', 'verified')
@@ -437,7 +501,17 @@ class SearchController extends Controller
 		{
 			$data['products'] = ProductsServicesBook::select('id','title','slug','type','category_master_id','sub_category_slug')
 			->orderBy('created_at','desc')
-			->with('categoryMaster:id,title','subCategory:title,slug')
+			->with('categoryMaster','subCategory')
+			->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->where('title','like', '%'.$request->search.'%')
 			->where('type',$request->type)
 			->where('is_published', '1')
@@ -450,7 +524,17 @@ class SearchController extends Controller
 			{
 				$data['jobs'] = Job::select('id','title','slug','category_master_id','sub_category_slug')
 				->orderBy('created_at','desc')
-				->with('categoryMaster:id,title','subCategory:title,slug')
+				->with('categoryMaster','subCategory')
+				->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+	                $q->select('id','category_master_id','title','slug')
+	                    ->where('language_id', $lang_id)
+	                    ->where('is_parent', '1');
+	            }])
+	            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+	                $q->select('id','category_master_id','title','slug')
+	                    ->where('language_id', $lang_id)
+	                    ->where('is_parent', '0');
+	            }])
 				->where('title','like', '%'.$request->search.'%')
 				->where('is_published', '1')
 				->where('job_status', '1')
@@ -461,7 +545,17 @@ class SearchController extends Controller
 			{
 				$data['jobs'] = Job::select('id','title','slug','category_master_id','sub_category_slug')
 				->orderBy('created_at','desc')
-				->with('categoryMaster:id,title','subCategory:title,slug')
+				->with('categoryMaster','subCategory')
+				->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+	                $q->select('id','category_master_id','title','slug')
+	                    ->where('language_id', $lang_id)
+	                    ->where('is_parent', '1');
+	            }])
+	            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+	                $q->select('id','category_master_id','title','slug')
+	                    ->where('language_id', $lang_id)
+	                    ->where('is_parent', '0');
+	            }])
 				->where('title','like', '%'.$request->search.'%')
 				->where('id',null)
 				->where('is_published', '1')
@@ -475,7 +569,17 @@ class SearchController extends Controller
 
 			$data['contests'] = Contest::select('id','title','slug','type','category_master_id','sub_category_slug')
 			->orderBy('created_at','desc')
-			->with('categoryMaster:id,title','subCategory:title,slug')
+			->with('categoryMaster','subCategory')
+			->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->where('title','like', '%'.$request->search.'%')
 			->where('type',$request->type)
 			->where('is_published', '1')

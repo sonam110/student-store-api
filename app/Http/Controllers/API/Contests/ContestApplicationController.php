@@ -13,27 +13,54 @@ use DB;
 use Auth;
 use Event;
 use mervick\aesEverywhere\AES256;
-
+use App\Models\Language;
 
 class ContestApplicationController extends Controller
 {
-    /**
-         * Display a listing of the resource.
-         *
-         * @return \Illuminate\Http\Response
-         */
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
 
     public function index(Request $request)
     {
     	try
     	{
+            $lang_id = $this->lang_id; 
+
             if(!empty($request->per_page_record))
             {
-                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user','orderItem:id,contest_application_id,order_id','orderItem.order:id,order_number')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user','orderItem:id,contest_application_id,order_id','orderItem.order:id,order_number')
+                    ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }])
+                ->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user','orderItem:id,contest_application_id,order_id','orderItem.order:id,order_number')->get();
+                $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user','orderItem:id,contest_application_id,order_id','orderItem.order:id,order_number')
+                    ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }])
+                    ->get();
             }
     		return response(prepareResult(false, $contestApplications, getLangByLabelGroups('messages','message_contest_application_list')), config('http_response.success'));
     	}
@@ -115,7 +142,20 @@ class ContestApplicationController extends Controller
 
     public function show(ContestApplication $contestApplication)
     {
-    	$contestApplication = ContestApplication::where('id',$contestApplication->id)->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')->first();
+        $lang_id = $this->lang_id;
+
+    	$contestApplication = ContestApplication::where('id',$contestApplication->id)->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')
+        ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '1');
+        }])
+        ->with(['contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '0');
+        }])
+        ->first();
     	return response()->json(prepareResult(false, $contestApplication, getLangByLabelGroups('messages','message_contest_application_list')), config('http_response.success'));
     }
 

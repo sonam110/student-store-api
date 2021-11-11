@@ -45,6 +45,11 @@ class FrontController extends Controller
     {
         $this->paymentInfo = PaymentGatewaySetting::first();
         $this->appsetting = AppSetting::first();
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
     }
 
 	public function getUserType()

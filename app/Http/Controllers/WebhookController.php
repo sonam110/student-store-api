@@ -72,6 +72,13 @@ class WebhookController extends Controller
             Log::channel('webhook')->info('customer.subscription.created');
             Log::channel('webhook')->info($subscriptionSchedule);
         }
+        elseif ($event->type == "customer.subscription.updated")
+        { 
+            $subscriptionSchedule = $event->data->object;
+            $this->abortedSubscription($subscription_id);
+            Log::channel('webhook')->info('customer.subscription.created');
+            Log::channel('webhook')->info($subscriptionSchedule);
+        }
         Log::channel('webhook')->info('payload');
         Log::channel('webhook')->info($payload);
         http_response_code(200);

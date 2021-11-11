@@ -21,9 +21,19 @@ use Event;
 use App\Events\JobPostNotification;
 use mervick\aesEverywhere\AES256;
 use App\Models\UserPackageSubscription;
+use App\Models\Language;
 
 class JobController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
     public function index(Request $request)
     {
         try
@@ -203,7 +213,20 @@ class JobController extends Controller
             }
             
             DB::commit();
-            $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')->find($job->id);
+            $lang_id = $this->lang_id;
+
+            $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->find($job->id);
             return response()->json(prepareResult(false, $job, getLangByLabelGroups('messages','messages_job_created')), config('http_response.created'));
         }
         catch (\Throwable $exception)
@@ -543,10 +566,22 @@ class JobController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria job
             $jobs = Job::select('sp_jobs.*')
                     ->orderBy('sp_jobs.created_at','DESC')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
             if($searchType=='filter')
             {
                 if(!empty($request->category_master_id))
@@ -819,7 +854,17 @@ class JobController extends Controller
                 $jobs = Job::select('sp_jobs.*')
                         ->whereIn('sp_jobs.id',$actualArray)
                         ->where('is_published', '1')
-                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory');
+                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')
+                        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '1');
+                        }])
+                        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '0');
+                        }]);
             }
             if(!empty($request->per_page_record))
             {

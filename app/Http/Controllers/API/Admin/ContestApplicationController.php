@@ -11,14 +11,37 @@ use Str;
 use DB;
 use mervick\aesEverywhere\AES256;
 use Auth;
+use App\Models\Language;
 
 class ContestApplicationController extends Controller
 {
+	function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
 	public function index(Request $request)
 	{
 		try
 		{
-			$contestApplications = ContestApplication::with('contest','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.cancellationRanges','contest.categoryMaster','contest.subCategory')->orderBy('created_at','DESC');
+			$lang_id = $this->lang_id;
+
+			$contestApplications = ContestApplication::with('contest','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.cancellationRanges','contest.categoryMaster','contest.subCategory')
+			->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->orderBy('created_at','DESC');
 			if(!empty($request->application_status))
 			{
 				$contestApplications = $contestApplications->where('application_status',$request->application_status);
@@ -42,7 +65,20 @@ class ContestApplicationController extends Controller
 
 	public function show(ContestApplication $contestApplication)
 	{
-		$contestApplication = ContestApplication::with('contest','user','contest.cancellationRanges','contest.categoryMaster','contest.subCategory')->find($contestApplication->id);		
+		$lang_id = $this->lang_id;
+
+		$contestApplication = ContestApplication::with('contest','user','contest.cancellationRanges','contest.categoryMaster','contest.subCategory')
+		->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '1');
+        }])
+        ->with(['contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            $q->select('id','category_master_id','title','slug')
+                ->where('language_id', $lang_id)
+                ->where('is_parent', '0');
+        }])
+        ->find($contestApplication->id);		
 		return response()->json(prepareResult(false, $contestApplication, getLangByLabelGroups('messages','message_contest_application_list')), config('http_response.success'));
 	}
 

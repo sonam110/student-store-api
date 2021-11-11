@@ -21,6 +21,15 @@ use App\Models\Job;
 
 class CategoryMasterController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
     public function index(Request $request)
     {
         try
@@ -47,11 +56,11 @@ class CategoryMasterController extends Controller
 
             if(!empty($request->per_page_record))
             {
-                $categoryMasters = $categoryMasters->with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->where('category_master_id',null)->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $categoryMasters = $categoryMasters->with('categoryLanguageDetails','subcategories.categoryLanguageDetails','moduleType')->where('category_master_id',null)->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $categoryMasters = $categoryMasters->with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->where('category_master_id',null)->get();
+                $categoryMasters = $categoryMasters->with('categoryLanguageDetails','subcategories.categoryLanguageDetails','moduleType')->where('category_master_id',null)->get();
             }
             return response(prepareResult(false, $categoryMasters, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
         }
@@ -257,7 +266,7 @@ class CategoryMasterController extends Controller
      */
     public function show(CategoryMaster $categoryMaster)
     {
-        $categoryMaster = CategoryMaster::with('categoryLanguageDetails','subcategories.categoryLanguageDetails')->find($categoryMaster->id);
+        $categoryMaster = CategoryMaster::with('categoryLanguageDetails','subcategories.categoryLanguageDetails','moduleType')->find($categoryMaster->id);
         return response()->json(prepareResult(false, $categoryMaster, getLangByLabelGroups('messages','message_category_master_list')), config('http_response.success'));
     }
 

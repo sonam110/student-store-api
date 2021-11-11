@@ -410,9 +410,10 @@ class LabelSeeder extends Seeder
           "third_place" => "Third Place" 
         ], 
         "bank_type" => [
-          "Local" => "Local", 
-          "International" => "International", 
-          "Paypal" => "Paypal",
+          "0" => "Local", 
+          "1" => "International", 
+          "2" => "Paypal",
+          "3" => "Paypal",
         ], 
         "book_cover" => [
           "title" => "Book Cover" 
@@ -458,8 +459,8 @@ class LabelSeeder extends Seeder
           "view_all" => "View all" 
         ], 
         "brand_status" => [
-          "Unverified" => "Unverified", 
-          "Verified" => "Verified" 
+          "0" => "Unverified", 
+          "1" => "Verified" 
         ], 
         "bucketType" => [
           "list" => "List", 
@@ -467,8 +468,8 @@ class LabelSeeder extends Seeder
           "textarea" => "Textarea" 
         ], 
         "bucketTypeIsMultiple" => [
-          "True" => "True", 
-          "False" => "False" 
+          "0" => "True", 
+          "1" => "False" 
         ], 
         "bucketTypeText" => [
           "date" => "Date", 
@@ -1864,19 +1865,19 @@ class LabelSeeder extends Seeder
           "9_months" => "9 Months" 
         ], 
         "job_status" => [
-          "Approved", 
-          "Pending Approval", 
-          "Rejected", 
-          "accepted" => "Accepted", 
-          "pending" => "Pending", 
-          "rejected" => "Rejected" 
+          "0" => "Approved",
+          "1" => "Pending Approval",
+          "2" => "Rejected",
+          "accepted" => "Accepted",
+          "pending" => "Pending",
+          "rejected" => "Rejected"
         ], 
         "job_status_drops" => [
-          "Inactive" => "Inactive",  
-          "Active" => "Active",  
-          "Rejected" => "Rejected",  
-          "Expired" => "Expired",  
-          "Cancelled"  => "Cancelled"  
+          "0" => "Inactive",
+          "1" => "Active",
+          "2" => "Rejected",
+          "3" => "Expired",
+          "4" => "Cancelled"
         ], 
         "job_tabs" => [
           "applicants" => "Applicants", 
@@ -1902,8 +1903,9 @@ class LabelSeeder extends Seeder
           "jobs" => "Jobs" 
         ], 
         "languageIds" => [
-          "English" => "English", 
-          "Language 2" => "Language 2"
+          "0" => "English",
+          "1" => "Language 2",
+          "2" => "Language 2"
         ], 
         "languageOptions" => [
           "en" => "English", 
@@ -2513,8 +2515,8 @@ class LabelSeeder extends Seeder
           "unread_messages" => "Unread messages : " 
         ], 
         "minor_students" => [
-        "Adult Students"  => "Adult Students", 
-        "Minors Students" => "Minors Students",
+          "0"  => "Adult Students", 
+          "1" => "Minors Students",
         ], 
         "module_names" => [
           "Book" => "Book", 
@@ -3462,15 +3464,15 @@ class LabelSeeder extends Seeder
           "authorize" => "Authorize" 
         ], 
         "product_status" => [
-          "Pending" => "Pending", 
-          "Verified" => "Verified", 
-          "Rejected" => "Rejected"
+          "0" => "Pending", 
+          "2" => "Verified", 
+          "3" => "Rejected"
         ], 
         "product_status_drop" => [
-          "Pending" => "Pending", 
-          "Processing" => "Processing", 
-          "Verified" => "Verified", 
-          "Rejected" => "Rejected" 
+          "0" => "Pending", 
+          "1" => "Processing", 
+          "2" => "Verified", 
+          "3" => "Rejected" 
         ], 
         "product_view_all" => [
           "all" => "All", 
@@ -3625,8 +3627,8 @@ class LabelSeeder extends Seeder
           "set_as_default_address" => "Set as default address." 
         ], 
         "published" => [
-          "Unpublished" => "Unpublished", 
-          "Published" => "Published" 
+          "0" => "Unpublished", 
+          "1" => "Published" 
         ], 
         "ratingDetails" => [
           "Buyer" => "Buyer", 
@@ -3648,8 +3650,8 @@ class LabelSeeder extends Seeder
           "view_all" => "View All" 
         ], 
         "read_status" => [
-        "Read" => "Read", 
-        "Not Read" => "Not Read" 
+        "0" => "Read", 
+        "1" => "Not Read" 
         ], 
         "reasons" => [
         ], 
@@ -4145,8 +4147,8 @@ class LabelSeeder extends Seeder
           "total_students" => "students" 
         ], 
         "status" => [
-          "False" => "False", 
-          "True" => "True" 
+          "0" => "False", 
+          "1" => "True" 
         ], 
         "status_messages" => [
           "ask_to_cancel" => "Aked for cancellation successful", 
@@ -4329,8 +4331,8 @@ class LabelSeeder extends Seeder
           "view_all" => "View all" 
         ], 
         "user_status" => [
-          "Inactive" => "Inactive", 
-          "Active" => "Active"  
+          "0" => "Inactive", 
+          "1" => "Active"  
         ], 
         "user_types" => [
           "company" => "Company", 
@@ -4360,8 +4362,8 @@ class LabelSeeder extends Seeder
           "returned" => "Return Code" 
         ], 
         "verifications" => [
-          "Not Verified" => "Not Verified", 
-          "Verified" => "Verified" 
+          "0" => "Not Verified", 
+          "1" => "Verified" 
         ], 
         "winner_places" => [
           "first" => "First Place", 

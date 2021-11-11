@@ -34,7 +34,6 @@ class CategoryMaster extends Model
         return $this->belongsTo(CategoryMaster::class, 'category_master_id', 'id');
     }
 
-
     public function categoryDetails()
     {
         return $this->hasMany(CategoryDetail::class, 'category_master_id', 'id');
@@ -55,6 +54,11 @@ class CategoryMaster extends Model
         return $this->hasOne(CategoryDetail::class, 'slug', 'slug');
     }
 
+    public function SubCategoryDetail()
+    {
+        return $this->hasOne(CategoryDetail::class, 'slug', 'slug');
+    }
+
     public function subcategories()
     {
         return $this->hasMany(static::class, 'category_master_id', 'id');
@@ -65,9 +69,6 @@ class CategoryMaster extends Model
         return $this->hasMany(CategoryMaster::class, 'category_master_id','id');
     }
 
-
-
-
     public function categoryLanguageDetails()
     {
         return $this->hasMany(CategoryDetail::class, 'slug', 'slug');
@@ -76,7 +77,5 @@ class CategoryMaster extends Model
     public function language()
     {
         return $this->belongsTo(Language::class, 'language_id', 'id');
-    }
-
-    
+    }    
 }

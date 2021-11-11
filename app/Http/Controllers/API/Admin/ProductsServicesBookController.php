@@ -23,18 +23,41 @@ use App\Models\OrderItem;
 use App\Models\ContactList;
 use App\Models\Brand;
 use App\Models\User;
+use App\Models\Language;
 
 class ProductsServicesBookController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
     public function index(Request $request)
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $productsServicesBooks = ProductsServicesBook::select('products_services_books.*')
-                                        ->join('users', function ($join) {
-                                            $join->on('products_services_books.user_id', '=', 'users.id');
-                                        })
-                                        ->orderBy('products_services_books.created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','addressDetail','categoryMaster','subCategory','coverImage','productTags');
+                ->join('users', function ($join) {
+                    $join->on('products_services_books.user_id', '=', 'users.id');
+                })
+                ->orderBy('products_services_books.created_at','DESC')
+                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','addressDetail','categoryMaster','subCategory','coverImage','productTags')
+                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }]);
             if($request->type)
             {
                 $productsServicesBooks = $productsServicesBooks->where('type',$request->type);
@@ -235,9 +258,22 @@ class ProductsServicesBookController extends Controller
 
     public function show(Request $request,ProductsServicesBook $productsServicesBook)
     {
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail','addressDetail','productImages','productTags')->with(['ratings.customer' => function($query){
-                $query->take(3);
-            }])->withCount('ratings')->find($productsServicesBook->id);
+        $lang_id = $this->lang_id;
+
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail','addressDetail','productImages','productTags')
+        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+        ->with(['ratings.customer' => function($query){
+            $query->take(3);
+        }])->withCount('ratings')->find($productsServicesBook->id);
         $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
         return response()->json(prepareResult(false, $productsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_list')), config('http_response.success'));
     }
@@ -546,6 +582,8 @@ class ProductsServicesBookController extends Controller
     {
         try
         { 
+            $lang_id = $this->lang_id;
+
             // return $request->status;
             $type = 'product';
             if(!empty($request->type))
@@ -557,6 +595,16 @@ class ProductsServicesBookController extends Controller
             ->where('products_services_books.type', $type)
             // ->where('products_services_books.status', $request->status)
             ->with('user:id,user_type_id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
             ->orderBy('products_services_books.created_at','DESC');
 
             if($request->user_type == 'student')
@@ -759,7 +807,17 @@ class ProductsServicesBookController extends Controller
                                 ->where('products_services_books.type', $type)
                                 ->where('products_services_books.is_published', '1')
                                 ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite'); 
+                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '1');
+                                }])
+                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                                    $q->select('id','category_master_id','title','slug')
+                                        ->where('language_id', $lang_id)
+                                        ->where('is_parent', '0');
+                                }]); 
                 }
             }
             elseif($searchType=='topRated')

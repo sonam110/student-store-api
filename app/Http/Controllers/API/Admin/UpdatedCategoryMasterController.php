@@ -21,11 +21,11 @@ class UpdatedCategoryMasterController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $categoryMasters = CategoryMaster::with('categoryDetail','childCategories.categoryDetail')->where('category_master_id',null)->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $categoryMasters = CategoryMaster::with('categoryDetail','childCategories.categoryDetail','moduleType')->where('category_master_id',null)->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $categoryMasters = CategoryMaster::with('categoryDetail','childCategories.categoryDetail')->where('category_master_id',null)->get();
+                $categoryMasters = CategoryMaster::with('categoryDetail','childCategories.categoryDetail','moduleType')->where('category_master_id',null)->get();
             }
             return response(prepareResult(false, $categoryMasters, getLangByLabelGroups('messages','message__category_master_list')), config('http_response.success'));
         }

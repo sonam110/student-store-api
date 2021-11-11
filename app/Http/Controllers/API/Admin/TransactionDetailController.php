@@ -8,9 +8,19 @@ use App\Models\User;
 use App\Models\TransactionDetail;
 use Auth;
 use App\Models\UserPackageSubscription;
+use App\Models\Language;
 
 class TransactionDetailController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
     public function index(Request $request)
     {
         try
@@ -48,9 +58,21 @@ class TransactionDetailController extends Controller
     {
         try
         {
+            $lang_id = $this->lang_id;
+
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria transactionDetail
             $transactionDetails = TransactionDetail::select('sp_transactionDetails.*')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','transactionDetailTags:id,transactionDetail_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite');
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','transactionDetailTags:id,transactionDetail_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite')
+                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }]);
             if($searchType=='filter')
             {
                 if(!empty($request->category_master_id))
@@ -299,7 +321,17 @@ class TransactionDetailController extends Controller
                 $transactionDetails = TransactionDetail::select('sp_transactionDetails.*')
                         ->whereIn('sp_transactionDetails.id',$actualArray)
                         ->where('is_published', '1')
-                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','transactionDetailTags:id,transactionDetail_id,title','addressDetail','categoryMaster','subCategory');
+                        ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','transactionDetailTags:id,transactionDetail_id,title','addressDetail','categoryMaster','subCategory')
+                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }]);
             }
             if(!empty($request->per_page_record))
             {

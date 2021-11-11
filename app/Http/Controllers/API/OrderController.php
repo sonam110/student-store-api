@@ -37,6 +37,7 @@ use PDF;
 use App\Models\UserPackageSubscription;
 use Stripe;
 use App\Models\PaymentGatewaySetting;
+use App\Models\Language;
 use App\Models\TempOrder;
 use Log;
 
@@ -45,13 +46,30 @@ class OrderController extends Controller
 	function __construct()
     {
         $this->paymentInfo = PaymentGatewaySetting::first();
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
     }
 
 	public function index(Request $request)
 	{
 		try
 		{
-			$orders = Order::orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback');
+			$lang_id = $this->lang_id;
+
+			$orders = Order::orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
+			->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }]);
 			if(!empty($request->per_page_record))
 			{
 				$orders = $orders->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -72,13 +90,37 @@ class OrderController extends Controller
 	{
 		try
 		{
+			$lang_id = $this->lang_id;
+
 			if(!empty($request->per_page_record))
 			{
-				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners','orderItems.contestApplication.contest.ratingAndFeedback')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners','orderItems.contestApplication.contest.ratingAndFeedback')
+				->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+	                $q->select('id','category_master_id','title','slug')
+	                    ->where('language_id', $lang_id)
+	                    ->where('is_parent', '1');
+	            }])
+	            ->with(['orderItems.productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+	                $q->select('id','category_master_id','title','slug')
+	                    ->where('language_id', $lang_id)
+	                    ->where('is_parent', '0');
+	            }])
+            	->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 			}
 			else
 			{
-				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners','orderItems.contestApplication.contest.ratingAndFeedback')->get();
+				$orders = Order::where('user_id', Auth::id())->orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user.serviceProviderDetail','orderItems.productsServicesBook.user.defaultAddress','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback','transaction','orderItems.contestApplication.contest.user:id,first_name,last_name','orderItems.contestApplication.contest.cancellationRanges','orderItems.contestApplication.contest.contestWinners','orderItems.contestApplication.contest.ratingAndFeedback')
+				->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+	                $q->select('id','category_master_id','title','slug')
+	                    ->where('language_id', $lang_id)
+	                    ->where('is_parent', '1');
+	            }])
+	            ->with(['orderItems.productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+	                $q->select('id','category_master_id','title','slug')
+	                    ->where('language_id', $lang_id)
+	                    ->where('is_parent', '0');
+	            }])
+	            ->get();
 			}
 			return response(prepareResult(false, $orders, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
 		}
@@ -92,13 +134,25 @@ class OrderController extends Controller
 	{
 		try
 		{
+			$lang_id = $this->lang_id;
+
 			$orderItems = OrderItem::select('order_items.*')
 			->join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
 			->orderBy('order_items.created_at','DESC')
 			->where('products_services_books.user_id',Auth::id())
-			->with('productsServicesBook.user.serviceProviderDetail','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','user','orderTrackings','return','replacement','dispute','ratingAndFeedback','order:id,order_number,first_name,last_name,email,contact_number,latitude,longitude,country,state,city,full_address,zip_code','order.addressDetail');
+			->with('productsServicesBook.user.serviceProviderDetail','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','productsServicesBook.subCategory','user','orderTrackings','return','replacement','dispute','ratingAndFeedback','order:id,order_number,first_name,last_name,email,contact_number,latitude,longitude,country,state,city,full_address,zip_code','order.addressDetail')
+			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }]);
 			if(!empty($request->per_page_record))
 			{
 				$orders = $orderItems->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -518,7 +572,21 @@ class OrderController extends Controller
 			]);
 
 			DB::commit();
-			$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')->find($order->id);
+
+			$lang_id = $this->lang_id;
+
+			$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
+			->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['orderItems.productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->find($order->id);
 			return response()->json(prepareResult(false, $order, getLangByLabelGroups('messages','messages_order_created')), config('http_response.created'));
 		}
 		catch (\Throwable $exception)
@@ -530,7 +598,20 @@ class OrderController extends Controller
 
 	public function show(Order $order)
 	{
-		$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')->find($order->id);
+		$lang_id = $this->lang_id;
+
+		$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
+			->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['orderItems.productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->find($order->id);
 		return response()->json(prepareResult(false, $order, getLangByLabelGroups('messages','messages_order_list')), config('http_response.success'));
 	} 
 

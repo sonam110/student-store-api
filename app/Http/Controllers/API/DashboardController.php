@@ -10,9 +10,18 @@ use App\Models\OrderItem;
 use App\Models\Job;
 use App\Models\Contest;
 use App\Models\ProductsServicesBook;
+use App\Models\Language;
 
 class DashboardController extends Controller
 {
+	function __construct()
+    {
+        $this->lang_id = Language::first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
 
 	public function index(Request $request)
 	{
@@ -278,12 +287,24 @@ class DashboardController extends Controller
 	{
 		try
 		{
+			$lang_id = $this->lang_id;
+
 			$total_sales_book_list = OrderItem::join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
 			->where('order_items.product_type','book')
 			->limit(10)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory','order.user:id,first_name,last_name,user_type_id')
+			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->orderBy('order_items.created_at','desc')
 			->where('products_services_books.user_id',Auth::id());
 
@@ -294,6 +315,16 @@ class DashboardController extends Controller
 			->where('order_items.product_type','service')
 			->limit(10)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory','order.user:id,first_name,last_name,user_type_id')
+			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->orderBy('order_items.created_at','desc')
 			->where('products_services_books.user_id',Auth::id());
 
@@ -304,6 +335,16 @@ class DashboardController extends Controller
 			->where('order_items.product_type','product')
 			->limit(10)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory','order.user:id,first_name,last_name,user_type_id')
+			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->orderBy('order_items.created_at','desc')
 			->where('products_services_books.user_id',Auth::id());
 
@@ -317,6 +358,16 @@ class DashboardController extends Controller
 			->where('order_items.contest_type','contest')
 			->limit(10)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory','order.user:id,first_name,last_name,user_type_id')
+			->with(['contestApplication.contest.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['contestApplication.contest.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->orderBy('order_items.created_at','desc')
 			->where('contests.user_id',Auth::id());
 
@@ -330,6 +381,16 @@ class DashboardController extends Controller
 			->where('order_items.contest_type','event')
 			->limit(10)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory','order.user:id,first_name,last_name,user_type_id')
+			->with(['contestApplication.contest.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['contestApplication.contest.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->orderBy('order_items.created_at','desc')
 			->where('contests.user_id',Auth::id());
 
@@ -351,6 +412,8 @@ class DashboardController extends Controller
 	{
 		try
 		{
+			$lang_id = $this->lang_id;
+			
 			$top_sales_book_list = OrderItem::select('order_items.*',\DB::raw('COUNT(order_items.id) as total_order_count', 'order_items.products_services_book_id'),\DB::raw('sum(order_items.quantity) as total_sell_count','order_items.products_services_book_id'))
 			->join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
@@ -358,6 +421,16 @@ class DashboardController extends Controller
 			->where('order_items.product_type','book')
 			->limit(5)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory')
+			->with(['productsServicesBook.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['productsServicesBook.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->groupBy('order_items.products_services_book_id')
 			->orderBy('total_order_count', 'DESC')
 			->where('products_services_books.user_id',Auth::id());
@@ -370,6 +443,16 @@ class DashboardController extends Controller
 			->where('order_items.product_type','service')
 			->limit(5)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory')
+			->with(['productsServicesBook.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['productsServicesBook.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->groupBy('order_items.products_services_book_id')
 			->orderBy('total_order_count', 'DESC')
 			->where('products_services_books.user_id',Auth::id());
@@ -382,6 +465,16 @@ class DashboardController extends Controller
 			->where('order_items.product_type','product')
 			->limit(5)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory')
+			->with(['productsServicesBook.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['productsServicesBook.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->groupBy('order_items.products_services_book_id')
 			->orderBy('total_order_count', 'DESC')
 			->where('products_services_books.user_id',Auth::id());
@@ -397,6 +490,16 @@ class DashboardController extends Controller
 			->where('order_items.contest_type','contest')
 			->limit(5)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory')
+			->with(['contestApplication.contest.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['contestApplication.contest.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->groupBy('order_items.contest_application_id')
 			->orderBy('total_order_count', 'DESC')
 			->where('contests.user_id',Auth::id());
@@ -412,6 +515,16 @@ class DashboardController extends Controller
 			->where('order_items.contest_type','event')
 			->limit(5)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory')
+			->with(['contestApplication.contest.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['contestApplication.contest.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->groupBy('order_items.contest_application_id')
 			->orderBy('total_order_count', 'DESC')
 			->where('contests.user_id',Auth::id());
@@ -500,10 +613,21 @@ class DashboardController extends Controller
 	{
 		try
 		{
-			
+			$lang_id = $this->lang_id;
+
 			$recent_job_list = Job::orderBy('created_at','desc')
 			->limit(10)
 			->with('user:id,first_name,last_name,user_type_id','categoryMaster','subCategory')
+			->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->where('user_id',Auth::id());
 
 
@@ -514,6 +638,16 @@ class DashboardController extends Controller
 			->limit(5)
 			->groupBy('job_applications.job_id')
 			->with('user:id,first_name,last_name,user_type_id','categoryMaster','subCategory')
+			->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
 			->orderBy('total_job_application_count', 'DESC')
 			->where('sp_jobs.user_id',Auth::id());
 			
