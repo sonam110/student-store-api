@@ -305,6 +305,10 @@ class CategoryMasterController extends Controller
                     $categoryMaster = CategoryMaster::find($cat_parent_id);
                 }
 
+                $detailInfo = CategoryDetail::where('category_master_id', $request->category_master_id)->where('language_id', $language->id)->first();
+                    $detailInfo->title = $value['category_title'];
+                    $detailInfo->save();
+                    
                 if($categoryMaster)
                 {
                     $subCategory = $value['subcategories'];
