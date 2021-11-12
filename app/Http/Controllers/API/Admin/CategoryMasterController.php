@@ -324,7 +324,14 @@ class CategoryMasterController extends Controller
                         $language->save();
                     }
 
-                    $categoryDetail = new CategoryDetail;
+                    if(CategoryDetail::where('category_master_id', $categoryMaster->id)->where('language_id', $language->id)->where('is_parent', 1)->count()<1)
+                    {
+                        $categoryDetail = new CategoryDetail;
+                    }
+                    else
+                    {
+                        $categoryDetail = CategoryDetail::where('category_master_id', $categoryMaster->id)->where('language_id', $language->id)->where('is_parent', 1)->first();
+                    }
                     $categoryDetail->category_master_id = $categoryMaster->id;
                     $categoryDetail->language_id        = $language->id;
                     $categoryDetail->is_parent          = 1;
@@ -345,20 +352,31 @@ class CategoryMasterController extends Controller
                             CategoryDetail::where('slug',$subcat_slug)->delete();
 
                             $subCategoryMaster = CategoryMaster::find($subvalue['subcategory_id']);
+                            if(!$subCategoryMaster)
+                            {
+                                $subCategoryMaster = new CategoryMaster;
+                            }   
                             $subCategoryMaster->title              = $subvalue['subcategory_title'];
                             $subCategoryMaster->vat                = $categoryMaster->vat;
                             $subCategoryMaster->save();
                         }
                         else
                         {
-                            $subCategoryMaster = new CategoryMaster;
-                            $subCategoryMaster->module_type_id     = $categoryMaster->module_type_id;
-                            $subCategoryMaster->category_master_id = $categoryMaster->id;
-                            $subCategoryMaster->title              = $subvalue['subcategory_title'];
-                            $subCategoryMaster->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subCategoryMaster->title);
-                            $subCategoryMaster->status             = 1;
-                            $subCategoryMaster->vat                = $categoryMaster->vat;
-                            $subCategoryMaster->save();
+                            if(CategoryMaster::where('module_type_id', $categoryMaster->module_type_id)->where('category_master_id', $categoryMaster->id)->where('title', $subvalue['subcategory_title'])->count()<1)
+                            {
+                                $subCategoryMaster = new CategoryMaster;
+                                $subCategoryMaster->module_type_id     = $categoryMaster->module_type_id;
+                                $subCategoryMaster->category_master_id = $categoryMaster->id;
+                                $subCategoryMaster->title              = $subvalue['subcategory_title'];
+                                $subCategoryMaster->slug               = $sub_cat_slug_prefix.'-'.Str::slug($subCategoryMaster->title);
+                                $subCategoryMaster->status             = 1;
+                                $subCategoryMaster->vat                = $categoryMaster->vat;
+                                $subCategoryMaster->save();
+                            }
+                            else
+                            {
+                                $subCategoryMaster = CategoryMaster::where('module_type_id', $categoryMaster->module_type_id)->where('category_master_id', $categoryMaster->id)->where('title', $subvalue['subcategory_title'])->first();
+                            }
                         }
 
                         $sub_cat_parent_id[$subkey] = $subCategoryMaster->id;
@@ -372,7 +390,14 @@ class CategoryMasterController extends Controller
 
                     if($subCategoryMaster)
                     {
-                        $categoryDetail = new CategoryDetail;
+                        if(CategoryDetail::where('category_master_id', $subCategoryMaster->category_master_id)->where('language_id', $language->id)->where('is_parent', 0)->count()<1)
+                        {
+                            $categoryDetail = new CategoryDetail;
+                        }
+                        else
+                        {
+                            $categoryDetail = CategoryDetail::where('category_master_id', $subCategoryMaster->category_master_id)->where('language_id', $language->id)->where('is_parent', 0)->first();
+                        }
                         $categoryDetail->category_master_id = $subCategoryMaster->category_master_id;
                         $categoryDetail->language_id        = $language->id;
                         $categoryDetail->is_parent          = 0;
