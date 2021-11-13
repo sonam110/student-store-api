@@ -22,7 +22,7 @@ class CategoriesImport implements ToModel,WithHeadingRow
 
     public function model(array $row)
     {
-        $getLangForLoop = Language::get();
+        $getLangForLoop = Language::orderby('id','ASC')->get();
         foreach($getLangForLoop as $key => $lang)
         {
             if(@$row['title_in_'.strtolower($lang->title)])
@@ -52,7 +52,7 @@ class CategoriesImport implements ToModel,WithHeadingRow
                         if($getDetail->is_parent==1 && $key==0)
                         {
                             $catMaster = CategoryMaster::where('slug', $getDetail->slug)->first();
-                            $catMaster->title = $categoryDetail->title;
+                            $catMaster->title = $row['title_in_'.strtolower($lang->title)];
                             $catMaster->vat = (!empty(trim($row['vat']))) ? $row['vat'] : 0;
                             $catMaster->save();
                         }
