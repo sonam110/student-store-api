@@ -47,8 +47,8 @@ class LanguagesExport implements FromCollection, WithHeadings
     		return [
     			'SNO'             				=> $key+1,
     			'id'                            => $data->id,
-    			'title'							=> $data->title,
-    			'value'							=> $data->value,
+    			'title'							=> trim($data->title),
+    			'value'							=> trim($data->value),
     			'status'                        => $data->status,
               	'Created at'      				=> $data->created_at,
     		];

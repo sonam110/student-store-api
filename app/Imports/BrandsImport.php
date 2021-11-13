@@ -31,7 +31,7 @@ class BrandsImport implements ToModel,WithHeadingRow
         $brand = new Brand;
         $brand->user_id            	= $this->data['user_id'];
         $brand->category_master_id 	= $this->data['category_master_id'];
-        $brand->name              	= $row['name'];
+        $brand->name              	= trim($row['name']);
         $brand->status             	= 1;
         $brand->save();
         return;

@@ -47,7 +47,7 @@ class LabelsImport implements ToModel,WithHeadingRow
         else
         {
             $labelGroup = new LabelGroup;
-            $labelGroup->name                = $row['label_group_name'];
+            $labelGroup->name                = trim($row['label_group_name']);
             $labelGroup->status              = 1;
             $labelGroup->save();
         }
@@ -57,8 +57,8 @@ class LabelsImport implements ToModel,WithHeadingRow
             $label = new Label;
             $label->label_group_id         = $labelGroup->id;
             $label->language_id            = $this->data['language_id'];
-            $label->label_name             = $row['label_name'];
-            $label->label_value            = $row['label_value_in_entered_language'];
+            $label->label_name             = trim($row['label_name']);
+            $label->label_value            = trim($row['label_value_in_entered_language']);
             $label->status                 = 1;
             $label->save();
         }

@@ -35,7 +35,7 @@ class LabelsExport implements FromCollection, WithHeadings
     			'SNO'             				   => $key+1,
     			'label_group_name'				   => $data->labelGroup->name,
     			'label_name'					   => $data->label_name,
-    			'label_value_in_english'		   => $data->label_value,
+    			'label_value_in_english'		   => trim($data->label_value),
     			'label_value_in_entered_language'  => '',
               	// 'Created At'      			   => $data->created_at,
     		];

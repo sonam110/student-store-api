@@ -16,8 +16,8 @@ class LanguagesImport implements ToModel,WithHeadingRow
     public function model(array $row)
     {
         $brand = new Language;
-        $brand->title            	= $row['title'];
-        $brand->value 	            = $row['value'];
+        $brand->title            	= trim($row['title']);
+        $brand->value 	            = trim($row['value']);
         $brand->status             	= 1;
         $brand->save();
         return;

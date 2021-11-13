@@ -627,8 +627,7 @@ class CategoryMasterController extends Controller
 
     public function categoriesImport(Request $request)
     {
-        $data = ['languages' => $request->languages, 'category_master_id' => $request->category_master_id,'module_type_id' => $request->module_type_id];
-        $import = Excel::import(new CategoriesImport($data),request()->file('file'));
+        $import = Excel::import(new CategoriesImport(),request()->file('file'));
 
         return response(prepareResult(false, [], getLangByLabelGroups('messages','messages_products_services_book_imported')), config('http_response.success'));
     }
