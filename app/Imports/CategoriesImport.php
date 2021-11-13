@@ -43,7 +43,7 @@ class CategoriesImport implements ToModel,WithHeadingRow
                         }
                         else
                         {
-                            $categoryDetail = CategoryDetail::where('category_master_id', $getDetail->category_master_id)->where('language_id', $getDetail->language_id)->where('slug', $getDetail->slug)->first();
+                            $categoryDetail = CategoryDetail::where('category_master_id', $getDetail->category_master_id)->where('language_id', $lang->id)->where('slug', $getDetail->slug)->first();
                         }
                         
                         $categoryDetail->title = $row['title_in_'.strtolower($lang->title)];
