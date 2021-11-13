@@ -25,11 +25,11 @@ class BrandController extends Controller
             }
             if($request->status=='verified')
             {
-                $brands = $brands->where('status', 0);
+                $brands = $brands->where('status', 1);
             }
             elseif($request->status=='unverified')
             {
-                $brands = $brands->where('status', 1);
+                $brands = $brands->where('status', 0);
             }
 
 			if(!empty($request->per_page_record))
