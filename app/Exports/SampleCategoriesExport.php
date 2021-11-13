@@ -47,7 +47,7 @@ class SampleCategoriesExport implements FromCollection, WithHeadings
                 'SNO'                           => $key+1,
                 'id_do_not_change'              => $data->cat_details_id,
                 'module'                        => $data->moduleType->title,
-                'parent_category'               => trim($data->categoryMaster ? $data->categoryMaster->title : $data->cat_master_title),
+                'parent_category'               => trim($data->categoryMaster ? $data->categoryMaster->title : '**** '.$data->cat_master_title. ' ****'),
                 'vat'                           => $data->vat
             ];
 
