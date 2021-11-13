@@ -40,9 +40,7 @@ class SampleCategoriesExport implements FromCollection, WithHeadings
         ->where('category_details.language_id',Language::first()->id)
         ->orderBy('category_details.category_master_id','asc')
         ->orderBy('category_details.is_parent','desc');
-    	$categories = $categories->toSql();
-        \Log::info($categories);
-        die;
+    	$categories = $categories->get();
     	return $categories->map(function ($data, $key) {
             $data1 = [
                 'SNO'                           => $key+1,
