@@ -17,10 +17,8 @@ class SampleCategoriesExport implements FromCollection, WithHeadings
 
 	public function __construct()
 	{
+        //
 	}
-    /**
-    * @return \Illuminate\Support\Collection
-    */
 
     public function headings(): array {
         $data = ['SNO','id_do_not_change','module','parent_category','vat'];
