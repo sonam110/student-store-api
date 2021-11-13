@@ -36,7 +36,7 @@ class CategoriesImport implements ToModel,WithHeadingRow
                         {
                             $categoryDetail = new CategoryDetail;
                             $categoryDetail->category_master_id = $getDetail->category_master_id;
-                            $categoryDetail->language_id        = $getDetail->language_id;
+                            $categoryDetail->language_id        = $lang->id;
                             $categoryDetail->slug               = $getDetail->slug;
                             $categoryDetail->description        = $getDetail->description;
                             $categoryDetail->status             = $getDetail->status;
