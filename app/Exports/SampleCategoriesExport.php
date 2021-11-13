@@ -46,7 +46,7 @@ class SampleCategoriesExport implements FromCollection, WithHeadings
                 'SNO'                           => $key+1,
                 'module'                        => $data->moduleType->title,
                 'parent_category'               => $data->categoryMaster ? $data->categoryMaster->title : null,
-                'vat'                           => $data->vat;
+                'vat'                           => $data->vat
             ];
 
             foreach(Language::all() as $language)
