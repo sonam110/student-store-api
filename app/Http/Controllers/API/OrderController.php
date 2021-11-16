@@ -1530,7 +1530,11 @@ class OrderController extends Controller
 	{
 		try
 		{
-			$reasons = ReasonForAction::orderBy('created_at','DESC');
+		$reasons = ReasonForAction::select('reason_for_actions.id', 'reason_for_action_details.title as reason_for_action', 'reason_for_actions.action','reason_for_actions.text_field_enabled')
+			->join('reason_for_action_details', function ($join) {
+                    $join->on('reason_for_action_details.reason_for_action_id', '=', 'reason_for_actions.id');
+                })
+			->orderBy('reason_for_actions.created_at','DESC');
 
 			if(!empty($request->action))
 			{
@@ -1540,6 +1544,11 @@ class OrderController extends Controller
 			if(!empty($request->language_id))
 			{
 				$reasons = $reasons->where('language_id',$request->language_id);
+			}
+			else
+			{
+				$getFirstLang = Language::orderBy('reason_for_actions.id', 'ASC')->first()->id;
+				$reasons = $reasons->where('language_id', $getFirstLang);
 			}
 
 			if(!empty($request->module_type_id))
