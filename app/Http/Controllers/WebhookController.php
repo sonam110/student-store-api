@@ -42,7 +42,7 @@ class WebhookController extends Controller
             exit();
         }
 
-        if ($event->type == "subscription_schedule.aborted" || $event->type == "subscription_schedule.canceled")
+        /*if ($event->type == "subscription_schedule.aborted" || $event->type == "subscription_schedule.canceled")
         {
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->subscription;
@@ -71,11 +71,20 @@ class WebhookController extends Controller
             $subscriptionSchedule = $event->data->object;
             Log::channel('webhook')->info('customer.subscription.created');
             Log::channel('webhook')->info($subscriptionSchedule);
-        }
-        elseif ($event->type == "customer.subscription.updated")
+        }*/
+        
+        if ($event->type == "customer.subscription.updated")
         { 
             $subscriptionSchedule = $event->data->object;
-            //$this->abortedSubscription($subscription_id);
+            $subscription_id = $subscriptionSchedule->subscription;
+            $this->customerSubscriptionUpdated($subscription_id);
+            Log::channel('webhook')->info('customer.subscription.created');
+            Log::channel('webhook')->info($subscriptionSchedule);
+        }
+        elseif ($event->type == "customer.subscription.deleted") {
+            $subscriptionSchedule = $event->data->object;
+            $subscription_id = $subscriptionSchedule->subscription;
+            $this->abortedSubscription($subscription_id);
             Log::channel('webhook')->info('customer.subscription.created');
             Log::channel('webhook')->info($subscriptionSchedule);
         }
@@ -104,6 +113,15 @@ class WebhookController extends Controller
         }
     }
 
+    private function customerSubscriptionUpdated($subscription_id) 
+    {
+        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
+        if($subscribedPackage)
+        {
+            
+        }
+    }
+
     private function abortedSubscription($subscription_id) 
     {
         $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
@@ -121,15 +139,6 @@ class WebhookController extends Controller
             $module = 'profile';
             pushNotification($title,$body,$user,$type,true,$user_type,$module,'no-data','package');
             Log::channel('webhook')->info('Subscription canceled. User Package Subscription Id: '. $subscribedPackage->id);
-        }
-    }
-
-    private function completedSubscription($subscription_id) 
-    {
-        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
-        if($subscribedPackage)
-        {
-            
         }
     }
 }

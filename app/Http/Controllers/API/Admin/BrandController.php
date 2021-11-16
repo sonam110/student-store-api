@@ -32,6 +32,11 @@ class BrandController extends Controller
                 $brands = $brands->where('status', 0);
             }
 
+            if(!empty($request->category_id))
+            {
+                $brands = $brands->where('category_master_id', $request->category_id);
+            }
+
 			if(!empty($request->per_page_record))
 			{
 				$brands = $brands->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
