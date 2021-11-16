@@ -38,6 +38,8 @@ use App\Models\State;
 use App\Models\City;
 use mervick\aesEverywhere\AES256;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\ReasonForAction;
+use App\Models\ReasonForActionDetail;
 
 class FrontController extends Controller
 {
@@ -375,6 +377,18 @@ class FrontController extends Controller
 
 	public function payout()
 	{ 
+
+		$reasons = ReasonForAction::get();
+		foreach ($reasons as $key => $reason) 
+		{
+			$reasonForActionDetail = new ReasonForActionDetail;
+			$reasonForActionDetail->reason_for_action_id    = $reason->id;
+            $reasonForActionDetail->language_id     = $reason->language_id;
+            $reasonForActionDetail->title   = $reason->reason_for_action;
+            $reasonForActionDetail->slug     = \Str::slug($reason->reason_for_action);
+            $reasonForActionDetail->save();
+		}
+		dd('done');
 		/*$id = '04f770f9-9aad-4515-bebb-6fd6ca3fa812';
 		$user = DB::select(
 		    'call select_by_user_id(?)', [$id]

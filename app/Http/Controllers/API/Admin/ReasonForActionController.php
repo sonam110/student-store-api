@@ -87,7 +87,8 @@ class ReasonForActionController extends Controller
     
     public function show(ReasonForAction $reasonForAction)
     {
-        return response()->json(prepareResult(false, $reasonForAction, getLangByLabelGroups('messages','message_reason_for_action_list')), config('http_response.success'));
+        $reasonForActionReturn = ReasonForAction::with('reasonForActionDetails')->find($reasonForAction->id);
+        return response()->json(prepareResult(false, $reasonForActionReturn, getLangByLabelGroups('messages','message_reason_for_action_list')), config('http_response.success'));
     }
 
     
