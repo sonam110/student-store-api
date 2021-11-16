@@ -97,6 +97,9 @@ class CategoryController extends Controller
                         $q->select('id','bucket_group_attribute_id','name','language_id')
                         ->where('language_id', $language_id);
                     }])
+                ->whereHas('bucketGroup.bucketGroupAttributes.attributeDetails', function ($query) use ($language_id) {
+                    $query->where('language_id', $language_id);
+                })
                 ->where('attribute_masters.category_master_slug', $catId)
                 ->orderBy('attribute_masters.created_at','DESC')
                 ->where('bucket_group_details.language_id', $language_id)
