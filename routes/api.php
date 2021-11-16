@@ -285,7 +285,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 
 	//Stripe
 	Route::get('/create-stripe-account', [App\Http\Controllers\API\StripeController::class,'createStripeAccount']);
-	Route::get('/check-stripe-account-current-status/{user_id}/{account_id}', [App\Http\Controllers\API\StripeController::class,'checkStripeAccountCurrentStatus']);
+	Route::get('/check-stripe-account-current-status/{user_id}', [App\Http\Controllers\API\StripeController::class,'checkStripeAccountCurrentStatus']);
 	Route::get('/regenerate-stripe-account-link', [App\Http\Controllers\API\StripeController::class,'regenerateStripeAccountLink']);
 
 	Route::get('/vendor-fund-transfer-list', [App\Http\Controllers\API\StripeController::class,'vendorFundTransferList']);
