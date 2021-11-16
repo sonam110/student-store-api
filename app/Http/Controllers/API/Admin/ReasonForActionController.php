@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ReasonForAction;
+use App\Models\ReasonForActionDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
@@ -38,91 +39,92 @@ class ReasonForActionController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-
     public function store(Request $request)
-    {        
-        $validation = Validator::make($request->all(), [
-            'reason_for_action'  => 'required'
-        ]);
-
-        if ($validation->fails()) {
-            return response(prepareResult(false, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-        }
-
-        DB::beginTransaction();
-        try
+    {
+        foreach ($request->reason_for_actions as $key => $value) 
         {
-            $reasonForAction = new ReasonForAction;
-            $reasonForAction->language_id         	= $request->language_id;
-            $reasonForAction->module_type_id        = $request->module_type_id;
-            $reasonForAction->action        		= $request->action;
-			$reasonForAction->reason_for_action 	= $request->reason_for_action;
-			$reasonForAction->status    			= $request->status;
-            $reasonForAction->text_field_enabled    = $request->text_field_enabled;
-            $reasonForAction->save();
-            DB::commit();
-            return response()->json(prepareResult(false, $reasonForAction, getLangByLabelGroups('messages','message_reason_for_action_created')), config('http_response.created'));
+            if($value['language_id']=='1')
+            {
+                if(ReasonForAction::where('module_type_id', $request->module_type_id)->where('action', $request->action)->where('reason_for_action', $value['reason_for_action'])->count() > 0)
+                {
+                    $reasonForAction = ReasonForAction::where('module_type_id', $request->module_type_id)->where('action', $request->action)->where('reason_for_action', $value['reason_for_action'])->first();
+                }
+                else
+                {
+                    $reasonForAction = new ReasonForAction;
+                }
+
+                $reasonForAction->module_type_id        = $request->module_type_id;
+                $reasonForAction->action                = $request->action;
+                $reasonForAction->reason_for_action     = $value['reason_for_action'];
+                $reasonForAction->status                = 1;
+                $reasonForAction->text_field_enabled    = $request->text_field_enabled;
+                $reasonForAction->save();
+                break;
+            }
         }
-        catch (\Throwable $exception)
+
+        foreach ($request->reason_for_actions as $key => $value) 
         {
-        	DB::rollback();
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            if(ReasonForActionDetail::where('language_id', $value['language_id'])->where('reason_for_action_id', $reasonForAction->id)->where('slug', Str::slug($value['reason_for_action']))->count() > 0)
+            {
+                $reasonForActionDetail = ReasonForActionDetail::where('language_id', $value['language_id'])->where('reason_for_action_id', $reasonForAction->id)->where('slug', Str::slug($value['reason_for_action']))->first();
+            }
+            else
+            {
+                $reasonForActionDetail = new ReasonForActionDetail;
+            }
+
+            $reasonForActionDetail->reason_for_action_id    = $reasonForAction->id;
+            $reasonForActionDetail->language_id     = $value['language_id'];
+            $reasonForActionDetail->title   = $value['reason_for_action'];
+            $reasonForActionDetail->slug     = Str::slug($value['reason_for_action']);
+            $reasonForActionDetail->save();
         }
+        return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_reason_for_action_created')), config('http_response.created'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\ReasonForAction  $reasonForAction
-     * @return \Illuminate\Http\Response
-     */
+    
     public function show(ReasonForAction $reasonForAction)
     {
         return response()->json(prepareResult(false, $reasonForAction, getLangByLabelGroups('messages','message_reason_for_action_list')), config('http_response.success'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\ReasonForAction  $reasonForAction
-     * @return \Illuminate\Http\Response
-     */
     
     public function update(Request $request,ReasonForAction $reasonForAction)
     {
-        $validation = Validator::make($request->all(), [
-            'reason_for_action' => 'required'
-        ]);
-
-        if ($validation->fails()) {
-            return response(prepareResult(false, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-        }
-
-        DB::beginTransaction();
-        try
+        foreach ($request->reason_for_actions as $key => $value) 
         {
-            $reasonForAction->language_id         	= $request->language_id;
-            $reasonForAction->module_type_id           = $request->module_type_id;
-            $reasonForAction->action        	    = $request->action;
-			$reasonForAction->reason_for_action    	= $request->reason_for_action;
-			$reasonForAction->status    			= $request->status;
-            $reasonForAction->text_field_enabled    = $request->text_field_enabled;
-            $reasonForAction->save();
-            DB::commit();
-            return response()->json(prepareResult(false, $reasonForAction, getLangByLabelGroups('messages','message_reason_for_action_updated')), config('http_response.success'));
+            if($value['language_id']=='1')
+            {
+                $reasonForAction = ReasonForAction::find($request->reason_for_action_id);
+
+                $reasonForAction->reason_for_action     = $value['reason_for_action'];
+                $reasonForAction->text_field_enabled    = $request->text_field_enabled;
+                $reasonForAction->save();
+                break;
+            }
         }
-        catch (\Throwable $exception)
+
+        foreach ($request->reason_for_actions as $key => $value) 
         {
-        	DB::rollback();
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            if(!empty($value['id']))
+            {
+                $reasonForActionDetail = ReasonForActionDetail::find($value['id']);
+            }
+            else
+            {
+                $reasonForActionDetail = new ReasonForActionDetail;
+            }
+
+            $reasonForActionDetail->reason_for_action_id    = $reasonForAction->id;
+            $reasonForActionDetail->language_id     = $value['language_id'];
+            $reasonForActionDetail->title   = $value['reason_for_action'];
+            $reasonForActionDetail->slug     = Str::slug($value['reason_for_action']);
+            $reasonForActionDetail->save();
         }
+
+        return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_reason_for_action_created')), config('http_response.created'));
     }
 
     /**
