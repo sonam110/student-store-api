@@ -85,9 +85,9 @@ class WebhookController extends Controller
         { 
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->subscription;
-            //$this->customerSubscriptionUpdated($subscription_id, $payload);
+            $this->customerSubscriptionUpdated($subscription_id, $subscriptionSchedule);
             Log::channel('webhook')->info('customer.subscription.created');
-            Log::channel('webhook')->info($subscriptionSchedule->customer);
+            Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "customer.subscription.deleted") {
             $subscriptionSchedule = $event->data->object;
@@ -121,7 +121,7 @@ class WebhookController extends Controller
         }
     }
 
-    private function customerSubscriptionUpdated($subscription_id, $payload) 
+    private function customerSubscriptionUpdated($subscription_id, $subscriptionSchedule) 
     {
         $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
         if($subscribedPackage)

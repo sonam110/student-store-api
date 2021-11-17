@@ -286,7 +286,7 @@ class JobController extends Controller
 
         if($job->job_status=='3')
         {
-            return response()->json(prepareResult(false, $job, getLangByLabelGroups('messages','message_job_expired_cannot_update')), config('http_response.success'));
+            return response()->json(prepareResult(true, $job, getLangByLabelGroups('messages','message_job_expired_cannot_update')), config('http_response.success'));
         }
 
         DB::beginTransaction();
