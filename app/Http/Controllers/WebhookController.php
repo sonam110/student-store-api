@@ -284,7 +284,6 @@ class WebhookController extends Controller
                 $transactionDetail->transaction_timestamp       = $request->transaction_detail['transaction_timestamp'];
                 $transactionDetail->currency                    = $request->transaction_detail['currency'];
                 $transactionDetail->save();
-            }
 
 
 
