@@ -142,8 +142,10 @@ class WebhookController extends Controller
 
             $userInfo = $subscribedPackage->user;
             $addressfind = $subscribedPackage->user->defaultAddress;
+            $order                      = new Order;
             if($addressfind)
             {
+                $order->address_detail_id   = $addressfind->id;
                 $order->latitude            = $addressfind->latitude;
                 $order->longitude           = $addressfind->longitude;
                 $order->country             = $addressfind->country;
@@ -152,80 +154,56 @@ class WebhookController extends Controller
                 $order->full_address        = $addressfind->full_address;
                 $order->zip_code            = $addressfind->zip_code;
             }
-            $order                      = new Order;
+            $pakcageAmount = ($subscriptionSchedule->data->object->items->data[0]->plan->amount)/100;
             $order->order_number        = $order_number;
-            $order->user_id             = Auth::id();
-            $order->address_detail_id   = $request->address_detail_id;
-            $order->order_status        = $request->order_status;
-            $order->sub_total           = $request->sub_total;
-            $order->item_discount       = $request->item_discount;
-            $order->shipping_charge     = $shipping_charge;
-            $order->total               = $request->total;
-            $order->promo_code          = $request->promo_code;
-            $order->promo_code_discount = $request->promo_code_discount;
-            $order->grand_total         = $request->grand_total;
-            $order->remark              = $request->remark;
-            $order->first_name          = (!empty(Auth::user()->first_name)) ? AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')) : NULL;
-            $order->last_name           = (!empty(Auth::user()->last_name)) ? AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY')) : NULL;
-            $order->email               = (!empty(Auth::user()->email)) ? AES256::decrypt(Auth::user()->email, env('ENCRYPTION_KEY')) : NULL;
+            $order->user_id             = $userInfo->id;
+            
+            $order->order_status        = 'completed';
+            $order->sub_total           = $pakcageAmount;
+            $order->item_discount       = 0;
+            $order->shipping_charge     = 0;
+            $order->total               = $pakcageAmount;
+            $order->promo_code          = null;
+            $order->promo_code_discount = null;
+            $order->grand_total         = $pakcageAmount;
+            $order->remark              = $subscriptionSchedule->data->object->collection_method;
+            $order->first_name          = (!empty($userInfo->first_name)) ? AES256::decrypt($userInfo->first_name, env('ENCRYPTION_KEY')) : NULL;
+            $order->last_name           = (!empty($userInfo->last_name)) ? AES256::decrypt($userInfo->last_name, env('ENCRYPTION_KEY')) : NULL;
+            $order->email               = (!empty($userInfo->email)) ? AES256::decrypt($userInfo->email, env('ENCRYPTION_KEY')) : NULL;
             $order->contact_number      = (!empty(Auth::user()->contact_number)) ? AES256::decrypt(Auth::user()->contact_number, env('ENCRYPTION_KEY')) : NULL;
             
-            $order->used_reward_points  = $request->used_reward_points;
-            $order->order_for           = $request->order_for;
+            $order->used_reward_points  = 0;
+            $order->order_for           = 'packages';
             $order->reward_point_status = 'used';
             $order->save();
 
             if($order)
             {
-                $productsServicesBook = Package::find($orderedItem['package_id']);
                 $vat_percent = '0';
-                if($productsServicesBook->price == 0)
-                {
-                    $price = $productsServicesBook->subscription;
-                    $vendor_price = $price;
-                }
-                else
-                {
-                    $price = $productsServicesBook->price;
-                    $vendor_price = $price;
-                }
-                $title = $productsServicesBook->type_of_package;
-                $user_package = UserPackageSubscription::where('user_id',null)->first();
-
-                if($user_package)
-                {
-                    $commission = $user_package->commission_per_sale;
-                }
-                else
-                {
-                    $commission = 0;
-                }
+                $title = $subscribedPackage->type_of_package;
+                $commission = $subscribedPackage->commission_per_sale;
 
                 $orderItem = new OrderItem;
-                $orderItem->user_id                         = Auth::id();
-                $orderItem->order_id                        = $order->id;
-                $orderItem->package_id                      = $orderedItem['package_id'];
-                $orderItem->title   = $title;
-                    $orderItem->sku     = $productsServicesBook->sku;
-                $orderItem->price                           = $price;
-                $orderItem->earned_reward_points            = $earned_reward_points;
-                $orderItem->quantity                        = $orderedItem['quantity'];
-                $orderItem->discount                        = $discount;
-                $orderItem->cover_image                     = $orderedItem['cover_image'];
-                $orderItem->sell_type                       = $productsServicesBook->sell_type;
-                $orderItem->rent_duration                   = $productsServicesBook->rent_duration;
-                $orderItem->item_status                     = $request->order_status;
-                $orderItem->item_payment_status             = true;
-                $orderItem->amount_transferred_to_vendor    = $amount_transferred_to_vendor;
-                $orderItem->student_store_commission        = $student_store_commission;
-                $orderItem->cool_company_commission         = $cool_company_commission;
-                $orderItem->student_store_commission_percent= $commission;
-                $orderItem->cool_company_commission_percent = $coolCompanyCommission;
-                $orderItem->vat_percent                     = $vat_percent;
-                $orderItem->delivery_code                   = $delivery_code;
+                $orderItem->user_id = $userInfo->id;
+                $orderItem->order_id = $order->id;
+                $orderItem->package_id = $subscribedPackage->package_id;
+                $orderItem->title = $title;
+                $orderItem->price = $pakcageAmount;
+                $orderItem->earned_reward_points = 0;
+                $orderItem->quantity = 1;
+                $orderItem->discount = 0;
+                $orderItem->item_status = 'completed';
+                $orderItem->item_payment_status = true;
+                $orderItem->amount_transferred_to_vendor = 0;
+                $orderItem->student_store_commission = $pakcageAmount;
+                $orderItem->cool_company_commission = 0;
+                $orderItem->student_store_commission_percent = 0;
+                $orderItem->cool_company_commission_percent = 0;
+                $orderItem->vat_percent = 0;
+                $orderItem->delivery_code = null;
                 $orderItem->save();
 
-                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id',$order->user->language_id)->first();
+                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id', $userInfo->->language_id)->first();
                 if(empty($emailTemplate))
                 {
                     $emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
@@ -242,7 +220,6 @@ class WebhookController extends Controller
                 $details = [
                     'title' => $emailTemplate->subject,
                     'body' => $email_body,
-                    // 'order_details' => Order::with('orderItems')->find($order->id),
                     'order_details' => $order,
                 ];
                 
@@ -289,26 +266,15 @@ class WebhookController extends Controller
                 $transactionDetail->currency                    = $request->transaction_detail['currency'];
                 $transactionDetail->save();
 
-
-
-                $reward_point_value = AppSetting::first()->customer_rewards_pt_value * $request->used_reward_points;
-
-                $total = $sub_total - $reward_point_value;
-
-
-                $vat = (AppSetting::first()->vat) * $total / 100;
-
-                // $total = $total + $vat + $shipping_charge;
-
-                $total = $total + $shipping_charge;
+                $total = $pakcageAmount;
 
                 $order->update([
-                    'sub_total' => $sub_total,
-                    'total'  => $total,
-                    'shipping_charge'  => $shipping_charge,
-                    'vat' => $vat,
-                    'grand_total' => $total -  $request->promo_code_discount,
-                    'payable_amount' => $total -  $request->promo_code_discount,
+                    'sub_total' => $pakcageAmount,
+                    'total'  => $pakcageAmount,
+                    'shipping_charge'  => 0,
+                    'vat' => 0,
+                    'grand_total' => $pakcageAmount,
+                    'payable_amount' => $pakcageAmount,
                 ]);
             }
         }

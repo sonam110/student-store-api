@@ -177,12 +177,11 @@ class OrderController extends Controller
 				'address_detail_id'     => 'required',
 	            // 'grand_total'           => 'required'
 			]);
+			if ($validation->fails()) {
+				return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+			}
 		}
-		
 
-		if ($validation->fails()) {
-			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-		}
 		DB::beginTransaction();
 		try
 		{
@@ -361,9 +360,16 @@ class OrderController extends Controller
 					}
 
 					$reward_points_value = AppSetting::first()->single_rewards_pt_value * $earned_reward_points;
-
-					$amount_transferred_to_vendor = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * (100 - $commission) / 100;
-					$student_store_commission = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * ($commission) / 100;
+					if($request->order_for!='packages')
+					{
+						$amount_transferred_to_vendor = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * (100 - $commission) / 100;
+						$student_store_commission = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * ($commission) / 100;
+					}
+					else
+					{
+						$amount_transferred_to_vendor = 0;
+						$student_store_commission = $request->grand_total;
+					}
 
 					$cool_company_commission = 0;
 					$coolCompanyCommission = 0;
@@ -374,8 +380,6 @@ class OrderController extends Controller
 						$coolCompanyCommission = AppSetting::first()->coolCompanyCommission;
 						$cool_company_commission = $amount_transferred_to_vendor * ($coolCompanyCommission)/100;
 						$amount_transferred_to_vendor = $amount_transferred_to_vendor * (100 - $coolCompanyCommission)/100;
-						
-
 					}
 
 					if($productsServicesBook->discount_type == 1)
