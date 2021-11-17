@@ -94,6 +94,7 @@ class ContestController extends Controller
         DB::beginTransaction();
         try
         {
+            $lang_id = $this->lang_id;
             // $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module','Contest')->orderBy('created_at','desc')->first();
             // if(empty($user_package))
             // {
