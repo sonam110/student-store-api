@@ -171,10 +171,14 @@ class OrderController extends Controller
 
 	public function store(Request $request)
 	{
-		$validation = Validator::make($request->all(), [
-			'address_detail_id'     => 'required',
-            // 'grand_total'           => 'required'
-		]);
+		if($request->order_for!='packages')
+		{
+			$validation = Validator::make($request->all(), [
+				'address_detail_id'     => 'required',
+	            // 'grand_total'           => 'required'
+			]);
+		}
+		
 
 		if ($validation->fails()) {
 			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
@@ -197,6 +201,16 @@ class OrderController extends Controller
 			}
 
 			$addressfind = AddressDetail::find($request->address_detail_id);
+			if($addressfind)
+			{
+				$order->latitude            = $addressfind->latitude;
+				$order->longitude           = $addressfind->longitude;
+				$order->country             = $addressfind->country;
+				$order->state               = $addressfind->state;
+				$order->city                = $addressfind->city;
+				$order->full_address        = $addressfind->full_address;
+				$order->zip_code        	= $addressfind->zip_code;
+			}
 
 			$order                      = new Order;
 			$order->order_number        = $order_number;
@@ -215,13 +229,7 @@ class OrderController extends Controller
 			$order->last_name           = (!empty(Auth::user()->last_name)) ? AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY')) : NULL;
 			$order->email               = (!empty(Auth::user()->email)) ? AES256::decrypt(Auth::user()->email, env('ENCRYPTION_KEY')) : NULL;
 			$order->contact_number      = (!empty(Auth::user()->contact_number)) ? AES256::decrypt(Auth::user()->contact_number, env('ENCRYPTION_KEY')) : NULL;
-			$order->latitude            = $addressfind->latitude;
-			$order->longitude           = $addressfind->longitude;
-			$order->country             = $addressfind->country;
-			$order->state               = $addressfind->state;
-			$order->city                = $addressfind->city;
-			$order->full_address        = $addressfind->full_address;
-			$order->zip_code        	= $addressfind->zip_code;
+			
 			$order->used_reward_points 	= $request->used_reward_points;
 			$order->order_for 			= $request->order_for;
 			$order->reward_point_status = 'used';
