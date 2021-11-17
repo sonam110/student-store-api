@@ -201,6 +201,8 @@ class OrderController extends Controller
 			}
 
 			$addressfind = AddressDetail::find($request->address_detail_id);
+			
+			$order                      = new Order;
 			if($addressfind)
 			{
 				$order->latitude            = $addressfind->latitude;
@@ -211,8 +213,6 @@ class OrderController extends Controller
 				$order->full_address        = $addressfind->full_address;
 				$order->zip_code        	= $addressfind->zip_code;
 			}
-
-			$order                      = new Order;
 			$order->order_number        = $order_number;
 			$order->user_id        		= Auth::id();
 			$order->address_detail_id   = $request->address_detail_id;

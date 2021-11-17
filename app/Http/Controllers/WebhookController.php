@@ -140,8 +140,18 @@ class WebhookController extends Controller
                 $order_number = env('ORDER_START_NUMBER');
             }
 
-            $addressfind = AddressDetail::find($request->address_detail_id);
-
+            $userInfo = $subscribedPackage->user;
+            $addressfind = $subscribedPackage->user->defaultAddress;
+            if($addressfind)
+            {
+                $order->latitude            = $addressfind->latitude;
+                $order->longitude           = $addressfind->longitude;
+                $order->country             = $addressfind->country;
+                $order->state               = $addressfind->state;
+                $order->city                = $addressfind->city;
+                $order->full_address        = $addressfind->full_address;
+                $order->zip_code            = $addressfind->zip_code;
+            }
             $order                      = new Order;
             $order->order_number        = $order_number;
             $order->user_id             = Auth::id();
@@ -159,13 +169,7 @@ class WebhookController extends Controller
             $order->last_name           = (!empty(Auth::user()->last_name)) ? AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY')) : NULL;
             $order->email               = (!empty(Auth::user()->email)) ? AES256::decrypt(Auth::user()->email, env('ENCRYPTION_KEY')) : NULL;
             $order->contact_number      = (!empty(Auth::user()->contact_number)) ? AES256::decrypt(Auth::user()->contact_number, env('ENCRYPTION_KEY')) : NULL;
-            $order->latitude            = $addressfind->latitude;
-            $order->longitude           = $addressfind->longitude;
-            $order->country             = $addressfind->country;
-            $order->state               = $addressfind->state;
-            $order->city                = $addressfind->city;
-            $order->full_address        = $addressfind->full_address;
-            $order->zip_code            = $addressfind->zip_code;
+            
             $order->used_reward_points  = $request->used_reward_points;
             $order->order_for           = $request->order_for;
             $order->reward_point_status = 'used';
