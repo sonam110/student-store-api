@@ -407,8 +407,8 @@ class OrderController extends Controller
 					}
 					
                     
-					$orderItem->title							= $title;
-					$orderItem->sku							    = $productsServicesBook->sku;
+					$orderItem->title 	= $title;
+					$orderItem->sku		= $productsServicesBook->sku;
 					if(json_encode(@$orderedItem['attribute_data'])=="null" || $orderedItem['attribute_data']=="null")
 					{
 						$orderItem->attribute_data					= json_encode([]);
