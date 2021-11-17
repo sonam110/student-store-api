@@ -166,6 +166,7 @@ class WebhookController extends Controller
             $order->promo_code          = null;
             $order->promo_code_discount = null;
             $order->grand_total         = $pakcageAmount;
+            $order->payable_amount      = $pakcageAmount;
             $order->remark              = $subscriptionSchedule->data->object->collection_method;
             $order->first_name          = (!empty($userInfo->first_name)) ? AES256::decrypt($userInfo->first_name, env('ENCRYPTION_KEY')) : NULL;
             $order->last_name           = (!empty($userInfo->last_name)) ? AES256::decrypt($userInfo->last_name, env('ENCRYPTION_KEY')) : NULL;
@@ -203,7 +204,7 @@ class WebhookController extends Controller
                 $orderItem->delivery_code = null;
                 $orderItem->save();
 
-                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id', $userInfo->->language_id)->first();
+                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id', $userInfo->language_id)->first();
                 if(empty($emailTemplate))
                 {
                     $emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
@@ -265,17 +266,6 @@ class WebhookController extends Controller
                 $transactionDetail->transaction_timestamp       = $request->transaction_detail['transaction_timestamp'];
                 $transactionDetail->currency                    = $request->transaction_detail['currency'];
                 $transactionDetail->save();
-
-                $total = $pakcageAmount;
-
-                $order->update([
-                    'sub_total' => $pakcageAmount,
-                    'total'  => $pakcageAmount,
-                    'shipping_charge'  => 0,
-                    'vat' => 0,
-                    'grand_total' => $pakcageAmount,
-                    'payable_amount' => $pakcageAmount,
-                ]);
             }
         }
     }
