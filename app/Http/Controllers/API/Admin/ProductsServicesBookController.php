@@ -412,27 +412,45 @@ class ProductsServicesBookController extends Controller
 
     public function action($productsServicesBook_id, Request $request)
     {
+        $validation = Validator::make($request->all(), [
+                
+        ]);
         if($request->action=='update-status')
         {
             $validation = Validator::make($request->all(), [
                 'status'    => 'required'
             ]);
-            if ($validation->fails()) {
-                return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-            }
         }
         if($request->action=='publish') 
         {
             $validation = Validator::make($request->all(), [
                 'is_published'    => 'required|boolean'
             ]);
-            if ($validation->fails()) {
-                return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-            }
             
         }
+        if($request->action=='promote') 
+        {
+            $validation = Validator::make($request->all(), [
+                'is_promoted'           => 'required|boolean',
+            ]);
+        }
 
-        
+        if($request->action=='most_popular') 
+        {
+            $validation = Validator::make($request->all(), [
+                'most_popular'           => 'required|boolean',
+            ]);
+        }
+        if($request->action=='top_selling') 
+        {
+            $validation = Validator::make($request->all(), [
+                'top_selling'           => 'required|boolean',
+            ]);
+        }
+
+        if ($validation->fails()) {
+            return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
 
         DB::beginTransaction();
         try
@@ -440,7 +458,7 @@ class ProductsServicesBookController extends Controller
             $getProductsServicesBook = ProductsServicesBook::find($productsServicesBook_id);
             if(!$getProductsServicesBook)
             {
-                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_doesnt_exist')), config('http_response.internal_server_error'));
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_validation')), config('http_response.internal_server_error'));
             }
 
             //For Update Product status
@@ -459,24 +477,217 @@ class ProductsServicesBookController extends Controller
                     $getProductsServicesBook->published_at = date('Y-m-d');
                 }
                 $title = 'Product Published';
-                $body =  'Product '.$getProductsServicesBook->title.'has been successfully Published.';
+                $body =  'Product '.$getProductsServicesBook->title.' has been successfully Published.';
+            }
+
+            if($request->action=='promote') 
+            {
+                $getProductsServicesBook->is_promoted        = $request->is_promoted;
+                if($request->is_promoted == true)
+                {
+                    $getProductsServicesBook->promotion_start_at = date('Y-m-d');
+                    $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                    if(empty($user_package))
+                    {
+                        return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+                    }
+                    if($user_package->no_of_boost == $user_package->used_no_of_boost)
+                    {
+                        DB::rollback();
+                        return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_no_of_boost_exhausted_error')), config('http_response.internal_server_error'));
+                    }
+                    $getProductsServicesBook->promotion_end_at  = date('Y-m-d',strtotime('+'.$user_package->boost_no_of_days.'days'));
+                    $user_package->update(['used_no_of_boost'=>($user_package->used_no_of_boost + 1)]);
+                    $title = 'Product Promoted';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully Promoted  from '.$getProductsServicesBook->promotion_start_at.' to '.$getProductsServicesBook->promotion_end_at.'.';
+                }
+                else
+                {
+                    $title = 'Product Removed from Promoted';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully Removed from Promotion.';
+                }
+            }
+
+            if($request->action=='most_popular') 
+            {
+                $getProductsServicesBook->most_popular        = $request->most_popular;
+                if($request->most_popular == true)
+                {
+                    $getProductsServicesBook->most_popular_start_at = date('Y-m-d');
+                    $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                    if(empty($user_package))
+                    {
+                        return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+                    }
+                    if($user_package->most_popular == $user_package->used_most_popular)
+                    {
+                        DB::rollback();
+                        return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_most_popular_exhausted_error')), config('http_response.internal_server_error'));
+                    }
+                    $getProductsServicesBook->most_popular_end_at  = date('Y-m-d',strtotime('+'.$user_package->most_popular_no_of_days.'days'));
+                    $user_package->update(['used_most_popular'=>$user_package->used_most_popular + 1]);
+                    $title = 'Product  updated as Most Popular';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated as Most Popular  from '.$getProductsServicesBook->most_popular_start_at.' to '.$getProductsServicesBook->most_popular_end_at.'.';
+                }
+                else
+                {
+                    $title = 'Product Removed from Most Popular';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully Removed from Most Popular.';
+                }
+                
+            }
+
+            if($request->action=='top_selling') 
+            {
+                $getProductsServicesBook->top_selling        = $request->top_selling;
+                if($request->top_selling == true)
+                {
+
+                    $getProductsServicesBook->top_selling_start_at = date('Y-m-d');
+                    $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                    if(empty($user_package))
+                    {
+                        return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+                    }
+                    if($user_package->top_selling == $user_package->used_top_selling)
+                    {
+                        DB::rollback();
+                        return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_top_selling_exhausted_error')), config('http_response.internal_server_error'));
+                    }
+                    $getProductsServicesBook->top_selling_end_at  = date('Y-m-d',strtotime('+'.$user_package->top_selling_no_of_days.'days'));
+                    $user_package->update(['used_top_selling'=>$user_package->used_top_selling + 1]);
+                    $title = 'Product  updated as Top Selling';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated as Top Selling  from '.$getProductsServicesBook->top_selling_start_at.' to '.$getProductsServicesBook->top_selling_end_at.'.';
+                }
+                else
+                {
+                    $title = 'Product Removed from Top Selling';
+                    $body =  'Product '.$getProductsServicesBook->title.' has been successfully Removed from Top Selling.';
+                }   
+            }
+
+            if($request->action=='all_boost') 
+            {
+                if($getProductsServicesBook->is_promoted != $request->promote)
+                {
+                    $getProductsServicesBook->is_promoted = $request->promote;
+                    if($request->promote == true)
+                    {
+                        $getProductsServicesBook->promotion_start_at = date('Y-m-d');
+                        $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                        if(empty($user_package))
+                        {
+                            return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+                        }
+                        if($user_package->no_of_boost == $user_package->used_no_of_boost)
+                        {
+                            DB::rollback();
+                            return response()->json(prepareResult(true, ['promotion Package Use Exhasted'], getLangByLabelGroups('messages','message_no_of_boost_exhausted_error')), config('http_response.internal_server_error'));
+                        }
+                        $getProductsServicesBook->promotion_end_at  = date('Y-m-d',strtotime('+'.$user_package->boost_no_of_days.'days'));
+                        $user_package->update(['used_no_of_boost'=>($user_package->used_no_of_boost + 1)]);
+                        $title = 'Product Promoted';
+                        $body =  'Product '.$getProductsServicesBook->title.' has been successfully Promoted  from '.$getProductsServicesBook->promotion_start_at.' to '.$getProductsServicesBook->promotion_end_at.'.';
+                    }
+                    else
+                    {
+                        $title = 'Product Removed from Promoted';
+                        $body =  'Product '.$getProductsServicesBook->title.' has been successfully Removed from Promotion.';
+                    }
+                    $type = 'Product Action';
+                    if($getProductsServicesBook->type == 'book')
+                    {
+                        $module = 'book';
+                    }
+                    else
+                    {
+                        $module = 'product_service';
+                    }
+                    pushNotification($title,$body,Auth::user(),$type,true,'creator',$module,$getProductsServicesBook->id,'my-listing');
+                }
+
+                if($getProductsServicesBook->most_popular != $request->most_popular)
+                {
+                    $getProductsServicesBook->most_popular        = $request->most_popular;
+                    if($request->most_popular == true)
+                    {
+                        $getProductsServicesBook->most_popular_start_at = date('Y-m-d');
+                        $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                        if(empty($user_package))
+                        {
+                            return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+                        }
+                        if($user_package->most_popular == $user_package->used_most_popular)
+                        {
+                            DB::rollback();
+                            return response()->json(prepareResult(true, ['Popular Package Use Exhasted'], getLangByLabelGroups('messages','message_most_popular_exhausted_error')), config('http_response.internal_server_error'));
+                        }
+                        $getProductsServicesBook->most_popular_end_at  = date('Y-m-d',strtotime('+'.$user_package->most_popular_no_of_days.'days'));
+                        $user_package->update(['used_most_popular'=>$user_package->used_most_popular + 1]);
+                        $title = 'Product  updated as Most Popular';
+                        $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated as Most Popular  from '.$getProductsServicesBook->most_popular_start_at.' to '.$getProductsServicesBook->most_popular_end_at.'.';
+                    }
+                    else
+                    {
+                        $title = 'Product Removed from Most Popular';
+                        $body =  'Product '.$getProductsServicesBook->title.' has been successfully Removed from Most Popular.';
+                    }
+                    $type = 'Product Action';
+                    if($getProductsServicesBook->type == 'book')
+                    {
+                        $module = 'book';
+                    }
+                    else
+                    {
+                        $module = 'product_service';
+                    }
+                    pushNotification($title,$body,Auth::user(),$type,true,'creator',$module,$getProductsServicesBook->id,'my-listing');
+                }
+
+                if($getProductsServicesBook->top_selling != $request->top_selling)
+                {
+                    $getProductsServicesBook->top_selling        = $request->top_selling;
+                    if($request->top_selling == true)
+                    {
+
+                        $getProductsServicesBook->top_selling_start_at = date('Y-m-d');
+                        $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                        if(empty($user_package))
+                        {
+                            return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+                        }
+                        if($user_package->top_selling == $user_package->used_top_selling)
+                        {
+                            DB::rollback();
+                            return response()->json(prepareResult(true, ['Top selling Package Use Exhasted'], getLangByLabelGroups('messages','message_top_selling_exhausted_error')), config('http_response.internal_server_error'));
+                        }
+                        $getProductsServicesBook->top_selling_end_at  = date('Y-m-d',strtotime('+'.$user_package->top_selling_no_of_days.'days'));
+                        $user_package->update(['used_top_selling'=>$user_package->used_top_selling + 1]);
+                        $title = 'Product  updated as Top Selling';
+                        $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated as Top Selling  from '.$getProductsServicesBook->top_selling_start_at.' to '.$getProductsServicesBook->top_selling_end_at.'.';
+                    }
+                    else
+                    {
+                        $title = 'Product Removed from Top Selling';
+                        $body =  'Product '.$getProductsServicesBook->title.' has been successfully Removed from Top Selling.';
+                    }  
+                    $type = 'Product Action';
+                    if($getProductsServicesBook->type == 'book')
+                    {
+                        $module = 'book';
+                    }
+                    else
+                    {
+                        $module = 'product_service';
+                    }
+                    pushNotification($title,$body,Auth::user(),$type,true,'creator',$module,$getProductsServicesBook->id,'my-listing');
+                }
             }
 
             $getProductsServicesBook->save();
 
-            $type = 'Product Action';
-            if($getProductsServicesBook->type == 'book')
-	        {
-	            $module = 'book';
-	        }
-	        else
-	        {
-	            $module = 'product_service';
-	        }
-            pushNotification($title,$body,$getProductsServicesBook->user,$type,true,'creator',$module,$getProductsServicesBook->id,'my-listing');
-
             DB::commit();
-            return response()->json(prepareResult(false, $getProductsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_updated')), config('http_response.created'));
+            return response()->json(prepareResult(false, $getProductsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_'.$request->action)), config('http_response.created'));
         }
         catch (\Throwable $exception)
         {
