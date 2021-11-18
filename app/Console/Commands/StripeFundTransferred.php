@@ -96,7 +96,7 @@ class StripeFundTransferred extends Command
                           "transfer_group"  => "ORDER_PAYMENT_TILL_".$before15Days
                         ]);
                     } catch (\Exception $e) {
-                        pushNotification('Insufficient funds',$e, User::orderby('id','ASC')->first(),'',true,'Admin','Payment','no-data','Admin');
+                        pushNotification('Insufficient funds',$e, User::orderBy('auto_id','ASC')->first(),'',true,'Admin','Payment','no-data','Admin');
                         Log::info($e);
                         break;
                     }
