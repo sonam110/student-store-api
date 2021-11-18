@@ -335,12 +335,12 @@ class UserController extends Controller
     {
         try
         {
-        	$users = User::select('users.*')->where('users.user_type_id','!=', '1')->orderBy('users.created_at','desc');
-
+        	$users = User::select('users.*',)->where('users.user_type_id','!=', '1')->orderBy('users.created_at','desc');
 
         	if(!empty($request->name))
             {
-            	$users->whereRaw('concat(users.first_name," ",users.last_name) like ?', "%{$request->name}%");
+            	$name = str_replace(' ', '', $request->name);
+            	$users->whereRaw("(CASE WHEN users.last_name IS NOT NULL THEN concat(users.first_name,'',users.last_name) like '%{$name}%' ELSE users.first_name like '%{$request->name}%' END)");
             }
             if(!empty($request->first_name))
             {
