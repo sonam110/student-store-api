@@ -487,7 +487,7 @@ class ProductsServicesBookController extends Controller
                 {
                     $getProductsServicesBook->promotion_start_at = date('Y-m-d');
                     
-                    $getProductsServicesBook->promotion_end_at  = date('Y-m-d',strtotime('+'.$user_package->boost_no_of_days.'days'));
+                    $getProductsServicesBook->promotion_end_at  = date('Y-m-d',strtotime('+5 days'));
                     //$user_package->update(['used_no_of_boost'=>($user_package->used_no_of_boost + 1)]);
                     $title = 'Product Promoted';
                     $body =  'Product '.$getProductsServicesBook->title.' has been successfully Promoted by the STUDENT STORE, Applicable from '.$getProductsServicesBook->promotion_start_at.' to '.$getProductsServicesBook->promotion_end_at.'.';
@@ -530,7 +530,7 @@ class ProductsServicesBookController extends Controller
                     if($request->promote == true)
                     {
                         $getProductsServicesBook->promotion_start_at = date('Y-m-d');
-                        $getProductsServicesBook->promotion_end_at  = date('Y-m-d',strtotime('+'.$user_package->boost_no_of_days.'days'));
+                        $getProductsServicesBook->promotion_end_at  = date('Y-m-d',strtotime('+5 days'));
                         //$user_package->update(['used_no_of_boost'=>($user_package->used_no_of_boost + 1)]);
                         $title = 'Product Promoted';
                         $body =  'Product '.$getProductsServicesBook->title.' has been successfully Promoted by STUDENT STORE from '.$getProductsServicesBook->promotion_start_at.' to '.$getProductsServicesBook->promotion_end_at.'.';
