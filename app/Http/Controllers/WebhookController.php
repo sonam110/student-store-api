@@ -154,7 +154,10 @@ class WebhookController extends Controller
                 $order->full_address        = $addressfind->full_address;
                 $order->zip_code            = $addressfind->zip_code;
             }
+            Log::channel('webhook')->info($subscriptionSchedule->data->items);
+            die;
             $pakcageAmount = ($subscriptionSchedule->data->object->items->data[0]->plan->amount)/100;
+            
             $order->order_number        = $order_number;
             $order->user_id             = $userInfo->id;
             
@@ -204,6 +207,8 @@ class WebhookController extends Controller
                 $orderItem->delivery_code = null;
                 $orderItem->save();
 
+
+                //Transaction create
                 $getTransactionDetail = TransactionDetail::where('user_package_subscription_id', $subscribedPackage->id)->first();
                 if($getTransactionDetail)
                 {
@@ -232,9 +237,11 @@ class WebhookController extends Controller
                     $transactionDetail->gateway_detail = 'stripe';
 
                     $transactionDetail->transaction_timestamp = $subscriptionSchedule->created;
-                    $transactionDetail->currency                    = $request->transaction_detail['currency'];
+                    $transactionDetail->currency = $getTransactionDetail->currency;
                     $transactionDetail->save();
                 }
+
+                //
 
                 //Email
                 $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id', $userInfo->language_id)->first();
