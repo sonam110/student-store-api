@@ -86,39 +86,19 @@ class WebhookController extends Controller
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->subscription;
             $this->customerSubscriptionUpdated($subscription_id, $subscriptionSchedule);
-            Log::channel('webhook')->info('customer.subscription.created');
+            Log::channel('webhook')->info('customer.subscription.updated');
             Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "customer.subscription.deleted") {
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->subscription;
             $this->abortedSubscription($subscription_id);
-            Log::channel('webhook')->info('customer.subscription.created');
+            Log::channel('webhook')->info('customer.subscription.deleted');
             Log::channel('webhook')->info($subscriptionSchedule);
         }
-        Log::channel('webhook')->info('payload');
-        Log::channel('webhook')->info($payload);
+        //Log::channel('webhook')->info('payload');
+        //Log::channel('webhook')->info($payload);
         http_response_code(200);
-    }
-
-    private function customerSubscriptionCreated($subscription_id) 
-    {
-        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
-        if($subscribedPackage)
-        {
-            // $subscribedPackage->is_canceled = 1;
-            // $subscribedPackage->canceled_date = date('Y-m-d');
-            // $subscribedPackage->save();
-
-            // $title = 'Package Subscription Canceled';
-            // $body =  'Your '.$subscribedPackage->package->module.' module '.getLangByLabelGroups('packages', $subscribedPackage->package->type_of_package).' package is successfully canceled.';
-            // $user = $subscribedPackage->user;
-            // $type = 'Package';
-            // $user_type = 'buyer';
-            // $module = 'profile';
-            // pushNotification($title,$body,$user,$type,true,$user_type,$module,'no-data','package');
-            // Log::channel('webhook')->info('Subscription canceled. User Package Subscription Id: '. $subscribedPackage->id);
-        }
     }
 
     private function customerSubscriptionUpdated($subscription_id, $subscriptionSchedule) 
@@ -168,7 +148,7 @@ class WebhookController extends Controller
             $order->promo_code_discount = null;
             $order->grand_total         = $pakcageAmount;
             $order->payable_amount      = $pakcageAmount;
-            $order->remark              = $subscriptionSchedule->data->object->collection_method;
+            $order->remark              = $subscriptionSchedule->collection_method;
             $order->first_name          = (!empty($userInfo->first_name)) ? AES256::decrypt($userInfo->first_name, env('ENCRYPTION_KEY')) : NULL;
             $order->last_name           = (!empty($userInfo->last_name)) ? AES256::decrypt($userInfo->last_name, env('ENCRYPTION_KEY')) : NULL;
             $order->email               = (!empty($userInfo->email)) ? AES256::decrypt($userInfo->email, env('ENCRYPTION_KEY')) : NULL;
@@ -205,6 +185,44 @@ class WebhookController extends Controller
                 $orderItem->delivery_code = null;
                 $orderItem->save();
 
+                // create UserPackageSubscription
+                $userPackageSubscription = new UserPackageSubscription;
+                $userPackageSubscription->user_id = $userInfo->id;
+                $userPackageSubscription->subscription_id = $subscribedPackage->subscription_id;
+                $userPackageSubscription->payby                 = $subscribedPackage->payby;
+                $userPackageSubscription->package_id            = $subscribedPackage->package_id;
+                $userPackageSubscription->package_valid_till    = date("Y-m-d H:i:s", $subscriptionSchedule->current_period_end);
+                $userPackageSubscription->subscription_status   = 1;
+                $userPackageSubscription->module                = $subscribedPackage->module;
+                $userPackageSubscription->type_of_package       = $subscribedPackage->type_of_package;
+                $userPackageSubscription->job_ads               = $subscribedPackage->job_ads;
+                $userPackageSubscription->publications_day      = $subscribedPackage->publications_day;
+                $userPackageSubscription->duration              = $subscribedPackage->duration;
+                $userPackageSubscription->cvs_view              = $subscribedPackage->cvs_view;
+                $userPackageSubscription->employees_per_job_ad  = $subscribedPackage->employees_per_job_ad;
+                $userPackageSubscription->no_of_boost           = $subscribedPackage->no_of_boost;
+                $userPackageSubscription->boost_no_of_days      = $subscribedPackage->boost_no_of_days;
+                $userPackageSubscription->most_popular          = $subscribedPackage->most_popular;
+                $userPackageSubscription->most_popular_no_of_days= $subscribedPackage->most_popular_no_of_days;
+                $userPackageSubscription->top_selling           = $subscribedPackage->top_selling;
+                $userPackageSubscription->top_selling_no_of_days= $subscribedPackage->top_selling_no_of_days;
+                $userPackageSubscription->price                 = $subscribedPackage->price;
+                $userPackageSubscription->start_up_fee          = $subscribedPackage->start_up_fee;
+                $userPackageSubscription->subscription          = $subscribedPackage->subscription;
+                $userPackageSubscription->commission_per_sale   = $subscribedPackage->commission_per_sale;
+                $userPackageSubscription->number_of_product     = $subscribedPackage->number_of_product;
+                $userPackageSubscription->number_of_service     = $subscribedPackage->number_of_service;
+                $userPackageSubscription->number_of_book        = $subscribedPackage->number_of_book;
+                $userPackageSubscription->number_of_contest     = $subscribedPackage->number_of_contest;
+                $userPackageSubscription->number_of_event       = $subscribedPackage->number_of_event;
+                $userPackageSubscription->notice_month          = $subscribedPackage->notice_month;
+                $userPackageSubscription->locations             = $subscribedPackage->locations;
+                $userPackageSubscription->organization          = $subscribedPackage->organization;
+                $userPackageSubscription->attendees             = $subscribedPackage->attendees;
+                $userPackageSubscription->range_of_age          = $subscribedPackage->range_of_age;
+                $userPackageSubscription->cost_for_each_attendee= $subscribedPackage->cost_for_each_attendee;
+                $userPackageSubscription->top_up_fee            = $subscribedPackage->top_up_fee;
+                $userPackageSubscription->save();
 
                 //Transaction create
                 $getTransactionDetail = TransactionDetail::where('user_package_subscription_id', $subscribedPackage->id)->first();
@@ -239,10 +257,17 @@ class WebhookController extends Controller
                     $transactionDetail->save();
                 }
 
-                //
+                
+                $title = 'Package Subscription renew';
+                $body =  'Your '.$subscribedPackage->package->module.' module '.getLangByLabelGroups('packages', $subscribedPackage->package->type_of_package).' package is successfully renewed.';
+                $user = $subscribedPackage->user;
+                $type = 'Package';
+                $user_type = 'buyer';
+                $module = 'profile';
+                pushNotification($title,$body,$user,$type,true,$user_type,$module,'no-data','package');
 
                 //Email
-                /*$emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id', $userInfo->language_id)->first();
+                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id', $userInfo->language_id)->first();
                 if(empty($emailTemplate))
                 {
                     $emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
@@ -262,8 +287,9 @@ class WebhookController extends Controller
                     'order_details' => $order,
                 ];
                 
-                Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));*/
+                Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
                 //mail-end
+                return 1;
             }
         }
     }
