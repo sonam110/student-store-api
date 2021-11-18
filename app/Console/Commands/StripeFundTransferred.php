@@ -44,7 +44,7 @@ class StripeFundTransferred extends Command
     public function handle()
     {
         $paymentInfo = PaymentGatewaySetting::first();
-        \Stripe\Stripe::setApiKey($paymentInfo->payment_gateway_key);
+        \Stripe\Stripe::setApiKey($paymentInfo->payment_gateway_secret);
 
         $today          = new \DateTime();
         $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
