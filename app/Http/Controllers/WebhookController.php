@@ -204,6 +204,39 @@ class WebhookController extends Controller
                 $orderItem->delivery_code = null;
                 $orderItem->save();
 
+                $getTransactionDetail = TransactionDetail::where('user_package_subscription_id', $subscribedPackage->id)->first();
+                if($getTransactionDetail)
+                {
+                    $transactionDetail = new TransactionDetail;
+                    $transactionDetail->order_id = $order->id;
+                    $transactionDetail->payment_card_detail_id = $getTransactionDetail->payment_card_detail_id;
+                    $transactionDetail->card_number = $getTransactionDetail->card_number;
+                    $transactionDetail->card_type = $getTransactionDetail->card_type;
+                    $transactionDetail->card_cvv = $getTransactionDetail->card_cvv;
+                    $transactionDetail->card_expiry = $getTransactionDetail->card_expiry;
+                    $transactionDetail->card_holder_name = $getTransactionDetail->card_holder_name;
+                
+                    $transactionDetail->transaction_id = $subscriptionSchedule->id; //this is event id
+
+                    $transactionDetail->description = $getTransactionDetail->description;
+                    $transactionDetail->receipt_email = $getTransactionDetail->receipt_email;
+                    $transactionDetail->receipt_number = $getTransactionDetail->receipt_number;
+                    $transactionDetail->receipt_url = null;
+                    $transactionDetail->refund_url = null;
+
+                    $transactionDetail->transaction_status = 'Succeeded';
+                    $transactionDetail->transaction_reference_no = null;
+                    $transactionDetail->transaction_amount = $pakcageAmount;
+                    $transactionDetail->transaction_type = 'paid';
+                    $transactionDetail->transaction_mode = 'Online';
+                    $transactionDetail->gateway_detail = 'stripe';
+
+                    $transactionDetail->transaction_timestamp = $subscriptionSchedule->created;
+                    $transactionDetail->currency                    = $request->transaction_detail['currency'];
+                    $transactionDetail->save();
+                }
+
+                //Email
                 $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id', $userInfo->language_id)->first();
                 if(empty($emailTemplate))
                 {
@@ -226,46 +259,6 @@ class WebhookController extends Controller
                 
                 Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
                 //mail-end
-
-
-                $paymentCardDetail = false;
-                if(!empty($request->transaction_detail['payment_card_detail_id']))
-                {
-                    $paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);
-                }
-                
-                $transactionDetail = new TransactionDetail;
-                $transactionDetail->order_id                    = $order->id;
-
-                if($paymentCardDetail)
-                {
-                    $transactionDetail->payment_card_detail_id      = $request->transaction_detail['payment_card_detail_id'];
-                    $transactionDetail->card_number                 = $paymentCardDetail->card_number;
-                    $transactionDetail->card_type                   = $paymentCardDetail->card_type;
-                    $transactionDetail->card_cvv                    = $paymentCardDetail->card_cvv;
-                    $transactionDetail->card_expiry                 = $paymentCardDetail->card_expiry;
-                    $transactionDetail->card_holder_name            = $paymentCardDetail->card_holder_name;
-                }
-
-                
-                $transactionDetail->transaction_id              = $request->transaction_detail['transaction_id'];
-
-                $transactionDetail->description                 = $request->transaction_detail['description'];
-                $transactionDetail->receipt_email               = $request->transaction_detail['receipt_email'];
-                $transactionDetail->receipt_number              = $request->transaction_detail['receipt_number'];
-                $transactionDetail->receipt_url                 = $request->transaction_detail['receipt_url'];
-                $transactionDetail->refund_url                  = $request->transaction_detail['refund_url'];
-
-                $transactionDetail->transaction_status          = $request->transaction_detail['transaction_status'];
-                $transactionDetail->transaction_reference_no    = $request->transaction_detail['transaction_reference_no'];
-                $transactionDetail->transaction_amount          = $request->transaction_detail['transaction_amount'];
-                $transactionDetail->transaction_type            = $request->transaction_detail['transaction_type'];
-                $transactionDetail->transaction_mode            = $request->transaction_detail['transaction_mode'];
-                $transactionDetail->gateway_detail              = $request->transaction_detail['gateway_detail'];
-
-                $transactionDetail->transaction_timestamp       = $request->transaction_detail['transaction_timestamp'];
-                $transactionDetail->currency                    = $request->transaction_detail['currency'];
-                $transactionDetail->save();
             }
         }
     }

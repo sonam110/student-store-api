@@ -358,7 +358,7 @@ class DashboardController extends Controller
 			->where('order_items.contest_type','contest')
 			->limit(10)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory','order.user:id,first_name,last_name,user_type_id')
-			->with(['contestApplication.contest.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+			->with(['contestApplication.contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
@@ -381,7 +381,7 @@ class DashboardController extends Controller
 			->where('order_items.contest_type','event')
 			->limit(10)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory','order.user:id,first_name,last_name,user_type_id')
-			->with(['contestApplication.contest.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+			->with(['contestApplication.contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
@@ -421,7 +421,7 @@ class DashboardController extends Controller
 			->where('order_items.product_type','book')
 			->limit(5)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory')
-			->with(['productsServicesBook.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
@@ -443,7 +443,7 @@ class DashboardController extends Controller
 			->where('order_items.product_type','service')
 			->limit(5)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory')
-			->with(['productsServicesBook.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
@@ -465,7 +465,7 @@ class DashboardController extends Controller
 			->where('order_items.product_type','product')
 			->limit(5)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory')
-			->with(['productsServicesBook.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
@@ -490,7 +490,7 @@ class DashboardController extends Controller
 			->where('order_items.contest_type','contest')
 			->limit(5)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory')
-			->with(['contestApplication.contest.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+			->with(['contestApplication.contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
@@ -515,7 +515,7 @@ class DashboardController extends Controller
 			->where('order_items.contest_type','event')
 			->limit(5)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory')
-			->with(['contestApplication.contest.categoryMaster.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+			->with(['contestApplication.contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');

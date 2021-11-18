@@ -533,6 +533,7 @@ class OrderController extends Controller
 				if($paymentCardDetail)
 				{
 					$transactionDetail->payment_card_detail_id   	= $request->transaction_detail['payment_card_detail_id'];
+					$transactionDetail->user_package_subscription_id   	= @$request->transaction_detail['user_package_subscription_id'];
 					$transactionDetail->card_number              	= $paymentCardDetail->card_number;
 					$transactionDetail->card_type                	= $paymentCardDetail->card_type;
 					$transactionDetail->card_cvv                 	= $paymentCardDetail->card_cvv;
