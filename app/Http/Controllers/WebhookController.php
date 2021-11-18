@@ -154,9 +154,7 @@ class WebhookController extends Controller
                 $order->full_address        = $addressfind->full_address;
                 $order->zip_code            = $addressfind->zip_code;
             }
-            Log::channel('webhook')->info($subscriptionSchedule->data->items);
-            die;
-            $pakcageAmount = ($subscriptionSchedule->data->object->items->data[0]->plan->amount)/100;
+            $pakcageAmount = ($subscriptionSchedule->items->data[0]->plan->amount)/100;
             
             $order->order_number        = $order_number;
             $order->user_id             = $userInfo->id;
@@ -244,7 +242,7 @@ class WebhookController extends Controller
                 //
 
                 //Email
-                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id', $userInfo->language_id)->first();
+                /*$emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id', $userInfo->language_id)->first();
                 if(empty($emailTemplate))
                 {
                     $emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
@@ -264,7 +262,7 @@ class WebhookController extends Controller
                     'order_details' => $order,
                 ];
                 
-                Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
+                Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));*/
                 //mail-end
             }
         }
