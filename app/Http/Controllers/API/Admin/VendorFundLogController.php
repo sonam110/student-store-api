@@ -172,4 +172,32 @@ class VendorFundLogController extends Controller
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
     }
+
+    public function pendingVendorsFundForTransferred(Request $request)
+    {
+        $today          = new \DateTime();
+        $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
+
+        $getLists = OrderItem::select('products_services_books.user_id', \DB::raw('SUM(order_items.amount_transferred_to_vendor) as total_amount'))
+            ->where('order_items.is_returned', 0)
+            ->where('order_items.is_replaced', 0)
+            ->where('order_items.is_disputed', 0)
+            ->where('order_items.is_transferred_to_vendor', 0)
+            ->whereDate('order_items.delivery_completed_date', '<=', $before15Days)
+            ->where('order_items.item_status', 'completed')
+            ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
+            ->join('users', 'users.id','=','products_services_books.user_id')
+            ->with('user:id,first_name,last_name,email,stripe_account_id,stripe_status')
+            ->orderBy('order_items.products_services_book_id', 'ASC')
+            ->groupBy('products_services_books.user_id');
+        if(!empty($request->per_page_record))
+        {
+            $getLists = $getLists->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+        }
+        else
+        {
+            $getLists = $getLists->get();
+        }
+        return response(prepareResult(false, $getLists, 'Pending amount for transferred'), config('http_response.success'));
+    }
 }

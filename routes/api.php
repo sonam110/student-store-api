@@ -470,6 +470,8 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	//Fund transferred log
 	Route::post('/vendor-fund-transfer-list', [App\Http\Controllers\API\Admin\VendorFundLogController::class,'vendorFundTransferList']);
 	Route::post('/vendor-wise-fund-transfer-list', [App\Http\Controllers\API\Admin\VendorFundLogController::class,'vendorWiseFundTransferList']);
+
+	Route::get('/pending-vendors-fund-for-transferred', [App\Http\Controllers\API\Admin\VendorFundLogController::class,'pendingVendorsFundForTransferred']);
 	
 
 });
