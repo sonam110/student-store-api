@@ -10,7 +10,7 @@ use App\Models\OrderItem;
 use App\Models\TransactionDetail;
 use App\Models\AddressDetail;
 use App\Mail\OrderMail;
-use App\Mail\OrderConfirmedMail;
+use App\Mail\OrderPlacedMail;
 use mervick\aesEverywhere\AES256;
 use App\Models\EmailTemplate;
 use Mail;
