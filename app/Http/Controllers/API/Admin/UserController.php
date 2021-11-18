@@ -340,10 +340,7 @@ class UserController extends Controller
 
         	if(!empty($request->name))
             {
-            	$users->where(function ($query) use ($request) {
-				    $query->where('users.first_name', 'LIKE', '%'.$request->name.'%')
-				          ->orWhere('users.last_name', 'LIKE', '%'.$request->name.'%');
-				});
+            	$users->whereRaw('concat(users.first_name," ",users.last_name) like ?', "%{$request->name}%");
             }
             if(!empty($request->first_name))
             {
