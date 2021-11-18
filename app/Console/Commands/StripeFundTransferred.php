@@ -50,14 +50,14 @@ class StripeFundTransferred extends Command
         $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
 
         $getUserIds = OrderItem::select('products_services_books.user_id')
-            ->where('order_items.is_returned', '0')
-            ->where('order_items.is_replaced', '0')
-            ->where('order_items.is_disputed', '0')
-            ->where('order_items.amount_transferred_to_vendor', '0')
+            ->where('order_items.is_returned', 0)
+            ->where('order_items.is_replaced', 0)
+            ->where('order_items.is_disputed', 0)
+            ->where('order_items.is_transferred_to_vendor', 0)
             ->whereDate('order_items.delivery_completed_date', '<=', $before15Days)
             ->where('order_items.item_status', 'completed')
-            ->orderBy('order_items.products_services_book_id', 'ASC')
             ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
+            ->orderBy('order_items.products_services_book_id', 'ASC')
             ->groupBy('products_services_books.user_id')
             ->get();
         foreach($getUserIds as $user)
