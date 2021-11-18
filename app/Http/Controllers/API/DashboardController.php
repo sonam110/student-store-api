@@ -363,7 +363,7 @@ class DashboardController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
             }])
-            ->with(['contestApplication.contest.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            ->with(['contestApplication.contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
@@ -386,7 +386,7 @@ class DashboardController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
             }])
-            ->with(['contestApplication.contest.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            ->with(['contestApplication.contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
@@ -426,7 +426,7 @@ class DashboardController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
             }])
-            ->with(['productsServicesBook.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            ->with(['productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
@@ -448,7 +448,7 @@ class DashboardController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
             }])
-            ->with(['productsServicesBook.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            ->with(['productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
@@ -470,7 +470,7 @@ class DashboardController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
             }])
-            ->with(['productsServicesBook.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            ->with(['productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
@@ -495,7 +495,7 @@ class DashboardController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
             }])
-            ->with(['contestApplication.contest.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            ->with(['contestApplication.contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
@@ -520,7 +520,7 @@ class DashboardController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
             }])
-            ->with(['contestApplication.contest.categoryMaster.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            ->with(['contestApplication.contest.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
