@@ -95,6 +95,8 @@ class StripeFundTransferred extends Command
                       "transfer_group"  => "ORDER_PAYMENT_TILL_".$before15Days
                     ]);
                     
+                    Log::info($payout);
+
                     $createLog = new VendorFundTransfer;
                     $createLog->user_id = $user->user_id;
                     $createLog->transfer_group = $payout['transfer_group'];
