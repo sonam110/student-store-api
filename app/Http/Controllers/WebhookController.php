@@ -12,6 +12,7 @@ use App\Models\AddressDetail;
 use App\Mail\OrderMail;
 use App\Mail\OrderConfirmedMail;
 use mervick\aesEverywhere\AES256;
+use App\Models\EmailTemplate;
 use Mail;
 use Stripe;
 use Log;
