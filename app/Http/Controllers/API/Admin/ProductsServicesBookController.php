@@ -500,7 +500,7 @@ class ProductsServicesBookController extends Controller
                 if($request->most_popular == true)
                 {
                     $getProductsServicesBook->most_popular_start_at = date('Y-m-d');
-                    $getProductsServicesBook->most_popular_end_at  = date('Y-m-d',strtotime('+'.$user_package->most_popular_no_of_days.'days'));
+                    $getProductsServicesBook->most_popular_end_at  = date('Y-m-d',strtotime('+5 days'));
                     //$user_package->update(['used_most_popular'=>$user_package->used_most_popular + 1]);
                     $title = 'Product  updated as Most Popular';
                     $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated by the STUDENT STORE as Most Popular  from '.$getProductsServicesBook->most_popular_start_at.' to '.$getProductsServicesBook->most_popular_end_at.'.';
@@ -515,7 +515,7 @@ class ProductsServicesBookController extends Controller
                 {
 
                     $getProductsServicesBook->top_selling_start_at = date('Y-m-d');
-                    $getProductsServicesBook->top_selling_end_at  = date('Y-m-d',strtotime('+'.$user_package->top_selling_no_of_days.'days'));
+                    $getProductsServicesBook->top_selling_end_at  = date('Y-m-d',strtotime('+5 days'));
                     //$user_package->update(['used_top_selling'=>$user_package->used_top_selling + 1]);
                     $title = 'Product  updated as Top Selling';
                     $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated by the STUDENT STORE as Top Selling  from '.$getProductsServicesBook->top_selling_start_at.' to '.$getProductsServicesBook->top_selling_end_at.'.';
@@ -553,7 +553,7 @@ class ProductsServicesBookController extends Controller
                     if($request->most_popular == true)
                     {
                         $getProductsServicesBook->most_popular_start_at = date('Y-m-d');
-                        $getProductsServicesBook->most_popular_end_at  = date('Y-m-d',strtotime('+'.$user_package->most_popular_no_of_days.'days'));
+                        $getProductsServicesBook->most_popular_end_at  = date('Y-m-d',strtotime('+5 days'));
                         //$user_package->update(['used_most_popular'=>$user_package->used_most_popular + 1]);
                         $title = 'Product  updated as Most Popular';
                         $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated by STUDENT STORE as Most Popular  from '.$getProductsServicesBook->most_popular_start_at.' to '.$getProductsServicesBook->most_popular_end_at.'.';
@@ -577,7 +577,7 @@ class ProductsServicesBookController extends Controller
                     {
 
                         $getProductsServicesBook->top_selling_start_at = date('Y-m-d');
-                        $getProductsServicesBook->top_selling_end_at  = date('Y-m-d',strtotime('+'.$user_package->top_selling_no_of_days.'days'));
+                        $getProductsServicesBook->top_selling_end_at  = date('Y-m-d',strtotime('+5 days'));
                         //$user_package->update(['used_top_selling'=>$user_package->used_top_selling + 1]);
                         $title = 'Product  updated as Top Selling';
                         $body =  'Product '.$getProductsServicesBook->title.' has been successfully updated by STUDENT STORE as Top Selling  from '.$getProductsServicesBook->top_selling_start_at.' to '.$getProductsServicesBook->top_selling_end_at.'.';
