@@ -173,7 +173,7 @@ class VendorFundLogController extends Controller
         }
     }
 
-    public function pendingVendorsFundForTransferred(Request $request)
+    public function pendingVendorsFundToTransferred(Request $request)
     {
         $today          = new \DateTime();
         $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
@@ -199,5 +199,30 @@ class VendorFundLogController extends Controller
             $getLists = $getLists->get();
         }
         return response(prepareResult(false, $getLists, 'Pending amount for transferred'), config('http_response.success'));
+    }
+
+    public function pendingVendorFundToTransferred(Request $request, $user_id)
+    {
+        $today          = new \DateTime();
+        $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
+
+        $userInfoPendingToTrans = OrderItem::select('order_items.*')
+            ->where('order_items.is_returned', 0)
+            ->where('order_items.is_replaced', 0)
+            ->where('order_items.is_disputed', 0)
+            ->where('order_items.is_transferred_to_vendor', 0)
+            ->whereDate('order_items.delivery_completed_date', '<=', $before15Days)
+            ->where('order_items.item_status', 'completed')
+            ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
+            ->join('users', 'users.id','=','products_services_books.user_id')
+            ->where('users.id', $user_id)
+            ->get();
+
+            $returnObj = [
+                'orderList' => $userInfoPendingToTrans,
+                'userInfo'  => User::find($user_id)
+            ];
+
+        return response(prepareResult(false, $returnObj, 'Pending amount for transferred'), config('http_response.success'));
     }
 }
