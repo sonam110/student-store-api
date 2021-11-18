@@ -36,6 +36,7 @@ class Kernel extends ConsoleKernel
         RewardPointsCredit::class,
         CoolCompanyCreateAssignment::class,
         CoolCompanyRegFreelancer::class,
+        StripeFundTransferred::class,
         StripeAccountStatusCheck::class,
 
     ];
@@ -60,6 +61,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('create:freelancer')->hourly();
         $schedule->command('create:assignment')->dailyAt('02:00');
         $schedule->command('stripe:account')->hourly();
+        $schedule->command('stripevendor:findtransfer')->dailyAt('00:01');
         
     }
 
