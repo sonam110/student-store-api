@@ -88,14 +88,18 @@ class StripeFundTransferred extends Command
                 }
                 if($totalAmountForPaid>0)
                 {
-                    $payout = \Stripe\Transfer::create([
-                      "amount"          => $totalAmountForPaid * 100,
-                      "currency"        => $paymentInfo->stripe_currency,
-                      "destination"     => $userInfo->stripe_account_id,
-                      "transfer_group"  => "ORDER_PAYMENT_TILL_".$before15Days
-                    ]);
-                    
-                    Log::info($payout);
+                    try {
+                        $payout = \Stripe\Transfer::create([
+                          "amount"          => $totalAmountForPaid * 100,
+                          "currency"        => $paymentInfo->stripe_currency,
+                          "destination"     => $userInfo->stripe_account_id,
+                          "transfer_group"  => "ORDER_PAYMENT_TILL_".$before15Days
+                        ]);
+                    } catch (\Exception $e) {
+                        pushNotification('Insufficient funds',$e, User::orderby('id','ASC')->first(),'',true,'Admin','Payment','no-data','Admin');
+                        Log::info($e);
+                        break;
+                    }
 
                     $createLog = new VendorFundTransfer;
                     $createLog->user_id = $user->user_id;
