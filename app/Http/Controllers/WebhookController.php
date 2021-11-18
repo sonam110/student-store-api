@@ -152,7 +152,7 @@ class WebhookController extends Controller
             $order->first_name          = (!empty($userInfo->first_name)) ? AES256::decrypt($userInfo->first_name, env('ENCRYPTION_KEY')) : NULL;
             $order->last_name           = (!empty($userInfo->last_name)) ? AES256::decrypt($userInfo->last_name, env('ENCRYPTION_KEY')) : NULL;
             $order->email               = (!empty($userInfo->email)) ? AES256::decrypt($userInfo->email, env('ENCRYPTION_KEY')) : NULL;
-            $order->contact_number      = (!empty(Auth::user()->contact_number)) ? AES256::decrypt(Auth::user()->contact_number, env('ENCRYPTION_KEY')) : NULL;
+            $order->contact_number      = (!empty($userInfo->contact_number)) ? AES256::decrypt($userInfo->contact_number, env('ENCRYPTION_KEY')) : NULL;
             
             $order->used_reward_points  = 0;
             $order->order_for           = 'packages';
