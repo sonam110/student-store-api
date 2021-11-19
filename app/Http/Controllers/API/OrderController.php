@@ -402,7 +402,8 @@ class OrderController extends Controller
 						$orderItem->product_type					= $productsServicesBook->type;
 						$orderItem->note_to_seller                   = $orderedItem['note_to_seller'];
 
-						$checkItemType = ProductsServicesBook::select('type')->find($orderedItem['product_id']);
+						$checkItemType = ProductsServicesBook::select('type','user_id')->find($orderedItem['product_id']);
+						$vendor_user_id = $checkItemType->user_id;
 						if($checkItemType->type=='product')
 						{
 							ProductsServicesBook::where('id',$orderedItem['product_id'])->update(['quantity' => $productsServicesBook->quantity - $orderedItem['quantity']]);
@@ -410,15 +411,19 @@ class OrderController extends Controller
 					}
 					elseif(!empty($orderedItem['contest_application_id']))
 					{
+						$getCInfo = ContestApplication::find($orderedItem['contest_application_id']);
+						$vendor_user_id = $getCInfo->contest->user_id;
 						$orderItem->contest_application_id			= $orderedItem['contest_application_id'];
 						$orderItem->contest_type					= $productsServicesBook->type;
 					}
 					else
 					{
 						$orderItem->package_id						= $orderedItem['package_id'];
+						$vendor_user_id = null;
 					}
 					
                     
+					$orderItem->vendor_user_id 	= $vendor_user_id;
 					$orderItem->title 	= $title;
 					$orderItem->sku		= $productsServicesBook->sku;
 					if(json_encode(@$orderedItem['attribute_data'])=="null" || $orderedItem['attribute_data']=="null")

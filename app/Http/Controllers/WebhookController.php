@@ -169,6 +169,7 @@ class WebhookController extends Controller
                 $orderItem = new OrderItem;
                 $orderItem->user_id = $userInfo->id;
                 $orderItem->order_id = $order->id;
+                $orderItem->vendor_user_id = null;
                 $orderItem->package_id = $subscribedPackage->package_id;
                 $orderItem->title = $title;
                 $orderItem->price = $pakcageAmount;

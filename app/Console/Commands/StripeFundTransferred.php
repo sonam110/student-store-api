@@ -52,7 +52,7 @@ class StripeFundTransferred extends Command
         $getUserIds = OrderItem::select('products_services_books.user_id')
             ->where('order_items.is_returned', 0)
             ->where('order_items.is_replaced', 0)
-            ->where('order_items.is_disputed', 0)
+            ->whereRaw("(CASE WHEN order_items.is_disputed = 1 THEN order_items.disputes_resolved_in_favour = 1 ELSE order_items.is_disputed=0 END)")
             ->where('order_items.is_transferred_to_vendor', 0)
             ->whereDate('order_items.delivery_completed_date', '<=', $before15Days)
             ->where('order_items.item_status', 'completed')
@@ -73,10 +73,10 @@ class StripeFundTransferred extends Command
                 $totalAmountForPaid = 0;
                 $orderItemId = [];
                 $createOrderUserWise = OrderItem::select('products_services_books.user_id','order_items.id','order_items.order_id','order_items.products_services_book_id','order_items.amount_transferred_to_vendor','order_items.is_transferred_to_vendor','order_items.fund_transferred_date')
-                ->where('order_items.is_returned', '0')
-                ->where('order_items.is_replaced', '0')
-                ->where('order_items.is_disputed', '0')
-                ->where('order_items.is_transferred_to_vendor', '0')
+                ->where('order_items.is_returned', 0)
+                ->where('order_items.is_replaced', 0)
+                ->whereRaw("(CASE WHEN order_items.is_disputed = 1 THEN order_items.disputes_resolved_in_favour = 1 ELSE order_items.is_disputed=0 END)")
+                ->where('order_items.is_transferred_to_vendor', 0)
                 ->whereDate('order_items.delivery_completed_date', '<=', $before15Days)
                 ->where('order_items.item_status', 'completed')
                 ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')

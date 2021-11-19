@@ -36,6 +36,7 @@ use Image;
 use App\Models\Country;
 use App\Models\State;
 use App\Models\City;
+use App\Models\OrderItem;
 use mervick\aesEverywhere\AES256;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -375,6 +376,24 @@ class FrontController extends Controller
 
 	public function payout()
 	{ 
+		$list = OrderItem::get();
+		foreach ($list as $key => $value) {
+			if(!empty($value->products_services_book_id))
+			{
+				$user_id = $value->productsServicesBook->user_id;
+			}
+			elseif(!empty($value->contest_application_id))
+			{
+				$user_id = $value->contestApplication->contest->user_id;
+			}
+			else
+			{
+				$user_id = null;
+			}
+			$value->vendor_user_id = $user_id;
+			$value->save();
+		}
+		dd('done');
 		/*$id = '04f770f9-9aad-4515-bebb-6fd6ca3fa812';
 		$user = DB::select(
 		    'call select_by_user_id(?)', [$id]

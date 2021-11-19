@@ -21,6 +21,8 @@ class CreateOrderItemsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('order_id', 50);
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->string('vendor_user_id', 50);
+            $table->foreign('vendor_user_id')->references('id')->on('users');
             $table->string('package_id', 50)->nullable();
             $table->foreign('package_id')->references('id')->on('packages')->onDelete('cascade');
             $table->string('products_services_book_id', 50)->nullable();
@@ -50,6 +52,7 @@ class CreateOrderItemsTable extends Migration
             $table->boolean('is_returned')->nullable()->default(0);
             $table->boolean('is_replaced')->nullable()->default(0);
             $table->boolean('is_disputed')->nullable()->default(0);
+            $table->boolean('disputes_resolved_in_favour')->nullable()->default(0)->comment('In favour 0:Buyer, 1:Vendor');
             $table->string('cover_image')->nullable();
             $table->text('note_to_seller')->nullable();
             $table->boolean('is_rated')->nullable()->default(0);

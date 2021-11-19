@@ -178,27 +178,25 @@ class VendorFundLogController extends Controller
         $today          = new \DateTime();
         $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
 
-        $getLists = OrderItem::select('products_services_books.user_id', \DB::raw('SUM(order_items.amount_transferred_to_vendor) as total_amount'))
+        $getListsProducts = OrderItem::select('users.id as user_id','users.first_name','users.last_name','users.email','users.stripe_account_id','users.stripe_status', \DB::raw('SUM(order_items.amount_transferred_to_vendor) as total_amount'))
+            ->join('users', 'users.id','=','order_items.vendor_user_id')
+            ->whereNotNull('order_items.vendor_user_id')
             ->where('order_items.is_returned', 0)
             ->where('order_items.is_replaced', 0)
-            ->where('order_items.is_disputed', 0)
+            ->whereRaw("(CASE WHEN order_items.is_disputed = 1 THEN order_items.disputes_resolved_in_favour = 1 ELSE order_items.is_disputed=0 END)")
             ->where('order_items.is_transferred_to_vendor', 0)
             ->whereDate('order_items.delivery_completed_date', '<=', $before15Days)
             ->where('order_items.item_status', 'completed')
-            ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
-            ->join('users', 'users.id','=','products_services_books.user_id')
-            ->with('user:id,first_name,last_name,email,stripe_account_id,stripe_status')
-            ->orderBy('order_items.products_services_book_id', 'ASC')
-            ->groupBy('products_services_books.user_id');
+            ->groupBy('order_items.vendor_user_id');
         if(!empty($request->per_page_record))
         {
-            $getLists = $getLists->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+            $getListsProducts = $getListsProducts->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
         }
         else
         {
-            $getLists = $getLists->get();
+            $getListsProducts = $getListsProducts->get();
         }
-        return response(prepareResult(false, $getLists, 'Pending amount for transferred'), config('http_response.success'));
+        return response(prepareResult(false, $getListsProducts, 'Pending amount for transferred'), config('http_response.success'));
     }
 
     public function pendingVendorFundToTransferred(Request $request, $user_id)
@@ -207,21 +205,36 @@ class VendorFundLogController extends Controller
         $before15Days   = $today->sub(new \DateInterval('P15D'))->format('Y-m-d');
 
         $userInfoPendingToTrans = OrderItem::select('order_items.*')
+            ->join('users', 'users.id','=','order_items.vendor_user_id')
+            ->whereNotNull('order_items.vendor_user_id')
             ->where('order_items.is_returned', 0)
             ->where('order_items.is_replaced', 0)
-            ->where('order_items.is_disputed', 0)
+            ->whereRaw("(CASE WHEN order_items.is_disputed = 1 THEN order_items.disputes_resolved_in_favour = 1 ELSE order_items.is_disputed=0 END)")
             ->where('order_items.is_transferred_to_vendor', 0)
             ->whereDate('order_items.delivery_completed_date', '<=', $before15Days)
             ->where('order_items.item_status', 'completed')
-            ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
-            ->join('users', 'users.id','=','products_services_books.user_id')
-            ->where('users.id', $user_id)
+            ->where('order_items.vendor_user_id', $user_id)
             ->get();
 
-            $returnObj = [
-                'orderList' => $userInfoPendingToTrans,
-                'userInfo'  => User::find($user_id)
-            ];
+        
+        $userInfoPendingToTransTotalProducts = OrderItem::select(\DB::raw('SUM(order_items.amount_transferred_to_vendor) as amount_transferred_to_vendor, SUM(order_items.student_store_commission) as student_store_commission, SUM(order_items.cool_company_commission) as cool_company_commission, SUM(order_items.quantity * order_items.price) as total_order_amount'))
+            ->join('users', 'users.id','=','order_items.vendor_user_id')
+            ->whereNotNull('order_items.vendor_user_id')
+            ->where('order_items.is_returned', 0)
+            ->where('order_items.is_replaced', 0)
+            ->whereRaw("(CASE WHEN order_items.is_disputed = 1 THEN order_items.disputes_resolved_in_favour = 1 ELSE order_items.is_disputed=0 END)")
+            ->where('order_items.is_transferred_to_vendor', 0)
+            ->whereDate('order_items.delivery_completed_date', '<=', $before15Days)
+            ->where('order_items.item_status', 'completed')
+            
+            ->where('order_items.vendor_user_id', $user_id)
+            ->get();
+
+        
+        $returnObj = [
+            'orderList'         => $userInfoPendingToTrans,
+            'products_total'    => $userInfoPendingToTransTotalProducts
+        ];
 
         return response(prepareResult(false, $returnObj, 'Pending amount for transferred'), config('http_response.success'));
     }
