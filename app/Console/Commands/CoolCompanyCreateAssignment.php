@@ -52,33 +52,35 @@ class CoolCompanyCreateAssignment extends Command
 
         $vatRateId = AppSetting::select('coolCompanyVatRateId')->first()->coolCompanyVatRateId;
 
-        $getUserIds = OrderItem::select('products_services_books.user_id')
+        $getUserIds = OrderItem::select('users.id as user_id')
+            ->join('users', 'users.id','=','order_items.vendor_user_id')
+            ->whereNotNull('order_items.vendor_user_id')
             ->where('order_items.is_returned', '0')
             ->where('order_items.is_replaced', '0')
-            ->where('order_items.is_disputed', '0')
+            ->whereRaw("(CASE WHEN order_items.is_disputed = 1 THEN order_items.disputes_resolved_in_favour = 1 ELSE order_items.is_disputed=0 END)")
             ->where('order_items.product_type', 'service')
             ->where('order_items.is_sent_to_cool_company', '!=', '1')
             ->whereDate('order_items.delivery_completed_date', $before15Days)
             ->where('order_items.item_status', 'completed')
-            ->orderBy('order_items.products_services_book_id', 'ASC')
-            ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
-            ->groupBy('products_services_books.user_id')
+            ->orderBy('order_items.auto_id', 'ASC')
+            ->groupBy('order_items.vendor_user_id')
             ->get();
         foreach($getUserIds as $user)
         {
             $reportArray = [];
             $orderItemId = [];
-            $createBatchUserWise = OrderItem::select('products_services_books.user_id','order_items.id','order_items.order_id','order_items.products_services_book_id','order_items.price','order_items.quantity','order_items.vat_percent','student_details.cool_company_id')
+            $createBatchUserWise = OrderItem::select('users.id as user_id','order_items.id','order_items.order_id','order_items.products_services_book_id','order_items.price','order_items.quantity','order_items.vat_percent','student_details.cool_company_id')
+            ->join('users', 'users.id','=','order_items.vendor_user_id')
+            ->join('student_details', 'student_details.user_id','=','order_items.vendor_user_id')
+            ->whereNotNull('order_items.vendor_user_id')
             ->where('order_items.is_returned', '0')
             ->where('order_items.is_replaced', '0')
-            ->where('order_items.is_disputed', '0')
+            ->whereRaw("(CASE WHEN order_items.is_disputed = 1 THEN order_items.disputes_resolved_in_favour = 1 ELSE order_items.is_disputed=0 END)")
             ->where('order_items.product_type', 'service')
             ->where('order_items.is_sent_to_cool_company', '!=', '1')
             ->whereDate('order_items.delivery_completed_date', $before15Days)
             ->where('order_items.item_status', 'completed')
-            ->join('products_services_books', 'products_services_books.id','=','order_items.products_services_book_id')
-            ->where('products_services_books.user_id', $user->user_id)
-            ->join('student_details', 'student_details.user_id','=','products_services_books.user_id')
+            ->where('order_items.vendor_user_id', $user->user_id)
             ->where('student_details.cool_company_id', '!=', null)
             ->get();
             foreach ($createBatchUserWise as $key => $itemInfo) {
