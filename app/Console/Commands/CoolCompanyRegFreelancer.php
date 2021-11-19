@@ -185,7 +185,7 @@ class CoolCompanyRegFreelancer extends Command
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while create a freelancer.');
             $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
-            Log::channel('customlog')->error($error);
+            Log::channel('customlog')->error(curl_error($curl));
             die;
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
