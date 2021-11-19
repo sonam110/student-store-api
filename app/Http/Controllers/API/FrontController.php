@@ -376,7 +376,7 @@ class FrontController extends Controller
 
 	public function payout()
 	{ 
-		$list = OrderItem::get();
+		/*$list = OrderItem::get();
 		foreach ($list as $key => $value) {
 			if(!empty($value->products_services_book_id))
 			{
@@ -393,7 +393,7 @@ class FrontController extends Controller
 			$value->vendor_user_id = $user_id;
 			$value->save();
 		}
-		dd('done');
+		dd('done');*/
 		/*$id = '04f770f9-9aad-4515-bebb-6fd6ca3fa812';
 		$user = DB::select(
 		    'call select_by_user_id(?)', [$id]

@@ -41,125 +41,39 @@ class DashboardController extends Controller
 
 
 			$data['total_orders']           = OrderItem::select('order_items.id')
-			->join('products_services_books',function ($join) {
-				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-			})
-			->where('products_services_books.user_id',Auth::id())
-			->count()
-			+ OrderItem::select('order_items.id')
-			->join('contest_applications',function ($join) {
-				$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-			})
-			->join('contests',function ($join) {
-				$join->on('contest_applications.contest_id', '=', 'contests.id');
-			})
-			->where('contests.user_id',Auth::id())
+			->where('order_items.vendor_user_id',Auth::id())
 			->count();
+
 			$data['order_completed']        = OrderItem::select('order_items.id')
-			->join('products_services_books',function ($join) {
-				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-			})
-			->where('products_services_books.user_id',Auth::id())
-			->where('order_items.item_status','completed')
-			->count()
-			+ OrderItem::select('order_items.id')
-			->join('contest_applications',function ($join) {
-				$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-			})
-			->join('contests',function ($join) {
-				$join->on('contest_applications.contest_id', '=', 'contests.id');
-			})
-			->where('contests.user_id',Auth::id())
+			->where('order_items.vendor_user_id',Auth::id())
 			->where('order_items.item_status','completed')
 			->count();
 
 			$data['order_under_process']    = OrderItem::select('order_items.id')
-			->join('products_services_books',function ($join) {
-				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-			})
-			->where('products_services_books.user_id',Auth::id())
-			->where('order_items.item_status','processing')
-			->count()
-			+ OrderItem::select('order_items.id')
-			->join('contest_applications',function ($join) {
-				$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-			})
-			->join('contests',function ($join) {
-				$join->on('contest_applications.contest_id', '=', 'contests.id');
-			})
-			->where('contests.user_id',Auth::id())
+			->where('order_items.vendor_user_id',Auth::id())
 			->where('order_items.item_status','processing')
 			->count();
+			
 
 			$data['order_delivered']        = OrderItem::select('order_items.id')
-			->join('products_services_books',function ($join) {
-				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-			})
-			->where('products_services_books.user_id',Auth::id())
-			->where('order_items.item_status','delivered')
-			->count()
-			+ OrderItem::select('order_items.id')
-			->join('contest_applications',function ($join) {
-				$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-			})
-			->join('contests',function ($join) {
-				$join->on('contest_applications.contest_id', '=', 'contests.id');
-			})
-			->where('contests.user_id',Auth::id())
+			->where('order_items.vendor_user_id',Auth::id())
 			->where('order_items.item_status','delivered')
 			->count();
 
-			$data['total_earnings'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-			->join('products_services_books',function ($join) {
-				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-			})
-			->where('products_services_books.user_id',Auth::id())
-			->get()[0]['total_amount'];
-			+ OrderItem::select('order_items.id')
-			->join('contest_applications',function ($join) {
-				$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-			})
-			->join('contests',function ($join) {
-				$join->on('contest_applications.contest_id', '=', 'contests.id');
-			})
-			->where('contests.user_id',Auth::id())
+			$data['total_earnings'] = OrderItem::select('order_items.id')
+			->where('order_items.vendor_user_id',Auth::id())
 			->sum('order_items.amount_transferred_to_vendor');
 
 
 			$data['total_amount_refunded']  = OrderItem::select('order_items.id')
-			->join('products_services_books',function ($join) {
-				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-			})
-			->where('products_services_books.user_id',Auth::id())
-			->sum('order_items.amount_returned')
-			+ OrderItem::select('order_items.id')
-			->join('contest_applications',function ($join) {
-				$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-			})
-			->join('contests',function ($join) {
-				$join->on('contest_applications.contest_id', '=', 'contests.id');
-			})
-			->where('contests.user_id',Auth::id())
+			->where('order_items.vendor_user_id',Auth::id())
 			->sum('order_items.amount_returned');
-
+			
 			$data['total_returned_items']   = OrderItem::select('order_items.id')
-			->join('products_services_books',function ($join) {
-				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-			})
-			->where('products_services_books.user_id',Auth::id())
-			->where('order_items.item_status','returned')
-			->count()
-			+ OrderItem::select('order_items.id')
-			->join('contest_applications',function ($join) {
-				$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-			})
-			->join('contests',function ($join) {
-				$join->on('contest_applications.contest_id', '=', 'contests.id');
-			})
-			->where('contests.user_id',Auth::id())
+			->where('order_items.vendor_user_id',Auth::id())
 			->where('order_items.item_status','returned')
 			->count();
-
+			
 			return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}
 		catch (\Throwable $exception) 
@@ -180,57 +94,36 @@ class DashboardController extends Controller
 				$date = date('Y-m-d',strtotime('-'.($i-1).' days'));
 				$total_sales_book = OrderItem::select( 
 					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('products_services_books', function ($join) {
-					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-				})
 				->where('order_items.product_type','book')
 				->where('order_items.created_at','like','%'.$date.'%')
-				->where('products_services_books.user_id',Auth::id());
+				->where('order_items.vendor_user_id',Auth::id());
 
 
 				$total_sales_service = OrderItem::select( 
 					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('products_services_books', function ($join) {
-					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-				})
 				->where('order_items.product_type','service')
 				->where('order_items.created_at','like','%'.$date.'%')
-				->where('products_services_books.user_id',Auth::id());
+				->where('order_items.vendor_user_id',Auth::id());
 
 
 				$total_sales_product = OrderItem::select( 
 					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('products_services_books', function ($join) {
-					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-				})
 				->where('order_items.product_type','product')
 				->where('order_items.created_at','like','%'.$date.'%')
-				->where('products_services_books.user_id',Auth::id());
+				->where('order_items.vendor_user_id',Auth::id());
 
 				$contestOrders = OrderItem::select( 
 					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('contest_applications', function ($join) {
-					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-				})
-				->join('contests', function ($join) {
-					$join->on('contest_applications.contest_id', '=', 'contests.id');
-				})
 				->where('order_items.contest_type','contest')
 				->whereDate('order_items.created_at','like','%'.$date.'%')
-				->where('contests.user_id',Auth::id());
+				->where('order_items.vendor_user_id',Auth::id());
 
 
 				$eventOrders = OrderItem::select( 
 					\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('contest_applications', function ($join) {
-					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-				})
-				->join('contests', function ($join) {
-					$join->on('contest_applications.contest_id', '=', 'contests.id');
-				})
 				->where('order_items.contest_type','event')
 				->where('order_items.created_at','like','%'.$date.'%')
-				->where('contests.user_id',Auth::id());
+				->where('order_items.vendor_user_id',Auth::id());
 				
 
 				$data[$i-1]['date'] = $date;
@@ -548,58 +441,21 @@ class DashboardController extends Controller
 	{
 		try{
 			$data = [];
-			$data['total_earnings_of_today'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('products_services_books',function ($join) {
-					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-				})
-				->where('products_services_books.user_id',Auth::id())
+			$data['total_earnings_of_today'] = OrderItem::select('order_items.id')
 				->whereDate('order_items.created_at',date('Y-m-d'))
-				->get()[0]['total_amount'];
-				+ OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('contest_applications',function ($join) {
-					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-				})
-				->join('contests',function ($join) {
-					$join->on('contest_applications.contest_id', '=', 'contests.id');
-				})
-				->whereDate('order_items.created_at',date('Y-m-d'))
-				->where('contests.user_id',Auth::id())
-				->get()[0]['total_amount'];
+				->where('order_items.vendor_user_id',Auth::id())
+				->sum('order_items.amount_transferred_to_vendor');
 
-				$data['total_earnings_of_week'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('products_services_books',function ($join) {
-					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-				})
-				->where('products_services_books.user_id',Auth::id())
+				$data['total_earnings_of_week'] = OrderItem::select('order_items.id')
 				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-7days')))
-				->get()[0]['total_amount'];
-				+ OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('contest_applications',function ($join) {
-					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-				})
-				->join('contests',function ($join) {
-					$join->on('contest_applications.contest_id', '=', 'contests.id');
-				})
-				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-7days')))
-				->where('contests.user_id',Auth::id())
-				->get()[0]['total_amount'];
-				$data['total_earnings_of_month'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('products_services_books',function ($join) {
-					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
-				})
-				->where('products_services_books.user_id',Auth::id())
+				->where('order_items.vendor_user_id',Auth::id())
+				->sum('order_items.amount_transferred_to_vendor');
+
+				$data['total_earnings_of_month'] = OrderItem::select('order_items.id')
 				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-30days')))
-				->get()[0]['total_amount'];
-				+ OrderItem::select('order_items.id',\DB::raw('sum(order_items.amount_transferred_to_vendor) as total_amount'))
-				->join('contest_applications',function ($join) {
-					$join->on('order_items.contest_application_id', '=', 'contest_applications.id');
-				})
-				->join('contests',function ($join) {
-					$join->on('contest_applications.contest_id', '=', 'contests.id');
-				})
-				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-30days')))
-				->where('contests.user_id',Auth::id())
-				->get()[0]['total_amount'];
+				->where('order_items.vendor_user_id',Auth::id())
+				->sum('order_items.amount_transferred_to_vendor');
+				
 			return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}
 		catch (\Throwable $exception) 
