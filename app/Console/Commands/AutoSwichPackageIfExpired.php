@@ -92,7 +92,7 @@ class AutoSwichPackageIfExpired extends Command
                     $emailTemplate = EmailTemplate::where('template_for','package_upgrade')->where('language_id',$user->language_id)->first();
                     if(!$emailTemplate)
                     {
-                        EmailTemplate::where('template_for','package_upgrade')->first();
+                        $emailTemplate = EmailTemplate::where('template_for','package_upgrade')->first();
                     }
                     $body = $emailTemplate->body;
 

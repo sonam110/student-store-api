@@ -46,7 +46,7 @@ class ContactUsController extends Controller
             $emailTemplate = EmailTemplate::where('template_for','contact-us')->where('language_id',env('APP_DEFAULT_LANGUAGE'))->first();
             if(empty($emailTemplate))
             {
-                EmailTemplate::where('template_for','contact-us')->first();
+                $emailTemplate = EmailTemplate::where('template_for','contact-us')->first();
             }
 
             $body = $emailTemplate->body;

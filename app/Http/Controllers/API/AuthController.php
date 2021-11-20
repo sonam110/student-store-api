@@ -385,7 +385,7 @@ class AuthController extends Controller
 	            $emailTemplate = EmailTemplate::where('template_for','registration')->where('language_id',$user->language_id)->first();
 				if(empty($emailTemplate))
 				{
-					EmailTemplate::where('template_for','registration')->first();
+					$emailTemplate = EmailTemplate::where('template_for','registration')->first();
 				}
 
 				$body = $emailTemplate->body;
@@ -509,7 +509,7 @@ class AuthController extends Controller
 			$emailTemplate = EmailTemplate::where('template_for','registration')->where('language_id',$user->language_id)->first();
 			if(empty($emailTemplate))
 			{
-				EmailTemplate::where('template_for','registration')->first();
+				$emailTemplate = EmailTemplate::where('template_for','registration')->first();
 			}
 
 			$body = $emailTemplate->body;
@@ -707,7 +707,7 @@ class AuthController extends Controller
 				$emailTemplate = EmailTemplate::where('template_for','forgot_password')->where('language_id',$user->language_id)->first();
 				if(empty($emailTemplate))
 				{
-					EmailTemplate::where('template_for','forgot_password')->first();
+					$emailTemplate = EmailTemplate::where('template_for','forgot_password')->first();
 				}
 
 				$body = $emailTemplate->body;
