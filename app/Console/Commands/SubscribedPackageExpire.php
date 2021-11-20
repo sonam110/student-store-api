@@ -49,11 +49,11 @@ class SubscribedPackageExpire extends Command
 
     public function handle()
     {
-        $sixDays = date('Y-m-d 00:00:00',strtotime('+6days'));
-        $fourDays = date('Y-m-d 00:00:00',strtotime('+4days'));
-        $twoDays = date('Y-m-d 00:00:00',strtotime('+2days'));
-        $toDays = date('Y-m-d 00:00:00');
-        $subscribedPackages = UserPackageSubscription::whereIn('package_valid_till',[$sixDays,$fourDays,$twoDays,$toDays])->get();
+        $sixDays = date('Y-m-d',strtotime('+6days'));
+        $fourDays = date('Y-m-d',strtotime('+4days'));
+        $twoDays = date('Y-m-d',strtotime('+2days'));
+        $toDays = date('Y-m-d');
+        $subscribedPackages = UserPackageSubscription::select('id','package_valid_till','module','user_id','package_id')->whereIn(\DB::raw("DATE(package_valid_till)"),[$sixDays,$fourDays,$twoDays,$toDays])->with('user:id,first_name,last_name')->get();
         foreach($subscribedPackages as $subscribedPackage) {
             $days = $this->dateDiffInDays($toDays, $subscribedPackage->package_valid_till);
             $title = 'Subscribed Package Expiring';

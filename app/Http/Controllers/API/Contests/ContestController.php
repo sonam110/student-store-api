@@ -405,7 +405,7 @@ class ContestController extends Controller
 
         if($contest->status=='completed')
         {
-            return response()->json(prepareResult(false, $job, getLangByLabelGroups('messages','message_contest_completed_cannot_update')), config('http_response.success'));
+            return response()->json(prepareResult(true, 'Contest is comppleted so you can not update this contest after completion.', getLangByLabelGroups('messages','message_contest_completed_cannot_update')), config('http_response.success'));
         }
 
         DB::beginTransaction();
