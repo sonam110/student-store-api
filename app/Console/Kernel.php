@@ -16,6 +16,7 @@ use App\Console\Commands\CoolCompanyCreateAssignment;
 use App\Console\Commands\CoolCompanyRegFreelancer;
 use App\Console\Commands\StripeFundTransferred;
 use App\Console\Commands\StripeAccountStatusCheck;
+use App\Console\Commands\AutoSwichPackageIfExpired;
 
 
 class Kernel extends ConsoleKernel
@@ -38,6 +39,7 @@ class Kernel extends ConsoleKernel
         CoolCompanyRegFreelancer::class,
         StripeFundTransferred::class,
         StripeAccountStatusCheck::class,
+        AutoSwichPackageIfExpired::class,
 
     ];
 
@@ -52,8 +54,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('contests:onHold')->dailyAt('23:59');
         $schedule->command('contests:start')->dailyAt('00:01');
-        // $schedule->command('resumePdf:generate')->dailyAt('00:01');
-        $schedule->command('subscribedPackage:expire')->dailyAt('00:01');
+        $schedule->command('subscribedPackage:expire')->dailyAt('09:00');
         $schedule->command('contest:expire')->dailyAt('00:01');
         $schedule->command('job:expire')->dailyAt('00:01');
         $schedule->command('order:status')->hourly();
@@ -61,7 +62,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('create:freelancer')->hourly();
         $schedule->command('create:assignment')->dailyAt('02:00');
         $schedule->command('stripe:account')->hourly();
-        $schedule->command('stripevendor:findtransfer')->dailyAt('00:01');
+        $schedule->command('stripevendor:findtransfer')->dailyAt('03:00');
+        $schedule->command('expiredpackage:switchtofree')->dailyAt('00:01');
         
     }
 
