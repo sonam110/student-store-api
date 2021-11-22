@@ -68,7 +68,7 @@ class AbuseController extends Controller
             $notificationTemplate = NotificationTemplate::where('template_for','abuse_reported')->where('language_id',$product->user->language_id)->first();
             if(empty($notificationTemplate))
             {
-                NotificationTemplate::where('template_for','abuse_reported')->first();
+                $notificationTemplate = NotificationTemplate::where('template_for','abuse_reported')->first();
             }
 
             $body = $notificationTemplate->body;

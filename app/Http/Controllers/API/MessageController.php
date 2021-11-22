@@ -176,7 +176,7 @@ class MessageController extends Controller
             $notificationTemplate = NotificationTemplate::where('template_for','new_message')->where('language_id',$user->language_id)->first();
             if(empty($notificationTemplate))
             {
-                NotificationTemplate::where('template_for','new_message')->first();
+                $notificationTemplate = NotificationTemplate::where('template_for','new_message')->first();
             }
 
             $body = $notificationTemplate->body;

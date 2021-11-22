@@ -267,7 +267,7 @@ class ContestController extends Controller
                     $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->where('language_id',$user->language_id)->first();
                     if(empty($notificationTemplate))
                     {
-                        NotificationTemplate::where('template_for','new_contest_posted')->first();
+                        $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->first();
                     }
 
                     $body = $notificationTemplate->body;
