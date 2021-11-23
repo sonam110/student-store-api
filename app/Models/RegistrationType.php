@@ -23,6 +23,11 @@ class RegistrationType extends Model
         return $this->hasMany(RegistrationTypeDetail::class, 'registration_type_id', 'id');
     }
 
+    public function registrationTypeDetail()
+    {
+        return $this->hasOne(RegistrationTypeDetail::class, 'registration_type_id', 'id');
+    }
+
     public function serviceProviderTypes()
     {
         return $this->hasMany(ServiceProviderType::class, 'registration_type_id', 'id');

@@ -51,6 +51,14 @@ class ContestController extends Controller
                         ->where('language_id', $lang_id)
                         ->where('is_parent', '0');
                 }])
+                ->with(['serviceProviderType.serviceProviderTypeDetail' => function($q) use ($lang_id) {
+                    $q->select('id','service_provider_type_id','title','slug')
+                        ->where('language_id', $lang_id);
+                }])
+                ->with(['registrationType.registrationTypeDetail' => function($q) use ($lang_id) {
+                    $q->select('id','registration_type_id','title','slug')
+                        ->where('language_id', $lang_id);
+                }])
                 ->withCount('contestApplications')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
@@ -65,6 +73,14 @@ class ContestController extends Controller
                     $q->select('id','category_master_id','title','slug')
                         ->where('language_id', $lang_id)
                         ->where('is_parent', '0');
+                }])
+                ->with(['serviceProviderType.serviceProviderTypeDetail' => function($q) use ($lang_id) {
+                    $q->select('id','service_provider_type_id','title','slug')
+                        ->where('language_id', $lang_id);
+                }])
+                ->with(['registrationType.registrationTypeDetail' => function($q) use ($lang_id) {
+                    $q->select('id','registration_type_id','title','slug')
+                        ->where('language_id', $lang_id);
                 }])
                 ->withCount('contestApplications')->get();
             }

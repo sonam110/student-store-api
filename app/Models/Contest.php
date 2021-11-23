@@ -27,6 +27,16 @@ class Contest extends Model
         return $this->belongsTo(User::class,'user_id','id');
     }
 
+    public function serviceProviderType()
+    {
+        return $this->belongsTo(ServiceProviderType::class,'service_provider_type_id','id');
+    }
+
+    public function registrationType()
+    {
+        return $this->belongsTo(RegistrationType::class,'registration_type_id','id');
+    }
+
     public function categoryMaster()
     {
         return $this->belongsTo(CategoryMaster::class, 'category_master_id', 'id');

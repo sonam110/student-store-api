@@ -26,6 +26,11 @@ class ServiceProviderType extends Model
         return $this->hasMany(ServiceProviderTypeDetail::class, 'service_provider_type_id', 'id');
     }
 
+    public function serviceProviderTypeDetail()
+    {
+        return $this->hasOne(ServiceProviderTypeDetail::class, 'service_provider_type_id', 'id');
+    }
+
     public function registrationType()
     {
         return $this->belongsTo(RegistrationType::class, 'registration_type_id', 'id');
