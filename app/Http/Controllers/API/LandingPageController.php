@@ -2176,19 +2176,6 @@ class LandingPageController extends Controller
                                 ->where('language_id', $lang_id)
                                 ->where('is_parent', '1');
                         }])
-                        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                            $q->select('id','category_master_id','title','slug')
-                                ->where('language_id', $lang_id)
-                                ->where('is_parent', '0');
-                        }])
-                        ->with(['serviceProviderType.serviceProviderTypeDetail' => function($q) use ($lang_id) {
-                            $q->select('id','service_provider_type_id','title','slug')
-                                ->where('language_id', $lang_id);
-                        }])
-                        ->with(['registrationType.registrationTypeDetail' => function($q) use ($lang_id) {
-                            $q->select('id','registration_type_id','title','slug')
-                                ->where('language_id', $lang_id);
-                        }])
                         ->withCount('contestApplications')
                         ->where('status', 'verified')
                         ->where('application_start_date','<=', date('Y-m-d'))
@@ -2231,6 +2218,14 @@ class LandingPageController extends Controller
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
+            }])
+            ->with(['serviceProviderType.serviceProviderTypeDetail' => function($q) use ($lang_id) {
+                $q->select('id','service_provider_type_id','title','slug')
+                    ->where('language_id', $lang_id);
+            }])
+            ->with(['registrationType.registrationTypeDetail' => function($q) use ($lang_id) {
+                $q->select('id','registration_type_id','title','slug')
+                    ->where('language_id', $lang_id);
             }])
             ->withCount('contestApplications')
             ->find($contest->id);
