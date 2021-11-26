@@ -237,6 +237,7 @@ class CoolCompanyCreateAssignment extends Command
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while generate access token.');
             Log::channel('customlog')->error(curl_error($curl));
+            curl_close($curl);
             die;
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -279,7 +280,7 @@ class CoolCompanyCreateAssignment extends Command
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while create an assignments.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -317,8 +318,9 @@ class CoolCompanyCreateAssignment extends Command
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while start  assignment.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
+            curl_close($curl);
             die;
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -354,7 +356,7 @@ class CoolCompanyCreateAssignment extends Command
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while approve assignments.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -393,7 +395,7 @@ class CoolCompanyCreateAssignment extends Command
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while completing assignments.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);

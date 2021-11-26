@@ -379,7 +379,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while start  assignment.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }
@@ -416,7 +416,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while checking payment status.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }
@@ -453,7 +453,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while approve assignments.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }
@@ -490,7 +490,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while checking assignment status.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }
@@ -527,7 +527,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while checking payment status.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }
@@ -564,7 +564,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while getting team member list.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }
@@ -601,7 +601,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while getting team member info.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }
@@ -638,7 +638,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while getting geoup invoice.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }
@@ -675,7 +675,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while checking group invoice by ID.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }
@@ -712,7 +712,7 @@ class CoolCompanyController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             Log::channel('customlog')->error('Getting error while checking invoice report.');
-            $error = ["curl_error_".curl_errno($curl) => curl_error($curl)];
+            $error = curl_error($curl);
             Log::channel('customlog')->error($error);
             die;
         }

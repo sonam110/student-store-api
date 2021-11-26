@@ -301,7 +301,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	    if(curl_errno($curl)>0)
 	    {
 	    	$isRefunded = false;
-	      $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+	      $info = curl_error($curl);
 	      Log::info('Payment not refunded. Please check Curl Log:'. $data);
 	      Log::info($info);
 	      die;
