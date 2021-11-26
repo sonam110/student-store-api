@@ -257,8 +257,8 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 			$url = env('KLARNA_URL').'/ordermanagement/v1/orders/'.$transaction->transaction_id.'/refunds';
 			$paymentInfo = PaymentGatewaySetting::first();
 			$username = $paymentInfo->klarna_username;
-	        $password = $paymentInfo->klarna_password;
-	        $auth     = base64_encode($username.":".$password);
+	    $password = $paymentInfo->klarna_password;
+	    $auth     = base64_encode($username.":".$password);
 
 			$itemInfo[] = [
 				"reference" 		=> $orderItem->id,
@@ -301,9 +301,9 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	    if(curl_errno($curl)>0)
 	    {
 	    	$isRefunded = false;
-	       $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
-	      Log::info('Payment not refunded. Please check Curl Log');
-	      Log::info(curl_error($curl));
+	      $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+	      Log::info('Payment not refunded. Please check Curl Log:'. $data);
+	      Log::info($info);
 	      die;
 	    }
 	    else

@@ -1083,7 +1083,16 @@ class LabelSeeder extends Seeder
           "will_be_dedcuted_text" => "will be deducted according to the cancellation policy.", 
           "winner" => "Winner : ", 
           "winner_" => "Winner", 
-          "winners" => "Winners" 
+          "winners" => "Winners",
+          "condition_of_joining" => "Condition Of Joining",
+          "available_for" => "Available for :",
+          "education_level" => "Education level :",
+          "educational_institute" => "Educational institute :",
+          "age_restriction" => "Age Restriction :",
+          "condition_description" => "Condition description :",
+          "registration_type" => "Registration type :",
+          "service_provider_type" => "Service provider type :",
+          "you_can_not_participate_you_must_have_to_meet_conditions_of_joining" => "You can not participate, you must have to meet conditions of joining",
         ], 
         "contest_filter" => [
           "all" => "All", 
