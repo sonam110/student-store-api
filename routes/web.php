@@ -24,4 +24,6 @@ Route::get('/get-all-files', 'App\Http\Controllers\API\FrontController@getAllFil
 
 Route::get('/add-thumb-filename', 'App\Http\Controllers\API\FrontController@addThumbFileName');
 
+Route::get('/swedenpay', 'App\Http\Controllers\SwedenpayController@swedenpay');
+
 Route::get('/login', [App\Http\Controllers\Admin\MasterController::class,'login'])->name('login');
