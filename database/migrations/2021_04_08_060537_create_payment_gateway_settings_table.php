@@ -23,6 +23,13 @@ class CreatePaymentGatewaySettingsTable extends Migration
             $table->string('klarna_username')->nullable();
             $table->string('klarna_password')->nullable();
             $table->string('swish_access_token')->nullable();
+
+            $table->string('bambora_encoded_api_key')->nullable();
+            $table->string('bambora_secret_key')->nullable();
+            $table->string('bambora_access_key')->nullable();
+            $table->string('bambora_merchant_number')->nullable();
+            $table->string('bambora_md5_key')->nullable();
+
             $table->timestamps();
         });
     }

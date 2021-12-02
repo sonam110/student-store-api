@@ -2046,6 +2046,56 @@ class OrderController extends Controller
 	        	'klarna_response' => $klarna_response
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
+		} elseif($request->payment_method=='bambora_checkout_token') {
+			$user = User::find(Auth::id());
+
+			$url = env('BAMBORA_URL').'/sessions';
+			$data = [
+				'order' => [
+					'id' => '123',
+					'amount' => $total * 100,
+					'currency' => 'SEK'
+				],
+				'url' => [
+					'accept' => env('FRONT_APP_URL').'bam-accept',
+					'cancel' => env('FRONT_APP_URL').'bam-cancel'
+				]
+			];
+	        $postData = json_encode($data);
+
+	        $curl = curl_init();
+	        curl_setopt_array($curl, array(
+	          CURLOPT_URL => $url,
+	          CURLOPT_RETURNTRANSFER => true,
+	          CURLOPT_ENCODING => '',
+	          CURLOPT_MAXREDIRS => 10,
+	          CURLOPT_TIMEOUT => 0,
+	          CURLOPT_FOLLOWLOCATION => true,
+	          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	          CURLOPT_CUSTOMREQUEST => 'POST',
+	          CURLOPT_POSTFIELDS => $postData,
+	          CURLOPT_HTTPHEADER => array(
+	            'Authorization: Basic '.$auth,
+	            'Content-Type: application/json',
+	          ),
+	        ));
+
+	        $response = curl_exec($curl);
+	        if(curl_errno($curl)>0)
+	        {
+	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+	            return response()->json(prepareResult(true, $info, "Error while placing klarna order"), config('http_response.internal_server_error'));
+	        }
+
+	        $klarna_response = json_decode($response, true);
+	        curl_close($curl);
+	        $returnData = [
+	        	'created' 	=> time(),
+	        	'amount'	=> $total,
+	        	'currency'	=> 'SEK',
+	        	'klarna_response' => $klarna_response
+	        ];
+	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
 		} else {
 			\Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
 

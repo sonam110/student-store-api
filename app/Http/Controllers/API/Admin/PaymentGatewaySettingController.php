@@ -49,7 +49,12 @@ class PaymentGatewaySettingController extends Controller
             $paymentGatewaySetting->stripe_currency      = $request->stripe_currency;
             $paymentGatewaySetting->klarna_username      = $request->klarna_username;
             $paymentGatewaySetting->klarna_password      = $request->klarna_password;
-            $paymentGatewaySetting->swish_access_token      = $request->swish_access_token;
+            $paymentGatewaySetting->swish_access_token   = $request->swish_access_token;
+            $paymentGatewaySetting->bambora_encoded_api_key = $request->bambora_encoded_api_key;
+            $paymentGatewaySetting->bambora_secret_key      = $request->bambora_secret_key;
+            $paymentGatewaySetting->bambora_access_key      = $request->bambora_access_key;
+            $paymentGatewaySetting->bambora_merchant_number = $request->bambora_merchant_number;
+            $paymentGatewaySetting->bambora_md5_key         = $request->bambora_md5_key;
             $paymentGatewaySetting->save();
             return response()->json(prepareResult(false, $paymentGatewaySetting, getLangByLabelGroups('messages','message_updated')), config('http_response.success'));
         }
