@@ -17,6 +17,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/bam-callback', 'App\Http\Controllers\API\FrontController@bamCallback');
+
 Route::get('/payout', 'App\Http\Controllers\API\FrontController@payout');
 Route::get('/check-send-mail', 'App\Http\Controllers\API\FrontController@checkSendMail');
 
