@@ -2049,51 +2049,62 @@ class OrderController extends Controller
 		} elseif($request->payment_method=='bambora_checkout_token') {
 			$user = User::find(Auth::id());
 
-			$url = env('BAMBORA_URL').'/sessions';
-			$data = [
-				'order' => [
-					'id' => '123',
-					'amount' => $total * 100,
-					'currency' => 'SEK'
-				],
-				'url' => [
-					'accept' => env('FRONT_APP_URL').'bam-accept',
-					'cancel' => env('FRONT_APP_URL').'bam-cancel'
-				]
-			];
-	        $postData = json_encode($data);
+			$accessToken = $this->paymentInfo->bambora_access_key;
+			$merchantNumber = $this->paymentInfo->bambora_merchant_number;
+			$secretToken = $this->paymentInfo->bambora_secret_key;
 
-	        $curl = curl_init();
-	        curl_setopt_array($curl, array(
-	          CURLOPT_URL => $url,
-	          CURLOPT_RETURNTRANSFER => true,
-	          CURLOPT_ENCODING => '',
-	          CURLOPT_MAXREDIRS => 10,
-	          CURLOPT_TIMEOUT => 0,
-	          CURLOPT_FOLLOWLOCATION => true,
-	          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-	          CURLOPT_CUSTOMREQUEST => 'POST',
-	          CURLOPT_POSTFIELDS => $postData,
-	          CURLOPT_HTTPHEADER => array(
-	            'Authorization: Basic '.$auth,
-	            'Content-Type: application/json',
-	          ),
-	        ));
+			$apiKey = base64_encode(
+			  $accessToken . "@" . $merchantNumber . ":" . $secretToken
+			);
 
-	        $response = curl_exec($curl);
+			$checkoutUrl = env('BAMBORA_URL').'/sessions';
+
+			$request = array();
+			$request["order"] = array();
+			$request["order"]["id"] = "ABC123";
+			$request["order"]["amount"] = $total * 100;
+			$request["order"]["currency"] = "SEK";
+
+			$request["url"] = array();
+			$request["url"]["accept"] = env('FRONT_APP_URL').'bam-accept';
+			$request["url"]["cancel"] = env('FRONT_APP_URL').'bam-cancel';
+			$request["url"]["callbacks"] = array();
+			$request["url"]["callbacks"][] = array("url" => env('APP_URL').'bam-callback');
+
+			$requestJson = json_encode($request);
+
+			$contentLength = isset($requestJson) ? strlen($requestJson) : 0;
+
+			$headers = array(
+			  'Content-Type: application/json',
+			  'Content-Length: ' . $contentLength,
+			  'Accept: application/json',
+			  'Authorization: Basic ' . $apiKey
+			);
+
+			$curl = curl_init();
+
+			curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $requestJson);
+			curl_setopt($curl, CURLOPT_URL, $checkoutUrl);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($curl, CURLOPT_FAILONERROR, false);
+			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+			$rawResponse = curl_exec($curl);
+			$response = json_decode($rawResponse);
 	        if(curl_errno($curl)>0)
 	        {
 	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
-	            return response()->json(prepareResult(true, $info, "Error while placing klarna order"), config('http_response.internal_server_error'));
+	            return response()->json(prepareResult(true, $info, "Error while creating bambora checkout session"), config('http_response.internal_server_error'));
 	        }
-
-	        $klarna_response = json_decode($response, true);
 	        curl_close($curl);
 	        $returnData = [
 	        	'created' 	=> time(),
 	        	'amount'	=> $total,
 	        	'currency'	=> 'SEK',
-	        	'klarna_response' => $klarna_response
+	        	'bambora_response' => $response
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
 		} else {
