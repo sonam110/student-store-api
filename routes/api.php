@@ -317,6 +317,9 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/jobs-multiple-publish-update', [App\Http\Controllers\API\Admin\JobController::class, 'multiplePublishUpdate']);
 	Route::post('/jobs-filter', [App\Http\Controllers\API\Admin\JobController::class, 'filter']);
 
+	//address 
+	Route::post('/add-address', [App\Http\Controllers\API\Admin\UserAddressMgmtController::class, 'store']);
+
 
 	//master
 

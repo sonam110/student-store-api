@@ -302,8 +302,9 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	    {
 	    	$isRefunded = false;
 	      $info = curl_error($curl);
-	      Log::info('Payment not refunded. Please check Curl Log:'. $data);
-	      Log::info($info);
+	      Log::info('Payment not refunded. Please check Curl Log:');
+	      Log::info($data);
+	      Log::error($info);
 	      die;
 	    }
 	    else
