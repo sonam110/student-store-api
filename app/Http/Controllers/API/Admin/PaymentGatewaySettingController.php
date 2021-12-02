@@ -35,9 +35,9 @@ class PaymentGatewaySettingController extends Controller
             }
 
             
-            if(PaymentGatewaySetting::find(1))
+            if(PaymentGatewaySetting::first())
             {
-                $paymentGatewaySetting = PaymentGatewaySetting::find(1);
+                $paymentGatewaySetting = PaymentGatewaySetting::first();
             }
             else
             {
