@@ -240,8 +240,6 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	{
 		if($transaction->gateway_detail=='stripe' && $transaction->transaction_status=='succeeded')
 		{
-			try 
-			{
 				\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 				$stripe = new \Stripe\StripeClient(
 				  env('STRIPE_SECRET')
@@ -252,14 +250,6 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 				]);
 				$refund_id = $data->id;
 				$isRefunded = true;
-			} 
-			catch (\Exception $e) 
-			{
-			  Log::info('Stripe Payment not refunded. Please check Log');
-	      Log::info($e->getMessage());
-	      Log::info($orderItem);
-	      die;
-			}
 		}
 		elseif($transaction->gateway_detail=='klarna' && $transaction->transaction_status=='ACCEPTED')
 		{
