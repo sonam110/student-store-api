@@ -124,7 +124,7 @@ class OrderController extends Controller
 		{
 			$lang_id = $this->lang_id;
 			
-			$orderItems = OrderItem::join('orders', function ($join) {
+			$orderItems = OrderItem::select('order_items.*', 'users.first_name', 'users.last_name', 'users.email', 'order_items.created_at as created_at')->join('orders', function ($join) {
 	                        $join->on('order_items.order_id', '=', 'orders.id');
 	                    })
 						->join('users', function ($join) {
