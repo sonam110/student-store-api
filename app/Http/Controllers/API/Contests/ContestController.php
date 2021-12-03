@@ -613,7 +613,7 @@ class ContestController extends Controller
                     $orderedItems = OrderItem::whereIn('contest_application_id',$joinedContestApplicationId)->get();
                     foreach ($orderedItems as $key => $orderItem) {
                         $refundOrderItemId = $orderItem->id;
-                        $refundOrderItemPrice = $orderItem->price;
+                        $refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
                         $refundOrderItemQuantity = $orderItem->quantity;
                         $refundOrderItemReason = 'cancellation';
                         refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);

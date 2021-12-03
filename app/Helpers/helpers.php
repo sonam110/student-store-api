@@ -240,16 +240,26 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	{
 		if($transaction->gateway_detail=='stripe' && $transaction->transaction_status=='succeeded')
 		{
-			\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-			$stripe = new \Stripe\StripeClient(
-			  env('STRIPE_SECRET')
-			);
-			$data = \Stripe\Refund::create([
-				'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
-			  	'payment_intent' => $transaction->transaction_id,
-			]);
-			$refund_id = $data->id;
-			$isRefunded = true;
+			try 
+			{
+				\Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+				$stripe = new \Stripe\StripeClient(
+				  env('STRIPE_SECRET')
+				);
+				$data = \Stripe\Refund::create([
+					'amount' => $refundOrderItemPrice * $refundOrderItemQuantity * 100,
+				  	'payment_intent' => $transaction->transaction_id,
+				]);
+				$refund_id = $data->id;
+				$isRefunded = true;
+			} 
+			catch (\Exception $e) 
+			{
+			  Log::info('Stripe Payment not refunded. Please check Log');
+	      Log::info($e->getMessage());
+	      Log::info($orderItem);
+	      die;
+			}
 		}
 		elseif($transaction->gateway_detail=='klarna' && $transaction->transaction_status=='ACCEPTED')
 		{
@@ -303,8 +313,8 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	    	$isRefunded = false;
 	      $info = curl_error($curl);
 	      Log::info('Payment not refunded. Please check Curl Log:');
-	      Log::info($data);
 	      Log::error($info);
+	      Log::info($orderItem);
 	      die;
 	    }
 	    else
@@ -327,6 +337,12 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	
 	if($isRefunded)
 	{
+		if($orderItem->used_item_reward_points>0)
+		{
+			//reward points revert 
+			User::find($orderItem->user_id)->update(['reward_points' => $user->reward_points + $orderItem->used_item_reward_points]);
+		}
+
 		$refund = new Refund;
 		$refund->order_id   					= $orderId;
 		$refund->payment_card_detail_id   	= $transaction->payment_card_detail_id;
@@ -367,13 +383,14 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 		$refund->card_holder_name   		= $transaction->card_holder_name;
 		$refund->quantity   						= $refundOrderItemQuantity;
 		$refund->price   								= $refundOrderItemPrice;
+		$refund->rewards_refund   			= @$orderItem->used_item_reward_points;
 		$refund->reason_for_refund   		= $refundOrderItemReason;
 		$refund->save();
 	}
 	else
 	{
 		Log::info('Payment not refunded. Please check Log');
-		Log::info($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+		Log::info($orderItem);
 	}
 }
 

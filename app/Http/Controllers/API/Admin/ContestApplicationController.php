@@ -210,7 +210,7 @@ class ContestApplicationController extends Controller
 						{
 							$orderedItem = OrderItem::where('contest_application_id',$id)->get();
 							$refundOrderItemId = $orderItem->id;
-							$refundOrderItemPrice = ($orderItem->price)*($value->deduct_percentage_value)/100;
+							$refundOrderItemPrice = ($orderItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
 							$refundOrderItemQuantity = $orderItem->quantity;
 							$refundOrderItemReason = 'cancellation';
 							refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
@@ -272,7 +272,7 @@ class ContestApplicationController extends Controller
 							{
 								$orderedItem = OrderItem::where('contest_application_id',$id)->get();
 								$refundOrderItemId = $orderItem->id;
-								$refundOrderItemPrice = ($orderItem->price)*($value->deduct_percentage_value)/100;
+								$refundOrderItemPrice = ($orderItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
 								$refundOrderItemQuantity = $orderItem->quantity;
 								$refundOrderItemReason = 'cancellation';
 								refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);

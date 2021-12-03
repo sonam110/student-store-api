@@ -438,7 +438,7 @@ class OrderController extends Controller
 					
 					$orderItem->price                           = $price;
 					$orderItem->used_item_reward_points 				= $orderedItem['used_item_reward_points'];
-					$orderItem->price_after_apply_reward_points = ($price - ($price_after_apply_reward_points * $getAppSetting->customer_rewards_pt_value));
+					$orderItem->price_after_apply_reward_points = ($price - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value));
 					$orderItem->earned_reward_points            = $earned_reward_points;
 					$orderItem->quantity						= $orderedItem['quantity'];
 					$orderItem->discount						= $discount;
@@ -1263,7 +1263,7 @@ class OrderController extends Controller
 		if($item_status == 'canceled')
 		{
 			$refundOrderItemId = $orderItem->id;
-			$refundOrderItemPrice = $orderItem->price;
+			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
 			$refundOrderItemQuantity = $orderItem->quantity;
 			$refundOrderItemReason = 'cancellation';
 			refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
@@ -1272,7 +1272,7 @@ class OrderController extends Controller
 		if($item_status == 'returned')
 		{
 			$refundOrderItemId = $orderItem->id;
-			$refundOrderItemPrice = $orderItem->price;
+			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
 			$refundOrderItemQuantity = $orderItemReturn->quantity;
 			$refundOrderItemReason = 'return';
 			refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
@@ -1633,18 +1633,18 @@ class OrderController extends Controller
 		$itemInfo = [];
 		$getAppSetting = AppSetting::first();
 
-		$reward_point_value = $getAppSetting->customer_rewards_pt_value * $request->used_reward_points * 100;
+		$reward_point_value = round($getAppSetting->customer_rewards_pt_value * $request->used_reward_points * 100, 2);
 		foreach ($request->items as $key => $orderedItem) {
 			if(!empty($orderedItem['product_id']))
 			{
 				$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
 				if($productsServicesBook->is_on_offer == 1)
 				{
-					$price = $productsServicesBook->discounted_price;
+					$price = round($productsServicesBook->discounted_price, 2);
 				}
 				else
 				{
-					$price = $productsServicesBook->price;
+					$price = round($productsServicesBook->price, 2);
 				}
 
 				if($productsServicesBook->delivery_type == 'deliver_to_location')
@@ -1652,11 +1652,11 @@ class OrderController extends Controller
 					$shipping_package = ShippingCondition::where('user_id',$productsServicesBook->user_id)->where('order_amount_from','<=', $price * $orderedItem['quantity'])->where('order_amount_to','>=',$price * $orderedItem['quantity'])->orderBy('created_at','desc')->first();
 					if($shipping_package)
 					{
-						$shipping_charge = $shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']) * (100 - $shipping_package->discount_percent) / 100;
+						$shipping_charge = round($shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']) * (100 - $shipping_package->discount_percent) / 100, 2);
 					}
 					else
 					{
-						$shipping_charge = $shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']);
+						$shipping_charge = round($shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']), 2);
 					}
 				}
 
@@ -1666,9 +1666,9 @@ class OrderController extends Controller
 	                'reference' => $orderedItem['product_id'],
 	                'name'      => $orderedItem['title'],
 	                'quantity'  => $orderedItem['quantity'],
-	                'unit_price'=> $price * 100,
+	                'unit_price'=> round($price * 100),
 	                'tax_rate'  => 0,
-	                'total_amount'          => ($price * $orderedItem['quantity'] * 100) - $reward_point_value,
+	                'total_amount'          => (round($price * $orderedItem['quantity']) * 100) - $reward_point_value,
 	                'total_discount_amount' => $reward_point_value,
 	                'total_tax_amount'      => 0,
 	                'image_url' => $orderedItem['cover_image']
@@ -1679,11 +1679,11 @@ class OrderController extends Controller
 				$productsServicesBook = Contest::find($orderedItem['contest_id']);
 				if($productsServicesBook->is_on_offer == 1)
 				{
-					$price = $productsServicesBook->discounted_price;
+					$price = round($productsServicesBook->discounted_price, 2);
 				}
 				else
 				{
-					$price = $productsServicesBook->subscription_fees;
+					$price = round($productsServicesBook->subscription_fees, 2);
 				}
 
 				//For klarna
@@ -1692,9 +1692,9 @@ class OrderController extends Controller
 	                'reference' => $orderedItem['contest_id'],
 	                'name'      => $orderedItem['title'],
 	                'quantity'  => $orderedItem['quantity'],
-	                'unit_price'=> $price * 100,
+	                'unit_price'=> round($price * 100),
 	                'tax_rate'  => 0,
-	                'total_amount'          => ($price * $orderedItem['quantity'] * 100) - $reward_point_value,
+	                'total_amount'          => (round($price * $orderedItem['quantity']) * 100) - $reward_point_value,
 	                'total_discount_amount' => $reward_point_value,
 	                'total_tax_amount'      => 0,
 	                'image_url' => $orderedItem['cover_image']
@@ -1705,20 +1705,20 @@ class OrderController extends Controller
 				$productsServicesBook = Package::find($orderedItem['package_id']);
 				if($productsServicesBook->price == 0)
 				{
-					$price = $productsServicesBook->subscription;
+					$price = round($productsServicesBook->subscription, 2);
 				}
 				else
 				{
-					$price = $productsServicesBook->price;
+					$price = round($productsServicesBook->price, 2);
 				}
 			}
 
-			$sub_total = $sub_total + ($price * $orderedItem['quantity']);
+			$sub_total = round($sub_total + ($price * $orderedItem['quantity']), 2);
 		}
 
-		$reward_point_value = $getAppSetting->customer_rewards_pt_value * $request->used_reward_points;
+		$reward_point_value = round($getAppSetting->customer_rewards_pt_value * $request->used_reward_points, 2);
 
-		$total = $sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount;
+		$total = round($sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount, 2);
 
 		
         $username = $this->paymentInfo->klarna_username;
@@ -1731,7 +1731,7 @@ class OrderController extends Controller
 	            'purchase_country'  => 'SE',
 	            'purchase_currency' => 'SEK',
 	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
-	            'order_amount'      => $total * 100,
+	            'order_amount'      => round($total * 100),
 	            'order_tax_amount'  => 0,
 	            'order_lines'       => $itemInfo
 	        ];
@@ -1769,7 +1769,7 @@ class OrderController extends Controller
 	            'purchase_country'  => 'SE',
 	            'purchase_currency' => 'SEK',
 	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
-	            'order_amount'      => $total * 100,
+	            'order_amount'      => round($total * 100),
 	            'order_tax_amount'  => 0,
 	            'order_lines'       => $itemInfo
 	        ];
@@ -1881,7 +1881,7 @@ class OrderController extends Controller
 			    'locale' 	=>  env('KLARNA_LOCALE', 'sv-SE'),
 			    'auto_capture' 			=>  true,
 			    'purchase_currency' 	=>  'SEK',
-			    'order_amount' 			=>  $total * 100,
+			    'order_amount' 			=>  round($total * 100),
 			    'order_tax_amount' 		=>  0,
 			    'order_lines' 			=>  $itemInfo
 	        ];
@@ -1946,7 +1946,7 @@ class OrderController extends Controller
 	            //     'city'          => $city,
 	            //     'country'       => 'SE'
 	            // ],
-	            'order_amount'      => $total * 100,
+	            'order_amount'      => round($total * 100),
 	            'order_tax_amount'  => 0,
 	            'order_lines'       => $itemInfo,
 	            'merchant_urls'     => [
@@ -2004,7 +2004,7 @@ class OrderController extends Controller
 	            'purchase_currency' => 'SEK',
 	            'purchase_country'  => 'SE',
 	            'locale'            => env('KLARNA_LOCALE', 'sv-SE'),
-	            'order_amount'      => $total * 100,
+	            'order_amount'      => round($total * 100),
 	            'order_tax_amount'  => 0,
 	            'order_lines'       => $itemInfo,
 	            'merchant_urls'     => [
@@ -2073,7 +2073,7 @@ class OrderController extends Controller
 			$request = array();
 			$request["order"] = array();
 			$request["order"]["id"] = $temp_order_id;
-			$request["order"]["amount"] = $total * 100;
+			$request["order"]["amount"] = round($total * 100);
 			$request["order"]["currency"] = "SEK";
 
 			$request["url"] = array();
@@ -2128,7 +2128,7 @@ class OrderController extends Controller
 			);
 
 			$paymentIntent = \Stripe\PaymentIntent::create([
-			    'amount' 	=> ($total) * 100,
+			    'amount' 	=> round($total * 100),
 			    'currency' 	=> $this->paymentInfo->stripe_currency,
 			    'customer' 	=> $customer_id
 			]);

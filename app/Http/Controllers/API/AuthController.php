@@ -265,21 +265,21 @@ class AuthController extends Controller
 		if($user->save())
 		{
 			
-			if(sizeof($request->address)>0 && !empty($request->address))
+			if(sizeof($request->address)>0 && !empty($request->address) && $request->user_type_id == '3')
 			{
 				foreach ($request->address as $key => $address)
 				{
 					$addressDetail = new AddressDetail;
 					$addressDetail->user_id 		= $user->id;
-					$addressDetail->latitude 		= $address['latitude'];
-					$addressDetail->longitude 		= $address['longitude'];
-					$addressDetail->country 		= $address['country'];
-					$addressDetail->state 			= $address['state'];
-					$addressDetail->city 			= $address['city'];
-					$addressDetail->full_address 	= $address['full_address'];
-					$addressDetail->zip_code 		= $address['zip_code'];
-					$addressDetail->address_type 	= $address['address_type'];
-					$addressDetail->is_default 		= $address['is_default'];
+					$addressDetail->latitude 		= @$address['latitude'];
+					$addressDetail->longitude 		= @$address['longitude'];
+					$addressDetail->country 		= @$address['country'];
+					$addressDetail->state 			= @$address['state'];
+					$addressDetail->city 			= @$address['city'];
+					$addressDetail->full_address 	= @$address['full_address'];
+					$addressDetail->zip_code 		= @$address['zip_code'];
+					$addressDetail->address_type 	= @$address['address_type'];
+					$addressDetail->is_default 		= @$address['is_default'];
 					$addressDetail->status 			= 1;
 					$addressDetail->save();
 				}

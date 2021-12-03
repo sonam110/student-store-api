@@ -50,6 +50,7 @@ class CreateRefundsTable extends Migration
 
             $table->string('quantity',100)->nullable();
             $table->string('price',100)->nullable();
+            $table->string('rewards_refund',20)->default(0)->nullable();
             $table->string('reason_for_refund',100)->nullable();
             $table->timestamps();
         });
