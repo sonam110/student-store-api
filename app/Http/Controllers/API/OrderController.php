@@ -2049,6 +2049,14 @@ class OrderController extends Controller
 		} elseif($request->payment_method=='bambora_checkout_token') {
 			$user = User::find(Auth::id());
 
+			//Temp Order create
+			$tempOrderSave = new TempOrder;
+			$tempOrderSave->user_id = Auth::id();
+			$tempOrderSave->request_param = json_encode($request->all());
+			$tempOrderSave->save();
+
+	      	$temp_order_id = $tempOrderSave->id;
+
 			$accessToken = $this->paymentInfo->bambora_access_key;
 			$merchantNumber = $this->paymentInfo->bambora_merchant_number;
 			$secretToken = $this->paymentInfo->bambora_secret_key;
@@ -2061,7 +2069,7 @@ class OrderController extends Controller
 
 			$request = array();
 			$request["order"] = array();
-			$request["order"]["id"] = rand(10000,99999);
+			$request["order"]["id"] = $temp_order_id;
 			$request["order"]["amount"] = $total * 100;
 			$request["order"]["currency"] = "SEK";
 
