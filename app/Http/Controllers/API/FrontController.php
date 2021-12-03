@@ -210,6 +210,7 @@ class FrontController extends Controller
 				'klarna_username' 			=> AES256::encrypt($stripeSetting->klarna_username, env('ENCRYPTION_KEY')),
 				'klarna_password' 			=> AES256::encrypt($stripeSetting->klarna_password, env('ENCRYPTION_KEY')),
 				'swish_access_token' 		=> AES256::encrypt($stripeSetting->swish_access_token, env('ENCRYPTION_KEY')),
+				'bambora_md5_key' 		=> AES256::encrypt($stripeSetting->bambora_md5_key, env('ENCRYPTION_KEY')),
 			];
 			return response(prepareResult(false, $appSetting, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}
