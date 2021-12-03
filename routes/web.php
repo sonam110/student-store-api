@@ -17,8 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/bam-callback', 'App\Http\Controllers\API\FrontController@bamCallback');
-
 Route::get('/payout', 'App\Http\Controllers\API\FrontController@payout');
 Route::get('/check-send-mail', 'App\Http\Controllers\API\FrontController@checkSendMail');
 
@@ -27,5 +25,7 @@ Route::get('/get-all-files', 'App\Http\Controllers\API\FrontController@getAllFil
 Route::get('/add-thumb-filename', 'App\Http\Controllers\API\FrontController@addThumbFileName');
 
 Route::get('/swedenpay', 'App\Http\Controllers\SwedenpayController@swedenpay');
+
+Route::get('/bam-callback', 'App\Http\Controllers\BamboraController@bamCallback');
 
 Route::get('/login', [App\Http\Controllers\Admin\MasterController::class,'login'])->name('login');

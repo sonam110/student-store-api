@@ -2061,7 +2061,7 @@ class OrderController extends Controller
 
 			$request = array();
 			$request["order"] = array();
-			$request["order"]["id"] = "ABC123";
+			$request["order"]["id"] = rand(10000,99999);
 			$request["order"]["amount"] = $total * 100;
 			$request["order"]["currency"] = "SEK";
 
