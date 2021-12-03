@@ -341,7 +341,9 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 		if($orderItem->used_item_reward_points>0)
 		{
 			//reward points revert 
-			User::find($orderItem->user_id)->update(['reward_points' => $user->reward_points + $orderItem->used_item_reward_points]);
+			$userInfo = User::find($orderItem->user_id);
+			$userInfo->reward_points = $userInfo->reward_points + $orderItem->used_item_reward_points;
+			$userInfo->save();
 		}
 
 		$refund = new Refund;
