@@ -35,6 +35,8 @@ class CreateOrderItemsTable extends Migration
             $table->string('sku',100)->nullable();
             $table->longText('attribute_data')->nullable();
             $table->float('price')->nullable();
+            $table->float('used_item_reward_points')->default(0)->nullable();
+            $table->float('price_after_apply_reward_points')->default(0)->nullable();
             $table->bigInteger('quantity')->nullable();
             $table->string('discount')->nullable();
             $table->string('sell_type',100)->nullable();

@@ -187,6 +187,7 @@ class OrderController extends Controller
 		{
 			$delivery_code = NULL;
 			$shipping_charge = 0;
+			$getAppSetting = AppSetting::first();
 
 			$getLastOrder = Order::select('order_number')->orderBy('created_at','DESC')->first();
 			if(!empty($getLastOrder))
@@ -359,7 +360,7 @@ class OrderController extends Controller
 						$commission = 0;
 					}
 
-					$reward_points_value = AppSetting::first()->single_rewards_pt_value * $earned_reward_points;
+					$reward_points_value = $getAppSetting->single_rewards_pt_value * $earned_reward_points;
 					if($request->order_for!='packages')
 					{
 						$amount_transferred_to_vendor = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * (100 - $commission) / 100;
@@ -377,7 +378,7 @@ class OrderController extends Controller
 					//cool company commission for student
 					if(($productsServicesBook->user) && ($productsServicesBook->user->user_type_id == 2))
 					{
-						$coolCompanyCommission = AppSetting::first()->coolCompanyCommission;
+						$coolCompanyCommission = $getAppSetting->coolCompanyCommission;
 						$cool_company_commission = $amount_transferred_to_vendor * ($coolCompanyCommission)/100;
 						$amount_transferred_to_vendor = $amount_transferred_to_vendor * (100 - $coolCompanyCommission)/100;
 					}
@@ -436,6 +437,8 @@ class OrderController extends Controller
 					}
 					
 					$orderItem->price                           = $price;
+					$orderItem->used_item_reward_points 				= $orderedItem['used_item_reward_points'];
+					$orderItem->price_after_apply_reward_points = ($price - ($price_after_apply_reward_points * $getAppSetting->customer_rewards_pt_value));
 					$orderItem->earned_reward_points            = $earned_reward_points;
 					$orderItem->quantity						= $orderedItem['quantity'];
 					$orderItem->discount						= $discount;
@@ -567,14 +570,12 @@ class OrderController extends Controller
 				$transactionDetail->save();
 			}
 
-
-
-			$reward_point_value = AppSetting::first()->customer_rewards_pt_value * $request->used_reward_points;
+			$reward_point_value = $getAppSetting->customer_rewards_pt_value * $request->used_reward_points;
 
 			$total = $sub_total - $reward_point_value;
 
 
-			$vat = (AppSetting::first()->vat) * $total / 100;
+			$vat = ($getAppSetting->vat) * $total / 100;
 
 			// $total = $total + $vat + $shipping_charge;
 
@@ -1630,7 +1631,9 @@ class OrderController extends Controller
 		$sub_total = 0;
 		$shipping_charge = 0;
 		$itemInfo = [];
-		$reward_point_value = AppSetting::first()->customer_rewards_pt_value * $request->used_reward_points * 100;
+		$getAppSetting = AppSetting::first();
+
+		$reward_point_value = $getAppSetting->customer_rewards_pt_value * $request->used_reward_points * 100;
 		foreach ($request->items as $key => $orderedItem) {
 			if(!empty($orderedItem['product_id']))
 			{
@@ -1713,7 +1716,7 @@ class OrderController extends Controller
 			$sub_total = $sub_total + ($price * $orderedItem['quantity']);
 		}
 
-		$reward_point_value = AppSetting::first()->customer_rewards_pt_value * $request->used_reward_points;
+		$reward_point_value = $getAppSetting->customer_rewards_pt_value * $request->used_reward_points;
 
 		$total = $sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount;
 
