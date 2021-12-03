@@ -859,6 +859,8 @@ class OrderController extends Controller
 				$replaceOrderItem->title						= $orderItem->title;
 				$replaceOrderItem->sku							= $orderItem->sku;
 				$replaceOrderItem->price                        = $orderItem->price;
+				$replaceOrderItem->used_item_reward_points      = $orderItem->used_item_reward_points;
+				$replaceOrderItem->price_after_apply_reward_points = $orderItem->price_after_apply_reward_points;
 				$replaceOrderItem->quantity						= $orderItemReplacement->quantity;
 				$replaceOrderItem->discount						= $orderItem->discount;
 				$replaceOrderItem->cover_image                  = $orderItem->cover_image;
@@ -939,7 +941,7 @@ class OrderController extends Controller
 			$orderItemReturn->reason_of_return         	= $request->reason_of_return;
 			$orderItemReturn->date_of_return_initiated 	= date('Y-m-d');
 			$orderItemReturn->images                   	= $request->images;
-			$orderItemReturn->amount_to_be_returned    	= $orderItem->price * $request->quantity;
+			$orderItemReturn->amount_to_be_returned    	= $orderItem->price_after_apply_reward_points * $request->quantity;
 			$orderItemReturn->return_card_number       	= $request->return_card_number;
 			$orderItemReturn->return_card_holder_name  	= $request->return_card_holder_name;
 			$orderItemReturn->return_tracking_number   	= $request->return_tracking_number;
