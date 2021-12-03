@@ -14,8 +14,7 @@ class CreateTempOrdersTable extends Migration
     public function up()
     {
         Schema::create('temp_orders', function (Blueprint $table) {
-            $table->bigInteger('auto_id');
-            $table->uuid('id')->primary();
+            $table->id();
 
             $table->string('user_id', 50);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
