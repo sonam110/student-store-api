@@ -117,6 +117,12 @@ return [
             'path' => storage_path('logs/webhook.log'),
             'level' => 'info',
         ],
+
+        'bambora' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/bambora.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];

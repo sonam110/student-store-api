@@ -8,6 +8,6 @@ class BamboraController extends Controller
 {
     public function bamCallback(Request $request)
     {
-        \Log::info($request->all());
+        \Log::channel('bambora')->info($request->all());
     }
 }
