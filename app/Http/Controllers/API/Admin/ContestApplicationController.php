@@ -208,16 +208,21 @@ class ContestApplicationController extends Controller
 					foreach ($cancellationRanges as $key => $value) {
 						if($remainingHours >= $value->from && $remainingHours < $value->to)
 						{
-							$orderedItem = OrderItem::where('contest_application_id',$id)->get();
-							$refundOrderItemId = $orderItem->id;
-							$refundOrderItemPrice = ($orderItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
-							$refundOrderItemQuantity = $orderItem->quantity;
-							$refundOrderItemReason = 'cancellation';
-							$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
-
-							if(!$isRefunded)
+							$orderedItems = OrderItem::where('contest_application_id',$id)->get();
+							foreach ($orderedItems as $key => $orderedItem) 
 							{
-								return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+								$refundOrderItemId = $orderedItem->id;
+								$refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
+								$refundOrderItemQuantity = $orderedItem->quantity;
+								$refundOrderItemReason = 'cancellation';
+								$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+
+								if(!$isRefunded)
+								{
+									return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+								}
+								$orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+								$orderedItem->save();
 							}
 						}
 					}
@@ -275,15 +280,20 @@ class ContestApplicationController extends Controller
 						foreach ($cancellationRanges as $key => $value) {
 							if($remainingHours >= $value->from && $remainingHours < $value->to)
 							{
-								$orderedItem = OrderItem::where('contest_application_id',$id)->get();
-								$refundOrderItemId = $orderItem->id;
-								$refundOrderItemPrice = ($orderItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
-								$refundOrderItemQuantity = $orderItem->quantity;
-								$refundOrderItemReason = 'cancellation';
-								$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
-								if(!$isRefunded)
+								$orderedItems = OrderItem::where('contest_application_id',$id)->get();
+								foreach ($orderedItems as $key => $orderedItem) 
 								{
-									return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+									$refundOrderItemId = $orderedItem->id;
+									$refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
+									$refundOrderItemQuantity = $orderedItem->quantity;
+									$refundOrderItemReason = 'cancellation';
+									$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+									if(!$isRefunded)
+									{
+										return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+									}
+									$orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+									$orderedItem->save();
 								}
 							}
 						}

@@ -9,6 +9,7 @@ use Stripe as ST;
 use App\Models\OrderItem;
 use App\Models\TransactionDetail;
 use App\Models\Refund;
+use App\Models\SharedRewardPoint;
 use App\Models\PaymentGatewaySetting;
 
 function prepareResult($error, $data, $msg)
@@ -341,9 +342,17 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 		if($orderItem->used_item_reward_points>0)
 		{
 			//reward points revert 
+			$getOneItemReward = ceil($orderItem->used_item_reward_points / $orderItem->quantity);
 			$userInfo = User::find($orderItem->user_id);
-			$userInfo->reward_points = $userInfo->reward_points + $orderItem->used_item_reward_points;
+			$userInfo->reward_points = $userInfo->reward_points + ($getOneItemReward * $refundOrderItemQuantity);
 			$userInfo->save();
+
+			//Log create
+			$sharedRewardPoint 						= new SharedRewardPoint;
+			$sharedRewardPoint->sender_id 			= User::orderBy('auto_id', 'ASC')->first()->id;
+			$sharedRewardPoint->receiver_id 		= $orderItem->user_id;
+			$sharedRewardPoint->reward_points 	= ($getOneItemReward * $refundOrderItemQuantity);
+			$sharedRewardPoint->save();
 		}
 
 		$refund = new Refund;

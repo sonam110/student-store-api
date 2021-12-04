@@ -604,16 +604,18 @@ class ContestController extends Controller
                     }
                     
                     $orderedItems = OrderItem::whereIn('contest_application_id',$joinedContestApplicationId)->get();
-                    foreach ($orderedItems as $key => $orderItem) {
-                        $refundOrderItemId = $orderItem->id;
-                        $refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
-                        $refundOrderItemQuantity = $orderItem->quantity;
+                    foreach ($orderedItems as $key => $orderedItem) {
+                        $refundOrderItemId = $orderedItem->id;
+                        $refundOrderItemPrice = $orderedItem->price_after_apply_reward_points;
+                        $refundOrderItemQuantity = $orderedItem->quantity;
                         $refundOrderItemReason = 'cancellation';
                         $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
                         if(!$isRefunded)
                         {
                             return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
                         }
+                        $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+                        $orderedItem->save();
                     }
 
                     $joinedApplicationsStatusUpdate = ContestApplication::where('contest_id',$contest_id)

@@ -438,7 +438,7 @@ class OrderController extends Controller
 					
 					$orderItem->price                           = $price;
 					$orderItem->used_item_reward_points 				= $orderedItem['used_item_reward_points'];
-					$orderItem->price_after_apply_reward_points = ($price - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value));
+					$orderItem->price_after_apply_reward_points = ((($price * $orderedItem['quantity']) - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value)) / $orderedItem['quantity']);
 					$orderItem->earned_reward_points            = $earned_reward_points;
 					$orderItem->quantity						= $orderedItem['quantity'];
 					$orderItem->discount						= $discount;
@@ -1003,7 +1003,7 @@ class OrderController extends Controller
 			$orderItemDispute->order_item_id              	= $id;
 			$orderItemDispute->products_services_book_id 	= $orderItem->products_services_book_id;
 			$orderItemDispute->quantity                  	= $request->quantity;
-			$orderItemDispute->amount_to_be_returned        = $orderItem->price * $request->quantity;
+			$orderItemDispute->amount_to_be_returned        = $orderItem->price_after_apply_reward_points * $request->quantity;
 			$orderItemDispute->reason_id_for_dispute        = $request->reason_id;
 			$orderItemDispute->dispute                  	= $request->dispute;
 			$orderItemDispute->dispute_status             	= $request->item_status;
@@ -1182,6 +1182,7 @@ class OrderController extends Controller
 			$refundOrderItemQuantity = $orderItem->quantity;
 			$refundOrderItemReason = 'cancellation';
 			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+			$orderItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
 			if(!$isRefunded)
 			{
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
@@ -1286,7 +1287,7 @@ class OrderController extends Controller
 		$orderItem->reason_id_for_cancellation_request_decline 	= $reason_id_for_cancellation_request_decline;
 		$orderItem->reason_for_cancellation_request_decline 	= $reason_for_cancellation_request_decline;
 		$orderItem->is_returned 								= $is_returned;
-		$orderItem->amount_returned 							= $amount_returned;
+		$orderItem->amount_returned  							= $amount_returned;
 		$orderItem->is_replaced 								= $is_replaced;
 		$orderItem->is_disputed 								= $is_disputed;
 		$orderItem->save();
