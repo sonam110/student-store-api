@@ -610,7 +610,7 @@ class ContestController extends Controller
                         $refundOrderItemQuantity = $orderedItem->quantity;
                         $refundOrderItemReason = 'cancellation';
                         $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
-                        if(!$isRefunded)
+                        if($isRefunded=='failed')
                         {
                             return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
                         }

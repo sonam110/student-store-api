@@ -1183,7 +1183,7 @@ class OrderController extends Controller
 			$refundOrderItemReason = 'cancellation';
 			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
 			$orderItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
-			if(!$isRefunded)
+			if($isRefunded=='failed')
 			{
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
@@ -1197,7 +1197,7 @@ class OrderController extends Controller
 			$refundOrderItemQuantity = $orderItemReturn->quantity;
 			$refundOrderItemReason = 'return';
 			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
-			if(!$isRefunded)
+			if($isRefunded=='failed')
 			{
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
