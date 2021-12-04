@@ -673,25 +673,7 @@ class OrderController extends Controller
 		$delivery_code = $orderItem->delivery_code;
 		$orderQuantity = $orderItem->quantity;
 
-		//////////////////////////////////////////
-		//////////Stock Update Start/////////////
-		if($request->item_status=='canceled' || $request->item_status=='resolved_to_customer' || $request->item_status=='returned' || $request->item_status=='cancelation_request_accepted') 
-		{
-			$productsServicesBookId = $orderItem->products_services_book_id;
-			if(!empty($productsServicesBookId))
-			{
-				$updateStock = ProductsServicesBook::select('id','quantity','type')->find($productsServicesBookId);
-				if($updateStock->type!='service')
-				{
-					$updateStock->quantity = $updateStock->quantity + $orderItem->quantity;
-					$updateStock->save();
-				}
-			}
-		}
-		//////////////////////////////////////////
-		//////////Stock Update End/////////////
-
-
+		
 		if($request->item_status == 'resolved_to_customer')
 		{
 			$item_status = 'canceled';
@@ -714,7 +696,6 @@ class OrderController extends Controller
 			}
 		}
 		
-
 		$type = 'delivery';
 
 		$comment = $request->comment;
@@ -1002,57 +983,6 @@ class OrderController extends Controller
 			//Mail end
 		}
 
-		if($request->item_status == 'returned')
-		{
-			$type = 'return';
-			$orderItemReturn = OrderItemReturn::where('order_item_id',$id)->first();
-			$amount_returned = $orderItemReturn->amount_to_be_returned;
-			// if($orderItemReturn->return_type == 'by_hand' && $request->return_code != $orderItemReturn->return_code)
-			// {
-			// 	return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
-			// }
-			$orderItemReturn->date_of_return_completed      = date('Y-m-d');
-			$orderItemReturn->return_status                 = $request->item_status;
-			$orderItemReturn->save();
-
-			$title = 'Return Request Accepted';
-			$body =  'Request for return of ordered product '.$orderItem->title.' has Accepted.';
-
-			//Mail-start
-
-
-			///to Buyer
-
-
-			$emailTemplate = EmailTemplate::where('template_for','order_returned')->where('language_id',$orderItem->order->user->language_id)->first();
-			if(empty($emailTemplate))
-			{
-				$emailTemplate = EmailTemplate::where('template_for','order_returned')->first();
-			}
-
-			$mail_body = $emailTemplate->body;
-
-			$arrayVal = [
-				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
-				'{{order_item}}' => $orderItem->title,
-			];
-			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
-			
-			$details = [
-				'title' => $emailTemplate->subject,
-				'body' => $mail_body
-			];
-			
-			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
-
-			//Mail end
-
-			$add_qty = ProductsServicesBook::where('id',$orderItemReturn->products_services_book_id)->first()->quantity +
-			$orderItemReturn->quantity;
-
-			ProductsServicesBook::where('id',$orderItemReturn->products_services_book_id)->update(['quantity' => $add_qty]);
-		}
-
 		if($request->item_status == 'dispute_initiated')
 		{
 			$is_disputed = true;
@@ -1243,6 +1173,105 @@ class OrderController extends Controller
 			$ask_for_cancellation = '3';
 		}
 
+		///////////////////////////////////////////////////////
+		//AMOUNT REFUND IF STATUS IS CANCELED
+		if($item_status == 'canceled')
+		{
+			$refundOrderItemId = $orderItem->id;
+			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
+			$refundOrderItemQuantity = $orderItem->quantity;
+			$refundOrderItemReason = 'cancellation';
+			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+			if(!$isRefunded)
+			{
+				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			}
+
+		}
+		//AMOUNT REFUND IF STATUS IS RETURNED
+		if($item_status == 'returned')
+		{
+			$refundOrderItemId = $orderItem->id;
+			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
+			$refundOrderItemQuantity = $orderItemReturn->quantity;
+			$refundOrderItemReason = 'return';
+			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+			if(!$isRefunded)
+			{
+				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			}
+		}
+		///////////////////////////////////////////////////////
+
+		if($request->item_status == 'returned')
+		{
+			$type = 'return';
+			$orderItemReturn = OrderItemReturn::where('order_item_id',$id)->first();
+			$amount_returned = $orderItemReturn->amount_to_be_returned;
+			// if($orderItemReturn->return_type == 'by_hand' && $request->return_code != $orderItemReturn->return_code)
+			// {
+			// 	return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
+			// }
+			$orderItemReturn->date_of_return_completed      = date('Y-m-d');
+			$orderItemReturn->return_status                 = $request->item_status;
+			$orderItemReturn->save();
+
+			$title = 'Return Request Accepted';
+			$body =  'Request for return of ordered product '.$orderItem->title.' has Accepted.';
+
+			//Mail-start
+
+
+			///to Buyer
+
+
+			$emailTemplate = EmailTemplate::where('template_for','order_returned')->where('language_id',$orderItem->order->user->language_id)->first();
+			if(empty($emailTemplate))
+			{
+				$emailTemplate = EmailTemplate::where('template_for','order_returned')->first();
+			}
+
+			$mail_body = $emailTemplate->body;
+
+			$arrayVal = [
+				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
+				'{{order_item}}' => $orderItem->title,
+			];
+			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
+			
+			$details = [
+				'title' => $emailTemplate->subject,
+				'body' => $mail_body
+			];
+			
+			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
+
+			//Mail end
+
+			$add_qty = ProductsServicesBook::where('id',$orderItemReturn->products_services_book_id)->first()->quantity +
+			$orderItemReturn->quantity;
+
+			ProductsServicesBook::where('id',$orderItemReturn->products_services_book_id)->update(['quantity' => $add_qty]);
+		}
+		
+		//////////////////////////////////////////
+		//////////Stock Update Start/////////////
+		if($request->item_status=='canceled' || $request->item_status=='resolved_to_customer' || $request->item_status=='returned' || $request->item_status=='cancelation_request_accepted') 
+		{
+			$productsServicesBookId = $orderItem->products_services_book_id;
+			if(!empty($productsServicesBookId))
+			{
+				$updateStock = ProductsServicesBook::select('id','quantity','type')->find($productsServicesBookId);
+				if($updateStock->type!='service')
+				{
+					$updateStock->quantity = $updateStock->quantity + $orderItem->quantity;
+					$updateStock->save();
+				}
+			}
+		}
+		//////////////////////////////////////////
+		//////////Stock Update End/////////////
+
 		$orderItem->item_status                     			= $item_status;
 		$orderItem->tracking_number 		        			= $tracking_number;
 		$orderItem->shipment_company_name 	        			= $shipment_company_name;
@@ -1261,24 +1290,6 @@ class OrderController extends Controller
 		$orderItem->is_replaced 								= $is_replaced;
 		$orderItem->is_disputed 								= $is_disputed;
 		$orderItem->save();
-
-		if($item_status == 'canceled')
-		{
-			$refundOrderItemId = $orderItem->id;
-			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
-			$refundOrderItemQuantity = $orderItem->quantity;
-			$refundOrderItemReason = 'cancellation';
-			refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
-
-		}
-		if($item_status == 'returned')
-		{
-			$refundOrderItemId = $orderItem->id;
-			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
-			$refundOrderItemQuantity = $orderItemReturn->quantity;
-			$refundOrderItemReason = 'return';
-			refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
-		}
 
 		if($type == 'no_tracking')
 		{

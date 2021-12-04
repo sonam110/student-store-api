@@ -258,7 +258,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 			  Log::info('Stripe Payment not refunded. Please check Log');
 	      Log::info($e->getMessage());
 	      Log::info($orderItem);
-	      die;
+	      return false;
 			}
 		}
 		elseif($transaction->gateway_detail=='klarna' && $transaction->transaction_status=='ACCEPTED')
@@ -312,10 +312,10 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	    {
 	    	$isRefunded = false;
 	      $info = curl_error($curl);
-	      Log::info('Payment not refunded. Please check Curl Log:');
+	      Log::info('Klarna Payment not refunded. Please check Log');
 	      Log::error($info);
 	      Log::info($orderItem);
-	      die;
+	      return false;
 	    }
 	    else
 	    {
@@ -389,11 +389,14 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 		$refund->rewards_refund   			= @$orderItem->used_item_reward_points;
 		$refund->reason_for_refund   		= $refundOrderItemReason;
 		$refund->save();
+
+		return true;
 	}
 	else
 	{
 		Log::info('Payment not refunded. Please check Log');
 		Log::info($orderItem);
+		return false;
 	}
 }
 

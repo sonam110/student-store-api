@@ -602,22 +602,28 @@ class ContestController extends Controller
                     foreach ($joinedApplications as $key => $value) {
                         $joinedContestApplicationId[] = $value->id;
                     }
-                    $joinedApplicationsStatusUpdate = ContestApplication::where('contest_id',$contest_id)
-                                                ->where('application_status','joined')
-                                                ->update([
-                                                    'application_status'=>'canceled',
-                                                    'reason_for_cancellation' => $request->reason_for_cancellation,
-                                                    'reason_id_for_cancellation' => $request->reason_id_for_cancellation,
-                                                    'cancelled_by' => Auth::id(),
-                                                ]);
+                    
                     $orderedItems = OrderItem::whereIn('contest_application_id',$joinedContestApplicationId)->get();
                     foreach ($orderedItems as $key => $orderItem) {
                         $refundOrderItemId = $orderItem->id;
                         $refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
                         $refundOrderItemQuantity = $orderItem->quantity;
                         $refundOrderItemReason = 'cancellation';
-                        refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+                        $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+                        if(!$isRefunded)
+                        {
+                            return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+                        }
                     }
+
+                    $joinedApplicationsStatusUpdate = ContestApplication::where('contest_id',$contest_id)
+                        ->where('application_status','joined')
+                        ->update([
+                            'application_status'=>'canceled',
+                            'reason_for_cancellation' => $request->reason_for_cancellation,
+                            'reason_id_for_cancellation' => $request->reason_id_for_cancellation,
+                            'cancelled_by' => Auth::id(),
+                        ]);
 
                     $getContest->reason_for_cancellation = $request->reason_for_cancellation;
                     $getContest->reason_id_for_cancellation = $request->reason_id_for_cancellation;

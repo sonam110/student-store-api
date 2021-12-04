@@ -213,7 +213,12 @@ class ContestApplicationController extends Controller
 							$refundOrderItemPrice = ($orderItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
 							$refundOrderItemQuantity = $orderItem->quantity;
 							$refundOrderItemReason = 'cancellation';
-							refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+							$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+
+							if(!$isRefunded)
+							{
+								return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+							}
 						}
 					}
 				}
@@ -275,7 +280,11 @@ class ContestApplicationController extends Controller
 								$refundOrderItemPrice = ($orderItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
 								$refundOrderItemQuantity = $orderItem->quantity;
 								$refundOrderItemReason = 'cancellation';
-								refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+								$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+								if(!$isRefunded)
+								{
+									return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+								}
 							}
 						}
 					}
