@@ -1645,10 +1645,13 @@ class OrderController extends Controller
 		$sub_total = 0;
 		$shipping_charge = 0;
 		$itemInfo = [];
+		$orderItems = [];
 		$getAppSetting = AppSetting::first();
 
 		$reward_point_value = round($getAppSetting->customer_rewards_pt_value * $request->used_reward_points * 100, 2);
 		foreach ($request->items as $key => $orderedItem) {
+			$used_item_reward_points_value = round($getAppSetting->customer_rewards_pt_value * $orderedItem['used_item_reward_points'] * 100, 2);
+
 			if(!empty($orderedItem['product_id']))
 			{
 				$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
@@ -1682,11 +1685,29 @@ class OrderController extends Controller
 	                'quantity'  => $orderedItem['quantity'],
 	                'unit_price'=> round($price * 100),
 	                'tax_rate'  => 0,
-	                'total_amount'          => (round($price * $orderedItem['quantity']) * 100) - $reward_point_value,
-	                'total_discount_amount' => $reward_point_value,
+	                'total_amount'          => (round($price * $orderedItem['quantity'] * 100)) - $used_item_reward_points_value,
+	                'total_discount_amount' => $used_item_reward_points_value,
 	                'total_tax_amount'      => 0,
 	                'image_url' => $orderedItem['cover_image']
 	        	];
+
+	        	$orderItems[] = [
+	        		'reference' => $orderedItem['product_id'],
+			        'name' => $orderedItem['title'],
+			        'type' => 'PRODUCT',
+			        'class' => 'ProductGroup1',
+			        'itemUrl' => env('FRONT_APP_URL').'product/'.$productsServicesBook->slug.'/'.$productsServicesBook->id,
+			        'imageUrl' => $orderedItem['cover_image'],
+			        'description' => $orderedItem['title'],
+			        'discountDescription' => ($reward_point_value>0) ? 'Reward point applied' : '-',
+			        'quantity' => $orderedItem['quantity'],
+			        'quantityUnit' => 'pcs',
+			        'unitPrice' => round($price * 100),
+			        'discountPrice' => $used_item_reward_points_value,
+			        'vatPercent' => 0,
+			        'amount' => (round($price * $orderedItem['quantity'] * 100)) - $used_item_reward_points_value,
+			        'vatAmount' => 0,
+			    ];
 			}
 			elseif(!empty($orderedItem['contest_id']))
 			{
@@ -1708,11 +1729,29 @@ class OrderController extends Controller
 	                'quantity'  => $orderedItem['quantity'],
 	                'unit_price'=> round($price * 100),
 	                'tax_rate'  => 0,
-	                'total_amount'          => (round($price * $orderedItem['quantity']) * 100) - $reward_point_value,
-	                'total_discount_amount' => $reward_point_value,
+	                'total_amount'          => (round($price * $orderedItem['quantity'] * 100)) - $used_item_reward_points_value,
+	                'total_discount_amount' => $used_item_reward_points_value,
 	                'total_tax_amount'      => 0,
 	                'image_url' => $orderedItem['cover_image']
 	        	];
+
+	        	$orderItems[] = [
+	        		'reference' => $orderedItem['contest_id'],
+			        'name' => $orderedItem['title'],
+			        'type' => 'OTHER',
+			        'class' => 'ProductGroup1',
+			        'itemUrl' => env('FRONT_APP_URL').'contest/'.$productsServicesBook->id,
+			        'imageUrl' => $orderedItem['cover_image'],
+			        'description' => $orderedItem['title'],
+			        'discountDescription' => ($reward_point_value>0) ? 'Reward point applied' : '-',
+			        'quantity' => $orderedItem['quantity'],
+			        'quantityUnit' => 'pcs',
+			        'unitPrice' => round($price * 100),
+			        'discountPrice' => $used_item_reward_points_value,
+			        'vatPercent' => 0,
+			        'amount' => (round($price * $orderedItem['quantity'] * 100)) - $used_item_reward_points_value,
+			        'vatAmount' => 0,
+			    ];
 			}
 			else
 			{
@@ -2130,6 +2169,94 @@ class OrderController extends Controller
 	        	'amount'	=> $total,
 	        	'currency'	=> 'SEK',
 	        	'bambora_response' => $response
+	        ];
+	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
+		} elseif($request->payment_method=='swish_checkout') {
+			$user = User::find(Auth::id());
+			$accessToken = $this->paymentInfo->swish_access_token;
+
+			$checkoutUrl = env('SWISH_URL').'/psp/paymentorders';
+
+			//Temp Order create
+			$tempOrderSave = new TempOrder;
+			$tempOrderSave->user_id = Auth::id();
+			$tempOrderSave->request_param = json_encode($request->all());
+			$tempOrderSave->save();
+
+	      	$temp_order_id = $tempOrderSave->id;
+
+	        $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+	        $phone = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
+	        $phone_number   = ltrim($phone, '0');
+			$phone_number_with_country_code = ((strlen($phone_number))==9) ? env('COUNTRY_CODE').$phone_number : $phone_number; 
+			$orderObj = [
+			  'paymentorder' =>  [
+			    'operation' => 'Purchase',
+			    'currency' => 'SEK',
+			    'amount' => round($total * 100),
+			    'vatAmount' => 0,
+			    'description' => 'Purchase from Student Store',
+			    'userAgent' => $request->header('User-Agent'),
+			    'language' => 'sv-SE',
+			    'generateRecurrenceToken' => false,
+			    'generateUnscheduledToken' => false,
+			    'urls' => [
+			      'hostUrls' => [
+			        0 => 'https://studentstore.se/',
+			        1 => 'https://api.studentstore.se/',
+			      ],
+			      'completeUrl' => 'https://studentstore.se/payment-completed',
+			      'cancelUrl' => 'https://studentstore.se/payment-canceled',
+			      'paymentUrl' => 'https://studentstore.se/perform-payment',
+			      'callbackUrl' => 'https://api.studentstore.com/swish-payment-callback',
+			      'termsOfServiceUrl' => 'https://studentstore.se/page/privacy-policy',
+			      'logoUrl' => $getAppSetting->logo_path,
+			    ],
+			    'payeeInfo' =>  [
+			      'payeeId' => env('SWISH_MERCHANT_ID'),
+			      'payeeReference' => (string) Str::random(30),
+			      'payeeName' => $getAppSetting->app_name,
+			      'productCategory' => 'SS-123',
+			      'orderReference' => date('Y-m-d').'-'.$temp_order_id,
+			      'subsite' => 'StudentsStore',
+			    ],
+			    'payer' => [
+			    	'email' => $email,
+			    	'msisdn'=> '+'.$phone_number_with_country_code
+			    ],
+			    'orderItems' => $orderItems,
+			  ],
+			];
+
+			$requestJson = json_encode($orderObj);
+			$headers = [
+				'Content-Type: application/json',
+			  	'Authorization: Bearer '.$accessToken,
+			];
+
+			$curl = curl_init();
+
+			curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $requestJson);
+			curl_setopt($curl, CURLOPT_URL, $checkoutUrl);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($curl, CURLOPT_FAILONERROR, false);
+			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+			$rawResponse = curl_exec($curl);
+			$response = json_decode($rawResponse);
+	        if(curl_errno($curl)>0)
+	        {
+	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+	            return response()->json(prepareResult(true, $info, "Error while creating swish checkout"), config('http_response.internal_server_error'));
+	        }
+	        curl_close($curl);
+	        $returnData = [
+	        	'created' 	=> time(),
+	        	'amount'	=> $total,
+	        	'currency'	=> 'SEK',
+	        	'swish_response' => $response
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Order successfully created."), config('http_response.success'));
 		} else {
