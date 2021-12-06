@@ -20,7 +20,7 @@ class CreateStudentDetailsTable extends Migration
             $table->string('user_id', 50);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             
-            $table->string('enrollment_no',100)->unique();
+            $table->string('enrollment_no',100)->nullable();
             $table->string('education_level',100)->nullable();
             $table->string('board_university',100)->nullable();
             $table->string('institute_name',100)->nullable();

@@ -45,7 +45,7 @@ class ProductsImport implements ToModel,WithHeadingRow
         //     $discountAmount = $row['original_price_required'] - (($row['original_price_required'] * $row['discount_in_percentage_not_required'])/100);
         //     $discountValue = $row['discount_in_percentage_not_required'];
         // }
-        if($row['discount_in_percentage_not_required']>0)
+        if(@$row['discount_in_percentage_not_required']>0)
         {
             $discountAmount = $row['original_price_required'] - (($row['original_price_required'] * $row['discount_in_percentage_not_required'])/100);
             $is_on_offer = 1;
