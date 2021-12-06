@@ -236,6 +236,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/orders-count', [App\Http\Controllers\API\OrderController::class,'ordersCount']);
 	
 
+	Route::post('/checkin-swish', [App\Http\Controllers\API\OrderController::class,'checkinSwish']);
 	Route::post('/create-stripe-intent', [App\Http\Controllers\API\OrderController::class,'createStripeIntent']);
 	Route::post('/create-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'createStripeSubscription']);
 	Route::post('/cancel-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'cancelStripeSubscription']);
