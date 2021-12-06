@@ -28,4 +28,6 @@ Route::get('/swedenpay', 'App\Http\Controllers\SwedenpayController@swedenpay');
 
 Route::get('/bam-callback', 'App\Http\Controllers\BamboraController@bamCallback');
 
+Route::get('/swish-payment-callback', 'App\Http\Controllers\SwishController@swishPaymentCallback');
+
 Route::get('/login', [App\Http\Controllers\Admin\MasterController::class,'login'])->name('login');

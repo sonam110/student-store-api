@@ -123,6 +123,12 @@ return [
             'path' => storage_path('logs/bambora.log'),
             'level' => 'info',
         ],
+
+        'swish' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/swish.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];
