@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+Route::post('/checkin-swish', [App\Http\Controllers\API\OrderController::class,'checkinSwish']);
+
 //Stripe Webhook
 Route::get('/klarna/order-info/{order_id}', [App\Http\Controllers\API\OrderController::class,'getKlarnaOrderInfo']);
 Route::post('/stripe/webhook', [App\Http\Controllers\WebhookController::class,'stripeWebhook']);
@@ -236,7 +238,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::get('/orders-count', [App\Http\Controllers\API\OrderController::class,'ordersCount']);
 	
 
-	Route::post('/checkin-swish', [App\Http\Controllers\API\OrderController::class,'checkinSwish']);
+	
 	Route::post('/create-stripe-intent', [App\Http\Controllers\API\OrderController::class,'createStripeIntent']);
 	Route::post('/create-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'createStripeSubscription']);
 	Route::post('/cancel-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'cancelStripeSubscription']);
