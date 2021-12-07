@@ -405,7 +405,7 @@ class OrderController extends Controller
 
 						$checkItemType = ProductsServicesBook::select('type','user_id')->find($orderedItem['product_id']);
 						$vendor_user_id = $checkItemType->user_id;
-						if($checkItemType->type=='product')
+						if($checkItemType->type=='product' || $checkItemType->type=='book')
 						{
 							ProductsServicesBook::where('id',$orderedItem['product_id'])->update(['quantity' => $productsServicesBook->quantity - $orderedItem['quantity']]);
 						}	
@@ -1192,6 +1192,7 @@ class OrderController extends Controller
 		//AMOUNT REFUND IF STATUS IS RETURNED
 		if($item_status == 'returned')
 		{
+			$orderItemReturn = OrderItemReturn::where('order_item_id',$id)->first();
 			$refundOrderItemId = $orderItem->id;
 			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
 			$refundOrderItemQuantity = $orderItemReturn->quantity;

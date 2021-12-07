@@ -76,7 +76,7 @@ class ProductsImport implements ToModel,WithHeadingRow
         }
 
         //Product
-        if($row['type_required']=='product' && $row['original_price_required']> 0)
+        if(@$row['type_required']=='product' && $row['original_price_required']> 0)
         {
             $products = new ProductsServicesBook;
             $products->user_id                   = $this->data['user_id'];
@@ -120,7 +120,7 @@ class ProductsImport implements ToModel,WithHeadingRow
         }
 
         //Service
-        elseif($row['type_required']=='service' && $row['original_price_required']> 0)
+        elseif(@$row['type_required']=='service' && $row['original_price_required']> 0)
         {
             $products = new ProductsServicesBook;
             $products->user_id                   = $this->data['user_id'];
@@ -152,7 +152,7 @@ class ProductsImport implements ToModel,WithHeadingRow
         }
 
         //Book
-        elseif($row['type_required']=='book' && $row['original_price_required']> 0)
+        elseif(@$row['type_required']=='book' && $row['original_price_required']> 0)
         {
             $products = new ProductsServicesBook;
             $products->user_id                   = $this->data['user_id'];
