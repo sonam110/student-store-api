@@ -2313,7 +2313,7 @@ class OrderController extends Controller
 	        	'amount'	=> $total,
 	        	'currency'	=> 'SEK',
 	        	'swish_response' => $response,
-	        	'for_capture_obj' => json_encode($forCaptureObj)
+	        	'for_capture_obj' => $forCaptureObj
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Checkout link successfully created."), config('http_response.success'));
 		} else {
