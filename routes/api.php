@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::post('/checkin-swish', [App\Http\Controllers\API\OrderController::class,'checkinSwish']);
 
 //Stripe Webhook
 Route::get('/klarna/order-info/{order_id}', [App\Http\Controllers\API\OrderController::class,'getKlarnaOrderInfo']);
@@ -244,7 +243,11 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/cancel-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'cancelStripeSubscription']);
 	Route::get('/temp-order-delete/{id}', [App\Http\Controllers\API\OrderController::class,'tempOrderDelete']);
 
-	//Klarna
+	//Checkin API
+	Route::post('/checkin-swish', [App\Http\Controllers\API\OrderController::class,'checkinSwish']);
+
+	//Swedbankpay capture
+	Route::post('/swedbankpay-capture', [App\Http\Controllers\API\OrderController::class,'swedbankpayCapture']);
 
 	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\RatingAndFeedbackController', ['as' => 'api']);
 	Route::get('/rating-and-feedback-approve/{id}', [App\Http\Controllers\API\RatingAndFeedbackController::class,'approve']);

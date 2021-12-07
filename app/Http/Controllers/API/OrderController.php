@@ -2233,6 +2233,8 @@ class OrderController extends Controller
 	        $phone = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
 	        $phone_number   = ltrim($phone, '0');
 			$phone_number_with_country_code = ((strlen($phone_number))==9) ? env('COUNTRY_CODE').$phone_number : $phone_number; 
+			$payeeReference = (string) Str::random(30);
+			$receiptReference = (string) Str::random(30);
 			$orderObj = [
 			  'paymentorder' =>  [
 			    'operation' => 'Purchase',
@@ -2258,7 +2260,7 @@ class OrderController extends Controller
 			    ],
 			    'payeeInfo' =>  [
 			      'payeeId' => env('SWISH_MERCHANT_ID'),
-			      'payeeReference' => (string) Str::random(30),
+			      'payeeReference' => $payeeReference,
 			      'payeeName' => $getAppSetting->app_name,
 			      'productCategory' => 'SS-123',
 			      'orderReference' => date('Y-m-d').'-'.$temp_order_id,
@@ -2296,11 +2298,22 @@ class OrderController extends Controller
 	            return response()->json(prepareResult(true, $info, "Error while creating swish checkout"), config('http_response.internal_server_error'));
 	        }
 	        curl_close($curl);
+	        $forCaptureObj = [
+	        	'transaction' => [
+	        		'description' => 'Payment capture',
+	        		'amount'=> round($total * 100),
+					'vatAmount'=> 0,
+					'payeeReference'=> $payeeReference,
+					'receiptReference'=> $receiptReference,
+					'orderItems' => $orderItems
+	        	]
+	        ];
 	        $returnData = [
 	        	'created' 	=> time(),
 	        	'amount'	=> $total,
 	        	'currency'	=> 'SEK',
-	        	'swish_response' => $response
+	        	'swish_response' => $response,
+	        	'for_capture_obj' => json_encode($forCaptureObj)
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Checkout link successfully created."), config('http_response.success'));
 		} else {
@@ -2440,5 +2453,39 @@ class OrderController extends Controller
 	        //echo '<pre>';
 	        //print_r($res['refunds'][0]['refund_id']);
 	        return response(prepareResult(false, $res, 'Order Info'), config('http_response.success'));
+	}
+
+	public function swedbankpayCapture(Request $request)
+	{
+		$accessToken = $this->paymentInfo->swish_access_token;
+		$checkoutUrl = env('SWISH_URL').$request->capture_url;
+		$headers = [
+			'Content-Type: application/json',
+		  	'Authorization: Bearer '.$accessToken,
+		];
+
+		$curl = curl_init();
+
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $request->for_capture_obj);
+		curl_setopt($curl, CURLOPT_URL, $checkoutUrl);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($curl, CURLOPT_FAILONERROR, false);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+		$rawResponse = curl_exec($curl);
+		$response = json_decode($rawResponse);
+        if(curl_errno($curl)>0)
+        {
+            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+            return response()->json(prepareResult(true, $info, "Error while creating swish checkout"), config('http_response.internal_server_error'));
+        }
+        curl_close($curl);
+        $returnData = [
+        	'created' 	=> time(),
+        	'swish_response' => $response
+        ];
+        return response()->json(prepareResult(false, $returnData, "Swedbankpay successfully captured ."), config('http_response.success'));
 	}
 }
