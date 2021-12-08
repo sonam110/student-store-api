@@ -1193,6 +1193,12 @@ class OrderController extends Controller
 		if($item_status == 'returned')
 		{
 			$orderItemReturn = OrderItemReturn::where('order_item_id',$id)->first();
+
+			if($orderItemReturn->return_type == 'by_hand' && $request->return_code != $orderItemReturn->return_code)
+			{
+				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
+			}
+
 			$refundOrderItemId = $orderItem->id;
 			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
 			$refundOrderItemQuantity = $orderItemReturn->quantity;
@@ -1207,13 +1213,7 @@ class OrderController extends Controller
 
 		if($request->item_status == 'returned')
 		{
-			$type = 'return';
-			$orderItemReturn = OrderItemReturn::where('order_item_id',$id)->first();
-			$amount_returned = $orderItemReturn->amount_to_be_returned;
-			if($orderItemReturn->return_type == 'by_hand' && $request->return_code != $orderItemReturn->return_code)
-			{
-				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
-			}
+			$type = 'return';			
 			$orderItemReturn->date_of_return_completed      = date('Y-m-d');
 			$orderItemReturn->return_status                 = $request->item_status;
 			$orderItemReturn->save();
