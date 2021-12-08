@@ -63,7 +63,7 @@ class Contest extends Model
 
     public function isApplied()
     {
-        return $this->hasOne(ContestApplication::class,'contest_id','id')->where('user_id',Auth::id())->select(['id','contest_id','user_id']);
+        return $this->hasOne(ContestApplication::class,'contest_id','id')->where('user_id',Auth::id())->select(['id','contest_id','user_id'])->where('application_status', '!=', 'canceled');
     }
 
     // public function isAppliedNotCanceled()
