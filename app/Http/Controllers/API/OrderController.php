@@ -1210,10 +1210,10 @@ class OrderController extends Controller
 			$type = 'return';
 			$orderItemReturn = OrderItemReturn::where('order_item_id',$id)->first();
 			$amount_returned = $orderItemReturn->amount_to_be_returned;
-			// if($orderItemReturn->return_type == 'by_hand' && $request->return_code != $orderItemReturn->return_code)
-			// {
-			// 	return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
-			// }
+			if($orderItemReturn->return_type == 'by_hand' && $request->return_code != $orderItemReturn->return_code)
+			{
+				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_return_code_error')), config('http_response.internal_server_error'));
+			}
 			$orderItemReturn->date_of_return_completed      = date('Y-m-d');
 			$orderItemReturn->return_status                 = $request->item_status;
 			$orderItemReturn->save();
