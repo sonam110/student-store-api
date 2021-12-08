@@ -772,6 +772,8 @@ class OrderController extends Controller
 			$orderItemReplacement->replacement_code             = $replacement_code;
 			$orderItemReplacement->save();
 
+			$orderQuantity = $request->quantity;
+
 			$title = 'Replacement Request';
 			$body =  'Order for '.$orderItem->title.' has Replacement Request because of '.$request->reason_of_replacement.'.';
 
@@ -859,6 +861,8 @@ class OrderController extends Controller
 				$orderTracking->comment         = '';
 				$orderTracking->type         	= 'delivery';
 				$orderTracking->save();
+
+				$orderQuantity = $orderItemReplacement->quantity;
 			}
 
 			$title = 'Replacement Request Accepted';
@@ -940,6 +944,8 @@ class OrderController extends Controller
 			$orderItemReturn->return_status				= $request->item_status;
 			$orderItemReturn->return_code               = $return_code;
 			$orderItemReturn->save();
+
+			$orderQuantity = $request->quantity;
 
 			$title = 'Return Request';
 			$body =  'Order for '.$orderItem->title.' has Return Request because of '.$request->reason_of_return.'.';
@@ -1188,6 +1194,8 @@ class OrderController extends Controller
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
 
+			$orderQuantity = $orderItem->quantity;
+
 		}
 		//AMOUNT REFUND IF STATUS IS RETURNED
 		if($item_status == 'returned')
@@ -1208,16 +1216,13 @@ class OrderController extends Controller
 			{
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
-		}
-		///////////////////////////////////////////////////////
 
-		if($request->item_status == 'returned')
-		{
+			$orderQuantity = $orderItemReturn->quantity;
 			$type = 'return';			
 			$orderItemReturn->date_of_return_completed      = date('Y-m-d');
 			$orderItemReturn->return_status                 = $request->item_status;
 			$orderItemReturn->save();
-
+			
 			$title = 'Return Request Accepted';
 			$body =  'Request for return of ordered product '.$orderItem->title.' has Accepted.';
 
@@ -1250,10 +1255,7 @@ class OrderController extends Controller
 
 			//Mail end
 
-			$add_qty = ProductsServicesBook::where('id',$orderItemReturn->products_services_book_id)->first()->quantity +
-			$orderItemReturn->quantity;
-
-			ProductsServicesBook::where('id',$orderItemReturn->products_services_book_id)->update(['quantity' => $add_qty]);
+			
 		}
 		
 		//////////////////////////////////////////
@@ -1266,7 +1268,7 @@ class OrderController extends Controller
 				$updateStock = ProductsServicesBook::select('id','quantity','type')->find($productsServicesBookId);
 				if($updateStock->type!='service')
 				{
-					$updateStock->quantity = $updateStock->quantity + $orderItem->quantity;
+					$updateStock->quantity = $updateStock->quantity + $orderQuantity;
 					$updateStock->save();
 				}
 			}
