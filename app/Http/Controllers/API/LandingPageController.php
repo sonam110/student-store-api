@@ -2227,9 +2227,7 @@ class LandingPageController extends Controller
                 $q->select('id','registration_type_id','title','slug')
                     ->where('language_id', $lang_id);
             }])
-            ->withCount(['contestApplications' => function($q) {
-                $q->where('application_status', '!=', 'canceled');
-            }])
+            ->withCount('contestApplications')
             ->find($contest->id);
             $contest['is_applied'] = $applied;
             $contest['latitude'] = $contest->addressDetail? $contest->addressDetail->latitude:null;

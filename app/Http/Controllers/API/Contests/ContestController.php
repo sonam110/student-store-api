@@ -373,9 +373,7 @@ class ContestController extends Controller
             $q->select('id','registration_type_id','title','slug')
                 ->where('language_id', $lang_id);
         }])
-        ->withCount(['contestApplications' => function($q) {
-            $q->where('application_status', '!=', 'canceled');
-        }, 'ratings'])
+        ->withCount('contestApplications','ratings')
         ->with(['ratings.customer' => function($query){
                         $query->take(3);
                     }])

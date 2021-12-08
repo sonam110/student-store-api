@@ -58,7 +58,7 @@ class Contest extends Model
     }
     public function contestApplications()
     {
-        return $this->hasMany(ContestApplication::class, 'contest_id', 'id');
+        return $this->hasMany(ContestApplication::class, 'contest_id', 'id')->where('application_status', '!=', 'canceled');
     }
 
     public function isApplied()
