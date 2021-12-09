@@ -709,10 +709,6 @@ class OrderController extends Controller
 		{
 			$return_applicable_date = date('Y-m-d',strtotime('+14 days'));
 			$delivery_completed_date = date('Y-m-d');
-
-			OrderItem::where('id',$id)->update(['reward_point_status'=>'credited']);
-			$user = $orderItem->user;
-			$user->update(['reward_points'=>($user->reward_points + $orderItem->earned_reward_points)]);
 		}
 		if(!empty($request->expected_delivery_date))
 		{
