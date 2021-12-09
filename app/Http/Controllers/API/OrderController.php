@@ -652,6 +652,7 @@ class OrderController extends Controller
 	{
 		
 		$title = null;
+		$body = null;
         // pending->confirmed->shipped->delivered->completed->replacement_initiated->replacement_acccepted->replacement_completed->return_initiated->return_confirmed->return_declined->return_completed
 		$orderItem = OrderItem::find($id);
 		$expected_delivery_date = $orderItem->expected_delivery_date;

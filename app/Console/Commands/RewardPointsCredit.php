@@ -40,7 +40,7 @@ class RewardPointsCredit extends Command
     public function handle()
     {
         $date = date('Y-m-d',strtotime('-14 days'));
-        $orderItems = OrderItem::where('delivery_completed_date','<=',$date)->where('reward_point_status','pending')->where('is_replaced','0')->where('is_returned','0')->where('is_disputed','0')->get();
+        $orderItems = OrderItem::whereDate('return_applicable_date','<=',$date)->whereNotNull('return_applicable_date')->where('reward_point_status','pending')->where('is_replaced','0')->where('is_returned','0')->where('is_disputed','0')->get();
           foreach($orderItems as $orderItem) {
             $orderItem->update(['reward_point_status' => 'credited']);
 
