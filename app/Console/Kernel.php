@@ -52,17 +52,20 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->command('contest:expire')->dailyAt('00:01');
         $schedule->command('contests:onHold')->dailyAt('23:59');
         $schedule->command('contests:start')->dailyAt('00:01');
-        $schedule->command('subscribedPackage:expire')->dailyAt('09:00');
-        $schedule->command('contest:expire')->dailyAt('00:01');
+
         $schedule->command('job:expire')->dailyAt('00:01');
         $schedule->command('order:status')->hourly();
         $schedule->command('rewardPoints:credit')->dailyAt('00:01');
+
         $schedule->command('create:freelancer')->hourly();
         $schedule->command('create:assignment')->dailyAt('02:00');
         $schedule->command('stripe:account')->hourly();
         $schedule->command('stripevendor:findtransfer')->dailyAt('03:00');
+        
+        $schedule->command('subscribedPackage:expire')->dailyAt('09:00');
         $schedule->command('expiredpackage:switchtofree')->dailyAt('00:01');
         
     }
