@@ -338,19 +338,18 @@ class SearchController extends Controller
 
 		if(!empty($request->search))
 		{
-			$contests->where('contests.title','like', '%'.$request->search.'%')
-			->orWhere('category_masters.title','like', '%'.$request->search.'%');
+			$contests = $contests->where('contests.title','like', '%'.$request->search.'%')->orWhere('category_masters.title','like', '%'.$request->search.'%');
 		}
 
 		if(!empty($request->per_page_record))
 		{
-			$contests->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			$res = $contests->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 		}
 		else
 		{
-			$contests->get();
+			$res = $contests->get();
 		}
-		return response()->json(prepareResult(false, $contests, getLangByLabelGroups('messages','message_jobs_list')), config('http_response.success'));
+		return response()->json(prepareResult(false, $res, getLangByLabelGroups('messages','message_jobs_list')), config('http_response.success'));
 	}
 
 	public function commonSearch(Request $request)
