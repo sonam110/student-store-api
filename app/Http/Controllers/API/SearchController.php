@@ -295,21 +295,21 @@ class SearchController extends Controller
 	{
 		$lang_id = $this->lang_id;
 
-		$dataType = 'contest';
-		$dataOf = '3';
-		if(!empty($request->dataType))
+		$type = 'contest';
+		$user_type = '3';
+		if(!empty($request->type))
 		{
-			$dataType = $request->dataType;
+			$type = $request->type;
 		}
-		if(!empty($request->dataOf))
+		if(!empty($request->user_type))
 		{
-			if($request->dataOf == 'student')
+			if($request->user_type == 'student')
 			{
-				$dataOf = '2';
+				$user_type = '2';
 			}
-			elseif($request->dataOf == 'company')
+			elseif($request->user_type == 'company')
 			{
-				$dataOf = '3';
+				$user_type = '3';
 			}
 		}
 
@@ -320,8 +320,8 @@ class SearchController extends Controller
 			->join('category_masters', function ($join) {
 				$join->on('contests.category_master_id', '=', 'category_masters.id');
 			})
-			->where('users.user_type_id',$dataOf)
-			->where('contests.type',$dataType)
+			->where('users.user_type_id',$user_type)
+			->where('contests.type',$type)
 			->orderBy('contests.created_at','desc')
 			->with('categoryMaster','subCategory')
 			->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -338,7 +338,7 @@ class SearchController extends Controller
 
 		if(!empty($request->search))
 		{
-			$contests = $contests->where('contests.title','like', '%'.$request->search.'%')->orWhere('category_masters.title','like', '%'.$request->search.'%');
+			$contests->where('contests.title','like', '%'.$request->search.'%')->orWhere('category_masters.title','like', '%'.$request->search.'%');
 		}
 
 		if(!empty($request->per_page_record))
