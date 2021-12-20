@@ -344,7 +344,8 @@ class SearchController extends Controller
 			$search = $request->search;
 			$contests->where(function ($query) use ($search) {
 			    $query->where('contests.title','like', '%'.$search.'%')
-			          ->orWhere('category_masters.title','like', '%'.$search.'%');
+			          ->orWhere('category_masters.title','like', '%'.$search.'%')
+			          ->orWhere('contests.tags','like', '%'.$search.'%');
 			});
 		}
 
