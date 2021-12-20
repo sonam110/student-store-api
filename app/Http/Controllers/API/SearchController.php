@@ -341,7 +341,11 @@ class SearchController extends Controller
 
 		if(!empty($request->search))
 		{
-			$contests->where('contests.title','like', '%'.$request->search.'%')->orWhere('category_masters.title','like', '%'.$request->search.'%');
+			$search = $request->search;
+			$contests->where(function ($query) use ($search) {
+			    $query->where('contests.title','like', '%'.$search.'%')
+			          ->orWhere('category_masters.title','like', '%'.$search.'%');
+			});
 		}
 
 		if(!empty($request->per_page_record))
