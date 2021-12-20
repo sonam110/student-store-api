@@ -40,10 +40,8 @@ class SearchController extends Controller
 				$dataOf = '3';
 			}
 		}
-		
-		if(!empty($request->per_page_record))
-		{
-			$products = ProductsServicesBook::select('products_services_books.*')
+
+		$products = ProductsServicesBook::select('products_services_books.*')
 			->join('users', function ($join) {
 				$join->on('products_services_books.user_id', '=', 'users.id');
 			})
@@ -51,161 +49,30 @@ class SearchController extends Controller
 			->where('products_services_books.type',$dataType)
 			->orderBy('products_services_books.created_at','desc')
 			->with('coverImage','addressDetail')
-			->where('products_services_books.title','like', '%'.$request->search.'%')
-			->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			->join('category_masters', function ($join) {
+				$join->on('products_services_books.category_master_id', '=', 'category_masters.id');
+			});
+
+		if(!empty($request->search))
+		{
+			$search = $request->search;
+			$products->where(function ($query) use ($search) {
+			    $query->where('products_services_books.title','like', '%'.$search.'%')
+			          ->orWhere('category_masters.title','like', '%'.$search.'%')
+			          ->orWhere('products_services_books.tags','like', '%'.$search.'%');
+			});
+		}
+
+		if(!empty($request->per_page_record))
+		{
+			$res = $products->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 		}
 		else
 		{
-			$products = ProductsServicesBook::select('products_services_books.*')
-			->join('users', function ($join) {
-				$join->on('products_services_books.user_id', '=', 'users.id');
-			})
-			->where('users.user_type_id',$dataOf)
-			->where('products_services_books.type',$dataType)
-			->orderBy('products_services_books.created_at','desc')
-			->with('coverImage','addressDetail')
-			->where('products_services_books.title','like', '%'.$request->search.'%')
-			->get();
+			$res = $products->get();
 		}
-
-		if($products->count() == 0)
-		{
-			if(!empty($request->per_page_record))
-			{
-				$products = ProductsServicesBook::select('products_services_books.*')
-				->join('users', function ($join) {
-					$join->on('products_services_books.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('products_services_books.type',$dataType)
-				->orderBy('products_services_books.created_at','desc')
-				->with('coverImage','addressDetail')
-				->join('category_masters', function ($join) {
-					$join->on('products_services_books.category_master_id', '=', 'category_masters.id');
-				})
-				->where('category_masters.title','like', '%'.$request->search.'%')
-				->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-			}
-			else
-			{
-				$products = ProductsServicesBook::select('products_services_books.*')
-				->join('users', function ($join) {
-					$join->on('products_services_books.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('products_services_books.type',$dataType)
-				->orderBy('products_services_books.created_at','desc')
-				->with('coverImage','addressDetail')
-				->join('category_masters', function ($join) {
-					$join->on('products_services_books.category_master_id', '=', 'category_masters.id');
-				})
-				->where('category_masters.title','like', '%'.$request->search.'%')
-				->get();
-			}
-		}
-
-		if($products->count() == 0)
-		{
-			if(!empty($request->per_page_record))
-			{
-				$products = ProductsServicesBook::select('products_services_books.*')
-				->join('users', function ($join) {
-					$join->on('products_services_books.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('products_services_books.type',$dataType)
-				->orderBy('products_services_books.created_at','desc')
-				->with('coverImage','addressDetail')
-				->join('category_masters', function ($join) {
-					$join->on('products_services_books.sub_category_slug', '=', 'category_masters.slug');
-				})
-				->where('category_masters.title','like', '%'.$request->search.'%')
-				->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-			}
-			else
-			{
-				$products = ProductsServicesBook::select('products_services_books.*')
-				->join('users', function ($join) {
-					$join->on('products_services_books.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('products_services_books.type',$dataType)
-				->orderBy('products_services_books.created_at','desc')
-				->with('coverImage','addressDetail')
-				->join('category_masters', function ($join) {
-					$join->on('products_services_books.sub_category_slug', '=', 'category_masters.slug');
-				})
-				->where('category_masters.title','like', '%'.$request->search.'%')
-				->get();
-			}
-		}
-
-		if($products->count() == 0)
-		{
-			if(!empty($request->per_page_record))
-			{
-				$products = ProductsServicesBook::select('products_services_books.*')
-				->join('users', function ($join) {
-					$join->on('products_services_books.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('products_services_books.type',$dataType)
-				->orderBy('products_services_books.created_at','desc')
-				->with('coverImage','addressDetail')
-				->join('product_tags', function ($join) {
-					$join->on('products_services_books.id', '=', 'product_tags.products_services_book_id');
-				})
-				->where('product_tags.title', 'LIKE', '%'.$request->search.'%')
-				->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-			}
-			else
-			{
-				$products = ProductsServicesBook::select('products_services_books.*')
-				->join('users', function ($join) {
-					$join->on('products_services_books.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('products_services_books.type',$dataType)
-				->orderBy('products_services_books.created_at','desc')
-				->with('coverImage','addressDetail')
-				->join('product_tags', function ($join) {
-					$join->on('products_services_books.id', '=', 'product_tags.products_services_book_id');
-				})
-				->where('product_tags.title', 'LIKE', '%'.$request->search.'%')
-				->get();
-			}
-		}
-
-		if($products->count() == 0)
-		{
-			if(!empty($request->per_page_record))
-			{
-				$products = ProductsServicesBook::select('products_services_books.*')
-				->join('users', function ($join) {
-					$join->on('products_services_books.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('products_services_books.type',$dataType)
-				->orderBy('products_services_books.created_at','desc')
-				->with('coverImage','addressDetail')
-				->where('gtin_isbn','like', '%'.$request->search.'%')
-				->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-			}
-			else
-			{
-				$products = ProductsServicesBook::select('products_services_books.*')
-				->join('users', function ($join) {
-					$join->on('products_services_books.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('products_services_books.type',$dataType)
-				->orderBy('products_services_books.created_at','desc')
-				->with('coverImage','addressDetail')
-				->where('gtin_isbn','like', '%'.$request->search.'%')
-				->get();
-			}
-		}
-		return response()->json(prepareResult(false, $products, getLangByLabelGroups('messages','message_products_services_book_list')), config('http_response.success'));
+		
+		return response()->json(prepareResult(false, $res, getLangByLabelGroups('messages','message_products_services_book_list')), config('http_response.success'));
 	}
 
 
