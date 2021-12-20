@@ -312,11 +312,13 @@ class SearchController extends Controller
 				$dataOf = '3';
 			}
 		}
-		if(!empty($request->per_page_record))
-		{
-			$contests = Contest::select('contests.*')
+
+		$contests = Contest::select('contests.*')
 			->join('users', function ($join) {
 				$join->on('contests.user_id', '=', 'users.id');
+			})
+			->join('category_masters', function ($join) {
+				$join->on('contests.category_master_id', '=', 'category_masters.id');
 			})
 			->where('users.user_type_id',$dataOf)
 			->where('contests.type',$dataType)
@@ -331,104 +333,22 @@ class SearchController extends Controller
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
-            }])
-			->where('contests.title','like', '%'.$request->search.'%')
-			->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+            }]);
+
+
+		if(!empty($request->search))
+		{
+			$contests->where('contests.title','like', '%'.$request->search.'%')
+			->orWhere('category_masters.title','like', '%'.$request->search.'%');
+		}
+
+		if(!empty($request->per_page_record))
+		{
+			$contests->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 		}
 		else
 		{
-			$contests = Contest::select('contests.*')
-			->join('users', function ($join) {
-				$join->on('contests.user_id', '=', 'users.id');
-			})
-			->where('users.user_type_id',$dataOf)
-			->where('contests.type',$dataType)
-			->orderBy('contests.created_at','desc')
-			->with('categoryMaster','subCategory')
-			->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                $q->select('id','category_master_id','title','slug')
-                    ->where('language_id', $lang_id)
-                    ->where('is_parent', '1');
-            }])
-            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                $q->select('id','category_master_id','title','slug')
-                    ->where('language_id', $lang_id)
-                    ->where('is_parent', '0');
-            }])
-			->where('contests.title','like', '%'.$request->search.'%')
-			->get();
-		}
-
-		if($contests->count() == 0)
-		{
-			if(!empty($request->per_page_record))
-			{
-				$contests = Contest::select('contests.*')
-				->join('users', function ($join) {
-					$join->on('contests.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('contests.type',$dataType)
-				->orderBy('contests.created_at','desc')
-				->with('categoryMaster','subCategory')
-				->join('category_masters', function ($join) {
-					$join->on('contests.category_master_id', '=', 'category_masters.id');
-				})
-				->where('category_masters.title','like', '%'.$request->search.'%')
-				->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-			}
-			else
-			{
-				$contests = Contest::select('contests.*')
-				->join('users', function ($join) {
-					$join->on('contests.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('contests.type',$dataType)
-				->orderBy('contests.created_at','desc')
-				->with('categoryMaster','subCategory')
-				->join('category_masters', function ($join) {
-					$join->on('contests.category_master_id', '=', 'category_masters.id');
-				})
-				->where('category_masters.title','like', '%'.$request->search.'%')
-				->get();
-			}
-		}
-
-		if($contests->count() == 0)
-		{
-			if(!empty($request->per_page_record))
-			{
-				$contests = Contest::select('contests.*')
-				->join('users', function ($join) {
-					$join->on('contests.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('contests.type',$dataType)
-				->orderBy('contests.created_at','desc')
-				->with('categoryMaster','subCategory')
-				->join('category_masters', function ($join) {
-					$join->on('contests.sub_category_slug', '=', 'category_masters.slug');
-				})
-				->where('category_masters.title','like', '%'.$request->search.'%')
-				->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-			}
-			else
-			{
-				$contests = Contest::select('contests.*')
-				->join('users', function ($join) {
-					$join->on('contests.user_id', '=', 'users.id');
-				})
-				->where('users.user_type_id',$dataOf)
-				->where('contests.type',$dataType)
-				->orderBy('contests.created_at','desc')
-				->with('categoryMaster','subCategory')
-				->join('category_masters', function ($join) {
-					$join->on('contests.sub_category_slug', '=', 'category_masters.slug');
-				})
-				->where('category_masters.title','like', '%'.$request->search.'%')
-				->get();
-			}
+			$contests->get();
 		}
 		return response()->json(prepareResult(false, $contests, getLangByLabelGroups('messages','message_jobs_list')), config('http_response.success'));
 	}
