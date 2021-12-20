@@ -52,7 +52,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('contest:expire')->dailyAt('00:01');
+        $schedule->command('contest:expire')->dailyAt('00:30');
         $schedule->command('contests:onHold')->dailyAt('23:59');
         $schedule->command('contests:start')->dailyAt('00:01');
 
