@@ -323,6 +323,9 @@ class SearchController extends Controller
 			->where('users.user_type_id',$user_type)
 			->where('contests.type',$type)
 			->orderBy('contests.created_at','desc')
+			->orderBy('contests.is_published', 1)
+			->orderBy('contests.is_deleted', 0)
+			->orderBy('contests.status', 'verified')
 			->with('categoryMaster','subCategory')
 			->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
