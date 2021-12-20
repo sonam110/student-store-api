@@ -82,84 +82,37 @@ class SearchController extends Controller
 
 	public function jobSearch(Request $request)
 	{
+		$jobs = Job::select('sp_jobs.*')
+			->join('category_masters', function ($join) {
+				$join->on('sp_jobs.category_master_id', '=', 'category_masters.id');
+			})
+			->join('job_tags', function ($join) {
+				$join->on('sp_jobs.id', '=', 'job_tags.job_id');
+			})
+			->where('sp_jobs.is_published', 1)
+			->where('sp_jobs.is_deleted', 0)
+			->where('sp_jobs.job_status', 1)
+			->orderBy('sp_jobs.created_at','desc');
+
+		if(!empty($request->search))
+		{
+			$search = $request->search;
+			$jobs->where(function ($query) use ($search) {
+			    $query->where('jobs.title','like', '%'.$search.'%')
+			          ->orWhere('category_masters.title','like', '%'.$search.'%')
+			          ->orWhere('job_tags.title', 'LIKE', '%'.$search.'%');
+			});
+		}
+
 		if(!empty($request->per_page_record))
 		{
-			$jobs = Job::where('title','like', '%'.$request->search.'%')
-			->orderBy('sp_jobs.created_at','desc')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+			$res = $jobs->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
 		}
 		else
 		{
-			$jobs = Job::where('title','like', '%'.$request->search.'%')
-			->orderBy('sp_jobs.created_at','desc')->get();
+			$res = $jobs->get();
 		}
-			
-
-		if($jobs->count() == 0)
-		{
-			if(!empty($request->per_page_record))
-			{
-				$jobs = Job::select('sp_jobs.*')
-						->join('category_masters', function ($join) {
-							$join->on('sp_jobs.category_master_id', '=', 'category_masters.id');
-						})
-						->where('category_masters.title','like', '%'.$request->search.'%')
-						->orderBy('sp_jobs.created_at','desc')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-			}
-			else
-			{
-				$jobs = Job::select('sp_jobs.*')
-						->join('category_masters', function ($join) {
-							$join->on('sp_jobs.category_master_id', '=', 'category_masters.id');
-						})
-						->where('category_masters.title','like', '%'.$request->search.'%')
-						->orderBy('sp_jobs.created_at','desc')->get();
-			}
-		}
-
-		if($jobs->count() == 0)
-		{
-			if(!empty($request->per_page_record))
-			{
-				$jobs = Job::select('sp_jobs.*')
-							->join('category_masters', function ($join) {
-								$join->on('sp_jobs.sub_category_slug', '=', 'category_masters.slug');
-							})
-							->where('category_masters.title','like', '%'.$request->search.'%')
-							->orderBy('sp_jobs.created_at','desc')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-			}
-			else
-			{
-				$jobs = Job::select('sp_jobs.*')
-							->join('category_masters', function ($join) {
-								$join->on('sp_jobs.sub_category_slug', '=', 'category_masters.slug');
-							})
-							->where('category_masters.title','like', '%'.$request->search.'%')
-							->orderBy('sp_jobs.created_at','desc')->get();
-			}
-		}
-
-		if($jobs->count() == 0)
-		{
-			if(!empty($request->per_page_record))
-			{
-				$jobs = Job::select('sp_jobs.*')
-							->join('job_tags', function ($join) {
-								$join->on('sp_jobs.id', '=', 'job_tags.job_id');
-							})
-							->where('job_tags.title', 'LIKE', '%'.$request->search.'%')
-							->orderBy('sp_jobs.created_at','desc')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-			}
-			else
-			{
-				$jobs = Job::select('sp_jobs.*')
-							->join('job_tags', function ($join) {
-								$join->on('sp_jobs.id', '=', 'job_tags.job_id');
-							})
-							->where('job_tags.title', 'LIKE', '%'.$request->search.'%')
-							->orderBy('sp_jobs.created_at','desc')->get();
-			}
-		}
-		return response()->json(prepareResult(false, $jobs, getLangByLabelGroups('messages','message_jobs_list')), config('http_response.success'));
+		return response()->json(prepareResult(false, $res, getLangByLabelGroups('messages','message_jobs_list')), config('http_response.success'));
 	}
 
 	public function contestSearch(Request $request)
