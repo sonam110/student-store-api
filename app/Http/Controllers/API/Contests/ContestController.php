@@ -730,6 +730,15 @@ class ContestController extends Controller
             }
             elseif($searchType=='filter')
             {
+                if(!empty($request->available_for))
+                {
+                    $contests->where('contests.available_for', $request->available_for)
+                      ->orWhere('contests.available_for', 'all')
+                      ->orWhereNull('contests.available_for');
+
+                    $contests->where('available_for', $request->available_for);
+                }
+
                 if(!empty($request->category_master_id))
                 {
                     $contests->where('category_master_id',$request->category_master_id);
