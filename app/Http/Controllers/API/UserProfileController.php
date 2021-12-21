@@ -413,15 +413,18 @@ class UserProfileController extends Controller
 		    return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
 		}
 
-		$cvsViewLog = CvsViewLog::where('user_id',Auth::id())->where('user_cv_detail_id',$user_cv_detail_id)->where('user_package_subscription_id',$user_package->id)->where('valid_till','<=',$user_package->package_valid_till)->count();
+		/*$cvsViewLog = CvsViewLog::where('user_id', Auth::id())
+			->where('user_cv_detail_id',$user_cv_detail_id)
+			->where('user_package_subscription_id',$user_package->id)
+			->where('valid_till','<=',$user_package->package_valid_till)
+			->count();*/
 
-		if($cvsViewLog <= 0)
+		if($user_package->cvs_view>0)
 		{
 			if($user_package->cvs_view == $user_package->used_cvs_view)
 			{
 			    return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
 			}
-
 			$cvsViewLog = new CvsViewLog;
 			$cvsViewLog->user_id 						= Auth::id();
 			$cvsViewLog->user_cv_detail_id 				= $user_cv_detail_id;
@@ -431,7 +434,6 @@ class UserProfileController extends Controller
 
 			$user_package->update(['used_cvs_view'=>($user_package->used_cvs_view + 1)]);
 		}
-
 		$user = Auth::user();
 		if($user)
 		{
