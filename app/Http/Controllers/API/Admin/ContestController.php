@@ -15,6 +15,7 @@ use App\Models\ContestCancellationRange;
 use App\Models\UserPackageSubscription;
 use App\Models\ContestTag;
 use App\Models\Language;
+use App\Models\NotificationTemplate;
 
 class ContestController extends Controller
 {
@@ -213,19 +214,10 @@ class ContestController extends Controller
             if(!empty($request->educational_institition))
             {
                $users = $users->join('student_details', function ($join) {
-                                    $join->on('users.id', '=', 'student_details.user_id');
-                                })
-                              ->where('student_details.institute_name',$request->educational_institition);           
+                        $join->on('users.id', '=', 'student_details.user_id');
+                    })
+                  ->where('student_details.institute_name',$request->educational_institition);           
            }
-
-            $users = $users->get();
-            $title = 'New Contest Posted';
-            $body =  'New Contest '.$contest->title.' Posted.';
-            $type = 'Contest Posted';
-            pushMultipleNotification($title,$body,$users,$type,true,'buyer','contest',$contest->id,'landing_screen');
-
-            // Notification End
-            
             
             DB::commit();
             $lang_id = $this->lang_id;
@@ -523,9 +515,30 @@ class ContestController extends Controller
                     $contest->reason_for_rejection = $request->reason_for_rejection;
                     $contest->reason_id_for_rejection = $request->reason_id_for_rejection;
                 }
+
+                if($request->status == 'verified' && $contest->is_published==1)
+                {
+                    $users = $users->get();
+                    foreach ($users as $key => $user) 
+                    {
+                        $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->where('language_id',$user->language_id)->first();
+                        if(empty($notificationTemplate))
+                        {
+                            $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->first();
+                        }
+                        $body = $notificationTemplate->body;
+                        $arrayVal = [
+                            '{{contest_title}}' => $contest->title,
+                        ];
+                        $title = $notificationTemplate->title;
+                        $body = strReplaceAssoc($arrayVal, $body);
+                        $type = 'Contest Posted';
+                        pushNotification($title,$body,$user,$type,true,'buyer','contest',$contest->id,'landing_screen');
+                    }
+                }
                 
-                $title = 'Contest Status Updated';
-                $body =  'Contest '.$contest->title.' status has been successfully updated.';
+                $title = 'Contest '. $request->status;
+                $body =  'Contest '.$contest->title.' status has been'. $request->status;
                 $contest->save();
 
                 $type = 'Contest Action';

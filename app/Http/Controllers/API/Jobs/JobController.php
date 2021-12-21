@@ -183,16 +183,6 @@ class JobController extends Controller
                         }
                     }
 
-                    if($request->is_published == true)
-                    { 
-                        $users = User::where('user_type_id',2)->get();
-                        $title = 'New Job Posted';
-                        $body =  'New Job '.$job->title.' Posted by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'  '.AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY'));
-                        $type = 'Job Posted';
-                        pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'student-landing');
-                        // event(new JobPostNotification($job->id));
-                    }
-
                     foreach ($request->known_languages as $key => $lang) {
                         if(LangForDDL::where('name', $lang)->count() < 1)
                         {
@@ -360,11 +350,7 @@ class JobController extends Controller
                         $jobTag->save();
                     }
                 }
-                // if($request->is_published == true)
-                // {
-                //     event(new JobPostNotification($job->id));
-                // }
-
+                
                 foreach ($request->known_languages as $key => $lang) {
                     if(LangForDDL::where('name', $lang)->count() < 1)
                     {

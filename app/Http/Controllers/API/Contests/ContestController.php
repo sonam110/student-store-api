@@ -256,38 +256,11 @@ class ContestController extends Controller
                 if(!empty($request->educational_institition))
                 {
                    $users = $users->join('student_details', function ($join) {
-                                        $join->on('users.id', '=', 'student_details.user_id');
-                                    })
-                                  ->where('student_details.institute_name',$request->educational_institition);           
+                        $join->on('users.id', '=', 'student_details.user_id');
+                    })
+                  ->where('student_details.institute_name',$request->educational_institition);           
                }
-
-                $users = $users->get();
-
-                foreach ($users as $key => $user) {
-                    $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->where('language_id',$user->language_id)->first();
-                    if(empty($notificationTemplate))
-                    {
-                        $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->first();
-                    }
-
-                    $body = $notificationTemplate->body;
-
-                    $arrayVal = [
-                        '{{contest_title}}' => $contest->title,
-                    ];
-                    
-
-                    $title = $notificationTemplate->title;
-                    $body = strReplaceAssoc($arrayVal, $body);
-                    $type = 'Contest Posted';
-                    pushNotification($title,$body,$user,$type,true,'buyer','contest',$contest->id,'landing_screen');
-                }
-
-                
-
-                // Notification End
-                
-            // }
+               
             DB::commit();
             $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','addressDetail','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {

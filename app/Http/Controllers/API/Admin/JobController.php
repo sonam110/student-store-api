@@ -192,16 +192,6 @@ class JobController extends Controller
                     }
                 }
 
-                if($request->is_published == true)
-                { 
-                    $users = User::where('user_type_id',2)->get();
-                    $title = 'New Job Posted';
-                    $body =  'New Job '.$job->title.' Posted by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')).'  '.AES256::decrypt(Auth::user()->last_name, env('ENCRYPTION_KEY'));
-                    $type = 'Job Posted';
-                    pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'student-landing');
-                    // event(new JobPostNotification($job->id));
-                }
-
                 foreach ($request->known_languages as $key => $lang) {
                     if(LangForDDL::where('name', $lang)->count() < 1)
                     {
@@ -343,10 +333,6 @@ class JobController extends Controller
                         $jobTag->save();
                     }
                 }
-                // if($request->is_published == true)
-                // {
-                //     event(new JobPostNotification($job->id));
-                // }
 
                 foreach ($request->known_languages as $key => $lang) {
                     if(LangForDDL::where('name', $lang)->count() < 1)
@@ -402,6 +388,14 @@ class JobController extends Controller
                 if($request->job_status == "1")
                 {
                     $status_text = 'Active';
+                    if($getJob->is_published == true)
+                    { 
+                        $users = User::where('user_type_id',2)->get();
+                        $title = 'New Job Posted';
+                        $body =  'New Job '.$job->title.' Posted by '.AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY'));
+                        $type = 'Job Posted';
+                        pushMultipleNotification($title,$body,$users,$type,true,'buyer','job',$job->id,'student-landing');
+                    }
                 }
                 elseif($request->job_status == "2")
                 {
@@ -420,7 +414,7 @@ class JobController extends Controller
 
                 $getJob->job_status = $request->job_status;
 
-                $title = 'Job Status Updated';
+                $title = 'Job '.$status_text;
                 $body =  'Job '.$getJob->title.' status has been successfully updated to '.$status_text.'.';
             }
             if($request->action=='publish') 
