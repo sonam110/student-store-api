@@ -735,8 +735,6 @@ class ContestController extends Controller
                     $contests->where('contests.available_for', $request->available_for)
                       ->orWhere('contests.available_for', 'all')
                       ->orWhereNull('contests.available_for');
-
-                    $contests->where('available_for', $request->available_for);
                 }
 
                 if(!empty($request->category_master_id))
