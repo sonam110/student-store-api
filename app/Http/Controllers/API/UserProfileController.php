@@ -406,7 +406,11 @@ class UserProfileController extends Controller
 
 	public function cvsView($user_cv_detail_id)
 	{
-		$user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module','job')->orderBy('created_at','desc')->first();
+		$user_package = UserPackageSubscription::where('user_id',Auth::id())
+			->where('module','job')
+			->whereDate('package_valid_till','>=', date('Y-m-d'))
+			->orderBy('created_at','desc')
+			->first();
 
 		if(empty($user_package))
 		{
