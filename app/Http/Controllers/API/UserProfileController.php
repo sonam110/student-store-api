@@ -419,21 +419,23 @@ class UserProfileController extends Controller
 			->where('valid_till','<=',$user_package->package_valid_till)
 			->count();*/
 
-		if($user_package->cvs_view>0)
+		if($user_package->cvs_view<1)
 		{
-			if($user_package->cvs_view == $user_package->used_cvs_view)
-			{
-			    return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
-			}
-			$cvsViewLog = new CvsViewLog;
-			$cvsViewLog->user_id 						= Auth::id();
-			$cvsViewLog->user_cv_detail_id 				= $user_cv_detail_id;
-			$cvsViewLog->valid_till 					= $user_package->package_valid_till;
-			$cvsViewLog->user_package_subscription_id 	= $user_package->id;
-			$cvsViewLog->save();
-
-			$user_package->update(['used_cvs_view'=>($user_package->used_cvs_view + 1)]);
+			return response()->json(prepareResult(true, ['CV view is not allowed in the purchased package.'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
 		}
+
+		if($user_package->cvs_view == $user_package->used_cvs_view)
+		{
+		    return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
+		}
+		$cvsViewLog = new CvsViewLog;
+		$cvsViewLog->user_id 						= Auth::id();
+		$cvsViewLog->user_cv_detail_id 				= $user_cv_detail_id;
+		$cvsViewLog->valid_till 					= $user_package->package_valid_till;
+		$cvsViewLog->user_package_subscription_id 	= $user_package->id;
+		$cvsViewLog->save();
+
+		$user_package->update(['used_cvs_view'=>($user_package->used_cvs_view + 1)]);
 		$user = Auth::user();
 		if($user)
 		{
