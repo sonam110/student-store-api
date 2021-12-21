@@ -732,9 +732,12 @@ class ContestController extends Controller
             {
                 if(!empty($request->available_for))
                 {
-                    $contests->where('contests.available_for', $request->available_for)
-                      ->orWhere('contests.available_for', 'all')
-                      ->orWhere('contests.available_for', null);
+                    $available_for = $request->available_for;
+                    $contests->where(function ($query) use ($available_for) {
+                        $query->whereNull('contests.available_for')
+                              ->orWhere('contests.available_for', 'all')
+                              ->orWhere('contests.available_for', $available_for);
+                    });
                 }
 
                 if(!empty($request->category_master_id))
@@ -774,11 +777,6 @@ class ContestController extends Controller
                 if(!empty($request->free_cancellation))
                 {
                     $contests->where('use_cancellation_policy' , 0);
-                }
-
-                if(!empty($request->available_for))
-                {
-                    $contests->where('available_for', $request->available_for);
                 }
 
                 if(!empty($request->search_title))
