@@ -65,7 +65,8 @@ class LanguageController extends Controller
             $language = new Language;
             $language->title               	= $request->title;
             $language->value         		= $request->value;
-            $language->status      			= $request->status;
+            $language->status               = $request->status;
+            $language->direction      		= $request->direction;
             $language->save();
             DB::commit();
             return response()->json(prepareResult(false, new LanguageResource($language), getLangByLabelGroups('messages','message_language_created')), config('http_response.created'));
@@ -112,6 +113,7 @@ class LanguageController extends Controller
             $language->title               	= $request->title;
             $language->value         		= $request->value;
             $language->status      			= $request->status;
+            $language->direction            = $request->direction;
             $language->save();
             DB::commit();
             return response()->json(prepareResult(false, new LanguageResource($language), getLangByLabelGroups('messages','message_language_updated')), config('http_response.success'));

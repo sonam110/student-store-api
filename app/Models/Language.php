@@ -13,5 +13,6 @@ class Language extends Model
         'title',
         'value',
         'status'
+        'direction'
     ];
 }
