@@ -12,7 +12,7 @@ class Language extends Model
     protected $fillable = [
         'title',
         'value',
-        'status'
+        'status',
         'direction'
     ];
 }
