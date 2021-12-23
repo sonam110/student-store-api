@@ -1688,20 +1688,20 @@ class OrderController extends Controller
 		$accessToken = $this->paymentInfo->swish_access_token;
 		if($request->payment_from=='mobile')
 		{
-			$data = [
-			    'transaction' => []
-			];
+			$postData = '{
+			    "transaction": {
+			    }
+			}';
 		}
 		else
 		{
-			$data = [
-			    'transaction' => [
-			    	'msisdn' => $request->msisdn
-			    ]
-			];
+			$postData = '{
+			    "transaction": {
+			        "msisdn": "'.$request->msisdn.'"
+			    }
+			}';
 		}
 		
-		$postData = json_encode($data);
 		$url = env('SWISH_URL').'/'.$request->url;
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
