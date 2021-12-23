@@ -20,6 +20,7 @@ class CreateTempOrdersTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->longText('request_param');
+            $table->string('payment_token')->nullable()->comment('using swish payment');
             $table->timestamps();
         });
     }

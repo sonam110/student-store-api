@@ -1701,7 +1701,7 @@ class OrderController extends Controller
 			    }
 			}';
 		}
-		
+
 		$url = env('SWISH_URL').'/'.$request->url;
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
@@ -2390,6 +2390,7 @@ class OrderController extends Controller
 	        if(curl_errno($curl)>0)
 	        {
 	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+	            TempOrder::find($tempOrderSave->id)->delete();
 	            return response()->json(prepareResult(true, $info, "Error while creating swish direct payment"), config('http_response.internal_server_error'));
 	        }
 	        curl_close($curl);
@@ -2403,6 +2404,15 @@ class OrderController extends Controller
 					'orderItems' => $orderItems
 	        	]
 	        ];
+	        $payment_token = null;
+	        foreach($response as $key => $res)
+	        {
+	        	$paymentID = explode('/', $res->id);
+	        	$payment_token = $paymentID[4];
+	        	break;
+	        }
+	        $tempOrderSave->payment_token = $payment_token;
+	        $tempOrderSave->save();
 	        $returnData = [
 	        	'created' 	=> time(),
 	        	'amount'	=> $total,

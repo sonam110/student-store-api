@@ -9,5 +9,5 @@ class TempOrder extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['auto_id', 'user_id','request_param'];
+    protected $fillable = ['auto_id', 'user_id','request_param','payment_token'];
 }
