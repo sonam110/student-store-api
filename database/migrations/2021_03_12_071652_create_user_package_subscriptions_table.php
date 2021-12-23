@@ -71,6 +71,7 @@ class CreateUserPackageSubscriptionsTable extends Migration
             $table->integer('used_number_of_book')->nullable()->default(0);
             $table->integer('used_number_of_contest')->nullable()->default(0);
             $table->integer('used_number_of_event')->nullable()->default(0);
+            $table->boolean('is_recurring_transaction')->nullable()->default(0);
             $table->timestamps();
         });
     }

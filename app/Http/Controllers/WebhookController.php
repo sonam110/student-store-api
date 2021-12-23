@@ -224,6 +224,7 @@ class WebhookController extends Controller
                 $userPackageSubscription->range_of_age          = $subscribedPackage->range_of_age;
                 $userPackageSubscription->cost_for_each_attendee= $subscribedPackage->cost_for_each_attendee;
                 $userPackageSubscription->top_up_fee            = $subscribedPackage->top_up_fee;
+                $userPackageSubscription->is_recurring_transaction            = 1;
                 $userPackageSubscription->save();
 
                 //Transaction create
