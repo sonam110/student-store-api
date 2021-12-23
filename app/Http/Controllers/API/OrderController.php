@@ -1702,7 +1702,7 @@ class OrderController extends Controller
 			}';
 		}
 
-		$url = env('SWISH_URL').'/'.$request->url;
+		$url = env('SWISH_URL').$request->url;
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
 		  CURLOPT_URL => $url,
@@ -1738,7 +1738,7 @@ class OrderController extends Controller
 	public function getThePaymentStatus(Request $request)
 	{
 		$accessToken = $this->paymentInfo->swish_access_token;
-		$url = env('SWISH_URL').'/'.$request->url;
+		$url = env('SWISH_URL').$request->url;
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
 		  CURLOPT_URL => $url,
