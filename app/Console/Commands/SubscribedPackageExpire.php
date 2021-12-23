@@ -56,8 +56,13 @@ class SubscribedPackageExpire extends Command
         $subscribedPackages = UserPackageSubscription::select('id','package_valid_till','module','user_id','package_id')->whereIn(\DB::raw("DATE(package_valid_till)"),[$sixDays,$fourDays,$twoDays,$toDays])->with('user:id,first_name,last_name')->get();
         foreach($subscribedPackages as $subscribedPackage) {
             $days = $this->dateDiffInDays($toDays, $subscribedPackage->package_valid_till);
+            $remaingDay = $days.' days';
+            if($days==0)
+            {
+                $remaingDay = 'today';
+            }
             $title = 'Subscribed Package Expiring';
-            $body =  'Subscribed Package for '.$subscribedPackage->module.' is expiring in '.$days.' days.';
+            $body =  'Subscribed Package for '.$subscribedPackage->module.' is expiring in '.$remaingDay.'.';
             $user = $subscribedPackage->user;
             $type = 'Package Expire';
             if($subscribedPackage->module == 'product' || $subscribedPackage->module == 'service')
