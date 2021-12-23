@@ -1729,7 +1729,7 @@ class OrderController extends Controller
         $returnData = json_decode($response, true);
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
-        if($response_code==401 || $returnData['status']==403)
+        if($response_code==401 || @$returnData['status']==403)
         {
         	return response()->json(prepareResult(true, 'unauthorized', "Error while creating swish e/m commerce Sale Transaction"), config('http_response.unauthorized'));
         }
