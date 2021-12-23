@@ -1726,13 +1726,14 @@ class OrderController extends Controller
             curl_close($curl);
             return response()->json(prepareResult(true, $info, "Error while creating swish e/m commerce Sale Transaction"), config('http_response.internal_server_error'));
         }
+        $returnData = json_decode($response, true);
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
-        if($response_code==401)
+        if($response_code==401 || $returnData['status']==403)
         {
         	return response()->json(prepareResult(true, 'unauthorized', "Error while creating swish e/m commerce Sale Transaction"), config('http_response.unauthorized'));
         }
-        return response()->json(prepareResult(false, $response, "Checkin done."), config('http_response.success'));
+        return response()->json(prepareResult(false, $returnData, "swish payment response."), config('http_response.success'));
 	}
 
 	public function getThePaymentStatus(Request $request)
@@ -1762,12 +1763,13 @@ class OrderController extends Controller
             return response()->json(prepareResult(true, $info, "Error while getting swish payment status"), config('http_response.internal_server_error'));
         }
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        
         curl_close($curl);
         if($response_code==401)
         {
         	return response()->json(prepareResult(true, 'unauthorized', "Error while getting swish payment status"), config('http_response.unauthorized'));
         }
-        return response()->json(prepareResult(false, $response, "Checkin done."), config('http_response.success'));
+        return response()->json(prepareResult(false, json_encode($response), "Response from swish api"), config('http_response.success'));
 	}
 
 	public function createStripeIntent(Request $request)
