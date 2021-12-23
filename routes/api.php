@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 //Stripe Webhook
 Route::get('/klarna/order-info/{order_id}', [App\Http\Controllers\API\OrderController::class,'getKlarnaOrderInfo']);
 Route::post('/stripe/webhook', [App\Http\Controllers\WebhookController::class,'stripeWebhook']);
+Route::post('/swish-payment-callback', [App\Http\Controllers\SwishController::class,'swishPaymentCallback']);
 
 Route::get('/initial-screen', [App\Http\Controllers\API\LandingPageController::class,'initialScreen']);
 
@@ -245,6 +246,8 @@ Route::group(['middleware' => 'auth:api'],function () {
 
 	//Checkin API
 	Route::post('/checkin-swish', [App\Http\Controllers\API\OrderController::class,'checkinSwish']);
+	Route::post('/create-commerce-sale-transaction', [App\Http\Controllers\API\OrderController::class,'createCommerceSaleTransaction']);
+	Route::post('/get-the-payment-status', [App\Http\Controllers\API\OrderController::class,'getThePaymentStatus']);
 
 	//Swedbankpay capture
 	Route::post('/swedbankpay-capture', [App\Http\Controllers\API\OrderController::class,'swedbankpayCapture']);

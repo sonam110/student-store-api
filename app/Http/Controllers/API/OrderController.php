@@ -1683,6 +1683,93 @@ class OrderController extends Controller
         return response()->json(prepareResult(false, $response, "Checkin done."), config('http_response.success'));
 	}
 
+	public function createCommerceSaleTransaction(Request $request)
+	{
+		$accessToken = $this->paymentInfo->swish_access_token;
+		if($request->payment_from=='mobile')
+		{
+			$data = [
+			    'transaction' => []
+			];
+		}
+		else
+		{
+			$data = [
+			    'transaction' => [
+			    	'msisdn' => $request->msisdn
+			    ]
+			];
+		}
+		
+		$postData = json_encode($data);
+		$url = env('SWISH_URL').'/'.$request->url;
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $url,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'POST',
+		  CURLOPT_POSTFIELDS => $postData,
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer '.$accessToken,
+		    'Content-Type: application/json'
+		  ),
+		));
+		$response = curl_exec($curl);
+		if(curl_errno($curl)>0)
+        {
+            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+            curl_close($curl);
+            return response()->json(prepareResult(true, $info, "Error while creating swish e/m commerce Sale Transaction"), config('http_response.internal_server_error'));
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==401)
+        {
+        	return response()->json(prepareResult(true, 'unauthorized', "Error while creating swish e/m commerce Sale Transaction"), config('http_response.unauthorized'));
+        }
+        return response()->json(prepareResult(false, $response, "Checkin done."), config('http_response.success'));
+	}
+
+	public function getThePaymentStatus(Request $request)
+	{
+		$accessToken = $this->paymentInfo->swish_access_token;
+		$url = env('SWISH_URL').'/'.$request->url;
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $url,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer '.$accessToken,
+		    'Content-Type: application/json'
+		  ),
+		));
+		$response = curl_exec($curl);
+		if(curl_errno($curl)>0)
+        {
+            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+            curl_close($curl);
+            return response()->json(prepareResult(true, $info, "Error while getting swish payment status"), config('http_response.internal_server_error'));
+        }
+        $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($response_code==401)
+        {
+        	return response()->json(prepareResult(true, 'unauthorized', "Error while getting swish payment status"), config('http_response.unauthorized'));
+        }
+        return response()->json(prepareResult(false, $response, "Checkin done."), config('http_response.success'));
+	}
+
 	public function createStripeIntent(Request $request)
 	{
 		$sub_total = 0;
@@ -2214,6 +2301,117 @@ class OrderController extends Controller
 	        	'bambora_response' => $response
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Token successfully created."), config('http_response.success'));
+		} elseif($request->payment_method=='swish_direct_checkout') {
+			$user = User::find(Auth::id());
+			$accessToken = $this->paymentInfo->swish_access_token;
+
+			$checkoutUrl = env('SWISH_URL').'/psp/swish/payments';
+
+			//Temp Order create
+			$tempOrderSave = new TempOrder;
+			$tempOrderSave->user_id = Auth::id();
+			$tempOrderSave->request_param = json_encode($request->all());
+			$tempOrderSave->save();
+
+	      	$temp_order_id = $tempOrderSave->id;
+
+	        $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
+	        $phone = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
+	        $phone_number   = ltrim($phone, '0');
+			$phone_number_with_country_code = ((strlen($phone_number))==9) ? env('COUNTRY_CODE').$phone_number : $phone_number; 
+			$payeeReference = (string) Str::random(30);
+			$receiptReference = (string) Str::random(30);
+			$orderObj = [
+			  'payment' =>  [
+			    'operation' => 'Purchase',
+			    'intent' => 'Sale',
+			    'currency' => 'SEK',
+			    'prices'=> [
+				    [
+				    	'type' => 'Swish',
+    				    'amount' => round($total * 100),
+    				    'vatAmount' => 0
+    				]
+				],
+			    'description' => 'Purchase from Student Store',
+			    'userAgent' => $request->header('User-Agent'),
+			    'language' => 'sv-SE',
+			    'urls' => [
+			      'hostUrls' => [
+			        0 => 'https://studentstore.se/',
+			        1 => 'https://api.studentstore.se/',
+			      ],
+			      'paymentUrl' => 'https://studentstore.se/perform-payment',
+			      'completeUrl' => 'https://studentstore.se/payment-completed',
+			      'cancelUrl' => 'https://studentstore.se/payment-canceled',
+			      'callbackUrl' => 'https://api.studentstore.com/swish-payment-callback',
+			      'logoUrl' => $getAppSetting->logo_path,
+			      'termsOfServiceUrl' => 'https://studentstore.se/page/privacy-policy',
+			    ],
+			    'payeeInfo' =>  [
+			      'payeeId' => env('SWISH_MERCHANT_ID'),
+			      'payeeReference' => $payeeReference,
+			      'payeeName' => $getAppSetting->app_name,
+			      'productCategory' => 'SS-123',
+			      'orderReference' => date('Y-m-d').'-'.$temp_order_id,
+			      'subsite' => 'StudentsStore',
+			    ],
+			    'payer' => [
+			    	'email' => $email,
+			    	'msisdn' => '+'.$phone_number_with_country_code
+			    ],
+			    'prefillInfo' => [
+				    'msisdn' => '+'.$phone_number_with_country_code
+				]
+			  ],
+			  'swish'=> [
+			        'enableEcomOnly' => false
+			    ]
+			];
+
+			$requestJson = json_encode($orderObj);
+			$headers = [
+				'Content-Type: application/json',
+			  	'Authorization: Bearer '.$accessToken,
+			];
+
+			$curl = curl_init();
+
+			curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $requestJson);
+			curl_setopt($curl, CURLOPT_URL, $checkoutUrl);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($curl, CURLOPT_FAILONERROR, false);
+			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+			$rawResponse = curl_exec($curl);
+			$response = json_decode($rawResponse);
+	        if(curl_errno($curl)>0)
+	        {
+	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+	            return response()->json(prepareResult(true, $info, "Error while creating swish direct payment"), config('http_response.internal_server_error'));
+	        }
+	        curl_close($curl);
+	        $forCaptureObj = [
+	        	'transaction' => [
+	        		'description' => 'Swish Direct Purchase Payment',
+	        		'amount'=> round($total * 100),
+					'vatAmount'=> 0,
+					'payeeReference'=> $payeeReference,
+					'receiptReference'=> $receiptReference,
+					'orderItems' => $orderItems
+	        	]
+	        ];
+	        $returnData = [
+	        	'created' 	=> time(),
+	        	'amount'	=> $total,
+	        	'currency'	=> 'SEK',
+	        	'swish_response' => $response,
+	        	'for_capture_obj' => $forCaptureObj,
+	        	'msisdn' => '+'.$phone_number_with_country_code
+	        ];
+	        return response()->json(prepareResult(false, $returnData, "Swish direct payment link successfully created."), config('http_response.success'));
 		} elseif($request->payment_method=='swish_checkout') {
 			$user = User::find(Auth::id());
 			$accessToken = $this->paymentInfo->swish_access_token;
