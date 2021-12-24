@@ -2637,6 +2637,17 @@ class OrderController extends Controller
 		return response()->json(prepareResult(true, 'Temp Order not found.', 'Temp Order not found.'), config('http_response.not_found'));
 	}
 
+	public function getTempOrder($id)
+	{
+		$getTempOrder = TempOrder::where('user_id', Auth::id())->find($id);
+		if($getTempOrder)
+		{
+			$getTempOrder['request_param'] = json_decode($getTempOrder->request_param);
+			return response(prepareResult(false, $getTempOrder, 'Temp Order info'), config('http_response.success'));
+		}
+		return response()->json(prepareResult(true, 'Temp Order not found.', 'Temp Order not found.'), config('http_response.not_found'));
+	}
+
 	public function getKlarnaOrderInfo($klarna_transaction_id)
 	{
 		$url = env('KLARNA_URL').'/ordermanagement/v1/orders/'.$klarna_transaction_id;

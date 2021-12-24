@@ -243,6 +243,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/create-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'createStripeSubscription']);
 	Route::post('/cancel-stripe-subscription', [App\Http\Controllers\API\OrderController::class,'cancelStripeSubscription']);
 	Route::get('/temp-order-delete/{id}', [App\Http\Controllers\API\OrderController::class,'tempOrderDelete']);
+	Route::get('/get-temp-order/{id}', [App\Http\Controllers\API\OrderController::class,'getTempOrder']);
 
 	//Checkin API
 	Route::post('/checkin-swish', [App\Http\Controllers\API\OrderController::class,'checkinSwish']);
