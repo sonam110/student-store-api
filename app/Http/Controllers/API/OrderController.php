@@ -2422,7 +2422,8 @@ class OrderController extends Controller
 	        	'swish_response' => $response,
 	        	'for_capture_obj' => $forCaptureObj,
 	        	'msisdn' => '+'.$phone_number_with_country_code,
-	        	'payment_token' => $payment_token
+	        	'payment_token' => $payment_token,
+	        	'temp_order_id' => $tempOrderSave->id
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Swish direct payment link successfully created."), config('http_response.success'));
 		} elseif($request->payment_method=='swish_checkout') {
