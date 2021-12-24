@@ -1769,7 +1769,7 @@ class OrderController extends Controller
         {
         	return response()->json(prepareResult(true, 'unauthorized', "Error while getting swish payment status"), config('http_response.unauthorized'));
         }
-        return response()->json(prepareResult(false, json_encode($response), "Response from swish api"), config('http_response.success'));
+        return response()->json(prepareResult(false, $response, "Response from swish api"), config('http_response.success'));
 	}
 
 	public function createStripeIntent(Request $request)
