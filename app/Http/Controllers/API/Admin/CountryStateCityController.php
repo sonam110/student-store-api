@@ -15,7 +15,15 @@ class CountryStateCityController extends Controller
         $getCountry = Country::where('status', '1');
         if($request->only_sweden == true)
         {
-            $getCountry = $getCountry->where('name','Sweden')->get();
+            $getCountry->where('name','Sweden');
+        }
+        elseif($request->only_saudi == true)
+        {
+            $getCountry->where('name','Saudi Arabia');
+        }
+        elseif($request->only_turkey == true)
+        {
+            $getCountry->where('name','Turkey');
         }
         if(!empty($request->per_page_record))
         {
