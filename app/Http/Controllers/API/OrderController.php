@@ -2407,7 +2407,7 @@ class OrderController extends Controller
 	        	]
 	        ];
 	        $payment_token = null;
-	        foreach($response as $key => $res)
+	        foreach(@$response as $key => $res)
 	        {
 	        	$paymentID = explode('/', $res->id);
 	        	$payment_token = $paymentID[4];
