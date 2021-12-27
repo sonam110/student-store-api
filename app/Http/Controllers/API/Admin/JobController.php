@@ -269,9 +269,9 @@ class JobController extends Controller
         { 
             if(JobApplication::where('job_id', $job->id)->count()>0)
             {
-                return response()->json(prepareResult(true, 'You cannot edit this job because this job have some applicants.', getLangByLabelGroups('messages','message_validation')), config('http_response.internal_server_error'));
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','job_applicants_exist')), config('http_response.internal_server_error'));
             }
-            
+
             //delete tags before update
             JobTag::where('job_id', $job->id)->delete();
 
