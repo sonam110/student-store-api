@@ -43,8 +43,8 @@ class JobExpire extends Command
             $job->update(['job_status' => '3']);
             // Notification Start
 
-            $title = 'Job Status update';
-            $body =  'Status for Job '.$job->title.' is updated to expired.';
+            $title = 'Job Expired';
+            $body =  'Status for Job '.$job->title.' is expired now.';
             $user = $job->user;
             $type = 'Job Expired';
             pushNotification($title,$body,$user,$type,true,'seller','job',$job->id,'posted-jobs');
