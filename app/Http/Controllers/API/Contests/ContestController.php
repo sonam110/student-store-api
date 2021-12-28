@@ -582,16 +582,18 @@ class ContestController extends Controller
                         $refundOrderItemPrice = $orderedItem->price_after_apply_reward_points;
                         $refundOrderItemQuantity = $orderedItem->quantity;
                         $refundOrderItemReason = 'cancellation';
-                        $isRefunded = 'success';
-                        if($refundOrderItemPrice>0)
-                        {
-                            $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
-                        }
+
+                        $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+
                         if($isRefunded=='failed')
                         {
                             return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
                         }
+
                         $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+                        $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
+
+
                         $orderedItem->save();
                     }
 

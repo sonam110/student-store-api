@@ -237,7 +237,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	$orderId = $orderItem->order->id;
 	$transaction = $orderItem->order->transaction;
 	$refund_id = time().'-SYS-GEN';
-	if(!empty($transaction->transaction_id))
+	if(!empty($transaction->transaction_id) && $refundOrderItemPrice > 0)
 	{
 		if($transaction->gateway_detail=='stripe' && \Str::lower($transaction->transaction_status)=='succeeded')
 		{

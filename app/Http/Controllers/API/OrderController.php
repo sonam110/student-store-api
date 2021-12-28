@@ -1185,12 +1185,12 @@ class OrderController extends Controller
 			$refundOrderItemQuantity = $orderItem->quantity;
 			$refundOrderItemReason = 'cancellation';
 
-			$isRefunded = 'success';
-			if($refundOrderItemPrice>0)
-			{
-				$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
-			}
+			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+
 			$orderItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+			$orderItem->returned_rewards = ceil($orderItem->used_item_reward_points / $refundOrderItemQuantity);
+
+
 			if($isRefunded=='failed')
 			{
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
@@ -1213,12 +1213,12 @@ class OrderController extends Controller
 			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
 			$refundOrderItemQuantity = $orderItemReturn->quantity;
 			$refundOrderItemReason = 'return';
-			$isRefunded = 'success';
-			if($refundOrderItemPrice>0)
-			{
-				$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
-			}
 			
+			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+			
+			$orderItem->amount_returned = $refundOrderItemPrice * $refundOrderItemQuantity;
+			$orderItem->returned_rewards = ceil($orderItem->used_item_reward_points / $refundOrderItemQuantity);
+
 			if($isRefunded=='failed')
 			{
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
@@ -1228,6 +1228,9 @@ class OrderController extends Controller
 			$type = 'return';			
 			$orderItemReturn->date_of_return_completed      = date('Y-m-d');
 			$orderItemReturn->return_status                 = $request->item_status;
+
+
+
 			$orderItemReturn->save();
 			
 			$title = 'Return Request Accepted';
