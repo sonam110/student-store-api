@@ -518,23 +518,23 @@ class ContestController extends Controller
 
                 if($request->status == 'verified' && $contest->is_published==1)
                 {
-                    $users = $users->get();
-                    foreach ($users as $key => $user) 
-                    {
-                        $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->where('language_id',$user->language_id)->first();
-                        if(empty($notificationTemplate))
-                        {
-                            $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->first();
-                        }
-                        $body = $notificationTemplate->body;
-                        $arrayVal = [
-                            '{{contest_title}}' => $contest->title,
-                        ];
-                        $title = $notificationTemplate->title;
-                        $body = strReplaceAssoc($arrayVal, $body);
-                        $type = 'Contest Posted';
-                        pushNotification($title,$body,$user,$type,true,'buyer','contest',$contest->id,'landing_screen');
-                    }
+                    // $users = $users->get();
+                    // foreach ($users as $key => $user) 
+                    // {
+                    //     $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->where('language_id',$user->language_id)->first();
+                    //     if(empty($notificationTemplate))
+                    //     {
+                    //         $notificationTemplate = NotificationTemplate::where('template_for','new_contest_posted')->first();
+                    //     }
+                    //     $body = $notificationTemplate->body;
+                    //     $arrayVal = [
+                    //         '{{contest_title}}' => $contest->title,
+                    //     ];
+                    //     $title = $notificationTemplate->title;
+                    //     $body = strReplaceAssoc($arrayVal, $body);
+                    //     $type = 'Contest Posted';
+                    //     pushNotification($title,$body,$user,$type,true,'buyer','contest',$contest->id,'landing_screen');
+                    // }
                 }
                 
                 $title = 'Contest '. $request->status;
