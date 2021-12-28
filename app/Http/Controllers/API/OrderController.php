@@ -1300,7 +1300,7 @@ class OrderController extends Controller
 		$orderItem->reason_id_for_cancellation_request_decline 	= $reason_id_for_cancellation_request_decline;
 		$orderItem->reason_for_cancellation_request_decline 	= $reason_for_cancellation_request_decline;
 		$orderItem->is_returned 								= $is_returned;
-		$orderItem->amount_returned  							= $amount_returned;
+		//$orderItem->amount_returned  							= $amount_returned;
 		$orderItem->is_replaced 								= $is_replaced;
 		$orderItem->is_disputed 								= $is_disputed;
 		$orderItem->save();
