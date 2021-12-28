@@ -1184,7 +1184,12 @@ class OrderController extends Controller
 			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
 			$refundOrderItemQuantity = $orderItem->quantity;
 			$refundOrderItemReason = 'cancellation';
-			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+
+			$isRefunded = 'success';
+			if($refundOrderItemPrice>0)
+			{
+				$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+			}
 			$orderItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
 			if($isRefunded=='failed')
 			{
@@ -1208,7 +1213,12 @@ class OrderController extends Controller
 			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
 			$refundOrderItemQuantity = $orderItemReturn->quantity;
 			$refundOrderItemReason = 'return';
-			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+			$isRefunded = 'success';
+			if($refundOrderItemPrice>0)
+			{
+				$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+			}
+			
 			if($isRefunded=='failed')
 			{
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));

@@ -215,7 +215,11 @@ class ContestApplicationController extends Controller
 								$refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
 								$refundOrderItemQuantity = $orderedItem->quantity;
 								$refundOrderItemReason = 'cancellation';
-								$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+								$isRefunded = 'success';
+								if($refundOrderItemPrice>0)
+								{
+									$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+								}
 
 								if($isRefunded=='failed')
 								{
@@ -287,7 +291,11 @@ class ContestApplicationController extends Controller
 									$refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
 									$refundOrderItemQuantity = $orderedItem->quantity;
 									$refundOrderItemReason = 'cancellation';
-									$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+									$isRefunded = 'success';
+									if($refundOrderItemPrice>0)
+									{
+										$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+									}
 									if($isRefunded=='failed')
 									{
 										return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
