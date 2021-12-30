@@ -46,7 +46,7 @@ class ContestExpire extends Command
             $contest->update(['status' => 'expired']);
             // Notification Start
 
-            $title = 'Contest Status update';
+            $title = 'Contest expired';
             $body =  'Status for Contest '.$contest->title.' is updated to expired.';
             $user = $contest->user;
             $type = 'Contest Expired';
@@ -68,10 +68,10 @@ class ContestExpire extends Command
             
             // Notification Start
 
-            $title = 'Contest Status update';
+            $title = 'Contest completed';
             $body =  'Status for Contest '.$contest->title.' is updated to completed.';
             $user = $contest->user;
-            $type = 'Contest Expired';
+            $type = 'Contest completed';
             pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
         }
     }

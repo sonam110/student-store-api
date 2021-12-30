@@ -43,7 +43,6 @@ class ContestStart extends Command
           foreach($contests as $contest) {
             if($contest->contestApplications->count() > 0){
                 $start_date = new DateTime($contest->start_date);
-                // $start_date = date('Y-m-d',strtotime($contest->start_date));
                 $diffInDays = ($start_date->diff(\Carbon\Carbon::now())->days) + 1;
                 $title = $diffInDays.' days left for contest';
                 $body =  $contest->title.' will start in '.$diffInDays.' days.';

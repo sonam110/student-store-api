@@ -366,7 +366,7 @@ class OrderController extends Controller
 						$student_store_commission = ($forSSandCCWithoutVat * (($commission) / 100));
 
 						//Finally amount transferred to vendor
-						$amount_transferred_to_vendor = ($sellingPrice - ($cool_company_commission_amount + $student_store_commission))
+						$amount_transferred_to_vendor = ($sellingPrice - ($cool_company_commission_amount + $student_store_commission));
 					}
 					else
 					{
@@ -2411,6 +2411,12 @@ class OrderController extends Controller
 	        	]
 	        ];
 	        $payment_token = null;
+	        if($response==null)
+	        {
+	        	TempOrder::find($tempOrderSave->id)->delete();
+	            return response()->json(prepareResult(true, $response, "Error while creating Swish Direct Purchase Payment"), config('http_response.internal_server_error'));
+	        }
+
 	        foreach(@$response as $key => $res)
 	        {
 	        	$paymentID = explode('/', $res->id);

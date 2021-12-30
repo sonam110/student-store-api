@@ -38,15 +38,15 @@ class ContestOnHold extends Command
      */
     public function handle()
     {
-        $contests = Contest::where('application_end_date',date('Y-m-d'))->get();
+        $contests = Contest::where('application_end_date', date('Y-m-d'))->get();
           foreach($contests as $contest) {
-            if($contest->contestApplications->count() < $contest->min_participants){
+            if($contest->contestApplications->count() < $contest->min_participants) {
 
                 $contest->update(['status' => 'hold']);
                 // Notification Start
 
-                $title = 'Contest Status update';
-                $body =  'Status for Contest '.$contest->title.' is updated to on hold because minimum participants didnt came. Edit your contest or refund the applicants.';
+                $title = 'Contest on hold';
+                $body =  'Status for Contest '.$contest->title.' is updated to on hold because minimum participants didn\'t came. Edit your contest or refund the applicants.';
                 $user = $contest->user;
                 $type = 'Contest On Hold';
                 pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');

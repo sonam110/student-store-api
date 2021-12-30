@@ -27,6 +27,7 @@ class AutoSwichPackageIfExpired extends Command
         $subscribedPackages = UserPackageSubscription::select('id','package_valid_till','module','user_id','package_id')
             ->where('subscription_status', 1)
             ->whereDate('package_valid_till', '<', date('Y-m-d'))
+            ->orderBy('created_at', 'DESC')
             ->get();
         foreach($subscribedPackages as $key => $package)
         {
