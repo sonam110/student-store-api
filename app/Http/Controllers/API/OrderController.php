@@ -366,7 +366,7 @@ class OrderController extends Controller
 						$student_store_commission = ($forSSandCCWithoutVat * (($commission) / 100));
 
 						//Finally amount transferred to vendor
-						$amount_transferred_to_vendor = ($sellingPrice - ($cool_company_commission_amount + $student_store_commission));
+						$amount_transferred_to_vendor = (($sellingPrice - ($cool_company_commission_amount + $student_store_commission)) - $reward_points_value);
 					}
 					else
 					{
