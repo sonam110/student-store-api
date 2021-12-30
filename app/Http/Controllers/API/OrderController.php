@@ -246,29 +246,23 @@ class OrderController extends Controller
 						$vat_percent = $productsServicesBook->categoryMaster->vat;
 						if($productsServicesBook->is_on_offer == 1)
 						{
-							$price = $productsServicesBook->discounted_price;
-
-							if($productsServicesBook->discount_type == 1)
-							{
-								$discount_amount = $productsServicesBook->basic_price_wo_vat * $productsServicesBook->discount_value / 100;
-							}
-							else
-							{
-								$discount_amount = $productsServicesBook->discount_value;
-							} 
-
-							$vendor_price = $productsServicesBook->basic_price_wo_vat - $discount_amount;
+							$sellingPrice = $productsServicesBook->discounted_price;
 						}
 						else
 						{
-							$price = $productsServicesBook->price;
-							$vendor_price = $productsServicesBook->basic_price_wo_vat;
+							$sellingPrice = $productsServicesBook->price;
 						}
+						$spWithoutVat = $sellingPrice - (($sellingPrice * $vat_percent) / 100);
+
 						$title = $productsServicesBook->title;
 
 						if($productsServicesBook->delivery_type == 'deliver_to_location')
 						{
-							$shipping_package = ShippingCondition::where('user_id',$productsServicesBook->user_id)->where('order_amount_from','<=', $price*$orderedItem['quantity'])->where('order_amount_to','>=',$price*$orderedItem['quantity'])->orderBy('created_at','desc')->first();
+							$shipping_package = ShippingCondition::where('user_id',$productsServicesBook->user_id)
+							->where('order_amount_from','<=', $price*$orderedItem['quantity'])
+							->where('order_amount_to','>=',$price*$orderedItem['quantity'])
+							->orderBy('created_at','desc')
+							->first();
 							if($shipping_package)
 							{
 								$shipping_charge = $shipping_charge + ($productsServicesBook->shipping_charge * $orderedItem['quantity']) * (100 - $shipping_package->discount_percent) / 100;
@@ -300,23 +294,14 @@ class OrderController extends Controller
 						$vat_percent = $productsServicesBook->categoryMaster->vat;
 						if($productsServicesBook->is_on_offer == 1)
 						{
-							$price = $productsServicesBook->discounted_price;
-							if($productsServicesBook->discount_type == 1)
-							{
-								$discount_amount = $productsServicesBook->basic_price_wo_vat * $productsServicesBook->discount_value / 100;
-							}
-							else
-							{
-								$discount_amount = $productsServicesBook->discount_value;
-							} 
-							
-							$vendor_price = $productsServicesBook->basic_price_wo_vat - $discount_amount;
+							$sellingPrice = $productsServicesBook->discounted_price;
 						}
 						else
 						{
-							$price = $productsServicesBook->subscription_fees;
-							$vendor_price = $productsServicesBook->basic_price_wo_vat;
+							$sellingPrice = $productsServicesBook->subscription_fees;
 						}
+						$spWithoutVat = $sellingPrice - (($sellingPrice * $vat_percent) / 100);
+
 						$title = $productsServicesBook->title;
 
 						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module','contest')->orderBy('created_at','desc')->first();
@@ -327,14 +312,15 @@ class OrderController extends Controller
 						$vat_percent = '0';
 						if($productsServicesBook->price == 0)
 						{
-							$price = $productsServicesBook->subscription;
-							$vendor_price = $price;
+							$sellingPrice = $productsServicesBook->subscription;
 						}
 						else
 						{
-							$price = $productsServicesBook->price;
-							$vendor_price = $price;
+							$sellingPrice = $productsServicesBook->price;
 						}
+
+						$spWithoutVat = $sellingPrice - (($sellingPrice * $vat_percent) / 100);
+
 						$title = $productsServicesBook->type_of_package;
 						$user_package = UserPackageSubscription::where('user_id',null)->first();
 					}
@@ -351,36 +337,40 @@ class OrderController extends Controller
 						$earned_reward_points = '0';
 					}
 
-					if($user_package)
-					{
+					if($user_package) {
 						$commission = $user_package->commission_per_sale;
-					}
-					else
-					{
+					} else {
 						$commission = 0;
 					}
 
 					$reward_points_value = $getAppSetting->single_rewards_pt_value * $earned_reward_points;
-					if($request->order_for!='packages')
-					{
-						$amount_transferred_to_vendor = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * (100 - $commission) / 100;
-						$student_store_commission = (($vendor_price * $orderedItem['quantity']) - $reward_points_value) * ($commission) / 100;
-					}
-					else
-					{
-						$amount_transferred_to_vendor = 0;
-						$student_store_commission = $request->grand_total;
-					}
 
-					$cool_company_commission = 0;
+					//Distribution
+					$student_store_commission = 0;
+					$cool_company_commission_amount = 0;
 					$coolCompanyCommission = 0;
+					$amount_transferred_to_vendor = 0;
+
+					$forSSandCCWithoutVat = (($spWithoutVat * $orderedItem['quantity']) - $reward_points_value);
 
 					//cool company commission for student
 					if(($productsServicesBook->user) && ($productsServicesBook->user->user_type_id == 2))
 					{
 						$coolCompanyCommission = $getAppSetting->coolCompanyCommission;
-						$cool_company_commission = $amount_transferred_to_vendor * ($coolCompanyCommission)/100;
-						$amount_transferred_to_vendor = $amount_transferred_to_vendor * (100 - $coolCompanyCommission)/100;
+						$cool_company_commission_amount = ($forSSandCCWithoutVat * ($coolCompanyCommission)/100);
+					}
+
+					if($request->order_for!='packages')
+					{
+						//StudentStore Commission 
+						$student_store_commission = ($forSSandCCWithoutVat * (($commission) / 100));
+
+						//Finally amount transferred to vendor
+						$amount_transferred_to_vendor = ($sellingPrice - ($cool_company_commission_amount + $student_store_commission))
+					}
+					else
+					{
+						$student_store_commission = $request->grand_total;
 					}
 
 					if($productsServicesBook->discount_type == 1)
@@ -392,16 +382,16 @@ class OrderController extends Controller
 						$discount = $productsServicesBook->discount_value;
 					} 
 
-					$sub_total = $sub_total + ($price * $orderedItem['quantity']);
+					$sub_total = $sub_total + ($sellingPrice * $orderedItem['quantity']);
 
 					$orderItem = new OrderItem;
 					$orderItem->user_id							= Auth::id();
 					$orderItem->order_id						= $order->id;
 					if(!empty($orderedItem['product_id']))
 					{
-						$orderItem->products_services_book_id		= $orderedItem['product_id'];
-						$orderItem->product_type					= $productsServicesBook->type;
-						$orderItem->note_to_seller                   = $orderedItem['note_to_seller'];
+						$orderItem->products_services_book_id = $orderedItem['product_id'];
+						$orderItem->product_type = $productsServicesBook->type;
+						$orderItem->note_to_seller = $orderedItem['note_to_seller'];
 
 						$checkItemType = ProductsServicesBook::select('type','user_id')->find($orderedItem['product_id']);
 						$vendor_user_id = $checkItemType->user_id;
@@ -436,24 +426,24 @@ class OrderController extends Controller
 						$orderItem->attribute_data					= json_encode(@$orderedItem['attribute_data']);
 					}
 					
-					$orderItem->price                           = $price;
+					$orderItem->price = $sellingPrice;
 					$orderItem->used_item_reward_points 				= $orderedItem['used_item_reward_points'];
-					$orderItem->price_after_apply_reward_points = ((($price * $orderedItem['quantity']) - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value)) / $orderedItem['quantity']);
-					$orderItem->earned_reward_points            = $earned_reward_points;
-					$orderItem->quantity						= $orderedItem['quantity'];
-					$orderItem->discount						= $discount;
-					$orderItem->cover_image                     = $orderedItem['cover_image'];
-					$orderItem->sell_type						= $productsServicesBook->sell_type;
-					$orderItem->rent_duration					= $productsServicesBook->rent_duration;
-					$orderItem->item_status						= $request->order_status;
-					$orderItem->item_payment_status				= true;
-					$orderItem->amount_transferred_to_vendor	= $amount_transferred_to_vendor;
-					$orderItem->student_store_commission		= $student_store_commission;
-					$orderItem->cool_company_commission			= $cool_company_commission;
-					$orderItem->student_store_commission_percent= $commission;
+					$orderItem->price_after_apply_reward_points = ((($sellingPrice * $orderedItem['quantity']) - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value)) / $orderedItem['quantity']);
+					$orderItem->earned_reward_points = $earned_reward_points;
+					$orderItem->quantity = $orderedItem['quantity'];
+					$orderItem->discount = $discount;
+					$orderItem->cover_image = $orderedItem['cover_image'];
+					$orderItem->sell_type = $productsServicesBook->sell_type;
+					$orderItem->rent_duration = $productsServicesBook->rent_duration;
+					$orderItem->item_status = $request->order_status;
+					$orderItem->item_payment_status = true;
+					$orderItem->amount_transferred_to_vendor = $amount_transferred_to_vendor;
+					$orderItem->student_store_commission = $student_store_commission;
+					$orderItem->cool_company_commission = $cool_company_commission_amount;
+					$orderItem->student_store_commission_percent = $commission;
 					$orderItem->cool_company_commission_percent	= $coolCompanyCommission;
-					$orderItem->vat_percent						= $vat_percent;
-					$orderItem->delivery_code					= $delivery_code;
+					$orderItem->vat_percent = $vat_percent;
+					$orderItem->delivery_code = $delivery_code;
 					$orderItem->save();
 
 
