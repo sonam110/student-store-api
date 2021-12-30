@@ -66,8 +66,11 @@ class AppSettingController extends Controller
             $appSetting->customer_rewards_pt_value  = $request->customer_rewards_pt_value;
             $appSetting->single_rewards_pt_value    = $request->single_rewards_pt_value;
             $appSetting->vat                        = $request->vat;
+            $appSetting->is_enabled_cool_company       = $request->is_enabled_cool_company;
             $appSetting->coolCompanyVatRateId       = $request->cool_company_vat_rate_id;
             $appSetting->coolCompanyCommission      = $request->coolCompanyCommission;
+            $appSetting->cool_company_social_fee_percentage      = $request->cool_company_social_fee_percentage;
+            $appSetting->cool_company_salary_tax_percentage      = $request->cool_company_salary_tax_percentage;
             $appSetting->invite_url                 = $request->invite_url;
             $appSetting->play_store_url             = $request->play_store_url;
             $appSetting->app_store_url              = $request->app_store_url;

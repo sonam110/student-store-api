@@ -157,6 +157,14 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->price                        = $request->price;
             $productsServicesBook->shipping_charge              = $request->shipping_charge;
             $productsServicesBook->discounted_price             = $request->discounted_price;
+
+            $productsServicesBook->vat_percentage = $request->vat_percentage;
+            $productsServicesBook->vat_amount = $request->vat_amount;
+            $productsServicesBook->ss_commission_percent = $request->ss_commission_percent;
+            $productsServicesBook->ss_commission_amount = $request->ss_commission_amount;
+            $productsServicesBook->cc_commission_percent_all = $request->cc_commission_percent_all;
+            $productsServicesBook->cc_commission_amount_all = $request->cc_commission_amount_all;
+
             $productsServicesBook->is_on_offer                  = $request->is_on_offer;
             $productsServicesBook->discount_type                = $request->discount_type;
             $productsServicesBook->discount_value               = $request->discount_value;
@@ -316,6 +324,14 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->price                    = $request->price;
             $productsServicesBook->shipping_charge          = $request->shipping_charge;
             $productsServicesBook->discounted_price         = $request->discounted_price;
+
+            $productsServicesBook->vat_percentage = $request->vat_percentage;
+            $productsServicesBook->vat_amount = $request->vat_amount;
+            $productsServicesBook->ss_commission_percent = $request->ss_commission_percent;
+            $productsServicesBook->ss_commission_amount = $request->ss_commission_amount;
+            $productsServicesBook->cc_commission_percent_all = $request->cc_commission_percent_all;
+            $productsServicesBook->cc_commission_amount_all = $request->cc_commission_amount_all;
+            
             $productsServicesBook->is_on_offer              = $request->is_on_offer;
             $productsServicesBook->discount_type            = $request->discount_type;
             $productsServicesBook->discount_value           = $request->discount_value;
@@ -713,7 +729,7 @@ class ProductsServicesBookController extends Controller
                 $type = $request->type;
             }
             $searchType = $request->searchType; 
-            $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','discounted_price','deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug','products_services_books.is_published','products_services_books.brand')
+            $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','discounted_price','deposit_amount','products_services_books.is_used_item','products_services_books.vat_percentage','products_services_books.vat_amount','products_services_books.ss_commission_percent','products_services_books.ss_commission_amount','products_services_books.cc_commission_percent_all','products_services_books.cc_commission_amount_all','products_services_books.sub_category_slug','products_services_books.is_published','products_services_books.brand')
             ->where('products_services_books.type', $type)
             // ->where('products_services_books.status', $request->status)
             ->with('user:id,user_type_id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
@@ -922,7 +938,7 @@ class ProductsServicesBookController extends Controller
                 ->where('products_services_books.top_selling_end_at','>=', date('Y-m-d'));
                 if($products->count() <= 0)
                 {
-                     $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','discounted_price','deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug','products_services_books.is_published','products_services_books.brand')
+                     $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','discounted_price','deposit_amount','products_services_books.vat_percentage','products_services_books.vat_amount','products_services_books.ss_commission_percent','products_services_books.ss_commission_amount','products_services_books.cc_commission_percent_all','products_services_books.cc_commission_amount_all','products_services_books.is_used_item','products_services_books.sub_category_slug','products_services_books.is_published','products_services_books.brand')
                                 ->where('products_services_books.user_id', '!=', Auth::id())
                                 ->where('products_services_books.status', '2')
                                 ->where('products_services_books.is_used_item', $is_used_item)

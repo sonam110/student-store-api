@@ -252,7 +252,9 @@ class OrderController extends Controller
 						{
 							$sellingPrice = $productsServicesBook->price;
 						}
-						$spWithoutVat = $sellingPrice - (($sellingPrice * $vat_percent) / 100);
+						$sellingPriceWithQty = $sellingPrice * $orderedItem['quantity'];
+
+						$spWithoutVat = $sellingPriceWithQty - (($sellingPriceWithQty * $vat_percent) / 100);
 
 						$title = $productsServicesBook->title;
 
@@ -300,7 +302,9 @@ class OrderController extends Controller
 						{
 							$sellingPrice = $productsServicesBook->subscription_fees;
 						}
-						$spWithoutVat = $sellingPrice - (($sellingPrice * $vat_percent) / 100);
+						$sellingPriceWithQty = $sellingPrice * $orderedItem['quantity'];
+
+						$spWithoutVat = $sellingPriceWithQty - (($sellingPriceWithQty * $vat_percent) / 100);
 
 						$title = $productsServicesBook->title;
 
@@ -318,8 +322,8 @@ class OrderController extends Controller
 						{
 							$sellingPrice = $productsServicesBook->price;
 						}
-
-						$spWithoutVat = $sellingPrice - (($sellingPrice * $vat_percent) / 100);
+						$sellingPriceWithQty = $sellingPrice * $orderedItem['quantity'];
+						$spWithoutVat = $sellingPriceWithQty - (($sellingPriceWithQty * $vat_percent) / 100);
 
 						$title = $productsServicesBook->type_of_package;
 						$user_package = UserPackageSubscription::where('user_id',null)->first();
@@ -351,7 +355,7 @@ class OrderController extends Controller
 					$coolCompanyCommission = 0;
 					$amount_transferred_to_vendor = 0;
 
-					$forSSandCCWithoutVat = (($spWithoutVat * $orderedItem['quantity']) - $reward_points_value);
+					$forSSandCCWithoutVat = $spWithoutVat - $reward_points_value;
 
 					//cool company commission for student
 					if(($productsServicesBook->user) && ($productsServicesBook->user->user_type_id == 2))
@@ -382,7 +386,7 @@ class OrderController extends Controller
 						$discount = $productsServicesBook->discount_value;
 					} 
 
-					$sub_total = $sub_total + ($sellingPrice * $orderedItem['quantity']);
+					$sub_total = $sub_total + $sellingPrice;
 
 					$orderItem = new OrderItem;
 					$orderItem->user_id							= Auth::id();
@@ -428,7 +432,7 @@ class OrderController extends Controller
 					
 					$orderItem->price = $sellingPrice;
 					$orderItem->used_item_reward_points 				= $orderedItem['used_item_reward_points'];
-					$orderItem->price_after_apply_reward_points = ((($sellingPrice * $orderedItem['quantity']) - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value)) / $orderedItem['quantity']);
+					$orderItem->price_after_apply_reward_points = ((($sellingPrice) - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value)) / $orderedItem['quantity']);
 					$orderItem->earned_reward_points = $earned_reward_points;
 					$orderItem->quantity = $orderedItem['quantity'];
 					$orderItem->discount = $discount;
@@ -443,6 +447,7 @@ class OrderController extends Controller
 					$orderItem->student_store_commission_percent = $commission;
 					$orderItem->cool_company_commission_percent	= $coolCompanyCommission;
 					$orderItem->vat_percent = $vat_percent;
+					$orderItem->vat_percent = $vat_amount;
 					$orderItem->delivery_code = $delivery_code;
 					$orderItem->save();
 

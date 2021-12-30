@@ -39,6 +39,12 @@ class CreateProductsServicesBooksTable extends Migration
             $table->boolean('is_on_offer')->default(0);
             $table->integer('discount_type')->nullable()->comment('0:fixed amount, 1:percentage');
             $table->float('discount_value')->nullable()->comment('amount or percentage value');
+            $table->float('vat_percentage')->nullable()->default(0);
+            $table->float('vat_amount')->nullable()->default(0);
+            $table->float('ss_commission_percent')->nullable()->default(0);
+            $table->float('ss_commission_amount')->nullable()->default(0);
+            $table->float('cc_commission_percent_all')->nullable()->default(0);
+            $table->float('cc_commission_amount_all')->nullable()->default(0);
             $table->float('shipping_charge')->nullable()->default(0)->comment('for product and book');
 
             $table->bigInteger('quantity')->nullable()->default(0);

@@ -6,6 +6,7 @@ use App\Models\UserDeviceInfo;
 use App\Models\Notification;
 use Stripe as ST;
 
+use App\Models\AppSetting;
 use App\Models\OrderItem;
 use App\Models\TransactionDetail;
 use App\Models\Refund;
@@ -412,4 +413,20 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 function strReplaceAssoc(array $replace, $subject) 
 { 
 	return str_replace(array_keys($replace), array_values($replace), $subject);
+}
+
+function updateCommissions()
+{
+	$appsetting = AppSetting::select('is_enabled_cool_company','coolCompanyCommission','vat_percentage','vat_amount','ss_commission_percent','ss_commission_amount','cc_commission_percent_all','cc_commission_amount_all')->first();
+	$coolCompanyCommission = 0;
+	$vat_percentage = 0;
+	$vat_amount = 0;
+	$ss_commission_percent = 0;
+	$ss_commission_amount = 0;
+	$cc_commission_percent_all = 0;
+	$cc_commission_amount_all = 0;
+	if($appsetting->is_enabled_cool_company)
+	{
+
+	}
 }

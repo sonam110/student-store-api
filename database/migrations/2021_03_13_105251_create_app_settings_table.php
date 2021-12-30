@@ -43,8 +43,12 @@ class CreateAppSettingsTable extends Migration
             $table->string('meta_title')->nullable();
             $table->text('meta_keywords')->nullable();
             $table->text('meta_description')->nullable();
+            $table->boolean('is_enabled_cool_company')->default(1);
             $table->integer('coolCompanyVatRateId')->default('7');
-            $table->double('coolCompanyCommission',[10,2])->nullable()->default(0);
+            $table->double('coolCompanyCommission',[10,2])->nullable()->default('5.98');
+            $table->float('cool_company_social_fee_percentage')->nullable()->default('31.42');
+            $table->float('cool_company_salary_tax_percentage
+                ')->nullable()->default(30);
             $table->boolean('is_job_mod_enabled')->default(1);
             $table->boolean('is_product_mod_enabled')->default(1);
             $table->boolean('is_service_mod_enabled')->default(1);
