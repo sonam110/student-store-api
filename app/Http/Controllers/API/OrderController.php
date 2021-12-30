@@ -259,8 +259,8 @@ class OrderController extends Controller
 						if($productsServicesBook->delivery_type == 'deliver_to_location')
 						{
 							$shipping_package = ShippingCondition::where('user_id',$productsServicesBook->user_id)
-							->where('order_amount_from','<=', $price*$orderedItem['quantity'])
-							->where('order_amount_to','>=',$price*$orderedItem['quantity'])
+							->where('order_amount_from','<=', $sellingPrice*$orderedItem['quantity'])
+							->where('order_amount_to','>=',$sellingPrice*$orderedItem['quantity'])
 							->orderBy('created_at','desc')
 							->first();
 							if($shipping_package)
