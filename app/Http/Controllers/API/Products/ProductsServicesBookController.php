@@ -25,6 +25,7 @@ use App\Models\Abuse;
 use App\Models\Brand;
 use App\Models\User;
 use App\Models\Language;
+use App\Models\CategoryMaster;
 
 class ProductsServicesBookController extends Controller
 {
@@ -314,6 +315,21 @@ class ProductsServicesBookController extends Controller
             }
             else
             {
+
+                $amount = $request->price;
+                $is_on_offer = $request->is_on_offer;
+                $discount_type = $request->discount_type;
+                $discount_value = $request->discount_value;
+                $vat_percentage = 0;
+                $catVatId = CategoryMaster::select('vat')->find($request->category_master_id);
+                if($catVatId)
+                {
+                    $vat_percentage = $catVatId->vat;
+                }
+                $user_id = Auth::id();
+                
+                $getCommVal = updateCommissions($amount, $is_on_offer, $discount_type, $discount_value, $vat_percentage, $user_id, $request->type);
+
                 $checkSlugExist = ProductsServicesBook::where('title', $request->title)->count();
                 $productsServicesBook                               = new ProductsServicesBook;
                 $productsServicesBook->user_id                      = Auth::id();
@@ -330,6 +346,14 @@ class ProductsServicesBookController extends Controller
                 $productsServicesBook->price                        = $request->price;
                 $productsServicesBook->shipping_charge              = $request->shipping_charge;
                 $productsServicesBook->discounted_price             = $request->discounted_price;
+
+                $productsServicesBook->vat_percentage = $vat_percentage;
+                $productsServicesBook->vat_amount = $getCommVal['vat_amount'];
+                $productsServicesBook->ss_commission_percent = $getCommVal['ss_commission_percent'];
+                $productsServicesBook->ss_commission_amount = $getCommVal['ss_commission_amount'];
+                $productsServicesBook->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+                $productsServicesBook->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+
                 $productsServicesBook->is_on_offer                  = $request->is_on_offer;
                 $productsServicesBook->discount_type                = $request->discount_type;
                 $productsServicesBook->discount_value               = $request->discount_value;
@@ -615,6 +639,20 @@ class ProductsServicesBookController extends Controller
 
             $type = $productsServicesBook->type;
 
+            $amount = $request->price;
+            $is_on_offer = $request->is_on_offer;
+            $discount_type = $request->discount_type;
+            $discount_value = $request->discount_value;
+            $vat_percentage = 0;
+            $catVatId = CategoryMaster::select('vat')->find($request->category_master_id);
+            if($catVatId)
+            {
+                $vat_percentage = $catVatId->vat;
+            }
+            $user_id = Auth::id();
+            
+            $getCommVal = updateCommissions($amount, $is_on_offer, $discount_type, $discount_value, $vat_percentage, $user_id, $request->type);
+
             $productsServicesBook->address_detail_id    = $request->address_detail_id;
             $productsServicesBook->category_master_id   = $request->category_master_id;
             $productsServicesBook->sub_category_slug    = $request->sub_category_slug;
@@ -627,6 +665,14 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->price    = $request->price;
             $productsServicesBook->shipping_charge              = $request->shipping_charge;
             $productsServicesBook->discounted_price = $request->discounted_price;
+
+            $productsServicesBook->vat_percentage = $vat_percentage;
+            $productsServicesBook->vat_amount = $getCommVal['vat_amount'];
+            $productsServicesBook->ss_commission_percent = $getCommVal['ss_commission_percent'];
+            $productsServicesBook->ss_commission_amount = $getCommVal['ss_commission_amount'];
+            $productsServicesBook->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+            $productsServicesBook->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+
             $productsServicesBook->is_on_offer      = $request->is_on_offer;
             $productsServicesBook->discount_type    = $request->discount_type;
             $productsServicesBook->discount_value   = $request->discount_value;

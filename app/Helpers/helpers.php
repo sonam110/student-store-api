@@ -12,6 +12,7 @@ use App\Models\TransactionDetail;
 use App\Models\Refund;
 use App\Models\SharedRewardPoint;
 use App\Models\PaymentGatewaySetting;
+use App\Models\UserPackageSubscription;
 
 function prepareResult($error, $data, $msg)
 {
@@ -415,18 +416,80 @@ function strReplaceAssoc(array $replace, $subject)
 	return str_replace(array_keys($replace), array_values($replace), $subject);
 }
 
-function updateCommissions()
+function updateCommissions($amount, $is_on_offer, $discount_type, $discount_value, $vat_percentage, $userId, $type)
 {
-	$appsetting = AppSetting::select('is_enabled_cool_company','coolCompanyCommission','vat_percentage','vat_amount','ss_commission_percent','ss_commission_amount','cc_commission_percent_all','cc_commission_amount_all')->first();
-	$coolCompanyCommission = 0;
-	$vat_percentage = 0;
-	$vat_amount = 0;
+	$appsetting = AppSetting::select('is_enabled_cool_company','coolCompanyCommission','cool_company_social_fee_percentage','cool_company_salary_tax_percentage')->first();
+
 	$ss_commission_percent = 0;
-	$ss_commission_amount = 0;
-	$cc_commission_percent_all = 0;
+	$getPackageInfo = UserPackageSubscription::where('user_id', $userId)->where('module', $type)->orderBy('auto_id', 'DESC')->first();
+	if($getPackageInfo)
+	{
+		$ss_commission_percent = $getPackageInfo->commission_per_sale;
+	}
+	$coolCompanyCommission = 0;
 	$cc_commission_amount_all = 0;
+	$cc_social_fee_percentage = 0;
+	$cc_salary_tax_percentage = 0;
+	$cc_commission_fee = 0;
+	$for_social_fee_cal = 0;
+	$cc_social_fee = 0;
+	$for_gross_salary_cal = 0;
+	$cc_salary_tax = 0;
+	$net_salary = 0;
+	$vat_amount = 0;
+	$ss_commission_amount = 0;
+
+	if($is_on_offer==1)
+	{
+		if($discount_type==1)
+		{
+			$price = $amount - ($amount * $discount_value / 100);
+		}
+		else
+		{
+			$price = $amount - $discount_value;
+		}
+	}
+	else
+	{
+		$price = $amount;
+	}
+
+	$vat_amount = $price * ($vat_percentage / 100);
+	$ss_commission_amount = $price * ($ss_commission_percent / 100);
+
 	if($appsetting->is_enabled_cool_company)
 	{
+		$coolCompanyCommission = $appsetting->coolCompanyCommission;
+		$cc_social_fee_percentage = $appsetting->cool_company_social_fee_percentage;
+		$cc_salary_tax_percentage = $appsetting->cool_company_salary_tax_percentage;
 
+		$cc_commission_fee = $price * ($coolCompanyCommission / 100);
+		$for_social_fee_cal = $price - $cc_commission_fee;
+		$cc_social_fee = $for_social_fee_cal * ($cc_social_fee_percentage / 100);
+		$for_gross_salary_cal = $price - ($cc_commission_fee + $cc_social_fee);
+		$cc_salary_tax = $for_gross_salary_cal * ($cc_salary_tax_percentage / 100);
+		$net_salary = $price - ($cc_commission_fee + $cc_social_fee + $cc_salary_tax);
 	}
+	$totalCCAmount = $cc_commission_fee + $cc_social_fee + $cc_salary_tax;
+	$totalCCPercent = $coolCompanyCommission + $cc_social_fee_percentage + $cc_salary_tax_percentage;
+	$return = [
+			'cool_company_commission' => round($coolCompanyCommission, 2),
+			'cc_social_fee_percentage' => round($cc_social_fee_percentage, 2),
+			'cc_salary_tax_percentage' => round($cc_salary_tax_percentage, 2),
+			'cc_commission_fee' => round($cc_commission_fee, 2),
+			'for_social_fee_cal' => round($for_social_fee_cal, 2),
+			'cc_social_fee' => round($cc_social_fee, 2),
+			'for_gross_salary_cal' => round($for_gross_salary_cal, 2),
+			'cc_salary_tax' => round($cc_salary_tax, 2),
+			'net_salary' => round($net_salary, 2),
+			'vat_amount' => round($vat_amount, 2),
+			'ss_commission_percent' => round($ss_commission_percent, 2),
+			'ss_commission_amount' => round($ss_commission_amount, 2),
+			'price' => round($price, 2),
+			'totalCCPercent' => round($totalCCPercent, 2),
+			'totalCCAmount' => round($totalCCAmount, 2),
+	];
+
+	return $return;
 }

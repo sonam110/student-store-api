@@ -187,6 +187,7 @@ class OrderController extends Controller
 		{
 			$delivery_code = NULL;
 			$shipping_charge = 0;
+			$vat_amount = 0;
 			$getAppSetting = AppSetting::first();
 
 			$getLastOrder = Order::select('order_number')->orderBy('created_at','DESC')->first();
@@ -243,6 +244,7 @@ class OrderController extends Controller
 					if(!empty($orderedItem['product_id']))
 					{
 						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
+						$vat_amount = $productsServicesBook->vat_amount;
 						$vat_percent = $productsServicesBook->categoryMaster->vat;
 						if($productsServicesBook->is_on_offer == 1)
 						{
@@ -447,7 +449,7 @@ class OrderController extends Controller
 					$orderItem->student_store_commission_percent = $commission;
 					$orderItem->cool_company_commission_percent	= $coolCompanyCommission;
 					$orderItem->vat_percent = $vat_percent;
-					$orderItem->vat_percent = $vat_amount;
+					$orderItem->vat_amount = $vat_amount;
 					$orderItem->delivery_code = $delivery_code;
 					$orderItem->save();
 
