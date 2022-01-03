@@ -14,7 +14,7 @@ class JobApplication extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'user_id', 'job_id', 'user_cv_detail_id', 'job_title', 'application_status', 'job_start_date', 'job_end_date', 'application_remark', 'attachment_url'];
+        'user_id', 'job_id', 'user_cv_detail_id', 'job_title', 'application_status', 'job_start_date', 'job_end_date', 'application_remark', 'attachment_url', 'is_viewed'];
 
 
     public function user()

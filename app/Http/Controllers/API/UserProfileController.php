@@ -24,6 +24,7 @@ use App\Models\EmailTemplate;
 use App\Mail\OrderMail;
 use Mail;
 use App\Models\VendorFundTransfer;
+use App\Models\JobApplication;
 use mervick\aesEverywhere\AES256;
 
 class UserProfileController extends Controller
@@ -459,6 +460,14 @@ class UserProfileController extends Controller
         } catch (\Throwable $e) {
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
+	}
+
+	public function updateJobViewed($job_application_id)
+	{
+		$updateViewed = JobApplication::find($job_application_id);
+		$updateViewed->is_viewed = 1;
+		$updateViewed->save();
+		return response(prepareResult(false, $updateViewed, getLangByLabelGroups('messages','message_success_title')), config('http_response.created'));
 	}
 
 	public function languageUpdate(Request $request)

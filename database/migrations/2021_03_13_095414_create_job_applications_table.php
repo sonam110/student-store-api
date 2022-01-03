@@ -30,6 +30,7 @@ class CreateJobApplicationsTable extends Migration
             $table->dateTime('job_end_date')->nullable();
             $table->text('application_remark')->nullable();
             $table->string('attachment_url')->nullable();
+            $table->boolean('is_viewed')->default(0)->nullable();
             $table->timestamps();
         });
     }
