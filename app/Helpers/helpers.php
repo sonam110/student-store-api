@@ -426,6 +426,7 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 	{
 		$ss_commission_percent = $getPackageInfo->commission_per_sale;
 	}
+	$discounted_price = 0;
 	$coolCompanyCommission = 0;
 	$cc_commission_amount_all = 0;
 	$cc_social_fee_percentage = 0;
@@ -449,16 +450,21 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 		{
 			$price = $amount - $discount_value;
 		}
+		$discounted_price = $price;
 	}
 	else
 	{
 		$price = $amount;
 	}
 
-	$vat_amount = $price * ($vat_percentage / 100);
+	if(User::select('user_type_id')->find($userId)->user_type_id!=2)
+	{
+		$vat_amount = $price * ($vat_percentage / 100);
+	}
+	
 	$ss_commission_amount = $price * ($ss_commission_percent / 100);
 
-	if($appsetting->is_enabled_cool_company)
+	if($appsetting->is_enabled_cool_company && User::select('user_type_id')->find($userId)->user_type_id==2 && $type=='service')
 	{
 		$coolCompanyCommission = $appsetting->coolCompanyCommission;
 		$cc_social_fee_percentage = $appsetting->cool_company_social_fee_percentage;
@@ -486,6 +492,7 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 			'vat_amount' => round($vat_amount, 2),
 			'ss_commission_percent' => round($ss_commission_percent, 2),
 			'ss_commission_amount' => round($ss_commission_amount, 2),
+			'discounted_price' => round($discounted_price, 2),
 			'price' => round($price, 2),
 			'totalCCPercent' => round($totalCCPercent, 2),
 			'totalCCAmount' => round($totalCCAmount, 2),

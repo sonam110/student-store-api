@@ -33,25 +33,21 @@ class ProductsImport implements ToModel,WithHeadingRow
         $getUserInfo = User::select('user_type_id')->find($this->data['user_id']);
         $products = false;
         $getCat = CategoryMaster::select('vat')->find($this->data['category_master_id']);
-        $discountValue = 0;
+        $user_id = $this->data['user_id'];
+        $vat_percentage = $getCat->vat;
+        $type = $row['type_required'];
+        $discount_value = 0;
         $discountAmount = 0;
         $is_on_offer = 0;
         $discount_type = 0;
-        // $discountValue = 0;
-        // if($row['discount_type']=='fixed_amount') {
-        //     $discountAmount = $row['original_price_required'] - $row['discount_in_percentage_not_required'];
-        //     $discountValue = $row['discount_in_percentage_not_required'];
-        // } elseif($row['discount_type']=='percentage') {
-        //     $discountAmount = $row['original_price_required'] - (($row['original_price_required'] * $row['discount_in_percentage_not_required'])/100);
-        //     $discountValue = $row['discount_in_percentage_not_required'];
-        // }
         if(@$row['discount_in_percentage_not_required']>0)
         {
-            $discountAmount = $row['original_price_required'] - (($row['original_price_required'] * $row['discount_in_percentage_not_required'])/100);
             $is_on_offer = 1;
             $discount_type = 1;
-            $discountValue = $row['discount_in_percentage_not_required'];
+            $discount_value = $row['discount_in_percentage_not_required'];
         }
+
+        $getCommVal = updateCommissions($row['original_price_required'], $is_on_offer, $discount_type, $discount_value, $vat_percentage, $user_id, $type);
 
         $tag = [];
         $tagVal = [];
@@ -100,12 +96,20 @@ class ProductsImport implements ToModel,WithHeadingRow
                 $products->sku                       = $row['sku_required'];
             }
             
-            $products->basic_price_wo_vat        = $row['original_price_required'] - (($row['original_price_required'] * $getCat->vat)/100);
-            $products->price                     = $row['original_price_required'];
+            $products->basic_price_wo_vat        = $row['original_price_required'];
+            $products->price                     = $getCommVal['totalAmount'];
             $products->is_on_offer               = $is_on_offer;
             $products->discount_type             = $discount_type;
-            $products->discount_value            = $discountValue;
-            $products->discounted_price          = $discountAmount;
+            $products->discount_value            = $discount_value;
+            $products->discounted_price          = $getCommVal['discounted_price'];
+
+            $products->vat_percentage = $vat_percentage;
+            $products->vat_amount = $getCommVal['vat_amount'];
+            $products->ss_commission_percent = $getCommVal['ss_commission_percent'];
+            $products->ss_commission_amount = $getCommVal['ss_commission_amount'];
+            $products->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+            $products->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+
             $products->quantity                  = $row['quantity_required'];
             $products->short_summary             = Str::limit(strip_tags($row['product_description_required']), 250);
             $products->description               = $row['product_description_required'];
@@ -130,12 +134,20 @@ class ProductsImport implements ToModel,WithHeadingRow
             $products->type                      = $row['type_required'];
             $products->title                     = $row['service_name_required'];
             $products->slug                      = Str::slug($row['service_name_required']);
-            $products->basic_price_wo_vat        = $row['original_price_required'] - (($row['original_price_required'] * $getCat->vat)/100);
-            $products->price                     = $row['original_price_required'];
+            $products->basic_price_wo_vat        = $row['original_price_required'];
+            $products->price                     = $getCommVal['totalAmount'];
             $products->is_on_offer               = $is_on_offer;
             $products->discount_type             = $discount_type;
-            $products->discount_value            = $discountValue;
-            $products->discounted_price          = $discountAmount;
+            $products->discount_value            = $discount_value;
+            $products->discounted_price          = $getCommVal['discounted_price'];
+
+            $products->vat_percentage = $vat_percentage;
+            $products->vat_amount = $getCommVal['vat_amount'];
+            $products->ss_commission_percent = $getCommVal['ss_commission_percent'];
+            $products->ss_commission_amount = $getCommVal['ss_commission_amount'];
+            $products->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+            $products->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+
             $products->quantity                  = 1000;
             $products->short_summary             = Str::limit(strip_tags($row['service_description_required']), 250);
             $products->description               = $row['service_description_required'];
@@ -177,12 +189,20 @@ class ProductsImport implements ToModel,WithHeadingRow
             }
 
             
-            $products->basic_price_wo_vat        = $row['original_price_required'] - (($row['original_price_required'] * $getCat->vat)/100);
-            $products->price                     = $row['original_price_required'];
+            $products->basic_price_wo_vat        = $row['original_price_required'];
+            $products->price                     = $getCommVal['totalAmount'];
             $products->is_on_offer               = $is_on_offer;
             $products->discount_type             = $discount_type;
-            $products->discount_value            = $discountValue;
-            $products->discounted_price          = $discountAmount;
+            $products->discount_value            = $discount_value;
+            $products->discounted_price          = $getCommVal['discounted_price'];
+
+            $products->vat_percentage = $vat_percentage;
+            $products->vat_amount = $getCommVal['vat_amount'];
+            $products->ss_commission_percent = $getCommVal['ss_commission_percent'];
+            $products->ss_commission_amount = $getCommVal['ss_commission_amount'];
+            $products->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+            $products->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+            
             $products->quantity                  = $row['quantity_required'];
             $products->short_summary             = Str::limit(strip_tags($row['book_description_required']), 250);
             $products->description               = $row['book_description_required'];

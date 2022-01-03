@@ -169,7 +169,7 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->basic_price_wo_vat           = $request->basic_price_wo_vat;
             $productsServicesBook->price = $getCommVal['totalAmount'];
             $productsServicesBook->shipping_charge              = $request->shipping_charge;
-            $productsServicesBook->discounted_price             = $request->discounted_price;
+            $productsServicesBook->discounted_price             = $getCommVal['discounted_price'];
 
             $productsServicesBook->vat_percentage = $vat_percentage;
             $productsServicesBook->vat_amount = $getCommVal['vat_amount'];
@@ -349,7 +349,7 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->basic_price_wo_vat       = $request->basic_price_wo_vat;
             $productsServicesBook->price = $getCommVal['totalAmount'];
             $productsServicesBook->shipping_charge          = $request->shipping_charge;
-            $productsServicesBook->discounted_price         = $request->discounted_price;
+            $productsServicesBook->discounted_price         = $getCommVal['discounted_price'];
 
             $productsServicesBook->vat_percentage = $vat_percentage;
             $productsServicesBook->vat_amount = $getCommVal['vat_amount'];
