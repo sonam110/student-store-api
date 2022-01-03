@@ -450,6 +450,16 @@ class UserProfileController extends Controller
 			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
 	}
+	
+	public function getCvsView(Request $request)
+	{
+		try {
+            $data = CvsViewLog::where('user_id', Auth()->id())->with('users:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'userCvDetails.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->get();
+            return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
+        } catch (\Throwable $e) {
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+	}
 
 	public function languageUpdate(Request $request)
 	{

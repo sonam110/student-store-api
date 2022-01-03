@@ -157,6 +157,8 @@ Route::group(['middleware' => 'auth:api'],function () {
 
 	Route::apiResource('/shipping-condition', 'App\Http\Controllers\API\ShippingConditionController', ['as' => 'api']);
 
+	Route::get('/get-cvs-view', [App\Http\Controllers\API\UserProfileController::class,'getCvsView']);
+
 	Route::get('/cvs-view/{id}', [App\Http\Controllers\API\UserProfileController::class,'cvsView']);
 	Route::get('/unread-notifications', [App\Http\Controllers\API\UserProfileController::class,'unreadNotifications']);
 	Route::get('/transaction-details', 'App\Http\Controllers\API\UserProfileController@transactionDetails');
