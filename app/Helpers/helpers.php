@@ -489,6 +489,7 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 			'price' => round($price, 2),
 			'totalCCPercent' => round($totalCCPercent, 2),
 			'totalCCAmount' => round($totalCCAmount, 2),
+			'totalAmount' => round(($totalCCAmount + $ss_commission_amount + $price + $vat_amount), 2),
 	];
 
 	return $return;

@@ -316,7 +316,7 @@ class ProductsServicesBookController extends Controller
             else
             {
 
-                $amount = $request->price;
+                $amount = $request->basic_price_wo_vat;
                 $is_on_offer = $request->is_on_offer;
                 $discount_type = $request->discount_type;
                 $discount_value = $request->discount_value;
@@ -343,7 +343,7 @@ class ProductsServicesBookController extends Controller
                 $productsServicesBook->title                        = $request->title;
                 $productsServicesBook->slug                         = ($checkSlugExist>0 ? Str::slug($request->title).'-'.($checkSlugExist+1) : Str::slug($request->title));
                 $productsServicesBook->basic_price_wo_vat           = $request->basic_price_wo_vat;
-                $productsServicesBook->price                        = $request->price;
+                $productsServicesBook->price = $getCommVal['totalAmount'];
                 $productsServicesBook->shipping_charge              = $request->shipping_charge;
                 $productsServicesBook->discounted_price             = $request->discounted_price;
 
@@ -639,7 +639,7 @@ class ProductsServicesBookController extends Controller
 
             $type = $productsServicesBook->type;
 
-            $amount = $request->price;
+            $amount = $request->basic_price_wo_vat;
             $is_on_offer = $request->is_on_offer;
             $discount_type = $request->discount_type;
             $discount_value = $request->discount_value;
@@ -662,7 +662,7 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->gtin_isbn= $request->gtin_isbn;
             $productsServicesBook->title    = $request->title;
             $productsServicesBook->basic_price_wo_vat           = $request->basic_price_wo_vat;
-            $productsServicesBook->price    = $request->price;
+            $productsServicesBook->price = $getCommVal['totalAmount'];
             $productsServicesBook->shipping_charge              = $request->shipping_charge;
             $productsServicesBook->discounted_price = $request->discounted_price;
 
