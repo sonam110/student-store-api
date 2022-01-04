@@ -167,9 +167,9 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->title                        = $request->title;
             $productsServicesBook->slug                         = ($checkSlugExist>0 ? Str::slug($request->title).'-'.($checkSlugExist+1) : Str::slug($request->title));
             $productsServicesBook->basic_price_wo_vat           = $request->basic_price_wo_vat;
-            $productsServicesBook->price = $getCommVal['totalAmount'];
+            $productsServicesBook->price = $getCommVal['price_with_all_com_vat'];
             $productsServicesBook->shipping_charge              = $request->shipping_charge;
-            $productsServicesBook->discounted_price             = $getCommVal['discounted_price'];
+            $productsServicesBook->discounted_price             = $getCommVal['totalAmount'];
 
             $productsServicesBook->vat_percentage = $vat_percentage;
             $productsServicesBook->vat_amount = $getCommVal['vat_amount'];
@@ -347,9 +347,9 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->gtin_isbn                = $request->gtin_isbn;
             $productsServicesBook->title                    = $request->title;
             $productsServicesBook->basic_price_wo_vat       = $request->basic_price_wo_vat;
-            $productsServicesBook->price = $getCommVal['totalAmount'];
+            $productsServicesBook->price = $getCommVal['price_with_all_com_vat'];
             $productsServicesBook->shipping_charge          = $request->shipping_charge;
-            $productsServicesBook->discounted_price         = $getCommVal['discounted_price'];
+            $productsServicesBook->discounted_price         = $getCommVal['totalAmount'];
 
             $productsServicesBook->vat_percentage = $vat_percentage;
             $productsServicesBook->vat_amount = $getCommVal['vat_amount'];

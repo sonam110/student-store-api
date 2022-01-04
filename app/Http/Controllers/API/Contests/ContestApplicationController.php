@@ -127,8 +127,6 @@ class ContestApplicationController extends Controller
 
                 // Notification End
             }
-    		
-    		
             
     		DB::commit();
     		return response()->json(prepareResult(false, $contestApplication, getLangByLabelGroups('messages','message_contest_application_created')), config('http_response.created'));

@@ -557,8 +557,8 @@ function updatePrice($categoryID, $vat_percentage, $type)
 		$getCommVal = updateCommissions($item->basic_price_wo_vat, $item->is_on_offer, $item->discount_type, $item->discount_value, $vat_percentage, $item->user_id, $item->type);
 
 		//update Price
-		$item->price = $getCommVal['totalAmount'];
-		$item->discounted_price = $getCommVal['discounted_price'];
+		$item->price = $getCommVal['price_with_all_com_vat'];
+		$item->discounted_price = $getCommVal['totalAmount'];
 		$item->vat_percentage = $vat_percentage;
     $item->vat_amount = $getCommVal['vat_amount'];
     $item->ss_commission_percent = $getCommVal['ss_commission_percent'];
