@@ -322,7 +322,7 @@ class UserProfileController extends Controller
         
         Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($details));
 		//Mail End
-		
+
 		if($user)
 		{
 			return response(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_updated')), config('http_response.created'));
@@ -414,7 +414,7 @@ class UserProfileController extends Controller
 
 	public function cvsView($user_cv_detail_id)
 	{
-		$user_package = UserPackageSubscription::where('user_id',Auth::id())
+		$user_package = UserPackageSubscription::where('user_id', Auth::id())
 			->where('module','job')
 			->whereDate('package_valid_till','>=', date('Y-m-d'))
 			->orderBy('created_at','desc')
@@ -465,7 +465,7 @@ class UserProfileController extends Controller
             $data = CvsViewLog::where('user_id', Auth()->id())->with('users:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'userCvDetails.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->get();
             return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
         } catch (\Throwable $e) {
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            return response()->json(prepareResult(true, $e->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
 	}
 

@@ -86,6 +86,15 @@ class AutoSwichPackageIfExpired extends Command
                     $userPackageSubscription->top_up_fee = $getFreePackage->top_up_fee;
                     $userPackageSubscription->save();
 
+                    if($userPackageSubscription)
+                    {
+                        //update price if package changed
+                        $packageID = $getFreePackage->id;
+                        $type = $getFreePackage->module;
+                        $userID = $package->user_id;
+                        packageUpdatePrice($packageID, $type, $userID);
+                    }
+
                     $user = $package->user;
 
                     //Mail Start
