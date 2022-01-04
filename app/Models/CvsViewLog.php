@@ -11,11 +11,16 @@ class CvsViewLog extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','user_cv_detail_id','user_package_subscription_id','valid_till'];
+    protected $fillable = ['user_id','user_cv_detail_id', 'applicant_id','user_package_subscription_id','valid_till'];
+
+    public function company()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'applicant_id', 'id');
     }
 
     public function cvDetail()

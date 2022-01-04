@@ -25,6 +25,7 @@ use App\Mail\OrderMail;
 use Mail;
 use App\Models\VendorFundTransfer;
 use App\Models\JobApplication;
+use App\Models\UserCvDetail;
 use mervick\aesEverywhere\AES256;
 
 class UserProfileController extends Controller
@@ -440,9 +441,13 @@ class UserProfileController extends Controller
 		{
 		    return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
 		}
+
+		$getUserId = UserCvDetail::select('user_id')->find($user_cv_detail_id);
+
 		$cvsViewLog = new CvsViewLog;
 		$cvsViewLog->user_id 						= Auth::id();
 		$cvsViewLog->user_cv_detail_id 				= $user_cv_detail_id;
+		$cvsViewLog->applicant_id 					= $getUserId->user_id;
 		$cvsViewLog->valid_till 					= $user_package->package_valid_till;
 		$cvsViewLog->user_package_subscription_id 	= $user_package->id;
 		$cvsViewLog->save();
@@ -462,7 +467,7 @@ class UserProfileController extends Controller
 	public function getCvsView(Request $request)
 	{
 		try {
-            $data = CvsViewLog::where('user_id', Auth()->id())->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'cvDetail.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->get();
+            $data = CvsViewLog::where('user_id', Auth()->id())->with('company:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user.cvDetail')->get();
             return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
         } catch (\Throwable $e) {
             return response()->json(prepareResult(true, $e->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
