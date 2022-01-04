@@ -40,7 +40,12 @@ class ContestOnHold extends Command
     {
         $contests = Contest::where('application_end_date', date('Y-m-d'))->get();
           foreach($contests as $contest) {
-            if($contest->contestApplications->count() < $contest->min_participants) {
+            if(empty($contest->min_participants)) {
+                $min_participants = 0;
+            } else {
+                $min_participants = $contest->min_participants;
+            }
+            if($contest->contestApplications->count() < $min_participants) {
 
                 $contest->update(['status' => 'hold']);
                 // Notification Start

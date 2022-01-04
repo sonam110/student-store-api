@@ -247,6 +247,17 @@ class UserProfileController extends Controller
 		foreach ($request->user_packages as $key => $user_package) 
 		{
 			$package = Package::find($user_package);
+			
+			//update package status before active new one
+			$oldPackages = UserPackageSubscription::select('id','subscription_status')
+            ->where('subscription_status', 1)
+            ->where('module', $package->module)
+            ->get();
+            foreach ($oldPackages as $key => $package) {
+            	$package->subscription_status = 0;
+            	$package->save();
+            }
+			
 			$userPackageSubscription 						= new UserPackageSubscription;
 			$userPackageSubscription->user_id 				= Auth::id();
 			$userPackageSubscription->subscription_id 		= $request->subscription_id;
@@ -288,33 +299,29 @@ class UserProfileController extends Controller
 		$user = Auth::user();
 
         //Mail Start
+        $emailTemplate = EmailTemplate::where('template_for','package_upgrade')->where('language_id',$user->language_id)->first();
+		if(empty($emailTemplate))
+		{
+			$emailTemplate = EmailTemplate::where('template_for','package_upgrade')->first();
+		}
 
+        $body = $emailTemplate->body;
 
-            $emailTemplate = EmailTemplate::where('template_for','package_upgrade')->where('language_id',$user->language_id)->first();
-			if(empty($emailTemplate))
-			{
-				$emailTemplate = EmailTemplate::where('template_for','package_upgrade')->first();
-			}
-
-            $body = $emailTemplate->body;
-
-            $arrayVal = [
-            	'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
-            	'{{module}}' => 	$userPackageSubscription->module,
-            	'{{valid_till}}' => $userPackageSubscription->package_valid_till,
-            	'{{package_type}}' => $userPackageSubscription->type_of_package,
-            ];
-            $body = strReplaceAssoc($arrayVal, $body);
-            
-            $details = [
-            	'title' => $emailTemplate->subject,
-            	'body' => $body
-            ];
-            
-            Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($details));
-
+        $arrayVal = [
+        	'{{user_name}}' => AES256::decrypt($user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($user->last_name, env('ENCRYPTION_KEY')),
+        	'{{module}}' => 	$userPackageSubscription->module,
+        	'{{valid_till}}' => $userPackageSubscription->package_valid_till,
+        	'{{package_type}}' => $userPackageSubscription->type_of_package,
+        ];
+        $body = strReplaceAssoc($arrayVal, $body);
+        
+        $details = [
+        	'title' => $emailTemplate->subject,
+        	'body' => $body
+        ];
+        
+        Mail::to(AES256::decrypt($user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($details));
 		//Mail End
-
 		
 		if($user)
 		{

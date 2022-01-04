@@ -56,8 +56,8 @@ class JobApplicationController extends Controller
     	try
     	{
             $job = Job::find($request->job_id);
-            $job_start_date = date("Y-m-d", strtotime($request->job_start_date));
-            $job_end_date   = date("Y-m-d", strtotime($request->job_end_date));
+            $job_start_date = date("Y-m-d", strtotime($job->job_start_date));
+            $job_end_date   = date("Y-m-d", strtotime($job->application_end_date));
 
     		$jobApplication = new JobApplication;
     		$jobApplication->user_id            = Auth::id();
