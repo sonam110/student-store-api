@@ -297,6 +297,14 @@ class CategoryMasterController extends Controller
                     $categoryMaster = CategoryMaster::find($request->category_master_id);
                     $categoryMaster->title              = $value['category_title'];
                     $categoryMaster->vat                = $request->vat;
+                    if($categoryMaster->vat!==$request->vat)
+                    {
+                        //update price if VAT changed
+                        $categoryID = $request->category_master_id;
+                        $vat_percentage = $request->vat;
+                        $type = $categoryMaster->moduleType->slug;
+                        updatePrice($categoryID, $vat_percentage, $type);
+                    }
                     $categoryMaster->save();
                 }
                 $cat_parent_id = $categoryMaster->id;

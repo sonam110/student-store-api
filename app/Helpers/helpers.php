@@ -13,6 +13,8 @@ use App\Models\Refund;
 use App\Models\SharedRewardPoint;
 use App\Models\PaymentGatewaySetting;
 use App\Models\UserPackageSubscription;
+use App\Models\ProductsServicesBook;
+use App\Models\Contest;
 
 function prepareResult($error, $data, $msg)
 {
@@ -426,6 +428,7 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 	{
 		$ss_commission_percent = $getPackageInfo->commission_per_sale;
 	}
+
 	$discounted_price = 0;
 	$coolCompanyCommission = 0;
 	$cc_commission_amount_all = 0;
@@ -439,7 +442,45 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 	$net_salary = 0;
 	$vat_amount = 0;
 	$ss_commission_amount = 0;
+	$price_with_all_com_vat = 0;
 
+	$va = 0;
+	$ssca = 0;
+	$ccc = 0;
+	$ccsfp = 0;
+	$ccstp = 0;
+	$cccf = 0;
+	$fsfc = 0;
+	$ccsf = 0;
+	$fgsc = 0;
+	$ccst = 0;
+	$ns = 0;
+
+	//for actual value calculation
+	if(User::select('user_type_id')->find($userId)->user_type_id!=2)
+	{
+		$va = $amount * ($vat_percentage / 100);
+	}
+
+	$ssca = $amount * ($ss_commission_percent / 100);
+	
+	if($appsetting->is_enabled_cool_company && User::select('user_type_id')->find($userId)->user_type_id==2 && $type=='service')
+	{
+		$ccc = $appsetting->coolCompanyCommission;
+		$ccsfp = $appsetting->cool_company_social_fee_percentage;
+		$ccstp = $appsetting->cool_company_salary_tax_percentage;
+
+		$cccf = $amount * ($ccc / 100);
+		$fsfc = $amount - $cccf;
+		$ccsf = $fsfc * ($ccsfp / 100);
+		$fgsc = $amount - ($cccf + $ccsf);
+		$ccst = $fgsc * ($ccstp / 100);
+		$ns = $amount - ($cccf + $ccsf + $ccst);
+	}
+	$tcca = $cccf + $ccsf + $ccst;
+	$price_with_all_com_vat = round(($tcca + $ssca + $amount + $va), 2);
+
+	//For discount value
 	if($is_on_offer==1)
 	{
 		if($discount_type==1)
@@ -494,10 +535,31 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 			'ss_commission_amount' => round($ss_commission_amount, 2),
 			'discounted_price' => round($discounted_price, 2),
 			'price' => round($price, 2),
+			'price_with_all_com_vat' => round($price_with_all_com_vat, 2),
 			'totalCCPercent' => round($totalCCPercent, 2),
 			'totalCCAmount' => round($totalCCAmount, 2),
 			'totalAmount' => round(($totalCCAmount + $ss_commission_amount + $price + $vat_amount), 2),
 	];
 
 	return $return;
+}
+
+function updatePrice($categoryID, $vat_percentage, $type)
+{
+	$items = ProductsServicesBook::where('category_master_id', $categoryID)->get();
+	foreach ($items as $key => $item) {
+		$getCommVal = updateCommissions($item->basic_price_wo_vat, $item->is_on_offer, $item->discount_type, $item->discount_value, $vat_percentage, $item->user_id, $item->type);
+
+		//update Price
+		$item->price = $getCommVal['totalAmount'];
+		$item->discounted_price = $getCommVal['discounted_price'];
+		$item->vat_percentage = $vat_percentage;
+    $item->vat_amount = $getCommVal['vat_amount'];
+    $item->ss_commission_percent = $getCommVal['ss_commission_percent'];
+    $item->ss_commission_amount = $getCommVal['ss_commission_amount'];
+    $item->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+    $item->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+    $item->save();
+	}
+	return true;
 }
