@@ -462,7 +462,8 @@ class UserProfileController extends Controller
 	public function getCvsView(Request $request)
 	{
 		try {
-            $data = CvsViewLog::where('user_id', Auth()->id())->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user.userCvDetail')->get();
+            $data = CvsViewLog::where('user_id', Auth()->id())->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->get();
+            $data['user']['cv_detail'] = $data->cvDetail;
             return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
         } catch (\Throwable $e) {
             return response()->json(prepareResult(true, $e->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
