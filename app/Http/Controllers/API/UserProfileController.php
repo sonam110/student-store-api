@@ -467,7 +467,7 @@ class UserProfileController extends Controller
 	public function getCvsView(Request $request)
 	{
 		try {
-			$data = CvsViewLog::where('user_id', Auth()->id())->with('company:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user.cvDetail')
+			$data = CvsViewLog::where('user_id', Auth()->id())->with('company:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user.cvDetail');
             if(!empty($request->per_page_record))
             {
             	$results = $data->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
