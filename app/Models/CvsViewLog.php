@@ -13,12 +13,12 @@ class CvsViewLog extends Model
 
     protected $fillable = ['user_id','user_cv_detail_id','user_package_subscription_id','valid_till'];
 
-    public function users()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function userCvDetails()
+    public function userCvDetail()
     {
         return $this->belongsTo(UserCvDetail::class, 'user_cv_detail_id', 'id');
     }

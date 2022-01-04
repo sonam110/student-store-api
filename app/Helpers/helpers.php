@@ -570,7 +570,7 @@ function updatePrice($categoryID, $vat_percentage, $type)
 	return true;
 }
 
-function packageUpdatePrice($packageID, $userID)
+function packageUpdatePrice($packageID, $type, $userID)
 {
 	$items = ProductsServicesBook::where('category_master_id', $categoryID)->get();
 	foreach ($items as $key => $item) {
