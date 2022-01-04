@@ -191,13 +191,9 @@ class OrderController extends Controller
 			$getAppSetting = AppSetting::first();
 
 			$getLastOrder = Order::select('order_number')->orderBy('created_at','DESC')->first();
-			if(!empty($getLastOrder))
-			{
+			if(!empty($getLastOrder)) {
 				$order_number = $getLastOrder->order_number + 1;
-
-			}
-			else
-			{
+			} else {
 				$order_number = env('ORDER_START_NUMBER');
 			}
 
@@ -240,12 +236,22 @@ class OrderController extends Controller
 			{ 
 				Auth::user()->update(['reward_points'=>(Auth::user()->reward_points - $request->used_reward_points)]);
 				$sub_total = 0;
+				$vat_percentage = 0;
+				$student_store_commission = 0;
+				$cool_company_commission_amount = 0;
+				$coolCompanyCommission = 0;
+				$amount_transferred_to_vendor = 0;
+				$commission = 0;
 				foreach ($request->items as $key => $orderedItem) {
 					if(!empty($orderedItem['product_id']))
 					{
 						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
 						$vat_amount = $productsServicesBook->vat_amount;
-						$vat_percent = $productsServicesBook->categoryMaster->vat;
+						$vat_percentage = $productsServicesBook->vat_percentage;
+						$student_store_commission = $productsServicesBook->ss_commission_amount;
+						$cool_company_commission_amount = $productsServicesBook->cc_commission_amount_all;
+						$coolCompanyCommission = $productsServicesBook->cc_commission_percent_all;
+
 						if($productsServicesBook->is_on_offer == 1)
 						{
 							$sellingPrice = $productsServicesBook->discounted_price;
@@ -255,8 +261,6 @@ class OrderController extends Controller
 							$sellingPrice = $productsServicesBook->price;
 						}
 						$sellingPriceWithQty = $sellingPrice * $orderedItem['quantity'];
-
-						$spWithoutVat = $sellingPriceWithQty - (($sellingPriceWithQty * $vat_percent) / 100);
 
 						$title = $productsServicesBook->title;
 
@@ -295,7 +299,9 @@ class OrderController extends Controller
 					{
 						$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
 						$productsServicesBook = Contest::find($contest_id);
-						$vat_percent = $productsServicesBook->categoryMaster->vat;
+						$vat_amount = $productsServicesBook->vat_amount;
+						$vat_percentage = $productsServicesBook->vat_percentage;
+						$student_store_commission = $productsServicesBook->ss_commission_amount;
 						if($productsServicesBook->is_on_offer == 1)
 						{
 							$sellingPrice = $productsServicesBook->discounted_price;
@@ -306,8 +312,6 @@ class OrderController extends Controller
 						}
 						$sellingPriceWithQty = $sellingPrice * $orderedItem['quantity'];
 
-						$spWithoutVat = $sellingPriceWithQty - (($sellingPriceWithQty * $vat_percent) / 100);
-
 						$title = $productsServicesBook->title;
 
 						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module','contest')->orderBy('created_at','desc')->first();
@@ -315,7 +319,8 @@ class OrderController extends Controller
 					else
 					{
 						$productsServicesBook = Package::find($orderedItem['package_id']);
-						$vat_percent = '0';
+						$vat_percentage = 0;
+						$vat_amount = 0;
 						if($productsServicesBook->price == 0)
 						{
 							$sellingPrice = $productsServicesBook->subscription;
@@ -325,15 +330,12 @@ class OrderController extends Controller
 							$sellingPrice = $productsServicesBook->price;
 						}
 						$sellingPriceWithQty = $sellingPrice * $orderedItem['quantity'];
-						$spWithoutVat = $sellingPriceWithQty - (($sellingPriceWithQty * $vat_percent) / 100);
-
+						
 						$title = $productsServicesBook->type_of_package;
 						$user_package = UserPackageSubscription::where('user_id',null)->first();
 					}
 
 					//reward point will be applicable to student only
-					
-
 					if(($productsServicesBook->is_reward_point_applicable == 1) && (Auth::user()->user_type_id == 2))
 					{
 						$earned_reward_points = $productsServicesBook->reward_points * $orderedItem['quantity'];
@@ -343,34 +345,16 @@ class OrderController extends Controller
 						$earned_reward_points = '0';
 					}
 
+					$reward_points_value = $getAppSetting->single_rewards_pt_value * $earned_reward_points;		
+
 					if($user_package) {
 						$commission = $user_package->commission_per_sale;
 					} else {
 						$commission = 0;
-					}
-
-					$reward_points_value = $getAppSetting->single_rewards_pt_value * $earned_reward_points;
-
-					//Distribution
-					$student_store_commission = 0;
-					$cool_company_commission_amount = 0;
-					$coolCompanyCommission = 0;
-					$amount_transferred_to_vendor = 0;
-
-					$forSSandCCWithoutVat = $spWithoutVat - $reward_points_value;
-
-					//cool company commission for student
-					if(($productsServicesBook->user) && ($productsServicesBook->user->user_type_id == 2))
-					{
-						$coolCompanyCommission = $getAppSetting->coolCompanyCommission;
-						$cool_company_commission_amount = ($forSSandCCWithoutVat * ($coolCompanyCommission)/100);
-					}
+					}			
 
 					if($request->order_for!='packages')
 					{
-						//StudentStore Commission 
-						$student_store_commission = ($forSSandCCWithoutVat * (($commission) / 100));
-
 						//Finally amount transferred to vendor
 						$amount_transferred_to_vendor = (($sellingPrice - ($cool_company_commission_amount + $student_store_commission)) - $reward_points_value);
 					}
@@ -418,7 +402,6 @@ class OrderController extends Controller
 						$orderItem->package_id						= $orderedItem['package_id'];
 						$vendor_user_id = null;
 					}
-					
                     
 					$orderItem->vendor_user_id 	= $vendor_user_id;
 					$orderItem->title 	= $title;
@@ -448,7 +431,7 @@ class OrderController extends Controller
 					$orderItem->cool_company_commission = $cool_company_commission_amount;
 					$orderItem->student_store_commission_percent = $commission;
 					$orderItem->cool_company_commission_percent	= $coolCompanyCommission;
-					$orderItem->vat_percent = $vat_percent;
+					$orderItem->vat_percent = $vat_percentage;
 					$orderItem->vat_amount = $vat_amount;
 					$orderItem->delivery_code = $delivery_code;
 					$orderItem->save();
@@ -456,7 +439,6 @@ class OrderController extends Controller
 
 					if(!empty($orderedItem['product_id']))
 					{
-
 						$orderTracking                  = new OrderTracking;
 						$orderTracking->order_item_id   = $orderItem->id;
 						$orderTracking->status          = $request->order_status;
@@ -499,34 +481,7 @@ class OrderController extends Controller
 	                }
 				}
 
-				//Mail-start-buyer
-
-                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id',$order->user->language_id)->first();
-                if(empty($emailTemplate))
-                {
-                	$emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
-                }
-
-                $email_body = $emailTemplate->body;
-
-                $arrayVal = [
-                	'{{user_name}}' => AES256::decrypt($order->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($order->user->last_name, env('ENCRYPTION_KEY')),
-                	'{{order_number}}' => $order->order_number,
-                ];
-                $email_body = strReplaceAssoc($arrayVal, $email_body);
-                
-                $details = [
-                	'title' => $emailTemplate->subject,
-                	'body' => $email_body,
-                	// 'order_details' => Order::with('orderItems')->find($order->id),
-                	'order_details' => $order,
-                ];
-                
-                Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
-                //mail-end
-
-
-                $paymentCardDetail = false;
+				$paymentCardDetail = false;
                 if(!empty($request->transaction_detail['payment_card_detail_id']))
                 {
                 	$paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);
@@ -546,51 +501,65 @@ class OrderController extends Controller
 					$transactionDetail->card_holder_name         	= $paymentCardDetail->card_holder_name;
 				}
 
-				
                 $transactionDetail->transaction_id           	= $request->transaction_detail['transaction_id'];
-
                 $transactionDetail->description              	= $request->transaction_detail['description'];
                 $transactionDetail->receipt_email            	= $request->transaction_detail['receipt_email'];
                 $transactionDetail->receipt_number           	= $request->transaction_detail['receipt_number'];
                 $transactionDetail->receipt_url              	= $request->transaction_detail['receipt_url'];
                 $transactionDetail->refund_url               	= $request->transaction_detail['refund_url'];
-
                 $transactionDetail->transaction_status       	= $request->transaction_detail['transaction_status'];
                 $transactionDetail->transaction_reference_no 	= $request->transaction_detail['transaction_reference_no'];
                 $transactionDetail->transaction_amount       	= $request->transaction_detail['transaction_amount'];
                 $transactionDetail->transaction_type         	= $request->transaction_detail['transaction_type'];
                 $transactionDetail->transaction_mode         	= $request->transaction_detail['transaction_mode'];
                 $transactionDetail->gateway_detail           	= $request->transaction_detail['gateway_detail'];
-
                 $transactionDetail->transaction_timestamp    	= $request->transaction_detail['transaction_timestamp'];
                 $transactionDetail->currency       		     	= $request->transaction_detail['currency'];
 				$transactionDetail->save();
+
+				//Mail-start-buyer
+                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id',$order->user->language_id)->first();
+                if(empty($emailTemplate))
+                {
+                	$emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
+                }
+
+                $email_body = $emailTemplate->body;
+                $arrayVal = [
+                	'{{user_name}}' => AES256::decrypt($order->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($order->user->last_name, env('ENCRYPTION_KEY')),
+                	'{{order_number}}' => $order->order_number,
+                ];
+                $email_body = strReplaceAssoc($arrayVal, $email_body);
+                
+                $details = [
+                	'title' => $emailTemplate->subject,
+                	'body' => $email_body,
+                	// 'order_details' => Order::with('orderItems')->find($order->id),
+                	'order_details' => $order,
+                ];
+                
+                Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
+                //mail-end
 			}
 
 			$reward_point_value = $getAppSetting->customer_rewards_pt_value * $request->used_reward_points;
 
 			$total = $sub_total - $reward_point_value;
-
-
 			$vat = ($getAppSetting->vat) * $total / 100;
-
-			// $total = $total + $vat + $shipping_charge;
-
 			$total = $total + $shipping_charge;
 
 			$order->update([
-				'sub_total' => $sub_total,
-				'total'  => $total,
+				'sub_total' 	=> $sub_total,
+				'total'  		=> $total,
 				'shipping_charge'  => $shipping_charge,
-				'vat' => $vat,
-				'grand_total' => $total -  $request->promo_code_discount,
-				'payable_amount' => $total -  $request->promo_code_discount,
+				'vat' 			=> $vat,
+				'grand_total' 	=> $total - $request->promo_code_discount,
+				'payable_amount' => $total - $request->promo_code_discount,
 			]);
 
 			DB::commit();
 
 			$lang_id = $this->lang_id;
-
 			$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
 			->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
