@@ -15,11 +15,11 @@ class CvsViewLog extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function userCvDetails()
     {
-        return $this->hasMany(UserCvDetail::class, 'user_cv_detail_id', 'id');
+        return $this->belongsTo(UserCvDetail::class, 'user_cv_detail_id', 'id');
     }
 }
