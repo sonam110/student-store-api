@@ -87,6 +87,20 @@ class ContestController extends Controller
                 $user_id = Auth::id();
             }
 
+            //update price
+            $amount = $request->basic_price_wo_vat;
+            $is_on_offer = $request->is_on_offer;
+            $discount_type = $request->discount_type;
+            $discount_value = $request->discount_value;
+            $vat_percentage = 0;
+            $catVatId = CategoryMaster::select('vat')->find($request->category_master_id);
+            if($catVatId)
+            {
+                $vat_percentage = $catVatId->vat;
+            }
+            
+            $getCommVal = updateCommissions($amount, $is_on_offer, $discount_type, $discount_value, $vat_percentage, $user_id, $request->type);
+
             $start_date = date("Y-m-d", strtotime($request->start_date));
             $end_date = date("Y-m-d", strtotime($request->end_date));
             $application_start_date = date("Y-m-d", strtotime($request->application_start_date));
@@ -132,13 +146,19 @@ class ContestController extends Controller
             $contest->jury_members                          = $request->jury_members;
             $contest->is_free                               = $request->is_free;
             $contest->basic_price_wo_vat                     = $request->basic_price_wo_vat;
-            $contest->subscription_fees                     = $request->subscription_fees;
+            $contest->subscription_fees                     = $getCommVal['price_with_all_com_vat'];
             $contest->use_cancellation_policy               = $request->use_cancellation_policy;
             $contest->provide_participation_certificate     = $request->provide_participation_certificate;
             $contest->is_on_offer                           = $request->is_on_offer;
             $contest->discount_type                         = $request->discount_type;
             $contest->discount_value                        = $request->discount_value;
-            $contest->discounted_price                      = $request->discounted_price;
+            $contest->discounted_price                      = $getCommVal['totalAmount'];
+
+            $contest->vat_percentage = $vat_percentage;
+            $contest->vat_amount = $getCommVal['vat_amount'];
+            $contest->ss_commission_percent = $getCommVal['ss_commission_percent'];
+            $contest->ss_commission_amount = $getCommVal['ss_commission_amount'];
+
             $contest->required_file_upload                  = $request->required_file_upload;
             $contest->file_title                            = $request->file_title;
             $contest->is_reward_point_applicable            = $request->is_reward_point_applicable;
@@ -317,6 +337,20 @@ class ContestController extends Controller
                 $user_id = Auth::id();
             }
 
+            //update price
+            $amount = $request->basic_price_wo_vat;
+            $is_on_offer = $request->is_on_offer;
+            $discount_type = $request->discount_type;
+            $discount_value = $request->discount_value;
+            $vat_percentage = 0;
+            $catVatId = CategoryMaster::select('vat')->find($request->category_master_id);
+            if($catVatId)
+            {
+                $vat_percentage = $catVatId->vat;
+            }
+            
+            $getCommVal = updateCommissions($amount, $is_on_offer, $discount_type, $discount_value, $vat_percentage, $user_id, $request->type);
+
             $contest->user_id                               = $user_id;
             $contest->address_detail_id                     = $request->address_detail_id;
             $contest->registration_type_id                  = $request->registration_type_id;
@@ -356,13 +390,19 @@ class ContestController extends Controller
             $contest->jury_members                          = $request->jury_members;
             $contest->is_free                               = $request->is_free;
             $contest->basic_price_wo_vat                     = $request->basic_price_wo_vat;
-            $contest->subscription_fees                     = $request->subscription_fees;
+            $contest->subscription_fees                     = $getCommVal['price_with_all_com_vat'];
             $contest->use_cancellation_policy               = $request->use_cancellation_policy;
             $contest->provide_participation_certificate     = $request->provide_participation_certificate;
             $contest->is_on_offer                           = $request->is_on_offer;
             $contest->discount_type                         = $request->discount_type;
             $contest->discount_value                        = $request->discount_value;
-            $contest->discounted_price                      = $request->discounted_price;
+            $contest->discounted_price                      = $getCommVal['totalAmount'];
+
+            $contest->vat_percentage = $vat_percentage;
+            $contest->vat_amount = $getCommVal['vat_amount'];
+            $contest->ss_commission_percent = $getCommVal['ss_commission_percent'];
+            $contest->ss_commission_amount = $getCommVal['ss_commission_amount'];
+
             $contest->required_file_upload                  = $request->required_file_upload;
             $contest->file_title                            = $request->file_title;
             $contest->is_reward_point_applicable            = $request->is_reward_point_applicable;

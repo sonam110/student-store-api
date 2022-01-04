@@ -20,7 +20,8 @@ class CategoryMaster extends Model
         'category_master_id',
         'title',
         'slug',
-        'status'
+        'status',
+        'vat'
     ];
 
 

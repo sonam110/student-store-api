@@ -467,8 +467,16 @@ class UserProfileController extends Controller
 	public function getCvsView(Request $request)
 	{
 		try {
-            $data = CvsViewLog::where('user_id', Auth()->id())->with('company:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user.cvDetail')->get();
-            return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
+			$data = CvsViewLog::where('user_id', Auth()->id())->with('company:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user.cvDetail')
+            if(!empty($request->per_page_record))
+            {
+            	$results = $data->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+            }
+            else
+            {
+            	$results = $data->get();
+            }
+            return response(prepareResult(false, $results, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
         } catch (\Throwable $e) {
             return response()->json(prepareResult(true, $e->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }

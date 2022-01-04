@@ -76,6 +76,12 @@ class CreateContestsTable extends Migration
             $table->string('discount_type',100)->nullable();
             $table->float('discount_value')->nullable();
             $table->float('discounted_price')->nullable();
+
+            $table->float('vat_percentage')->nullable()->default(0);
+            $table->float('vat_amount')->nullable()->default(0);
+            $table->float('ss_commission_percent')->nullable()->default(0);
+            $table->float('ss_commission_amount')->nullable()->default(0);
+            
             $table->boolean('is_published')->default(false)->nullable();
             $table->dateTime('published_at')->nullable();
             $table->boolean('is_deleted')->default(false)->nullable();

@@ -89,10 +89,9 @@ class AutoSwichPackageIfExpired extends Command
                     if($userPackageSubscription)
                     {
                         //update price if package changed
-                        $packageID = $getFreePackage->id;
                         $type = $getFreePackage->module;
                         $userID = $package->user_id;
-                        packageUpdatePrice($packageID, $type, $userID);
+                        packageUpdatePrice($type, $userID);
                     }
 
                     $user = $package->user;

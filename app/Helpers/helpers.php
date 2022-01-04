@@ -423,7 +423,7 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 	$appsetting = AppSetting::select('is_enabled_cool_company','coolCompanyCommission','cool_company_social_fee_percentage','cool_company_salary_tax_percentage')->first();
 
 	$ss_commission_percent = 0;
-	$getPackageInfo = UserPackageSubscription::where('user_id', $userId)->where('module', $type)->orderBy('auto_id', 'DESC')->first();
+	$getPackageInfo = UserPackageSubscription::where('user_id', $userId)->where('module', $type)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
 	if($getPackageInfo)
 	{
 		$ss_commission_percent = $getPackageInfo->commission_per_sale;
@@ -550,8 +550,10 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 	return $return;
 }
 
+// if category VAT changed
 function updatePrice($categoryID, $vat_percentage, $type)
 {
+	// Update product price
 	$items = ProductsServicesBook::where('category_master_id', $categoryID)->get();
 	foreach ($items as $key => $item) {
 		$getCommVal = updateCommissions($item->basic_price_wo_vat, $item->is_on_offer, $item->discount_type, $item->discount_value, $vat_percentage, $item->user_id, $item->type);
@@ -565,21 +567,37 @@ function updatePrice($categoryID, $vat_percentage, $type)
     $item->ss_commission_amount = $getCommVal['ss_commission_amount'];
     $item->cc_commission_percent_all = $getCommVal['totalCCPercent'];
     $item->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+    $item->save();
+	}
+
+	//Update Contest Price
+	$items = Contest::where('category_master_id', $categoryID)->where('is_free', 0)->get();
+	foreach ($items as $key => $item) {
+		$getCommVal = updateCommissions($item->basic_price_wo_vat, $item->is_on_offer, $item->discount_type, $item->discount_value, $vat_percentage, $item->user_id, 'contest');
+
+		//update Price
+		$item->subscription_fees = $getCommVal['price_with_all_com_vat'];
+		$item->discounted_price = $getCommVal['totalAmount'];
+		$item->vat_percentage = $vat_percentage;
+    $item->vat_amount = $getCommVal['vat_amount'];
+    $item->ss_commission_percent = $getCommVal['ss_commission_percent'];
+    $item->ss_commission_amount = $getCommVal['ss_commission_amount'];
     $item->save();
 	}
 	return true;
 }
 
-function packageUpdatePrice($packageID, $type, $userID)
+function packageUpdatePrice($type, $userID)
 {
-	$items = ProductsServicesBook::where('category_master_id', $categoryID)->get();
+	// Update product price
+	$items = ProductsServicesBook::where('user_id', $userID)->where('type', $type)->get();
 	foreach ($items as $key => $item) {
-		$getCommVal = updateCommissions($item->basic_price_wo_vat, $item->is_on_offer, $item->discount_type, $item->discount_value, $vat_percentage, $item->user_id, $item->type);
+		$getCommVal = updateCommissions($item->basic_price_wo_vat, $item->is_on_offer, $item->discount_type, $item->discount_value, $item->categoryMaster->vat, $item->user_id, $item->type);
 
 		//update Price
 		$item->price = $getCommVal['price_with_all_com_vat'];
 		$item->discounted_price = $getCommVal['totalAmount'];
-		$item->vat_percentage = $vat_percentage;
+		$item->vat_percentage = $item->categoryMaster->vat;
     $item->vat_amount = $getCommVal['vat_amount'];
     $item->ss_commission_percent = $getCommVal['ss_commission_percent'];
     $item->ss_commission_amount = $getCommVal['ss_commission_amount'];
@@ -587,5 +605,21 @@ function packageUpdatePrice($packageID, $type, $userID)
     $item->cc_commission_amount_all = $getCommVal['totalCCAmount'];
     $item->save();
 	}
+
+	//Update Contest Price
+	$items = Contest::where('user_id', $userID)->where('is_free', 0)->get();
+	foreach ($items as $key => $item) {
+		$getCommVal = updateCommissions($item->basic_price_wo_vat, $item->is_on_offer, $item->discount_type, $item->discount_value, $item->categoryMaster->vat, $item->user_id, 'contest');
+
+		//update Price
+		$item->subscription_fees = $getCommVal['price_with_all_com_vat'];
+		$item->discounted_price = $getCommVal['totalAmount'];
+		$item->vat_percentage = $item->categoryMaster->vat;
+    $item->vat_amount = $getCommVal['vat_amount'];
+    $item->ss_commission_percent = $getCommVal['ss_commission_percent'];
+    $item->ss_commission_amount = $getCommVal['ss_commission_amount'];
+    $item->save();
+	}
+
 	return true;
 }
