@@ -2137,7 +2137,8 @@ class LabelSeeder extends Seeder
           "verification_successful" => "Verification Successful", 
           "verified" => "Are you sure? you want to change the status as verified?", 
           "will_be_send_to" => "Sending notification to",
-          "message_student_detail_incomplete" => "Please complete your information by updating your profile first" 
+          "message_student_detail_incomplete" => "Please complete your information by updating your profile first",
+          "message_contest_completed_update" => "You cannot edit this because some users are already participate this contest." 
         ], 
         "messageTemplates" => [
           "message" => "Message", 

@@ -406,6 +406,11 @@ class ContestController extends Controller
             return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
         }
 
+        if($contest->contestApplications->count()>0)
+        {
+            return response()->json(prepareResult(true, 'You cannot edit this because some users are already participate this contest.', getLangByLabelGroups('messages','message_contest_completed_update')), config('http_response.success'));
+        }
+
         if($contest->status=='completed')
         {
             return response()->json(prepareResult(true, 'Contest is comppleted so you can not update this contest after completion.', getLangByLabelGroups('messages','message_contest_completed_cannot_update')), config('http_response.success'));
@@ -547,8 +552,6 @@ class ContestController extends Controller
                     $allTypeTag->save();
                 }
             }
-
-
 
             DB::commit();
             return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_updated')), config('http_response.created'));
