@@ -16,6 +16,7 @@ use App\Models\UserPackageSubscription;
 use App\Models\ContestTag;
 use App\Models\Language;
 use App\Models\NotificationTemplate;
+use App\Models\CategoryMaster;
 
 class ContestController extends Controller
 {

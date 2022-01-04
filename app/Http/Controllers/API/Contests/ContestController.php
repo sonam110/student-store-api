@@ -20,6 +20,7 @@ use App\Models\Abuse;
 use App\Models\NotificationTemplate;
 use App\Models\RatingAndFeedback;
 use App\Models\Language;
+use App\Models\CategoryMaster;
 
 class ContestController extends Controller
 {

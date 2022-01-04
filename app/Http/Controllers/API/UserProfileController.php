@@ -171,18 +171,10 @@ class UserProfileController extends Controller
 
 	public function extraDetailUpdate(Request $request)
 	{
-		$validation = \Validator::make($request->all(),[ 
-		]);
-
-		if ($validation->fails()) {
-			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-		}
-
 		$user = Auth::user();
 		if($user->userType->title == 'Student')
 		{
-			$userDetail = StudentDetail::where('user_id',$user->id)->first();
-			if($userDetail)
+			if(StudentDetail::where('user_id',$user->id)->count()>0)
 			{
 				$userDetail = StudentDetail::where('user_id',$user->id)->first();
 			}
@@ -202,8 +194,7 @@ class UserProfileController extends Controller
 		}
 		elseif($user->userType->title == 'Service Provider')
 		{
-			$userDetail = ServiceProviderDetail::where('user_id',$user->id)->first();
-			if($userDetail)
+			if(ServiceProviderDetail::where('user_id',$user->id)->count()>0)
 			{
 				$userDetail = ServiceProviderDetail::where('user_id',$user->id)->first();
 			}

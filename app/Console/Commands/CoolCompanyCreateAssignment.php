@@ -61,6 +61,7 @@ class CoolCompanyCreateAssignment extends Command
             ->where('order_items.product_type', 'service')
             ->where('order_items.is_sent_to_cool_company', '!=', '1')
             ->whereDate('order_items.delivery_completed_date', $before15Days)
+            ->where('users.user_type_id', '2')
             ->where('order_items.item_status', 'completed')
             ->orderBy('order_items.auto_id', 'ASC')
             ->groupBy('order_items.vendor_user_id')
@@ -69,7 +70,7 @@ class CoolCompanyCreateAssignment extends Command
         {
             $reportArray = [];
             $orderItemId = [];
-            $createBatchUserWise = OrderItem::select('users.id as user_id','order_items.id','order_items.order_id','order_items.products_services_book_id','order_items.price','order_items.quantity','order_items.vat_percent','student_details.cool_company_id')
+            $createBatchUserWise = OrderItem::select('users.id as user_id','order_items.id','order_items.order_id','order_items.products_services_book_id','order_items.price','order_items.quantity','order_items.vat_percent','order_items.vat_amount','student_details.cool_company_id')
             ->join('users', 'users.id','=','order_items.vendor_user_id')
             ->join('student_details', 'student_details.user_id','=','order_items.vendor_user_id')
             ->whereNotNull('order_items.vendor_user_id')
@@ -102,7 +103,7 @@ class CoolCompanyCreateAssignment extends Command
                     'paymentType' => 2,
                     'customUnitType'    => 'days',
                     'unitQuantity'=> $itemInfo->quantity,
-                    'unitRate'    => $itemInfo->price - (($itemInfo->price * $itemInfo->vat_percent)/100),
+                    'unitRate'    => $itemInfo->price - $itemInfo->vat_amount,
                     'totalHours'  => 24,
                     'status'      => 'Approved'
                 ];
