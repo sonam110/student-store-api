@@ -18,7 +18,7 @@ class CvsViewLog extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function userCvDetail()
+    public function cvDetail()
     {
         return $this->belongsTo(UserCvDetail::class, 'user_cv_detail_id', 'id');
     }
