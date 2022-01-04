@@ -429,7 +429,6 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 		$ss_commission_percent = $getPackageInfo->commission_per_sale;
 	}
 
-	$discounted_price = 0;
 	$coolCompanyCommission = 0;
 	$cc_commission_amount_all = 0;
 	$cc_social_fee_percentage = 0;
@@ -463,7 +462,7 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 	}
 
 	$ssca = $amount * ($ss_commission_percent / 100);
-	
+
 	if($appsetting->is_enabled_cool_company && User::select('user_type_id')->find($userId)->user_type_id==2 && $type=='service')
 	{
 		$ccc = $appsetting->coolCompanyCommission;
@@ -491,7 +490,6 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 		{
 			$price = $amount - $discount_value;
 		}
-		$discounted_price = $price;
 	}
 	else
 	{
@@ -520,6 +518,15 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 	}
 	$totalCCAmount = $cc_commission_fee + $cc_social_fee + $cc_salary_tax;
 	$totalCCPercent = $coolCompanyCommission + $cc_social_fee_percentage + $cc_salary_tax_percentage;
+
+	if($is_on_offer==1)
+	{
+		$totalAmount = round(($totalCCAmount + $ss_commission_amount + $price + $vat_amount), 2);
+	}
+	else
+	{
+		$totalAmount = 0;
+	}
 	$return = [
 			'cool_company_commission' => round($coolCompanyCommission, 2),
 			'cc_social_fee_percentage' => round($cc_social_fee_percentage, 2),
@@ -533,12 +540,11 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 			'vat_amount' => round($vat_amount, 2),
 			'ss_commission_percent' => round($ss_commission_percent, 2),
 			'ss_commission_amount' => round($ss_commission_amount, 2),
-			'discounted_price' => round($discounted_price, 2),
 			'price' => round($price, 2),
 			'price_with_all_com_vat' => round($price_with_all_com_vat, 2),
 			'totalCCPercent' => round($totalCCPercent, 2),
 			'totalCCAmount' => round($totalCCAmount, 2),
-			'totalAmount' => round(($totalCCAmount + $ss_commission_amount + $price + $vat_amount), 2),
+			'totalAmount' => $totalAmount,
 	];
 
 	return $return;
