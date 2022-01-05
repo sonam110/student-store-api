@@ -154,7 +154,7 @@ class UserProfileController extends Controller
 		$user->show_email 						= $request->show_email;
 		$user->show_contact_number 				= $request->show_contact_number;
 
-		$user->bank_account_type 	= $request->bank_account_type;
+		$user->bank_account_type 	= (empty($request->bank_account_type)) ? $request->bank_account_type : 1;
 		$user->bank_name 			= $request->bank_name;
 		$user->bank_account_num 	= $request->bank_account_num;
 		$user->bank_identifier_code = $request->bank_identifier_code;

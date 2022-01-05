@@ -64,12 +64,12 @@ class CoolCompanyRegFreelancer extends Command
                 $tokenExpired   = $getToken['expire_time'];
             }
 
-            if($student->bank_account_type==1) {
-                $paymentAccountTypeId = 'Local';
+            if($student->bank_account_type==3) {
+                $paymentAccountTypeId = 'PayPal';
             } elseif($student->bank_account_type==2) {
                 $paymentAccountTypeId = 'International';
             } else {
-                $paymentAccountTypeId = 'PayPal';
+                $paymentAccountTypeId = 'Local';
             }
             $data = [
                 'firstName'   => $student->first_name,
