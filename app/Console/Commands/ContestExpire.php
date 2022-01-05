@@ -64,13 +64,16 @@ class ContestExpire extends Command
             foreach($getAllContApplications as $key => $apllications)
             {
                 $changeOrderStatus = OrderItem::where('contest_application_id', $apllications->id)->first();
-                $changeOrderStatus->item_status = 'completed';
-                $changeOrderStatus->delivery_completed_date = date('Y-m-d H:i:s');
-                if(!empty($changeOrderStatus->user) && $changeOrderStatus->user->user_type_id==2)
+                if($changeOrderStatus)
                 {
-                    $changeOrderStatus->return_applicable_date = date('Y-m-d');
+                    $changeOrderStatus->item_status = 'completed';
+                    $changeOrderStatus->delivery_completed_date = date('Y-m-d H:i:s');
+                    if(!empty($changeOrderStatus->user) && $changeOrderStatus->user->user_type_id==2)
+                    {
+                        $changeOrderStatus->return_applicable_date = date('Y-m-d');
+                    }
+                    $changeOrderStatus->save();
                 }
-                $changeOrderStatus->save();
             }
             
             // Notification Start
