@@ -417,7 +417,7 @@ class OrderController extends Controller
 					
 					$orderItem->price = $sellingPrice;
 					$orderItem->used_item_reward_points 				= $orderedItem['used_item_reward_points'];
-					$orderItem->price_after_apply_reward_points = ((($sellingPriceWithQty) - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value)));
+					$orderItem->price_after_apply_reward_points = ((($sellingPriceWithQty) - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value))/$orderedItem['quantity']);
 					$orderItem->earned_reward_points = $earned_reward_points;
 					$orderItem->quantity = $orderedItem['quantity'];
 					$orderItem->discount = $discount;
