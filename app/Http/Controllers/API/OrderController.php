@@ -246,8 +246,8 @@ class OrderController extends Controller
 					if(!empty($orderedItem['product_id']))
 					{
 						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
-						$vat_amount = $productsServicesBook->vat_amount;
-						$vat_percentage = $productsServicesBook->vat_percentage * $orderedItem['quantity'];
+						$vat_amount = $productsServicesBook->vat_amount * $orderedItem['quantity'];
+						$vat_percentage = $productsServicesBook->vat_percentage;
 						$student_store_commission = $productsServicesBook->ss_commission_amount * $orderedItem['quantity'];
 						$cool_company_commission_amount = $productsServicesBook->cc_commission_amount_all  * $orderedItem['quantity'];
 						$coolCompanyCommission = $productsServicesBook->cc_commission_percent_all;
