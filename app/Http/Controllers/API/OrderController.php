@@ -1883,7 +1883,10 @@ class OrderController extends Controller
 		$reward_point_value = round($getAppSetting->customer_rewards_pt_value * $request->used_reward_points, 2);
 
 		$total = round($sub_total - $reward_point_value + $shipping_charge - $request->promo_code_discount, 2);
-
+		if($total<1)
+		{
+			return response()->json(prepareResult(true, 'Total price must be greater than or equal to 1.', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
 		
         $username = $this->paymentInfo->klarna_username;
         $password = $this->paymentInfo->klarna_password;
