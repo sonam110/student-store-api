@@ -456,7 +456,7 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 	$ns = 0;
 
 	//for actual value calculation
-	if(User::select('user_type_id')->find($userId)->user_type_id!=2)
+	if(User::select('user_type_id')->find($userId)->user_type_id!=2 || $type=='service' || $type=="contest" || $type=="event")
 	{
 		$va = $amount * ($vat_percentage / 100);
 	}
@@ -496,7 +496,7 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 		$price = $amount;
 	}
 
-	if(User::select('user_type_id')->find($userId)->user_type_id!=2)
+	if(User::select('user_type_id')->find($userId)->user_type_id!=2 || $type=='service' || $type=="contest" || $type=="event")
 	{
 		$vat_amount = $price * ($vat_percentage / 100);
 	}
