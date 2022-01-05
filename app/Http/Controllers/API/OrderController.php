@@ -356,7 +356,7 @@ class OrderController extends Controller
 					if($request->order_for!='packages')
 					{
 						//Finally amount transferred to vendor
-						$amount_transferred_to_vendor = (($sellingPrice - ($cool_company_commission_amount + $student_store_commission)) - $reward_points_value);
+						$amount_transferred_to_vendor = (($sellingPriceWithQty - ($cool_company_commission_amount + $student_store_commission)) - $reward_points_value);
 					}
 					else
 					{
@@ -372,7 +372,7 @@ class OrderController extends Controller
 						$discount = $productsServicesBook->discount_value;
 					} 
 
-					$sub_total = $sub_total + $sellingPrice;
+					$sub_total = $sub_total + $sellingPriceWithQty;
 
 					$orderItem = new OrderItem;
 					$orderItem->user_id							= Auth::id();
@@ -417,7 +417,7 @@ class OrderController extends Controller
 					
 					$orderItem->price = $sellingPrice;
 					$orderItem->used_item_reward_points 				= $orderedItem['used_item_reward_points'];
-					$orderItem->price_after_apply_reward_points = ((($sellingPrice) - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value)) / $orderedItem['quantity']);
+					$orderItem->price_after_apply_reward_points = ((($sellingPriceWithQty) - ($orderedItem['used_item_reward_points'] * $getAppSetting->customer_rewards_pt_value));
 					$orderItem->earned_reward_points = $earned_reward_points;
 					$orderItem->quantity = $orderedItem['quantity'];
 					$orderItem->discount = $discount;
