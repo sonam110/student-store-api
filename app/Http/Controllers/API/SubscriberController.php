@@ -17,11 +17,16 @@ class SubscriberController extends Controller
     public function store(Request $request)
     {        
         $validation = Validator::make($request->all(), [
-            'email'  => 'required|unique:subscribers'
+            'email'  => 'required'
         ]);
 
         if ($validation->fails()) {
             return response(prepareResult(false, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
+
+        if(Subscriber::where('email', $request->email)->count()>0)
+        {
+            return response()->json(prepareResult(true, 'Already resgistered', getLangByLabelGroups('messages','alreadyAdded')), config('http_response.internal_server_error'));
         }
 
         DB::beginTransaction();
