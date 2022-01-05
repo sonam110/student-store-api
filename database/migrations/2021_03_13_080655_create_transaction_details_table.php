@@ -19,6 +19,7 @@ class CreateTransactionDetailsTable extends Migration
 
             $table->string('order_id', 50);
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            
             $table->string('payment_card_detail_id', 50)->nullable();
             $table->foreign('payment_card_detail_id')->references('id')->on('payment_card_details')->onDelete('cascade');
 
