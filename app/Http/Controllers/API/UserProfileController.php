@@ -479,9 +479,13 @@ class UserProfileController extends Controller
 	public function updateJobViewed($job_application_id)
 	{
 		$updateViewed = JobApplication::find($job_application_id);
-		$updateViewed->is_viewed = 1;
-		$updateViewed->save();
-		return response(prepareResult(false, $updateViewed, getLangByLabelGroups('messages','message_success_title')), config('http_response.created'));
+		if($updateViewed)
+		{
+			$updateViewed->is_viewed = 1;
+			$updateViewed->save();
+			return response(prepareResult(false, $updateViewed, getLangByLabelGroups('messages','message_success_title')), config('http_response.created'));
+		}
+		return response()->json(prepareResult(true, 'Job application not found.', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
 	}
 
 	public function languageUpdate(Request $request)
