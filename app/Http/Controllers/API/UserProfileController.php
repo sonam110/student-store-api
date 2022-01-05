@@ -406,52 +406,55 @@ class UserProfileController extends Controller
 
 	public function cvsView($user_cv_detail_id)
 	{
-		$user_package = UserPackageSubscription::where('user_id', Auth::id())
-			->where('module','job')
-			->whereDate('package_valid_till','>=', date('Y-m-d'))
-			->orderBy('created_at','desc')
-			->first();
-
-		if(empty($user_package))
+		if(CvsViewLog::where('user_cv_detail_id', $user_cv_detail_id)->where('user_id', Auth::id())->count()<1)
 		{
-		    return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
-		}
+			$user_package = UserPackageSubscription::where('user_id', Auth::id())
+				->where('module','job')
+				->whereDate('package_valid_till','>=', date('Y-m-d'))
+				->orderBy('created_at','desc')
+				->first();
 
-		/*$cvsViewLog = CvsViewLog::where('user_id', Auth::id())
-			->where('user_cv_detail_id',$user_cv_detail_id)
-			->where('user_package_subscription_id',$user_package->id)
-			->where('valid_till','<=',$user_package->package_valid_till)
-			->count();*/
+			if(empty($user_package))
+			{
+			    return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+			}
 
-		if($user_package->cvs_view<1)
-		{
-			return response()->json(prepareResult(true, ['CV view is not allowed in the purchased package.'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
-		}
+			/*$cvsViewLog = CvsViewLog::where('user_id', Auth::id())
+				->where('user_cv_detail_id',$user_cv_detail_id)
+				->where('user_package_subscription_id',$user_package->id)
+				->where('valid_till','<=',$user_package->package_valid_till)
+				->count();*/
 
-		if($user_package->cvs_view == $user_package->used_cvs_view)
-		{
-		    return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
-		}
+			if($user_package->cvs_view<1)
+			{
+				return response()->json(prepareResult(true, ['CV view is not allowed in the purchased package.'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
+			}
 
-		$getUserId = UserCvDetail::select('user_id')->find($user_cv_detail_id);
+			if($user_package->cvs_view == $user_package->used_cvs_view)
+			{
+			    return response()->json(prepareResult(true, ['Package Use Exhasted'], getLangByLabelGroups('messages','message_cvs_view_exhausted_error')), config('http_response.internal_server_error'));
+			}
 
-		$cvsViewLog = new CvsViewLog;
-		$cvsViewLog->user_id 						= Auth::id();
-		$cvsViewLog->user_cv_detail_id 				= $user_cv_detail_id;
-		$cvsViewLog->applicant_id 					= $getUserId->user_id;
-		$cvsViewLog->valid_till 					= $user_package->package_valid_till;
-		$cvsViewLog->user_package_subscription_id 	= $user_package->id;
-		$cvsViewLog->save();
+			$getUserId = UserCvDetail::select('user_id')->find($user_cv_detail_id);
 
-		$user_package->update(['used_cvs_view'=>($user_package->used_cvs_view + 1)]);
-		$user = Auth::user();
-		if($user)
-		{
-			return response(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_updated')), config('http_response.created'));
-		}
-		else
-		{
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			$cvsViewLog = new CvsViewLog;
+			$cvsViewLog->user_id 						= Auth::id();
+			$cvsViewLog->user_cv_detail_id 				= $user_cv_detail_id;
+			$cvsViewLog->applicant_id 					= $getUserId->user_id;
+			$cvsViewLog->valid_till 					= $user_package->package_valid_till;
+			$cvsViewLog->user_package_subscription_id 	= $user_package->id;
+			$cvsViewLog->save();
+
+			$user_package->update(['used_cvs_view'=>($user_package->used_cvs_view + 1)]);
+			$user = Auth::user();
+			if($user)
+			{
+				return response(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_updated')), config('http_response.created'));
+			}
+			else
+			{
+				return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			}
 		}
 	}
 	
