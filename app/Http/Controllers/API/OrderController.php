@@ -247,9 +247,9 @@ class OrderController extends Controller
 					{
 						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
 						$vat_amount = $productsServicesBook->vat_amount;
-						$vat_percentage = $productsServicesBook->vat_percentage;
-						$student_store_commission = $productsServicesBook->ss_commission_amount;
-						$cool_company_commission_amount = $productsServicesBook->cc_commission_amount_all;
+						$vat_percentage = $productsServicesBook->vat_percentage * $orderedItem['quantity'];
+						$student_store_commission = $productsServicesBook->ss_commission_amount * $orderedItem['quantity'];
+						$cool_company_commission_amount = $productsServicesBook->cc_commission_amount_all  * $orderedItem['quantity'];
 						$coolCompanyCommission = $productsServicesBook->cc_commission_percent_all;
 
 						if($productsServicesBook->is_on_offer == 1)
@@ -299,9 +299,9 @@ class OrderController extends Controller
 					{
 						$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
 						$productsServicesBook = Contest::find($contest_id);
-						$vat_amount = $productsServicesBook->vat_amount;
+						$vat_amount = $productsServicesBook->vat_amount * $orderedItem['quantity'];
 						$vat_percentage = $productsServicesBook->vat_percentage;
-						$student_store_commission = $productsServicesBook->ss_commission_amount;
+						$student_store_commission = $productsServicesBook->ss_commission_amount * $orderedItem['quantity'];
 						if($productsServicesBook->is_on_offer == 1)
 						{
 							$sellingPrice = $productsServicesBook->discounted_price;
