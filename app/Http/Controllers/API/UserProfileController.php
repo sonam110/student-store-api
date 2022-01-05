@@ -482,6 +482,10 @@ class UserProfileController extends Controller
 		$updateViewed = JobApplication::find($job_application_id);
 		if($updateViewed)
 		{
+			if($updateViewed->is_viewed = 1) 
+			{
+				return response()->json(prepareResult(true, 'Job already viewed.', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			}
 			$updateViewed->is_viewed = 1;
 			$updateViewed->save();
 			return response(prepareResult(false, $updateViewed, getLangByLabelGroups('messages','message_success_title')), config('http_response.created'));
