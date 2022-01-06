@@ -2377,7 +2377,7 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='closingSoon')
             {
-                $contests->whereBetween('application_end_date', [date('Y-m-d'), date('Y-m-d', strtotime("+2 days"))]);
+                $contests->whereBetween('application_end_date', [date('Y-m-d', strtotime("-1 days")), date('Y-m-d', strtotime("+2 days"))]);
             }
             elseif($searchType=='random')
             {
