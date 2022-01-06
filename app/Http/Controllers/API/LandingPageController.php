@@ -2312,13 +2312,14 @@ class LandingPageController extends Controller
                 {
                     $contests->where('contests.application_end_date', '<=',  date("Y-m-d", strtotime($request->applying_date)))->orderBy('contests.application_end_date','asc');
                 }
+
                 if(!empty($request->start_date))
                 {
-                    $contests->where('start_date', '>=', $request->start_date);
+                    $contests->where('start_date', '>=', date('Y-m-d', strtotime($request->start_date)));
                 }
                 if(!empty($request->end_date))
                 {
-                    $contests->where('end_date', '<=', $request->end_date);
+                    $contests->where('start_date', '<=', date('Y-m-d', strtotime($request->end_date)));
                 }
 
                 if(!empty($request->free_subscription))
