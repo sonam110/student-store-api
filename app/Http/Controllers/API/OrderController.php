@@ -616,10 +616,11 @@ class OrderController extends Controller
 
 	public function orderItemStatusUpdate(Request $request, $id)
 	{
-		
 		$title = null;
 		$body = null;
+
         // pending->confirmed->shipped->delivered->completed->replacement_initiated->replacement_acccepted->replacement_completed->return_initiated->return_confirmed->return_declined->return_completed
+
 		$orderItem = OrderItem::find($id);
 		$expected_delivery_date = $orderItem->expected_delivery_date;
 		$tracking_number = $orderItem->tracking_number;
@@ -689,7 +690,6 @@ class OrderController extends Controller
 			$shipment_company_name = $request->shipment_company_name;
 		}
 
-
 		if($request->item_status == 'replacement_initiated')
 		{
 			$comment = $request->reason_of_replacement;
@@ -721,10 +721,12 @@ class OrderController extends Controller
 			$orderItemReplacement->images                    	= $request->images;
 			$orderItemReplacement->replacement_tracking_number  = $request->replacement_tracking_number;
 			$orderItemReplacement->expected_replacement_date = date('Y-m-d',strtotime($request->expected_replacement_date));
-			$orderItemReplacement->first_name					= $orderItem->productsServicesBook->user->first_name;
-			$orderItemReplacement->last_name					= $orderItem->productsServicesBook->user->last_name;
-			$orderItemReplacement->email						= $orderItem->productsServicesBook->user->email;
-			$orderItemReplacement->contact_number				= $orderItem->productsServicesBook->user->contact_number;
+
+			$orderItemReplacement->first_name = (!empty($orderItem->productsServicesBook->user->first_name)) ? AES256::decrypt($orderItem->productsServicesBook->user->first_name, env('ENCRYPTION_KEY')) : NULL;
+			$orderItemReplacement->last_name = (!empty($orderItem->productsServicesBook->user->last_name)) ? AES256::decrypt($orderItem->productsServicesBook->user->last_name, env('ENCRYPTION_KEY')) : NULL;
+			$orderItemReplacement->email = (!empty($orderItem->productsServicesBook->user->email)) ? AES256::decrypt($orderItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')) : NULL;
+
+			$orderItemReplacement->contact_number = $orderItem->productsServicesBook->user->contact_number;
 			$orderItemReplacement->latitude           	= $addressfind->latitude;
 			$orderItemReplacement->longitude           	= $addressfind->longitude;
 			$orderItemReplacement->country             	= $addressfind->country;
@@ -740,12 +742,8 @@ class OrderController extends Controller
 			$title = 'Replacement Request';
 			$body =  'Order for '.$orderItem->title.' has Replacement Request because of '.$request->reason_of_replacement.'.';
 
-
 			//Mail-start
-
-
 			///to Buyer
-
 			$emailTemplate = EmailTemplate::where('template_for','order_replacement_request')->where('language_id',$orderItem->order->user->language_id)->first();
 			if(empty($emailTemplate))
 			{
@@ -753,7 +751,6 @@ class OrderController extends Controller
 			}
 
 			$mail_body = $emailTemplate->body;
-
 			$arrayVal = [
 				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
 				'{{order_item}}' => $orderItem->title,
@@ -769,14 +766,12 @@ class OrderController extends Controller
 			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
 
 			///to Seller
-
 			$seller_details = [
 				'title' => $title,
 				'body' => $body
 			];
 			
 			Mail::to(AES256::decrypt($orderItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($seller_details));
-
 			//Mail end
 		}
 
@@ -796,26 +791,56 @@ class OrderController extends Controller
 			if(empty($request->replacement_code))
 			{
 				$orderItem = OrderItem::find($orderItemReplacement->order_item_id);
+				$used_item_reward_points = $orderItem->used_item_reward_points;
+				$earned_reward_points = $orderItem->earned_reward_points;
+				$amount_transferred_to_vendor = $orderItem->amount_transferred_to_vendor;
+				$student_store_commission = $orderItem->student_store_commission;
+				$cool_company_commission = $orderItem->cool_company_commission;
+				$vat_amount = $orderItem->vat_amount;
+
+				//Update price in order_item
+				$orderItem->used_item_reward_points = ceil($orderItem->used_item_reward_points / $orderItem->quantity) * ($orderItem->quantity - $orderItemReplacement->quantity);
+				$orderItem->earned_reward_points = ceil($orderItem->earned_reward_points / $orderItem->quantity) * ($orderItem->quantity - $orderItemReplacement->quantity);
+				$orderItem->amount_transferred_to_vendor = round(($orderItem->amount_transferred_to_vendor / $orderItem->quantity) * ($orderItem->quantity - $orderItemReplacement->quantity), 2);
+				$orderItem->student_store_commission = round(($orderItem->student_store_commission / $orderItem->quantity) * ($orderItem->quantity - $orderItemReplacement->quantity), 2);
+				$orderItem->cool_company_commission = round(($orderItem->cool_company_commission / $orderItem->quantity) * ($orderItem->quantity - $orderItemReplacement->quantity), 2);
+				$orderItem->vat_amount = round(($orderItem->vat_amount / $orderItem->quantity) * ($orderItem->quantity - $orderItemReplacement->quantity), 2);
+				$orderItem->save(); 
+
+				
 				$replaceOrderItem = new OrderItem;
-				$replaceOrderItem->user_id						= $orderItem->user_id;
-				$replaceOrderItem->order_id						= $orderItem->order_id;
-				$replaceOrderItem->order_item_id				= $orderItem->id;
-				$replaceOrderItem->products_services_book_id	= $orderItem->products_services_book_id;
-				$replaceOrderItem->product_type					= $orderItem->product_type;
-				$replaceOrderItem->title						= $orderItem->title;
-				$replaceOrderItem->sku							= $orderItem->sku;
-				$replaceOrderItem->price                        = $orderItem->price;
-				$replaceOrderItem->used_item_reward_points      = $orderItem->used_item_reward_points;
+				$replaceOrderItem->user_id = $orderItem->user_id;
+				$replaceOrderItem->order_id = $orderItem->order_id;
+				$replaceOrderItem->vendor_user_id = $orderItem->vendor_user_id;
+				$replaceOrderItem->order_item_id = $orderItem->id;
+				$replaceOrderItem->products_services_book_id = $orderItem->products_services_book_id;
+				$replaceOrderItem->product_type = $orderItem->product_type;
+				$replaceOrderItem->title = $orderItem->title;
+				$replaceOrderItem->sku = $orderItem->sku;
+				$replaceOrderItem->price = $orderItem->price;
+
+				//Update price in order_item
+				$replaceOrderItem->used_item_reward_points = floor($used_item_reward_points - $orderItem->used_item_reward_points);
+				$replaceOrderItem->earned_reward_points = floor($earned_reward_points - $orderItem->earned_reward_points);
+				$replaceOrderItem->amount_transferred_to_vendor = round(($amount_transferred_to_vendor - $orderItem->amount_transferred_to_vendor), 2);
+				$replaceOrderItem->student_store_commission = round(($student_store_commission - $orderItem->student_store_commission), 2);
+				$replaceOrderItem->cool_company_commission = round(($cool_company_commission - $orderItem->cool_company_commission), 2);
+				$replaceOrderItem->vat_amount = round(($vat_amount - $orderItem->vat_amount), 2);
+
+				$replaceOrderItem->vat_percent = $orderItem->vat_percent;
+				$replaceOrderItem->cool_company_commission_percent = $orderItem->cool_company_commission_percent;
+				$replaceOrderItem->student_store_commission_percent = $orderItem->student_store_commission_percent;
+
 				$replaceOrderItem->price_after_apply_reward_points = $orderItem->price_after_apply_reward_points;
-				$replaceOrderItem->quantity						= $orderItemReplacement->quantity;
-				$replaceOrderItem->discount						= $orderItem->discount;
-				$replaceOrderItem->cover_image                  = $orderItem->cover_image;
-				$replaceOrderItem->sell_type					= $orderItem->sell_type;
-				$replaceOrderItem->rent_duration				= $orderItem->rent_duration;
-				$replaceOrderItem->item_status					= 'processing';
-				$replaceOrderItem->item_payment_status			= true;
-				$replaceOrderItem->note_to_seller               = $orderItem->note_to_seller;
-				$replaceOrderItem->order_type               	= '1';
+				$replaceOrderItem->quantity = $orderItemReplacement->quantity;
+				$replaceOrderItem->discount = $orderItem->discount;
+				$replaceOrderItem->cover_image = $orderItem->cover_image;
+				$replaceOrderItem->sell_type = $orderItem->sell_type;
+				$replaceOrderItem->rent_duration = $orderItem->rent_duration;
+				$replaceOrderItem->item_status = 'processing';
+				$replaceOrderItem->item_payment_status = true;
+				$replaceOrderItem->note_to_seller = $orderItem->note_to_seller;
+				$replaceOrderItem->order_type = 1;
 				$replaceOrderItem->save();
 
 				$orderTracking                  = new OrderTracking;
@@ -831,12 +856,7 @@ class OrderController extends Controller
 			$title = 'Replacement Request Accepted';
 			$body =  'Request for replacement of ordered product '.$orderItem->title.' has Accepted.';
 
-
-			//Mail-start
-
-
 			///to Buyer
-
 			$emailTemplate = EmailTemplate::where('template_for','order_replaced')->where('language_id',$orderItem->order->user->language_id)->first();
 			if(empty($emailTemplate))
 			{
@@ -844,13 +864,11 @@ class OrderController extends Controller
 			}
 
 			$mail_body = $emailTemplate->body;
-
 			$arrayVal = [
 				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
 				'{{order_item}}' => $orderItem->title,
 			];
 			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
-			
 			$details = [
 				'title' => $emailTemplate->subject,
 				'body' => $mail_body
@@ -914,10 +932,7 @@ class OrderController extends Controller
 			$body =  'Order for '.$orderItem->title.' has Return Request because of '.$request->reason_of_return.'.';
 			
 			//Mail-start
-
-
 			///to Buyer
-
 			$emailTemplate = EmailTemplate::where('template_for','order_return_request')->where('language_id',$orderItem->order->user->language_id)->first();
 			if(empty($emailTemplate))
 			{
@@ -925,30 +940,24 @@ class OrderController extends Controller
 			}
 
 			$mail_body = $emailTemplate->body;
-
 			$arrayVal = [
 				'{{user_name}}' => AES256::decrypt($orderItem->order->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($orderItem->order->last_name, env('ENCRYPTION_KEY')),
 				'{{order_item}}' => $orderItem->title,
 				'{{return_reason}}' => $request->reason_of_return,
 			];
 			$mail_body = strReplaceAssoc($arrayVal, $mail_body);
-			
 			$details = [
 				'title' => $emailTemplate->subject,
 				'body' => $mail_body
 			];
-			
 			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
 
 			///to Seller
-
 			$seller_details = [
 				'title' => $title,
 				'body' => $body
 			];
-			
 			Mail::to(AES256::decrypt($orderItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($seller_details));
-
 			//Mail end
 		}
 
@@ -1266,7 +1275,6 @@ class OrderController extends Controller
 		$orderItem->reason_id_for_cancellation_request_decline 	= $reason_id_for_cancellation_request_decline;
 		$orderItem->reason_for_cancellation_request_decline 	= $reason_for_cancellation_request_decline;
 		$orderItem->is_returned 								= $is_returned;
-		//$orderItem->amount_returned  							= $amount_returned;
 		$orderItem->is_replaced 								= $is_replaced;
 		$orderItem->is_disputed 								= $is_disputed;
 		$orderItem->save();
@@ -1307,10 +1315,7 @@ class OrderController extends Controller
 			$body =  'Order for '.$orderItem->title.' has been Confirmed.';
 
 			//Mail-start
-
-
 			///to Buyer
-
 			$emailTemplate = EmailTemplate::where('template_for','order_confirmed')->where('language_id',$orderItem->order->user->language_id)->first();
 			if(empty($emailTemplate))
 			{

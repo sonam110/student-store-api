@@ -933,11 +933,25 @@ class JobController extends Controller
 
             if(!empty($request->per_page_record))
             {
-                $jobApplications = JobApplication::whereIn('job_id',$jobs)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $jobApplications = JobApplication::whereIn('job_id',$jobs)
+                    ->orderBy('created_at','DESC')
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail')
+                    ->with(['job' => function($query){
+                        $query->select('id')
+                            ->withCount('acceptedJobApplications');
+                    }])
+                    ->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $jobApplications = JobApplication::whereIn('job_id',$jobs)->orderBy('created_at','DESC')->with('user:id, first_name, last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail')->get();
+                $jobApplications = JobApplication::whereIn('job_id',$jobs)
+                    ->orderBy('created_at','DESC')
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail')
+                    ->with(['job' => function($query){
+                        $query->select('id')
+                            ->withCount('acceptedJobApplications');
+                    }])
+                    ->get();
             }
             return response(prepareResult(false, $jobApplications, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
         }
@@ -964,7 +978,11 @@ class JobController extends Controller
                     ->join('user_cv_details', function ($join) {
                         $join->on('job_applications.user_id', '=', 'user_cv_details.user_id');
                     })
-                    ->with('job:id,title','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.cvDetail.jobTags','user.defaultAddress');
+                    ->with('job:id,title','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.cvDetail.jobTags','user.defaultAddress')
+                    ->with(['job' => function($query){
+                        $query->select('id')
+                            ->withCount('acceptedJobApplications');
+                    }]);
 
             if($searchType=='filter')
             {
