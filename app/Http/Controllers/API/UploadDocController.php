@@ -35,7 +35,7 @@ class UploadDocController extends Controller
             $destinationPath = 'uploads/';
             $thumbDestinationPath = 'uploads/thumbs/';
             $fileArray = array();
-            $formatCheck = ['tif','tiff','bmp','gif','eps','raw','jfif','webp'];
+            $formatCheck = ['tif','tiff','bmp','gif','eps','raw','jfif','webp','svg'];
 
             if($request->is_multiple==1)
             {

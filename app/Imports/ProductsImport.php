@@ -231,19 +231,25 @@ class ProductsImport implements ToModel,WithHeadingRow
         {
             if(isset($row['images_required']) && !empty($row['images_required']))
             {
+                $formatCheck = ['tif','tiff','bmp','gif','eps','raw','jfif','webp','svg', 'jpg', 'jpeg', 'png'];
+
                 foreach (explode(',', $row['images_required']) as $key => $image) 
                 {
-                    $cover = 0;
-                    if($key==0)
+                    $extension = pathinfo($image, PATHINFO_EXTENSION);
+                    if(in_array(strtolower($extension), $formatCheck))
                     {
-                        $cover = 1;
+                        $cover = 0;
+                        if($key==0)
+                        {
+                            $cover = 1;
+                        }
+                        $productImage = new ProductImage;
+                        $productImage->products_services_book_id   = $products->id;
+                        $productImage->image_path                  = $image;
+                        $productImage->thumb_image_path            = $image;
+                        $productImage->cover                       = $cover;
+                        $productImage->save();
                     }
-                    $productImage = new ProductImage;
-                    $productImage->products_services_book_id   = $products->id;
-                    $productImage->image_path                  = $image;
-                    $productImage->thumb_image_path            = $image;
-                    $productImage->cover                       = $cover;
-                    $productImage->save();
                 }
             }
 
