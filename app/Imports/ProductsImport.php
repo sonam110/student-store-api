@@ -255,7 +255,7 @@ class ProductsImport implements ToModel,WithHeadingRow
 
             if(!empty($products->tags))
             {
-                foreach (explode(',',$products->tags) as $key => $tag) 
+                foreach ($products->tags as $key => $tag) 
                 {
                     $allTypeTag = new ProductTag;
                     $allTypeTag->products_services_book_id  = $products->id;
