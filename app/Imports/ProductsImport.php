@@ -257,8 +257,6 @@ class ProductsImport implements ToModel,WithHeadingRow
             {
                 foreach ($tag as $key => $tagss) 
                 {
-                    \Log::info($tag);
-                    \Log::info($tagss);
                     $allTypeTag = new ProductTag;
                     $allTypeTag->products_services_book_id  = $products->id;
                     $allTypeTag->user_id = $this->data['user_id'];
