@@ -211,8 +211,8 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->service_period_time          = $request->service_period_time;
             $productsServicesBook->service_period_time_type     = $request->service_period_time_type;
             $productsServicesBook->service_online_link          = $request->service_online_link;
-            $productsServicesBook->service_languages            = json_encode($request->service_languages);
-            $productsServicesBook->tags                         = json_encode($request->tags);
+            $productsServicesBook->service_languages            = (!empty($request->service_languages)) ? json_encode($request->service_languages) : null;
+            $productsServicesBook->tags                         = (!empty($request->tags)) ? json_encode($request->tags) : null;
             $productsServicesBook->meta_title                   = $request->meta_title;
             $productsServicesBook->meta_keywords                = $request->meta_keywords;
             $productsServicesBook->is_promoted                  = $request->is_promoted;
@@ -391,8 +391,8 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->service_period_time      = $request->service_period_time;
             $productsServicesBook->service_period_time_type = $request->service_period_time_type;
             $productsServicesBook->service_online_link      = $request->service_online_link;
-            $productsServicesBook->service_languages        = json_encode($request->service_languages);
-            $productsServicesBook->tags                     = json_encode($request->tags);
+            $productsServicesBook->service_languages        = (!empty($request->service_languages)) ? json_encode($request->service_languages) : null;
+            $productsServicesBook->tags                     = (!empty($request->tags)) ? json_encode($request->tags) : null;
             $productsServicesBook->meta_title               = $request->meta_title;
             $productsServicesBook->meta_keywords            = $request->meta_keywords;
             /*$productsServicesBook->is_promoted              = $request->is_promoted;*/
