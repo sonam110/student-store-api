@@ -115,7 +115,7 @@ class FrontController extends Controller
 
 	public function userQr($qr_code)
 	{
-		$userInfo = User::where('qr_code_number', $qr_code)->with('userType','studentDetail')->first();
+		$userInfo = User::select('first_name','last_name','gender','dob','email','contact_number','profile_pic_path','profile_pic_thumb_path','short_intro','qr_code_img_path')->where('qr_code_number', $qr_code)->first();
 		if($userInfo)
 		{
 			return response()->json(prepareResult(false, $userInfo, "Registration-Types retrieved successfully! "), config('http_response.success'));
