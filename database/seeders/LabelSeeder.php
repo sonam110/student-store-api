@@ -2019,6 +2019,7 @@ class LabelSeeder extends Seeder
           "send_otp" => "We have sent an OTP to your registered mobile no." 
         ], 
         "message" => [
+          "app_version_expired" => "Your app is outdated, install a new version and try again.", 
           "item_out_of_stock_please_remove" => "item is out of stock now. Please remove it and try again.", 
           "accept_cookies" => "Student Store uses cookies to provide necessary website functionality, improve your experience and analyze our traffic. By using our website, you agree to", 
           "account_is_blocked" => "Your Account is blocked, Please contact admin.", 

@@ -28,7 +28,7 @@ class AppSettingController extends Controller
         try
         {
             $validation = \Validator::make($request->all(),[
-                'app_name'              => ['required', 'string', 'max:191'],
+                'app_name' => ['required', 'string', 'max:191'],
             ]);
 
             if ($validation->fails()) {
@@ -79,6 +79,7 @@ class AppSettingController extends Controller
             $appSetting->is_service_mod_enabled     = $request->is_service_mod_enabled;
             $appSetting->is_book_mod_enabled        = $request->is_book_mod_enabled;
             $appSetting->is_contest_mod_enabled     = $request->is_contest_mod_enabled;
+            $appSetting->allowed_app_version     = $request->allowed_app_version;
             $appSetting->save();
             return response()->json(prepareResult(false, new AppSettingResource($appSetting), getLangByLabelGroups('messages','message_updated')), config('http_response.success'));
         }
