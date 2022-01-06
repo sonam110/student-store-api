@@ -346,8 +346,11 @@ class FrontController extends Controller
 
 	public function getLanguageListForDDL(Request $request)
 	{
+		$languages = LangForDDL::orderBy('name', 'ASC')->get();
+		return response()->json(prepareResult(false, $languages, getLangByLabelGroups('messages','message_user_type_list')), config('http_response.success'));
+
 		$allowedVersion = AppSetting::select('allowed_app_version')->first();
-		$allVersions = array_push($allowedVersion, "web");
+		$allVersions = array_push(json_encode($allowedVersion), "web");
 		return $allVersions;
 		if(in_array($request->app_version, $allowedVersion))
 		{
