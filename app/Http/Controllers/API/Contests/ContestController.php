@@ -164,7 +164,7 @@ class ContestController extends Controller
                 $contest->application_end_date          		= $application_end_date;
                 $contest->max_participants              		= $request->max_participants;
                 $contest->no_of_winners                 		= $request->no_of_winners;
-                $contest->winner_prizes                			= (!empty($request->winner_prizes)) ? json_encode($request->winner_prizes) : null
+                $contest->winner_prizes                			= (!empty($request->winner_prizes)) ? json_encode($request->winner_prizes) : null;
                 $contest->mode                   				= $request->mode;
                 $contest->meeting_link            				= $request->meeting_link;
                 $contest->address               				= $request->address;
@@ -475,7 +475,7 @@ class ContestController extends Controller
             $contest->application_end_date          		= $application_end_date;
             $contest->max_participants              		= $request->max_participants;
             $contest->no_of_winners                 		= $request->no_of_winners;
-            $contest->winner_prizes                			= (!empty($request->winner_prizes)) ? json_encode($request->winner_prizes) : null
+            $contest->winner_prizes                			= (!empty($request->winner_prizes)) ? json_encode($request->winner_prizes) : null;
             $contest->mode                   				= $request->mode;
             $contest->meeting_link            				= $request->meeting_link;
             $contest->address               				= $request->address;
