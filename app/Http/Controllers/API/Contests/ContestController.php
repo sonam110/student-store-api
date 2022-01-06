@@ -349,7 +349,7 @@ class ContestController extends Controller
         {
             $is_abuse_reported = false;
         }
-        $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.defaultAddress:id,user_id,full_address','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path,avg_rating','contestWinners')
+        $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.defaultAddress:id,user_id,full_address','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path,avg_rating','user.studentDetail:id,user_id,avg_rating','contestWinners')
         ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
             $q->select('id','category_master_id','title','slug')
                 ->where('language_id', $lang_id)
