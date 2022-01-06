@@ -97,11 +97,11 @@ class ProductsImport implements ToModel,WithHeadingRow
             }
             
             $products->basic_price_wo_vat        = $row['original_price_required'];
-            $products->price                     = $getCommVal['totalAmount'];
+            $products->price                     = $getCommVal['price_with_all_com_vat'];
             $products->is_on_offer               = $is_on_offer;
             $products->discount_type             = $discount_type;
             $products->discount_value            = $discount_value;
-            $products->discounted_price          = $getCommVal['discounted_price'];
+            $products->discounted_price          = $getCommVal['totalAmount'];
 
             $products->vat_percentage = $vat_percentage;
             $products->vat_amount = $getCommVal['vat_amount'];
@@ -135,11 +135,11 @@ class ProductsImport implements ToModel,WithHeadingRow
             $products->title                     = $row['service_name_required'];
             $products->slug                      = Str::slug($row['service_name_required']);
             $products->basic_price_wo_vat        = $row['original_price_required'];
-            $products->price                     = $getCommVal['totalAmount'];
+            $products->price                     = $getCommVal['price_with_all_com_vat'];
             $products->is_on_offer               = $is_on_offer;
             $products->discount_type             = $discount_type;
             $products->discount_value            = $discount_value;
-            $products->discounted_price          = $getCommVal['discounted_price'];
+            $products->discounted_price          = $getCommVal['totalAmount'];
 
             $products->vat_percentage = $vat_percentage;
             $products->vat_amount = $getCommVal['vat_amount'];
@@ -190,11 +190,11 @@ class ProductsImport implements ToModel,WithHeadingRow
 
             
             $products->basic_price_wo_vat        = $row['original_price_required'];
-            $products->price                     = $getCommVal['totalAmount'];
+            $products->price                     = $getCommVal['price_with_all_com_vat'];
             $products->is_on_offer               = $is_on_offer;
             $products->discount_type             = $discount_type;
             $products->discount_value            = $discount_value;
-            $products->discounted_price          = $getCommVal['discounted_price'];
+            $products->discounted_price          = $getCommVal['totalAmount'];
 
             $products->vat_percentage = $vat_percentage;
             $products->vat_amount = $getCommVal['vat_amount'];
