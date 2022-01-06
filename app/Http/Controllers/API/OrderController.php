@@ -234,7 +234,6 @@ class OrderController extends Controller
 
 			if($order)
 			{ 
-				Auth::user()->update(['reward_points'=>(Auth::user()->reward_points - $request->used_reward_points)]);
 				$sub_total = 0;
 				$vat_percentage = 0;
 				$student_store_commission = 0;
@@ -246,6 +245,12 @@ class OrderController extends Controller
 					if(!empty($orderedItem['product_id']))
 					{
 						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
+
+						if($orderedItem['quantity'] > $productsServicesBook->quantity && $request->total<1)
+						{
+							return response()->json(prepareResult(true, 'Not found', $productsServicesBook->title.' '.getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+						}
+
 						$vat_amount = $productsServicesBook->vat_amount * $orderedItem['quantity'];
 						$vat_percentage = $productsServicesBook->vat_percentage;
 						$student_store_commission = $productsServicesBook->ss_commission_amount * $orderedItem['quantity'];
@@ -298,6 +303,7 @@ class OrderController extends Controller
 					elseif(!empty($orderedItem['contest_application_id']))
 					{
 						$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
+
 						$productsServicesBook = Contest::find($contest_id);
 						$vat_amount = $productsServicesBook->vat_amount * $orderedItem['quantity'];
 						$vat_percentage = $productsServicesBook->vat_percentage;
@@ -516,6 +522,9 @@ class OrderController extends Controller
                 $transactionDetail->transaction_timestamp    	= $request->transaction_detail['transaction_timestamp'];
                 $transactionDetail->currency       		     	= $request->transaction_detail['currency'];
 				$transactionDetail->save();
+
+				//Update reward points
+				Auth::user()->update(['reward_points'=>(Auth::user()->reward_points - $request->used_reward_points)]);
 
 				//Mail-start-buyer
                 $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id',$order->user->language_id)->first();
@@ -1771,6 +1780,12 @@ class OrderController extends Controller
 			if(!empty($orderedItem['product_id']))
 			{
 				$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
+				
+				if($orderedItem['quantity'] > $productsServicesBook->quantity)
+				{
+					return response()->json(prepareResult(true, 'Not found', $productsServicesBook->title.' '.getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+				}
+
 				if($productsServicesBook->is_on_offer == 1)
 				{
 					$price = round($productsServicesBook->discounted_price, 2);
@@ -1828,6 +1843,12 @@ class OrderController extends Controller
 			elseif(!empty($orderedItem['contest_id']))
 			{
 				$productsServicesBook = Contest::find($orderedItem['contest_id']);
+
+				if(($productsServicesBook->contestApplications->count() + $orderedItem['quantity']) > $productsServicesBook->max_participants)
+				{
+					return response()->json(prepareResult(true, 'Not found', $productsServicesBook->title.' '.getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+				}
+
 				if($productsServicesBook->is_on_offer == 1)
 				{
 					$price = round($productsServicesBook->discounted_price, 2);

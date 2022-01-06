@@ -27,11 +27,6 @@ class JobApplication extends Model
         return $this->belongsTo(Job::class, 'job_id', 'id');
     }
 
-    public function checkCount()
-    {
-        return $this->hasManyThrough(Job::class, JobApplication::class);
-    }
-
     public function userCvDetail()
     {
         return $this->belongsTo(UserCvDetail::class, 'user_cv_detail_id', 'id');

@@ -68,7 +68,7 @@ class RewardPointsCredit extends Command
                 $checkReplacedQty = $orderItem->replacement->quantity;
             }
 
-            $remainingOrderActiveQty = ($orderItem->quantity - ($checkReturnQty + $checkReplacedQty);
+            $remainingOrderActiveQty = ($orderItem->quantity - ($checkReturnQty + $checkReplacedQty));
             if($remainingOrderActiveQty>0)
             {
                 $creditReturnPoint = $orderItem->earned_reward_points * $oneItemRewardValue;
