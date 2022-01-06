@@ -2152,6 +2152,7 @@ class LabelSeeder extends Seeder
           "seller" => "Seller" 
         ], 
         "messages" => [
+          "message_user_cv_presented" => "CV is published now.",
           "job_applicants_exist" => "You cannot edit this job because this job has some applicants.",
           "message_recurring_alert_text" => "Recurring subscribtion will start automatically for this package after you buy it",
           "account_is_blocked" => "Your account is blocked, please contact admin", 

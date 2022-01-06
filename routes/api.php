@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+Route::get('/get-language-list-for-ddl', [App\Http\Controllers\API\FrontController::class,'getLanguageListForDDL']);
 
 
 //Stripe Webhook
@@ -62,7 +63,6 @@ Route::post('/get-info-by-group-and-label-name', [App\Http\Controllers\API\Front
 Route::post('/update-user-language', [App\Http\Controllers\API\FrontController::class,'updateUserLanguage']);
 Route::get('/get-languages', [App\Http\Controllers\API\FrontController::class,'getLanguages'])->name('get-languages');
 Route::get('/get-labels', [App\Http\Controllers\API\FrontController::class,'getLabels'])->name('get-labels');
-Route::get('/get-language-list-for-ddl', [App\Http\Controllers\API\FrontController::class,'getLanguageListForDDL']);
 
 Route::get('/user-detail/{id}', [App\Http\Controllers\API\LandingPageController::class,'userDetail']);
 

@@ -21,13 +21,6 @@ class UserCvDetailController extends Controller
 {
 	public function cvDetailUpdate(Request $request)
 	{
-		$validation = \Validator::make($request->all(),[ 
-			'title' => 'required',
-		]);
-
-		if ($validation->fails()) {
-			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
-		}
 		if($request->is_published == true)
 		{
 			$published_at = date('Y-m-d');
@@ -37,11 +30,27 @@ class UserCvDetailController extends Controller
 			$published_at = null;
 		}
 
+		$userCvDetail = UserCvDetail::firstOrNew(['user_id' =>  Auth::id()]);
+		if($request->present_my_cv==1)
+		{
+			$userCvDetail->is_published         = $request->is_published;
+			$userCvDetail->published_at         = $published_at;
+			$userCvDetail->save();
 
+			return response(prepareResult(false, $userCvDetail, getLangByLabelGroups('messages','message_user_cv_presented')), config('http_response.created'));
+		}
+
+		$validation = \Validator::make($request->all(),[ 
+			'title' => 'required',
+		]);
+
+		if ($validation->fails()) {
+			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+		}
 
 		$destinationPath = 'uploads/';
 		$cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
-		$userCvDetail = UserCvDetail::firstOrNew(['user_id' =>  Auth::id()]);
+		
 	    $userCvDetail->user_id         		= Auth::id();
 		$userCvDetail->address_detail_id    = $request->address_detail_id;
 		$userCvDetail->title         		= $request->title;
@@ -50,7 +59,7 @@ class UserCvDetailController extends Controller
 		$userCvDetail->preferred_job_env    = json_encode($request->preferred_job_env);
 		$userCvDetail->other_description    = $request->other_description;
 		$userCvDetail->is_published         = $request->is_published;
-		$userCvDetail->published_at         = $published_at;
+		$userCvDetail->published_at     	= $published_at;
 		$userCvDetail->cv_url				= $request->cv_url;
 		$userCvDetail->generated_cv_file	= env('CDN_DOC_URL').$destinationPath.$cv_name;
 		$userCvDetail->cv_update_status 		= 1;

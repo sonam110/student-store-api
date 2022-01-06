@@ -29,8 +29,7 @@ use App\Models\UserCvDetail;
 use mervick\aesEverywhere\AES256;
 
 class UserProfileController extends Controller
-{
-	
+{ 
 	public function passwordUpdate(Request $request)
 	{
 		$validation = \Validator::make($request->all(),[ 
