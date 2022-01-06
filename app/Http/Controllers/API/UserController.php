@@ -77,7 +77,7 @@ class UserController extends Controller
 		if ($validation->fails()) {
 			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
 		}
-		if($request->dob)
+		if(!empty($request->dob))
 		{
 			$dob = date("Y-m-d", strtotime($request->dob));
 		}

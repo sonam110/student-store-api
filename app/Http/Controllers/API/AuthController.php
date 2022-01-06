@@ -190,7 +190,7 @@ class AuthController extends Controller
 
 		DB::beginTransaction();
 
-		if($request->dob)
+		if(!empty($request->dob))
 		{
 			$dob = date("Y-m-d", strtotime($request->dob));
 		}
