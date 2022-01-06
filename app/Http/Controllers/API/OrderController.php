@@ -241,11 +241,12 @@ class OrderController extends Controller
 				$coolCompanyCommission = 0;
 				$amount_transferred_to_vendor = 0;
 				$commission = 0;
+				$delivery_type = null;
 				foreach ($request->items as $key => $orderedItem) {
 					if(!empty($orderedItem['product_id']))
 					{
 						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
-
+						$delivery_type = $productsServicesBook->delivery_type;
 						if($orderedItem['quantity'] > $productsServicesBook->quantity && $request->total<1)
 						{
 							return response()->json(prepareResult(true, 'Not found', $productsServicesBook->title.' '.getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
@@ -303,7 +304,7 @@ class OrderController extends Controller
 					elseif(!empty($orderedItem['contest_application_id']))
 					{
 						$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
-
+						$delivery_type = $contest_id->mode;
 						$productsServicesBook = Contest::find($contest_id);
 						$vat_amount = $productsServicesBook->vat_amount * $orderedItem['quantity'];
 						$vat_percentage = $productsServicesBook->vat_percentage;
@@ -439,6 +440,7 @@ class OrderController extends Controller
 					$orderItem->cool_company_commission_percent	= $coolCompanyCommission;
 					$orderItem->vat_percent = $vat_percentage;
 					$orderItem->vat_amount = $vat_amount;
+					$orderItem->delivery_type 	= $delivery_type;
 					$orderItem->delivery_code = $delivery_code;
 					$orderItem->save();
 
