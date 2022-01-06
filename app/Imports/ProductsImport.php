@@ -255,12 +255,12 @@ class ProductsImport implements ToModel,WithHeadingRow
 
             if(!empty($products->tags))
             {
-                foreach ($tagVal as $key => $tag) 
+                foreach ($tag as $key => $tagss) 
                 {
                     $allTypeTag = new ProductTag;
                     $allTypeTag->products_services_book_id  = $products->id;
                     $allTypeTag->user_id                    = $this->data['user_id'];
-                    $allTypeTag->title                      = $tag;
+                    $allTypeTag->title                      = $tagss;
                     $allTypeTag->type                       = isset($row['type_required']);
                     $allTypeTag->save();
                 }
