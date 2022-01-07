@@ -1227,7 +1227,9 @@ class OrderController extends Controller
 			$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
 			
 			$orderItem->amount_returned = $refundOrderItemPrice * $refundOrderItemQuantity;
-			$orderItem->returned_rewards = ceil($orderItem->used_item_reward_points / $refundOrderItemQuantity);
+
+			$eachQtyRewardValue = ceil($orderItem->used_item_reward_points / $orderItem->quantity);
+			$orderItem->returned_rewards = $eachQtyRewardValue * $refundOrderItemQuantity;
 
 			if($isRefunded=='failed')
 			{
