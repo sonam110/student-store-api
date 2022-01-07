@@ -35,16 +35,16 @@ class RatingAndFeedbacksImport implements ToModel,WithHeadingRow
         $product_id = $this->data['products_services_book_id'];
         $user_id = $this->data['user_id'];
 
-        $brand = new RatingAndFeedback;
-        $brand->to_user            	        = $user_id;
-        $brand->products_services_book_id 	= $product_id;
-        $brand->user_name              	    = $row['user_name'];
-        $brand->product_rating              = $row['product_rating'] ? $row['product_rating'] : "";
-        $brand->user_rating                 = $row['user_rating'] ? $row['user_rating'] : "";
-        $brand->product_feedback            = $row['product_feedback'] ? $row['product_feedback'] : "";
-        $brand->user_feedback               = $row['user_feedback'] ? $row['user_feedback'] : "";
-        $brand->is_feedback_approved        = 1;
-        $brand->save();
+        $rating = new RatingAndFeedback;
+        $rating->to_user            	        = $user_id;
+        $rating->products_services_book_id 	= $product_id;
+        $rating->user_name              	    = $row['user_name'];
+        $rating->product_rating              = $row['product_rating'] ? $row['product_rating'] : null;
+        $rating->user_rating                 = $row['user_rating'] ? $row['user_rating'] : null;
+        $rating->product_feedback            = $row['product_feedback'] ? $row['product_feedback'] : null;
+        $rating->user_feedback               = $row['user_feedback'] ? $row['user_feedback'] : null;
+        $rating->is_feedback_approved        = 1;
+        $rating->save();
 
 
         $product = ProductsServicesBook::find($product_id);

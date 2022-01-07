@@ -41,6 +41,38 @@ class RatingAndFeedbackController extends Controller
         }
     }
 
+    public function store(Request $request)
+    {
+        $validation = Validator::make($request->all(), [
+            'user_id'  => 'required'
+        ]);
+
+        if ($validation->fails()) {
+            return response(prepareResult(false, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
+
+        DB::beginTransaction();
+        try
+        {
+            $rating = new RatingAndFeedback;
+            $rating->to_user  = $request->user_id;
+            $rating->products_services_book_id  = $request->product_id;
+            $rating->user_name = $request->user_name;
+            $rating->product_rating = (!empty($request->product_rating)) ? $request->product_rating : null;
+            $rating->user_rating = (!empty($request->user_rating)) ? $request->user_rating : null;
+            $rating->product_feedback = (!empty($request->product_feedback)) ? $request->product_feedback : null;
+            $rating->user_feedback = (!empty($request->user_feedback)) ? $request->user_feedback : null;
+            $rating->is_feedback_approved = 1;
+            $rating->save();
+            DB::commit();
+            return response(prepareResult(false, $rating, getLangByLabelGroups('messages','message_success_title')), config('http_response.success'));
+        }
+        catch (\Throwable $exception) 
+        {
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+        }
+    }
+
     
     public function show(RatingAndFeedback $ratingAndFeedback)
     {

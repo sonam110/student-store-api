@@ -48,7 +48,6 @@ class SearchController extends Controller
 			->where('users.user_type_id',$dataOf)
 			->where('products_services_books.type',$dataType)
 			->where('products_services_books.is_published', 1)
-			->where('products_services_books.is_deleted', 0)
 			->where('products_services_books.status', 2)
 			->where('products_services_books.quantity',">", 0)
 			->orderBy('products_services_books.created_at','desc')

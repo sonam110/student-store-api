@@ -49,6 +49,7 @@ class RewardPointsCredit extends Command
             ->get();
           foreach($orderItems as $orderItem) 
           {
+            /*
             $creditRewardPoint = 0;
             $checkReturnQty = 0;
             $checkReplacedQty = 0;
@@ -71,8 +72,9 @@ class RewardPointsCredit extends Command
             $remainingOrderActiveQty = ($orderItem->quantity - ($checkReturnQty + $checkReplacedQty));
             if($remainingOrderActiveQty>0)
             {
-                $creditReturnPoint = $orderItem->earned_reward_points * $oneItemRewardValue;
+                $creditReturnPoint = $remainingOrderActiveQty * $oneItemRewardValue;
             }
+            */
 
 
             $orderItem->update(['reward_point_status' => 'credited']);
