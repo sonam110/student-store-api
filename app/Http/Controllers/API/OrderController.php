@@ -304,8 +304,8 @@ class OrderController extends Controller
 					elseif(!empty($orderedItem['contest_application_id']))
 					{
 						$contest_id = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
-						$delivery_type = $contest_id->mode;
 						$productsServicesBook = Contest::find($contest_id);
+						$delivery_type = $productsServicesBook->mode;
 						$vat_amount = $productsServicesBook->vat_amount * $orderedItem['quantity'];
 						$vat_percentage = $productsServicesBook->vat_percentage;
 						$student_store_commission = $productsServicesBook->ss_commission_amount * $orderedItem['quantity'];
