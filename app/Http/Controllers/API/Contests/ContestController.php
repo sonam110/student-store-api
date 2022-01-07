@@ -470,6 +470,7 @@ class ContestController extends Controller
             $contest->cover_image_thumb_path                = env('CDN_DOC_THUMB_URL').basename($request->cover_image_path);
             $contest->sponsor_detail            			= $request->sponsor_detail;
             $contest->start_date                			= $start_date;
+            $contest->end_date                              = $end_date;
             $contest->start_time                    		= $request->start_time;
             $contest->end_time                  			= $request->end_time;
             $contest->application_start_date    			= $application_start_date;

@@ -787,6 +787,7 @@ class JobController extends Controller
         DB::beginTransaction();
         try
         {
+            $title = null;
             $getJob = Job::find($job_id);
             if(!$getJob)
             {
