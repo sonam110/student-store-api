@@ -56,7 +56,8 @@ class RatingAndFeedbackController extends Controller
         {
             $rating = new RatingAndFeedback;
             $rating->to_user  = $request->user_id;
-            $rating->products_services_book_id  = $request->product_id;
+            $rating->products_services_book_id  = (!empty($request->products_services_book_id)) ? $request->products_services_book_id : null;
+            $rating->contest_id  = (!empty($request->contest_id)) ? $request->contest_id : null;
             $rating->user_name = $request->user_name;
             $rating->product_rating = (!empty($request->product_rating)) ? $request->product_rating : null;
             $rating->user_rating = (!empty($request->user_rating)) ? $request->user_rating : null;

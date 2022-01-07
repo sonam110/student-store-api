@@ -335,7 +335,17 @@ class UserController extends Controller
     {
         try
         {
-        	$users = User::select('users.*',)->where('users.user_type_id','!=', '1')->orderBy('users.created_at','desc');
+        	$users = User::select('users.*')
+        		->orderBy('users.first_name','desc');
+
+        	if($request->normal_user == 1)
+        	{
+        		$users->where('users.user_type_id', '!=', '1');
+        	}
+        	else
+        	{
+        		$users->whereNotIn('users.user_type_id', [1, 4]);
+        	}
 
         	if(!empty($request->name))
             {
