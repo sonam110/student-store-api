@@ -118,8 +118,11 @@ class CategoryController extends Controller
         {
             $brands = Brand::select('id', 'name')
                 ->where('status', '1')
-                ->where('category_master_id', $catId)
-                ->orderBy('created_at','DESC');
+                ->orderBy('name','ASC');
+            if($catId!='all')
+            {
+                $brands->where('category_master_id', $catId);
+            }
 
             if(!empty($request->brand))
             {
