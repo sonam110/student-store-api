@@ -448,7 +448,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::post('/send-notification', [App\Http\Controllers\API\Admin\NotificationController::class, 'sendNotification']);
 
 	Route::apiResource('/transaction-details', 'App\Http\Controllers\API\Admin\TransactionDetailController', ['as' => 'admin'])->only('index','show');
-	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\Admin\RatingAndFeedbackController', ['as' => 'admin'])->only('index','show','destroy');
+	Route::apiResource('/rating-and-feedback', 'App\Http\Controllers\API\Admin\RatingAndFeedbackController', ['as' => 'admin'])->only('index','show','store','destroy');
 	Route::post('/rating-and-feedback-status-update/{id}', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'statusUpdate']);
 	Route::post('/rating-and-feedback-multiple-status-update', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'multipleStatusUpdate']);
 	Route::post('/rating-and-feedback-filter', [App\Http\Controllers\API\Admin\RatingAndFeedbackController::class,'filter']);
