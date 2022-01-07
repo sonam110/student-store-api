@@ -305,6 +305,8 @@ Route::group(['middleware' => 'auth:api'],function () {
 
 	Route::get('/user-package-subscription-order/{id}', [App\Http\Controllers\API\UserController::class, 'userPackageSubscriptionOrder']);
 
+	Route::post('/user-filter', [App\Http\Controllers\API\Admin\UserController::class,'userFilter']);
+
 });
 
 Route::post('/contact-us', [App\Http\Controllers\API\ContactUsController::class,'store']);
