@@ -206,6 +206,7 @@ class SearchController extends Controller
 		->where('title','like', '%'.$request->search.'%')
 		->where('is_published', '1')
 		->where('status', '2')
+		->where('quantity','>' ,'0')
 		->limit(10)
 		->get();
 
@@ -267,6 +268,7 @@ class SearchController extends Controller
 			->where('type',$request->type)
 			->where('is_published', '1')
 			->where('status', '2')
+			->where('quantity','>' ,'0')
 			->limit(10)
 			->get();
 
