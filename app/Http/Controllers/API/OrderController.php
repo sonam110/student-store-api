@@ -1042,6 +1042,18 @@ class OrderController extends Controller
 			$item_status = 'completed';
 
 			$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
+
+			$orderItemForDispute = OrderItem::find($orderItemDispute->order_item_id);
+
+			//Update price in order_item
+			$orderItemForDispute->used_item_reward_points = ceil($orderItemForDispute->used_item_reward_points / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity);
+			$orderItemForDispute->earned_reward_points = ceil($orderItemForDispute->earned_reward_points / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity);
+			$orderItemForDispute->amount_transferred_to_vendor = round(($orderItemForDispute->amount_transferred_to_vendor / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity), 2);
+			$orderItemForDispute->student_store_commission = round(($orderItemForDispute->student_store_commission / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity), 2);
+			$orderItemForDispute->cool_company_commission = round(($orderItemForDispute->cool_company_commission / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity), 2);
+			$orderItemForDispute->vat_amount = round(($orderItemForDispute->vat_amount / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity), 2);
+			$orderItemForDispute->save(); 
+
 			$orderItemDispute->dispute_status                = $request->item_status;
 			$orderItemDispute->date_of_dispute_completed     = date('Y-m-d');
 			$orderItemDispute->save();
@@ -1182,6 +1194,18 @@ class OrderController extends Controller
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
 
+
+			$orderItemForCanceled = OrderItem::find($orderItem->id);
+
+			//Update price in order_item
+			$orderItemForCanceled->used_item_reward_points = ceil($orderItemForCanceled->used_item_reward_points / $orderItemForCanceled->quantity) * ($orderItemForCanceled->quantity - $refundOrderItemQuantity);
+			$orderItemForCanceled->earned_reward_points = ceil($orderItemForCanceled->earned_reward_points / $orderItemForCanceled->quantity) * ($orderItemForCanceled->quantity - $refundOrderItemQuantity);
+			$orderItemForCanceled->amount_transferred_to_vendor = round(($orderItemForCanceled->amount_transferred_to_vendor / $orderItemForCanceled->quantity) * ($orderItemForCanceled->quantity - $refundOrderItemQuantity), 2);
+			$orderItemForCanceled->student_store_commission = round(($orderItemForCanceled->student_store_commission / $orderItemForCanceled->quantity) * ($orderItemForCanceled->quantity - $refundOrderItemQuantity), 2);
+			$orderItemForCanceled->cool_company_commission = round(($orderItemForCanceled->cool_company_commission / $orderItemForCanceled->quantity) * ($orderItemForCanceled->quantity - $refundOrderItemQuantity), 2);
+			$orderItemForCanceled->vat_amount = round(($orderItemForCanceled->vat_amount / $orderItemForCanceled->quantity) * ($orderItemForCanceled->quantity - $refundOrderItemQuantity), 2);
+			$orderItemForCanceled->save(); 
+
 			$orderQuantity = $orderItem->quantity;
 
 		}
@@ -1210,12 +1234,21 @@ class OrderController extends Controller
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
 
+			$orderItemForReturned = OrderItem::find($orderItem->id);
+
+			//Update price in order_item
+			$orderItemForReturned->used_item_reward_points = ceil($orderItemForReturned->used_item_reward_points / $orderItemForReturned->quantity) * ($orderItemForReturned->quantity - $refundOrderItemQuantity);
+			$orderItemForReturned->earned_reward_points = ceil($orderItemForReturned->earned_reward_points / $orderItemForReturned->quantity) * ($orderItemForReturned->quantity - $refundOrderItemQuantity);
+			$orderItemForReturned->amount_transferred_to_vendor = round(($orderItemForReturned->amount_transferred_to_vendor / $orderItemForReturned->quantity) * ($orderItemForReturned->quantity - $refundOrderItemQuantity), 2);
+			$orderItemForReturned->student_store_commission = round(($orderItemForReturned->student_store_commission / $orderItemForReturned->quantity) * ($orderItemForReturned->quantity - $refundOrderItemQuantity), 2);
+			$orderItemForReturned->cool_company_commission = round(($orderItemForReturned->cool_company_commission / $orderItemForReturned->quantity) * ($orderItemForReturned->quantity - $refundOrderItemQuantity), 2);
+			$orderItemForReturned->vat_amount = round(($orderItemForReturned->vat_amount / $orderItemForReturned->quantity) * ($orderItemForReturned->quantity - $refundOrderItemQuantity), 2);
+			$orderItemForReturned->save(); 
+
 			$orderQuantity = $orderItemReturn->quantity;
 			$type = 'return';			
 			$orderItemReturn->date_of_return_completed      = date('Y-m-d');
 			$orderItemReturn->return_status                 = $request->item_status;
-
-
 
 			$orderItemReturn->save();
 			
@@ -1223,11 +1256,7 @@ class OrderController extends Controller
 			$body =  'Request for return of ordered product '.$orderItem->title.' has Accepted.';
 
 			//Mail-start
-
-
 			///to Buyer
-
-
 			$emailTemplate = EmailTemplate::where('template_for','order_returned')->where('language_id',$orderItem->order->user->language_id)->first();
 			if(empty($emailTemplate))
 			{
@@ -1248,10 +1277,7 @@ class OrderController extends Controller
 			];
 			
 			Mail::to(AES256::decrypt($orderItem->order->email, env('ENCRYPTION_KEY')))->send(new OrderStatusMail($details));
-
 			//Mail end
-
-			
 		}
 		
 		//////////////////////////////////////////
