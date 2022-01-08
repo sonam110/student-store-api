@@ -203,6 +203,8 @@ class ContestApplicationController extends Controller
                                 $orderedItem->reward_point_status = 'completed';
 
                                 $orderedItem->save();
+
+                                
                             }
                             break;
                         }

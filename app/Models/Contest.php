@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\CategoryMaster;
+use App\Models\OrderItem;
 use App\Models\AddressDetail;
 use App\Models\ContestCancellationRange;
 use App\Models\ContestApplication;
@@ -86,5 +87,10 @@ class Contest extends Model
     public function ratingAndFeedback()
     {
         return $this->hasOne(RatingAndFeedback::class,'contest_id','id')->where('from_user',Auth::id());
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class,'contest_id','id');
     }
 }
