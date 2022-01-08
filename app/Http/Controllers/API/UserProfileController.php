@@ -387,6 +387,7 @@ class UserProfileController extends Controller
 	{
 		$data = [];
 		$data['available_reward_pts'] 		= Auth::user()->reward_points;
+		$data['pending_reward_for_transfer']= Auth::user()->orderItems->where('reward_point_status','pending')->sum('earned_reward_points');
 		$data['pending_reward_pts'] 		= Auth::user()->orderItems->where('reward_point_status','pending')->count();
 		$data['used_reward_pts'] 			= Auth::user()->orders->where('reward_point_status','used')->count();
 		$data['reward_pt_policy'] 			= AppSetting::first()->reward_points_policy;

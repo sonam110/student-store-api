@@ -71,6 +71,33 @@ class OrderItemDisputeController extends Controller
         {
             $item_status = 'canceled';
             $reason_for_cancellation = $request->admin_remarks;
+
+            $refundOrderItemId = $orderItem->id;
+            $refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
+            $refundOrderItemQuantity = $orderItem->quantity;
+            $refundOrderItemReason = 'resolved_to_customer_by_admin';
+
+            $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+
+            $orderItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+            $orderItem->returned_rewards = ceil($orderItem->used_item_reward_points / $refundOrderItemQuantity);
+
+
+            if($isRefunded=='failed')
+            {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+
+            //Update price in order_item
+            $orderItem->used_item_reward_points = ceil($orderItem->used_item_reward_points / $orderItem->quantity) * ($orderItem->quantity - $refundOrderItemQuantity);
+            $orderItem->earned_reward_points = ceil($orderItem->earned_reward_points / $orderItem->quantity) * ($orderItem->quantity - $refundOrderItemQuantity);
+            $orderItem->amount_transferred_to_vendor = round(($orderItem->amount_transferred_to_vendor / $orderItem->quantity) * ($orderItem->quantity - $refundOrderItemQuantity), 2);
+            $orderItem->student_store_commission = round(($orderItem->student_store_commission / $orderItem->quantity) * ($orderItem->quantity - $refundOrderItemQuantity), 2);
+            $orderItem->cool_company_commission = round(($orderItem->cool_company_commission / $orderItem->quantity) * ($orderItem->quantity - $refundOrderItemQuantity), 2);
+            $orderItem->vat_amount = round(($orderItem->vat_amount / $orderItem->quantity) * ($orderItem->quantity - $refundOrderItemQuantity), 2);
+            $orderItem->save(); 
+
+            $orderQuantity = $orderItem->quantity;
         }
         else
         {

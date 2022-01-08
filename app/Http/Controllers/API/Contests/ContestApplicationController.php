@@ -90,7 +90,7 @@ class ContestApplicationController extends Controller
 
             if($contestApplication = ContestApplication::where('user_id',Auth::id())->where('contest_id',$contest->id)->first())
             {
-                $contestApplication->document= $request->document;
+                $contestApplication->document = $request->document;
                 $contestApplication->application_status = $request->application_status;
                 $contestApplication->save();
 

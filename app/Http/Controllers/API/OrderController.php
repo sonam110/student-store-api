@@ -1004,21 +1004,6 @@ class OrderController extends Controller
 			$emailTemplate = EmailTemplate::where('template_for','order_dispute_raised')->first();
 		}
 
-		if($request->item_status == 'resolved_to_customer')
-		{
-			$type = 'dispute';
-			$reason_for_cancellation = $request->reply;
-			$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
-			$orderItemDispute->date_of_dispute_completed     = date('Y-m-d');
-			$orderItemDispute->reply                 		= $request->reply;
-			$orderItemDispute->dispute_status                = $request->item_status;
-			$orderItemDispute->save();
-
-			$title = 'Dispute Resolved';
-			$body =  'Dispute raised on Ordered product '.$orderItem->title.' has been resolved.';
-			$emailTemplate = EmailTemplate::where('template_for','order_dispute_resolved')->first();
-		}
-
 		if($request->item_status == 'reviewed_by_seller')
 		{
 			$type = 'dispute';
@@ -1042,17 +1027,6 @@ class OrderController extends Controller
 			$item_status = 'completed';
 
 			$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
-
-			$orderItemForDispute = OrderItem::find($orderItemDispute->order_item_id);
-
-			//Update price in order_item
-			$orderItemForDispute->used_item_reward_points = ceil($orderItemForDispute->used_item_reward_points / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity);
-			$orderItemForDispute->earned_reward_points = ceil($orderItemForDispute->earned_reward_points / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity);
-			$orderItemForDispute->amount_transferred_to_vendor = round(($orderItemForDispute->amount_transferred_to_vendor / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity), 2);
-			$orderItemForDispute->student_store_commission = round(($orderItemForDispute->student_store_commission / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity), 2);
-			$orderItemForDispute->cool_company_commission = round(($orderItemForDispute->cool_company_commission / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity), 2);
-			$orderItemForDispute->vat_amount = round(($orderItemForDispute->vat_amount / $orderItemForDispute->quantity) * ($orderItemForDispute->quantity - $orderItemDispute->quantity), 2);
-			$orderItemForDispute->save(); 
 
 			$orderItemDispute->dispute_status                = $request->item_status;
 			$orderItemDispute->date_of_dispute_completed     = date('Y-m-d');
@@ -1153,30 +1127,10 @@ class OrderController extends Controller
 			$ask_for_cancellation = '1';
 		}
 
-		if($request->item_status == 'cancelation_request_accepted')
-		{
-			$type = 'delivery';
-			$item_status = 'canceled';
-			$reason_for_cancellation = $orderItem->reason_for_cancellation_request;
-			$title = 'Order Cancellation Request accepted by the buyer.';
-			$body =  'Cancellation request for  '.$orderItem->title.' has been accepted  by the user.';
-			$ask_for_cancellation = '2';
-		}
-
-		if($request->item_status == 'cancelation_request_declined')
-		{
-			$type = 'no_tracking';
-			$item_status = 'processing';
-			$reason_id_for_cancellation_request_decline = $request->reason_id;
-			$reason_for_cancellation_request_decline = $request->reason_for_cancellation_request_decline;
-			$title = 'Order Cancellation Request declined by the buyer.';
-			$body =  'Cancellation request for  '.$orderItem->title.' has been declined  by the user.';
-			$ask_for_cancellation = '3';
-		}
 
 		///////////////////////////////////////////////////////
 		//AMOUNT REFUND IF STATUS IS CANCELED
-		if($item_status == 'canceled')
+		if($item_status == 'canceled' || $request->item_status == 'cancelation_request_accepted')
 		{
 			$refundOrderItemId = $orderItem->id;
 			$refundOrderItemPrice = $orderItem->price_after_apply_reward_points;
@@ -1209,6 +1163,43 @@ class OrderController extends Controller
 			$orderQuantity = $orderItem->quantity;
 
 		}
+
+		if($request->item_status == 'resolved_to_customer')
+		{
+			$type = 'dispute';
+			$reason_for_cancellation = $request->reply;
+			$orderItemDispute = OrderItemDispute::where('order_item_id',$id)->first();
+			$orderItemDispute->date_of_dispute_completed     = date('Y-m-d');
+			$orderItemDispute->reply                 		= $request->reply;
+			$orderItemDispute->dispute_status                = $request->item_status;
+			$orderItemDispute->save();
+
+			$title = 'Dispute Resolved';
+			$body =  'Dispute raised on Ordered product '.$orderItem->title.' has been resolved.';
+			$emailTemplate = EmailTemplate::where('template_for','order_dispute_resolved')->first();
+		}
+
+		if($request->item_status == 'cancelation_request_accepted')
+		{
+			$type = 'delivery';
+			$item_status = 'canceled';
+			$reason_for_cancellation = $orderItem->reason_for_cancellation_request;
+			$title = 'Order Cancellation Request accepted by the buyer.';
+			$body =  'Cancellation request for  '.$orderItem->title.' has been accepted  by the user.';
+			$ask_for_cancellation = '2';
+		}
+
+		if($request->item_status == 'cancelation_request_declined')
+		{
+			$type = 'no_tracking';
+			$item_status = 'processing';
+			$reason_id_for_cancellation_request_decline = $request->reason_id;
+			$reason_for_cancellation_request_decline = $request->reason_for_cancellation_request_decline;
+			$title = 'Order Cancellation Request declined by the buyer.';
+			$body =  'Cancellation request for  '.$orderItem->title.' has been declined  by the user.';
+			$ask_for_cancellation = '3';
+		}
+
 		//AMOUNT REFUND IF STATUS IS RETURNED
 		if($item_status == 'returned')
 		{
