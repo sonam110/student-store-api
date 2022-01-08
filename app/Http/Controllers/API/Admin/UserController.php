@@ -504,8 +504,8 @@ class UserController extends Controller
 	{
 		$user = User::find($id);
 		$user['available_reward_pts'] 		= $user->reward_points;
-		$data['pending_reward_for_transfer']= Auth::user()->orderItems->where('reward_point_status','pending')->sum('earned_reward_points');
-		$user['pending_reward_pts'] 		= $user->orderItems->where('reward_point_status','pending')->count();
+		$data['pending_reward_for_transfer']= Auth::user()->orderItems->where('reward_point_status','pending')->where('earned_reward_points','>', 0)->sum('earned_reward_points');
+		$user['pending_reward_pts'] 		= $user->orderItems->where('reward_point_status','pending')->where('earned_reward_points','>', 0)->count();
 		$user['used_reward_pts'] 			= $user->orders->where('reward_point_status','used')->count();
 		$user['reward_pt_policy'] 			= AppSetting::first()->reward_points_policy;
 		$user['customer_reward_pt_value'] 	= AppSetting::first()->customer_rewards_pt_value;
