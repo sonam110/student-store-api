@@ -49,7 +49,7 @@ class UserCvDetailController extends Controller
 		}
 
 		$destinationPath = 'uploads/';
-		$cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'.pdf';
+		$cv_name = Str::slug(substr(AES256::decrypt(Auth::user()->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.Auth::user()->qr_code_number.'-'.rand(1,5).'.pdf';
 		
 	    $userCvDetail->user_id         		= Auth::id();
 		$userCvDetail->address_detail_id    = $request->address_detail_id;
@@ -120,15 +120,12 @@ class UserCvDetailController extends Controller
 		if($findUser)
 		{
 			$destinationPath = 'uploads/';
-	        $cv_name = Str::slug(substr(AES256::decrypt($findUser->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.$findUser->qr_code_number.'.pdf';
+	        $cv_name = Str::slug(substr(AES256::decrypt($findUser->first_name, env('ENCRYPTION_KEY')), 0, 15)).'-'.$findUser->qr_code_number.'-'.rand(1,5).'.pdf';
 
 	        $resumeDownloadPath = env('CDN_DOC_URL').$destinationPath.$cv_name;
 
 	        createResume($cv_name, $findUser);
-	        return response()->json(prepareResult(false, $resumeDownloadPath, 'Download Resume'), config('http_response.success'))
-	        ->withHeaders([
-                'Cache-Control' => 'must-revalidate',
-            ]);
+	        return response()->json(prepareResult(false, $resumeDownloadPath, 'Download Resume'), config('http_response.success'));
 		}
 		else
 		{
