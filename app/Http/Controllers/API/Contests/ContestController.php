@@ -397,7 +397,7 @@ class ContestController extends Controller
             $contest['total_canceled_refunded_amount'] = $contestCal->sum('canceled_refunded_amount');
             $contest['total_earned_reward_points'] = $contestCal->sum('earned_reward_points');
             $contest['total_amount_transferred_to_vendor'] = $contestCal->sum('amount_transferred_to_vendor');
-            $contest['total_student_store_commissionr'] = $contestCal->sum('student_store_commissionr');
+            $contest['total_student_store_commission'] = $contestCal->sum('student_store_commission');
             $contest['total_cool_company_commission'] = $contestCal->sum('cool_company_commission');
             $contest['total_vat_amount'] = $contestCal->sum('vat_amount');
         }
