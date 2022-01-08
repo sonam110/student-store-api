@@ -204,6 +204,7 @@ class ContestApplicationController extends Controller
 
                                 $orderedItem->save();
                             }
+                            break;
                         }
                     }
                 }

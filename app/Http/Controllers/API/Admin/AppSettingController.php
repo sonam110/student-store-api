@@ -80,6 +80,17 @@ class AppSettingController extends Controller
             $appSetting->is_book_mod_enabled        = $request->is_book_mod_enabled;
             $appSetting->is_contest_mod_enabled     = $request->is_contest_mod_enabled;
             $appSetting->allowed_app_version     = $request->allowed_app_version;
+            if($appSetting)
+            {
+                if(($appSetting->is_enabled_cool_company != $request->is_enabled_cool_company) ||
+                ($appSetting->coolCompanyVatRateId != $request->cool_company_vat_rate_id) ||
+                ($appSetting->coolCompanyCommission != $request->coolCompanyCommission) ||
+                ($appSetting->cool_company_social_fee_percentage != $request->cool_company_social_fee_percentage) ||
+                ($appSetting->cool_company_salary_tax_percentage != $request->cool_company_salary_tax_percentage))
+                {
+                    appSettingUpdatePrice();
+                }
+            }
             $appSetting->save();
             return response()->json(prepareResult(false, new AppSettingResource($appSetting), getLangByLabelGroups('messages','message_updated')), config('http_response.success'));
         }

@@ -623,3 +623,42 @@ function packageUpdatePrice($type, $userID)
 
 	return true;
 }
+
+// if app setting cool company val changed
+function appSettingUpdatePrice()
+{
+	// Update product price
+	$items = ProductsServicesBook::select('products_services_books.*')
+		->join('users', 'users.id','=','products_services_books.user_id')
+		->where('products_services_books.type', 'service')
+		->where('users.user_type_id', 2)
+		->get();
+	foreach ($items as $key => $item) {
+		$vat_percentage = $item->categoryMaster->vat;
+		$getCommVal = updateCommissions($item->basic_price_wo_vat, $item->is_on_offer, $item->discount_type, $item->discount_value, $vat_percentage, $item->user_id, $item->type);
+
+		//update Price
+		$item->price = $getCommVal['price_with_all_com_vat'];
+		$item->discounted_price = $getCommVal['totalAmount'];
+		$item->vat_percentage = $vat_percentage;
+    $item->vat_amount = $getCommVal['vat_amount'];
+    $item->ss_commission_percent = $getCommVal['ss_commission_percent'];
+    $item->ss_commission_amount = $getCommVal['ss_commission_amount'];
+    $item->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+    $item->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+    $item->save();
+	}
+	return true;
+}
+
+function updatePerticularOrderItem($order_item_id, $type)
+{
+	$orderItem = OrderItem::find($order_item_id);
+	if($orderItem)
+	{
+		if($type=='contest')
+		{
+			
+		}
+	}
+}

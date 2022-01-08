@@ -407,6 +407,7 @@ class OrderController extends Controller
 						$getCInfo = ContestApplication::find($orderedItem['contest_application_id']);
 						$vendor_user_id = $getCInfo->contest->user_id;
 						$orderItem->contest_application_id			= $orderedItem['contest_application_id'];
+						$orderItem->contest_id = $contest_id;
 						$orderItem->contest_type					= $productsServicesBook->type;
 					}
 					else

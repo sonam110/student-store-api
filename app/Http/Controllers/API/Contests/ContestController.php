@@ -390,6 +390,18 @@ class ContestController extends Controller
             $contest['cancel_button_enabled'] = true;
         }
 
+        if($contest->user_id==auth()->id())
+        {
+            $contestCal = OrderItem::where('contest_id', $contest->id);
+            $contest['total_ordered_amount'] = $contestCal->sum(\DB::raw('order_items.price * order_items.quantity'));
+            $contest['total_canceled_refunded_amount'] = $contestCal->sum('canceled_refunded_amount');
+            $contest['total_earned_reward_points'] = $contestCal->sum('earned_reward_points');
+            $contest['total_amount_transferred_to_vendor'] = $contestCal->sum('amount_transferred_to_vendor');
+            $contest['total_student_store_commissionr'] = $contestCal->sum('student_store_commissionr');
+            $contest['total_cool_company_commission'] = $contestCal->sum('cool_company_commission');
+            $contest['total_vat_amount'] = $contestCal->sum('vat_amount');
+        }
+
         return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_list')), config('http_response.success'));
     }
 
