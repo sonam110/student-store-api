@@ -199,6 +199,8 @@ class ContestApplicationController extends Controller
                                 }
                                 $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
                                 $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
+                                $orderedItem->earned_reward_points = 0;
+                                $orderedItem->reward_point_status = 'completed';
 
                                 $orderedItem->save();
                             }
