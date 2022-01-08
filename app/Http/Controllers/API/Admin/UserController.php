@@ -429,7 +429,10 @@ class UserController extends Controller
             	$users->join('user_package_subscriptions', function ($join) {
 		                $join->on('users.id', '=', 'user_package_subscriptions.user_id');
 		            })
-            	->where('package_id',$request->package_id);
+            	->where('package_id',$request->package_id)
+            	->where('subscription_status', 1)
+            	->orderBy('created_at', 'DESC')
+            	->groupBy('user_id');
             }
 
             if(!empty($request->per_page_record))
