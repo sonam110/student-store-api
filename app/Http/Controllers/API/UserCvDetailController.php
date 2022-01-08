@@ -125,7 +125,10 @@ class UserCvDetailController extends Controller
 	        $resumeDownloadPath = env('CDN_DOC_URL').$destinationPath.$cv_name;
 
 	        createResume($cv_name, $findUser);
-	        return response()->json(prepareResult(false, $resumeDownloadPath, 'Download Resume'), config('http_response.success'));
+	        return response()->json(prepareResult(false, $resumeDownloadPath, 'Download Resume'), config('http_response.success'))
+	        ->withHeaders([
+                'Cache-Control' => 'must-revalidate',
+            ]);
 		}
 		else
 		{
