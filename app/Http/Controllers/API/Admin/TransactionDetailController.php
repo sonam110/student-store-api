@@ -27,11 +27,11 @@ class TransactionDetailController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $transactionDetails = TransactionDetail::where('transaction_amount', '>',0)->orderBy('created_at','DESC')->with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','order.orderItems')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $transactionDetails = TransactionDetail::where('transaction_amount', '>',0)->orderBy('created_at','DESC')->with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $transactionDetails = TransactionDetail::where('transaction_amount', '>',0)->orderBy('created_at','DESC')->with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','order.orderItems')->get();
+                $transactionDetails = TransactionDetail::where('transaction_amount', '>',0)->orderBy('created_at','DESC')->with('order.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->get();
             }
             return response(prepareResult(false, $transactionDetails, getLangByLabelGroups('messages','messages_transactionDetail_list')), config('http_response.success'));
         }
