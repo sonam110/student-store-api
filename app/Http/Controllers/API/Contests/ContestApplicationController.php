@@ -183,11 +183,11 @@ class ContestApplicationController extends Controller
                     foreach ($cancellationRanges as $key => $value) {
                         if($remainingHours >= $value->from && $remainingHours < $value->to)
                         {
-                            $orderedItems = OrderItem::where('contest_application_id',$id)->get();
-                            foreach ($orderedItems as $key => $orderedItem) 
+                            $orderedItem = OrderItem::where('contest_application_id',$id)->first();
+                            if($orderedItem)
                             {
                                 $refundOrderItemId = $orderedItem->id;
-                                $refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
+                                $refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points) * ($value->deduct_percentage_value)/100;
                                 $refundOrderItemQuantity = $orderedItem->quantity;
                                 $refundOrderItemReason = 'cancellation';
                                 
@@ -206,6 +206,10 @@ class ContestApplicationController extends Controller
                             }
                         }
                     }
+                }
+                else
+                {
+
                 }
 
             }

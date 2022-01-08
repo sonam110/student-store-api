@@ -404,7 +404,7 @@ class UserProfileController extends Controller
 		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
 	}
 
-	public function cvsView($user_cv_detail_id)
+	public function cvsView(Request $request, $user_cv_detail_id)
 	{
 		if(CvsViewLog::where('user_cv_detail_id', $user_cv_detail_id)->where('user_id', Auth::id())->count()<1)
 		{
@@ -441,6 +441,9 @@ class UserProfileController extends Controller
 			$cvsViewLog->user_id 						= Auth::id();
 			$cvsViewLog->user_cv_detail_id 				= $user_cv_detail_id;
 			$cvsViewLog->applicant_id 					= $getUserId->user_id;
+			if($request->job_id) {
+				$cvsViewLog->job_id = $request->job_id;
+			}
 			$cvsViewLog->valid_till 					= $user_package->package_valid_till;
 			$cvsViewLog->user_package_subscription_id 	= $user_package->id;
 			$cvsViewLog->save();
@@ -462,7 +465,7 @@ class UserProfileController extends Controller
 	public function getCvsView(Request $request)
 	{
 		try {
-			$data = CvsViewLog::where('user_id', Auth()->id())->with('company:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user.cvDetail');
+			$data = CvsViewLog::where('user_id', Auth()->id())->with('company:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path', 'user.cvDetail','job:id,title,slug');
             if(!empty($request->per_page_record))
             {
             	$results = $data->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);

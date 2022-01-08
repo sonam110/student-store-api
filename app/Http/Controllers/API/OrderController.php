@@ -247,6 +247,11 @@ class OrderController extends Controller
 					{
 						$productsServicesBook = ProductsServicesBook::find($orderedItem['product_id']);
 						$delivery_type = $productsServicesBook->delivery_type;
+						if($productsServicesBook->type=='service')
+						{
+							$delivery_type = $productsServicesBook->service_type;
+						}
+						
 						if($orderedItem['quantity'] > $productsServicesBook->quantity && $request->total<1)
 						{
 							return response()->json(prepareResult(true, 'Not found', $productsServicesBook->title.' '.getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
@@ -1317,7 +1322,7 @@ class OrderController extends Controller
 		{
 			$orderTracking = new OrderTracking;
 			$orderTracking->order_item_id = $id;
-			$orderTracking->status = $request->item_status; 
+			$orderTracking->status = ($request->item_status=='cancelation_request_accepted') ? $item_status : $request->item_status; 
 			$orderTracking->comment = $comment;
 			$orderTracking->type = $type;
 			$orderTracking->save();

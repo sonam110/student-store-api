@@ -23,6 +23,8 @@ class CreateCvsViewLogsTable extends Migration
             $table->string('applicant_id', 50);
             $table->foreign('applicant_id')->references('id')->on('users')->onDelete('cascade');
 
+            $table->string('job_id', 50)->nullable();
+
             $table->string('user_package_subscription_id', 50)->nullable();
             $table->foreign('user_package_subscription_id')->references('id')->on('user_package_subscriptions')->onDelete('cascade');
             $table->date('valid_till')->nullable();
