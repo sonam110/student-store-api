@@ -241,6 +241,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	$orderId = $orderItem->order->id;
 	$transaction = $orderItem->order->transaction;
 	$refund_id = time().'-SYS-GEN';
+	$getOneItemReward = 0;
 	if(!empty($transaction->transaction_id) && $refundOrderItemPrice > 0)
 	{
 		if($transaction->gateway_detail=='stripe' && \Str::lower($transaction->transaction_status)=='succeeded')
@@ -346,7 +347,15 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 		if($orderItem->used_item_reward_points>0)
 		{
 			//reward points revert 
-			$getOneItemReward = ceil($orderItem->used_item_reward_points / $orderItem->quantity);
+			if(!empty($orderItem->contest_application_id))
+			{
+				$getOneItemReward = $orderItem->returned_rewards;
+			}
+			else
+			{
+				$getOneItemReward = ceil($orderItem->used_item_reward_points / $orderItem->quantity);
+			}
+			
 			$userInfo = User::find($orderItem->user_id);
 			$userInfo->reward_points = $userInfo->reward_points + ($getOneItemReward * $refundOrderItemQuantity);
 			$userInfo->save();
@@ -399,7 +408,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 		$refund->card_holder_name   		= $transaction->card_holder_name;
 		$refund->quantity   						= $refundOrderItemQuantity;
 		$refund->price   								= $refundOrderItemPrice;
-		$refund->rewards_refund   			= @$orderItem->used_item_reward_points;
+		$refund->rewards_refund   			= $getOneItemReward * $refundOrderItemQuantity;
 		$refund->reason_for_refund   		= $refundOrderItemReason;
 		$refund->save();
 
