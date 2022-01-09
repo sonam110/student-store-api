@@ -192,7 +192,7 @@ class ContestApplicationController extends Controller
                                 //Update commission and reward
                                 $orderedItem->used_item_reward_points = ceil($orderedItem->returned_rewards * ($value->deduct_percentage_value)/100);
                                 $orderedItem->returned_rewards = ceil($orderedItem->returned_rewards * ($value->deduct_percentage_value)/100);
-                                
+
                                 $orderedItem->amount_transferred_to_vendor = ceil($orderedItem->amount_transferred_to_vendor * ($value->deduct_percentage_value)/100);
                                 $orderedItem->student_store_commission = ceil($orderedItem->student_store_commission * ($value->deduct_percentage_value)/100);
                                 $orderedItem->cool_company_commission = ceil($orderedItem->cool_company_commission * ($value->deduct_percentage_value)/100);
@@ -212,6 +212,7 @@ class ContestApplicationController extends Controller
                                 $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
                                 $orderedItem->earned_reward_points = 0;
                                 $orderedItem->reward_point_status = 'completed';
+                                $orderedItem->item_status = 'canceled';
 
                                 $orderedItem->save();
                             }
@@ -246,9 +247,10 @@ class ContestApplicationController extends Controller
                             $orderedItem->vat_amount = 0;
 
                             $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
-                            $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
+                            $orderedItem->used_item_reward_points = ceil($orderedItem->returned_rewards / $refundOrderItemQuantity);
                             $orderedItem->earned_reward_points = 0;
                             $orderedItem->reward_point_status = 'completed';
+                            $orderedItem->item_status = 'canceled';
 
                             $orderedItem->save();
                         }
