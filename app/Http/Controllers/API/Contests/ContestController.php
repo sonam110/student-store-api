@@ -707,11 +707,11 @@ class ContestController extends Controller
     	{
     	    if(!empty($request->per_page_record))
     	    {
-    	        $contestApplications = ContestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,email,contact_number','user.defaultAddress:id,user_id,full_address','orderItem:id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+    	        $contestApplications = ContestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,email,contact_number','user.defaultAddress:id,user_id,full_address','orderItem:id,contest_application_id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
     	    }
     	    else
     	    {
-    	        $contestApplications = contestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,email,contact_number','user.defaultAddress:id,user_id,full_address','orderItem:id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->get();
+    	        $contestApplications = ContestApplication::where('contest_id',$id)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path,email,contact_number','user.defaultAddress:id,user_id,full_address','orderItem:id,contest_application_id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->get();
     	    }
     	    return response(prepareResult(false, $contestApplications, getLangByLabelGroups('messages','messages_contest_application_list')), config('http_response.success'));
     	}
