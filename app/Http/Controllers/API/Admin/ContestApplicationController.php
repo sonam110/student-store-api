@@ -216,7 +216,8 @@ class ContestApplicationController extends Controller
                                 $refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points) * ($value->deduct_percentage_value)/100;
 
                                 //Update commission and reward
-                                $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points * ($value->deduct_percentage_value)/100);
+                                $orderedItem->used_item_reward_points = ceil($orderedItem->returned_rewards * ($value->deduct_percentage_value)/100);
+                                $orderedItem->returned_rewards = ceil($orderedItem->returned_rewards * ($value->deduct_percentage_value)/100);
                                 $orderedItem->amount_transferred_to_vendor = ceil($orderedItem->amount_transferred_to_vendor * ($value->deduct_percentage_value)/100);
                                 $orderedItem->student_store_commission = ceil($orderedItem->student_store_commission * ($value->deduct_percentage_value)/100);
                                 $orderedItem->cool_company_commission = ceil($orderedItem->cool_company_commission * ($value->deduct_percentage_value)/100);
