@@ -296,7 +296,7 @@ class ProductsServicesBookController extends Controller
             }
 
             $type = $request->type;
-            $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$type)->orderBy('created_at','desc')->first();
+            $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$type)->where('subscription_status', 1)->orderBy('created_at','desc')->first();
             if(empty($user_package))
             {
                 return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
@@ -863,7 +863,7 @@ class ProductsServicesBookController extends Controller
                 if($request->is_promoted == true)
                 {
                 	$getProductsServicesBook->promotion_start_at = date('Y-m-d');
-                	$user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                	$user_package = UserPackageSubscription::where('user_id',Auth::id())->where('subscription_status', 1)->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
                     if(empty($user_package))
                     {
                         return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
@@ -891,7 +891,7 @@ class ProductsServicesBookController extends Controller
                 if($request->most_popular == true)
                 {
 	                $getProductsServicesBook->most_popular_start_at = date('Y-m-d');
-	                $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+	                $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('subscription_status', 1)->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
                     if(empty($user_package))
                     {
                         return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
@@ -921,7 +921,7 @@ class ProductsServicesBookController extends Controller
                 {
 
 	                $getProductsServicesBook->top_selling_start_at = date('Y-m-d');
-	                $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+	                $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('subscription_status', 1)->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
                     if(empty($user_package))
                     {
                         return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
@@ -951,7 +951,7 @@ class ProductsServicesBookController extends Controller
                     if($request->promote == true)
                     {
                         $getProductsServicesBook->promotion_start_at = date('Y-m-d');
-                        $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                        $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('subscription_status', 1)->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
                         if(empty($user_package))
                         {
                             return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
@@ -989,7 +989,7 @@ class ProductsServicesBookController extends Controller
                     if($request->most_popular == true)
                     {
                         $getProductsServicesBook->most_popular_start_at = date('Y-m-d');
-                        $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                        $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('subscription_status', 1)->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
                         if(empty($user_package))
                         {
                             return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
@@ -1028,7 +1028,7 @@ class ProductsServicesBookController extends Controller
                     {
 
                         $getProductsServicesBook->top_selling_start_at = date('Y-m-d');
-                        $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
+                        $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('subscription_status', 1)->where('module',$getProductsServicesBook->type)->orderBy('created_at','desc')->first();
                         if(empty($user_package))
                         {
                             return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));

@@ -303,7 +303,7 @@ class OrderController extends Controller
 							return response()->json(prepareResult(true, ['quantity exceeded.Only '.$productsServicesBook->quantity.' left.'], getLangByLabelGroups('messages','message_quantity_exceeded')), config('http_response.bad_request'));
 						}
 
-						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module',$productsServicesBook->type)->orderBy('created_at','desc')->first();
+						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module',$productsServicesBook->type)->where('subscription_status', 1)->orderBy('created_at','desc')->first();
 						
 					}
 					elseif(!empty($orderedItem['contest_application_id']))
@@ -326,7 +326,7 @@ class OrderController extends Controller
 
 						$title = $productsServicesBook->title;
 
-						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module','contest')->orderBy('created_at','desc')->first();
+						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module','contest')->where('subscription_status', 1)->orderBy('created_at','desc')->first();
 					}
 					else
 					{
@@ -2640,7 +2640,7 @@ class OrderController extends Controller
 
 	public function cancelStripeSubscription(Request $request)
 	{
-		$user_package = UserPackageSubscription::where('subscription_id', $request->subscription_id)->orderBy('auto_id', 'DESC')->first();
+		$user_package = UserPackageSubscription::where('subscription_id', $request->subscription_id)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
 		if($user_package)
 		{
 			$user_package->is_canceled = 1;

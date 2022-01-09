@@ -98,11 +98,11 @@ class UsernewResource extends JsonResource
                     'ratings'                            => RatingAndFeedback::where('to_user',$this->id)->limit(3)->with('customer')->get(),
                     'ratings_count'                      => $this->ratings->count(),
                     'user_packages'                      => array_filter(array(  
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Job')->orderBy('created_at','DESC')->first(), 
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Product')->orderBy('created_at','DESC')->first(),
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Service')->orderBy('created_at','DESC')->first(),
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Book')->orderBy('created_at','DESC')->first(), 
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Contest')->orderBy('created_at','DESC')->first()
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Job')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Product')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(),
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Service')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(),
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Book')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Contest')->where('subscription_status', 1)->orderBy('created_at','DESC')->first()
                                                     )),
                     'user_products'                     => $this->products,
                     'user_services'                     => $this->services,
@@ -160,11 +160,11 @@ class UsernewResource extends JsonResource
                     'ratings'                       => RatingAndFeedback::where('to_user',$this->id)->limit(3)->with('customer')->get(),
                     'ratings_count'                 => $this->ratings->count(),
                     'user_packages'                 => array_filter(array(  
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Job')->orderBy('created_at','DESC')->first(), 
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Product')->orderBy('created_at','DESC')->first(),
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Service')->orderBy('created_at','DESC')->first(),
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Book')->orderBy('created_at','DESC')->first(), 
-                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Contest')->orderBy('created_at','DESC')->first()
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Job')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Product')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(),
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Service')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(),
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Book')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Contest')->where('subscription_status', 1)->orderBy('created_at','DESC')->first()
                                                     )),
                     'user_products'                     => $this->products,
                     'user_services'                     => $this->services,

@@ -104,7 +104,7 @@ class WebhookController extends Controller
 
     private function customerSubscriptionUpdated($subscription_id, $subscriptionSchedule) 
     {
-        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
+        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
         if($subscribedPackage)
         {
             $delivery_code = NULL;
@@ -299,7 +299,7 @@ class WebhookController extends Controller
 
     private function abortedSubscription($subscription_id) 
     {
-        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->orderBy('auto_id', 'DESC')->first();
+        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
         if($subscribedPackage)
         {
             $subscribedPackage->is_canceled = 1;

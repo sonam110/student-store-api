@@ -96,7 +96,7 @@ class JobController extends Controller
         DB::beginTransaction();
         try
         {
-            $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module','Job')->orderBy('created_at','desc')->first();
+            $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module','Job')->where('subscription_status', 1)->orderBy('created_at','desc')->first();
             if(empty($user_package))
             {
                 return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
@@ -826,7 +826,7 @@ class JobController extends Controller
                     // $getJob->promotion_end_date     = $request->promotion_end_date;
 
                     $getJob->promotion_start_date = date('Y-m-d');
-                    $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module','Job')->orderBy('created_at','desc')->first();
+                    $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('subscription_status', 1)->where('module','Job')->orderBy('created_at','desc')->first();
                     if($user_package->no_of_boost == $user_package->used_no_of_boost)
                     {
                         DB::rollback();
