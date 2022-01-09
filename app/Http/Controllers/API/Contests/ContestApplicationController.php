@@ -88,7 +88,7 @@ class ContestApplicationController extends Controller
 
             $contest = Contest::find($request->contest_id);
 
-            if($contestApplication = ContestApplication::where('user_id',Auth::id())->where('contest_id',$contest->id)->first())
+            if($contestApplication = ContestApplication::where('user_id',Auth::id())->where('contest_id',$contest->id)->where('application_status','!=','canceled')->first())
             {
                 $contestApplication->document = $request->document;
                 $contestApplication->application_status = $request->application_status;
