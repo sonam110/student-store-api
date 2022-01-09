@@ -202,35 +202,82 @@ class ContestApplicationController extends Controller
 
 				$contest = $contestApplication->contest;
 				$remainingHours = \Carbon\Carbon::parse($contest->start_time)->diffInHours(now());
+				
 				if($contest->use_cancellation_policy == true)
-				{
-					$cancellationRanges = $contest->cancellationRanges;
-					foreach ($cancellationRanges as $key => $value) {
-						if($remainingHours >= $value->from && $remainingHours < $value->to)
-						{
-							$orderedItems = OrderItem::where('contest_application_id',$id)->get();
-							foreach ($orderedItems as $key => $orderedItem) 
-							{
-								$refundOrderItemId = $orderedItem->id;
-								$refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points)*($value->deduct_percentage_value)/100;
-								$refundOrderItemQuantity = $orderedItem->quantity;
-								$refundOrderItemReason = 'cancellation';
-								$isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+                {
+                    $cancellationRanges = $contest->cancellationRanges;
+                    foreach ($cancellationRanges as $key => $value) {
+                        if($remainingHours >= $value->from && $remainingHours < $value->to)
+                        {
+                            $orderedItem = OrderItem::where('contest_application_id',$id)->first();
+                            if($orderedItem)
+                            {
+                                $refundOrderItemId = $orderedItem->id;
+                                $refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points) * ($value->deduct_percentage_value)/100;
 
-								if($isRefunded=='failed')
-								{
-									return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-								}
-								$orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+                                //Update commission and reward
+                                $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points * ($value->deduct_percentage_value)/100);
+                                $orderedItem->amount_transferred_to_vendor = ceil($orderedItem->amount_transferred_to_vendor * ($value->deduct_percentage_value)/100);
+                                $orderedItem->student_store_commission = ceil($orderedItem->student_store_commission * ($value->deduct_percentage_value)/100);
+                                $orderedItem->cool_company_commission = ceil($orderedItem->cool_company_commission * ($value->deduct_percentage_value)/100);
+                                $orderedItem->vat_amount = ceil($orderedItem->vat_amount * ($value->deduct_percentage_value)/100);
+                                $orderedItem->save();
+
+                                $refundOrderItemQuantity = $orderedItem->quantity;
+                                $refundOrderItemReason = 'cancellation';
+                                
+                                $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+
+                                if($isRefunded=='failed')
+                                {
+                                    return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+                                }
+                                $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
                                 $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
                                 $orderedItem->earned_reward_points = 0;
                                 $orderedItem->reward_point_status = 'completed';
-								$orderedItem->save();
-							}
-						}
-					}
-				}
 
+                                $orderedItem->save();
+                            }
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    //if no policy set then return all amount
+                    $orderedItem = OrderItem::where('contest_application_id',$id)->first();
+                    if($orderedItem)
+                    {
+                        if(Contest::where('id', $orderedItem->contest_id)->where('status', '!=', 'completed')->first())
+                        {
+                            $refundOrderItemId = $orderedItem->id;
+                            $refundOrderItemPrice = $orderedItem->price_after_apply_reward_points;
+
+                            $refundOrderItemQuantity = $orderedItem->quantity;
+                            $refundOrderItemReason = 'cancellation';
+                            
+                            $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+
+                            if($isRefunded=='failed')
+                            {
+                                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+                            }
+
+                            $orderedItem->amount_transferred_to_vendor = 0;
+                            $orderedItem->student_store_commission = 0;
+                            $orderedItem->cool_company_commission = 0;
+                            $orderedItem->vat_amount = 0;
+                            
+                            $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+                            $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
+                            $orderedItem->earned_reward_points = 0;
+                            $orderedItem->reward_point_status = 'completed';
+
+                            $orderedItem->save();
+                        }
+                    }
+                }
 			}
 			elseif($request->application_status == 'rejected')
 			{
@@ -264,7 +311,7 @@ class ContestApplicationController extends Controller
 
 	public function multipleStatusUpdate(Request $request)
 	{
-		try
+		/*try
 		{
 			$contestApplications = ContestApplication::whereIn('id',$request->contest_application_id)->get();
 
@@ -335,7 +382,7 @@ class ContestApplicationController extends Controller
 		{
 			DB::rollback();
 			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
-		}
+		}*/
 	}
 
 }

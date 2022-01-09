@@ -650,15 +650,3 @@ function appSettingUpdatePrice()
 	}
 	return true;
 }
-
-function updatePerticularOrderItem($order_item_id, $type)
-{
-	$orderItem = OrderItem::find($order_item_id);
-	if($orderItem)
-	{
-		if($type=='contest')
-		{
-			
-		}
-	}
-}
