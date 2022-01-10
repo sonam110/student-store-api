@@ -312,7 +312,7 @@ class ContestController extends Controller
         $authApplication = null;
         if(!empty($request->contest_application_id))
         {
-            $contestApplication = ContestApplication::where('id',$contest->contest_application_id)->where('user_id',Auth::id())->first();
+            $contestApplication = ContestApplication::where('id',$request->contest_application_id)->where('user_id', Auth::id())->first();
             $applied = true;
             $authApplication = $contestApplication;
         }
@@ -642,7 +642,7 @@ class ContestController extends Controller
                         $joinedContestApplicationId[] = $value->id;
                     }
                     
-                    $orderedItems = OrderItem::whereIn('contest_application_id',$joinedContestApplicationId)->get();
+                    $orderedItems = OrderItem::whereIn('contest_application_id',$joinedContestApplicationId)->where('item_status','!=', 'canceled')->get();
                     foreach ($orderedItems as $key => $orderedItem) {
                         $refundOrderItemId = $orderedItem->id;
                         $refundOrderItemPrice = $orderedItem->price_after_apply_reward_points;
@@ -657,8 +657,11 @@ class ContestController extends Controller
                         }
 
                         $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+                        $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
                         $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
-
+                        $orderedItem->earned_reward_points = 0;
+                        $orderedItem->reward_point_status = 'completed';
+                        $orderedItem->item_status = 'canceled';
 
                         $orderedItem->save();
                     }
