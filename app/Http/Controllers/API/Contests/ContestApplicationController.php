@@ -198,7 +198,7 @@ class ContestApplicationController extends Controller
                                 $orderedItem->student_store_commission = $student_store_commission;
                                 $orderedItem->cool_company_commission = $cool_company_commission;
 
-                                $remainingAmount = ceil($orderedItem->price - $refundOrderItemPrice)
+                                $remainingAmount = ceil($orderedItem->price - $refundOrderItemPrice);
 
                                 $orderedItem->vat_amount = ceil(($remainingAmount * $orderedItem->vat_percent)/100);
 
