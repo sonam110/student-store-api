@@ -39,7 +39,7 @@ class AddPackagesOnStripeSeeder extends Seeder
                     } else {
                         $amount = $package->price;
                     }
-
+                    dd($amount);
                     $plan = $stripe->plans->create([
                         'amount'          => $amount * 100,
                         'currency'        => $paymentInfo->stripe_currency,
