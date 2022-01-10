@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Http\Resources\UserResource;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\UserpublicResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
