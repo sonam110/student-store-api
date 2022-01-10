@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\UserpublicResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
@@ -51,11 +52,11 @@ class UserController extends Controller
 
 	public function show(User $user)
 	{
-		// if(!$user)
-		// {
-		// 	return response()->json(prepareResult(true, ['user doesnt exist.'], getLangByLabelGroups('messages','message_user_doesnt_exist')), config('http_response.internal_server_error'));
-		// }		
-		return response()->json(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
+		if($user->id == Auth::id())
+		{
+			return response()->json(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
+		}	
+		return response()->json(prepareResult(false, new UserpublicResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
 	}
 
 	/**

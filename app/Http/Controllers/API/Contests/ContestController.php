@@ -399,13 +399,13 @@ class ContestController extends Controller
         if($contest->user_id==auth()->id())
         {
             $contestCal = OrderItem::where('contest_id', $contest->id);
-            $contest['total_ordered_amount'] = $contestCal->sum(\DB::raw('order_items.price * order_items.quantity'));
-            $contest['total_canceled_refunded_amount'] = $contestCal->sum('canceled_refunded_amount');
-            $contest['total_earned_reward_points'] = $contestCal->sum('earned_reward_points');
-            $contest['total_amount_transferred_to_vendor'] = $contestCal->sum('amount_transferred_to_vendor');
-            $contest['total_student_store_commission'] = $contestCal->sum('student_store_commission');
-            $contest['total_cool_company_commission'] = $contestCal->sum('cool_company_commission');
-            $contest['total_vat_amount'] = $contestCal->sum('vat_amount');
+            $contest['total_ordered_amount'] = round($contestCal->sum(\DB::raw('order_items.price * order_items.quantity')), 2);
+            $contest['total_canceled_refunded_amount'] = round($contestCal->sum('canceled_refunded_amount'), 2);
+            $contest['total_earned_reward_points'] = round($contestCal->sum('earned_reward_points'), 2);
+            $contest['total_amount_transferred_to_vendor'] = round($contestCal->sum('amount_transferred_to_vendor'), 2);
+            $contest['total_student_store_commission'] = round($contestCal->sum('student_store_commission'), 2);
+            $contest['total_cool_company_commission'] = round($contestCal->sum('cool_company_commission'), 2);
+            $contest['total_vat_amount'] = round($contestCal->sum('vat_amount'), 2);
         }
 
         return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_list')), config('http_response.success'));
