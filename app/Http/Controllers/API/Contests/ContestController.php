@@ -306,7 +306,7 @@ class ContestController extends Controller
         }
     }
 
-    public function show(Contest $contest)
+    public function show(Request $request, Contest $contest)
     {
         $lang_id = $this->lang_id;
         $authApplication = null;
