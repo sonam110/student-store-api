@@ -202,7 +202,7 @@ class ContestApplicationController extends Controller
 
                                 $orderedItem->vat_amount = ceil(($remainingAmount * $orderedItem->vat_percent)/100);
 
-                                $orderedItem->amount_transferred_to_vendor = ceil($orderedItem->price - ($refundOrderItemPrice + $student_store_commission + $cool_company_commission));
+                                $orderedItem->amount_transferred_to_vendor = round($orderedItem->price - ($refundOrderItemPrice + $student_store_commission + $cool_company_commission), 2);
 
                                 $orderedItem->save();
 
