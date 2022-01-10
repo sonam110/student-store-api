@@ -309,8 +309,14 @@ class ContestController extends Controller
     public function show(Contest $contest)
     {
         $lang_id = $this->lang_id;
-
-        if($contestApplication = ContestApplication::where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->first())
+        $authApplication = null;
+        if(!empty($request->contest_application_id))
+        {
+            $contestApplication = ContestApplication::where('id',$contest->contest_application_id)->where('user_id',Auth::id())->first();
+            $applied = true;
+            $authApplication = $contestApplication;
+        }
+        elseif($contestApplication = ContestApplication::where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->orderBy('auto_id','DESC')->first())
         {
             $applied = true;
             $authApplication = $contestApplication;

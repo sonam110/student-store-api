@@ -213,21 +213,22 @@ class ContestApplicationController extends Controller
                             if($orderedItem)
                             {
                                 $refundOrderItemId = $orderedItem->id;
+                                
                                 //Update commission and reward
                                 $refundOrderItemPrice = ($orderedItem->price_after_apply_reward_points) * (100 - $value->deduct_percentage_value)/100;
-                                $student_store_commission = ceil($orderedItem->student_store_commission * ($value->deduct_percentage_value)/100);
-                                $cool_company_commission = ceil($orderedItem->cool_company_commission * ($value->deduct_percentage_value)/100);
+                                $student_store_commission = round(($orderedItem->student_store_commission * ($value->deduct_percentage_value)/100), 2);
+                                $cool_company_commission = round(($orderedItem->cool_company_commission * ($value->deduct_percentage_value)/100), 2);
 
                                 
                                 $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points * (100 - $value->deduct_percentage_value)/100);
                                 $orderedItem->student_store_commission = $student_store_commission;
                                 $orderedItem->cool_company_commission = $cool_company_commission;
 
-                                $remainingAmount = ceil($orderedItem->price - $refundOrderItemPrice);
+                                $remainingAmount = round(($orderedItem->price - $refundOrderItemPrice), 2);
 
-                                $orderedItem->vat_amount = ceil(($remainingAmount * $orderedItem->vat_percent)/100);
+                                $orderedItem->vat_amount = round((($remainingAmount * $orderedItem->vat_percent)/100), 2);
 
-                                $orderedItem->amount_transferred_to_vendor = ceil($orderedItem->price - ($refundOrderItemPrice + $student_store_commission + $cool_company_commission));
+                                $orderedItem->amount_transferred_to_vendor = round($orderedItem->price - ($refundOrderItemPrice + $student_store_commission + $cool_company_commission), 2);
 
                                 $orderedItem->save();
 
