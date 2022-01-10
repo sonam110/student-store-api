@@ -231,6 +231,7 @@ class LandingPageController extends Controller
         $productsServicesBook['cart_id'] = $cartId;
         $productsServicesBook['is_chat_initiated'] = $is_chat_initiated;
         $productsServicesBook['contact_list_id'] = $contactListId;
+        $productsServicesBook['language_id'] = $productsServicesBook->language_id;
         $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
         return response()->json(prepareResult(false, $productsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_list')), config('http_response.success'));
     }
