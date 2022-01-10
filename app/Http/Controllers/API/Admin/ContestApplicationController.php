@@ -205,10 +205,12 @@ class ContestApplicationController extends Controller
 				
 				if($contest->use_cancellation_policy == true)
                 {
+                	$notInAnyCase = false;
                     $cancellationRanges = $contest->cancellationRanges;
                     foreach ($cancellationRanges as $key => $value) {
                         if($remainingHours >= $value->from && $remainingHours < $value->to)
                         {
+                        	$notInAnyCase = true;
                             $orderedItem = OrderItem::where('contest_application_id',$id)->first();
                             if($orderedItem)
                             {
@@ -250,6 +252,42 @@ class ContestApplicationController extends Controller
                             }
                             break;
                         }
+                    }
+
+                    if($notInAnyCase)
+                    {
+                    	//if no policy set then return all amount
+	                    $orderedItem = OrderItem::where('contest_application_id',$id)->first();
+	                    if($orderedItem)
+	                    {
+	                        if(Contest::where('id', $orderedItem->contest_id)->where('status', '!=', 'completed')->first())
+	                        {
+	                            $refundOrderItemId = $orderedItem->id;
+	                            $refundOrderItemPrice = $orderedItem->price_after_apply_reward_points;
+
+	                            $refundOrderItemQuantity = $orderedItem->quantity;
+	                            $refundOrderItemReason = 'cancellation';
+	                            
+	                            $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
+
+	                            if($isRefunded=='failed')
+	                            {
+	                                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+	                            }
+
+	                            $orderedItem->amount_transferred_to_vendor = 0;
+	                            $orderedItem->student_store_commission = 0;
+	                            $orderedItem->cool_company_commission = 0;
+	                            $orderedItem->vat_amount = 0;
+	                            
+	                            $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+	                            $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
+	                            $orderedItem->earned_reward_points = 0;
+	                            $orderedItem->reward_point_status = 'completed';
+	                            $orderedItem->item_status = 'canceled';
+	                            $orderedItem->save();
+	                        }
+	                    }
                     }
                 }
                 else
