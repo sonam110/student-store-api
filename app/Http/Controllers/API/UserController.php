@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Http\Resources\UserResource;
-use App\Http\Resources\UserpublicResource;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Str;
@@ -56,7 +56,7 @@ class UserController extends Controller
 		{
 			return response()->json(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
 		}	
-		return response()->json(prepareResult(false, new UserpublicResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
+		return response()->json(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
 	}
 
 	/**
