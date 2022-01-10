@@ -254,7 +254,7 @@ class ContestApplicationController extends Controller
                         }
                     }
 
-                    if($notInAnyCase)
+                    if(!$notInAnyCase)
                     {
                     	//if no policy set then return all amount
 	                    $orderedItem = OrderItem::where('contest_application_id',$id)->first();
