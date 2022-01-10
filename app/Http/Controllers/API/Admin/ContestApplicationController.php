@@ -262,6 +262,15 @@ class ContestApplicationController extends Controller
 	                    {
 	                        if(Contest::where('id', $orderedItem->contest_id)->where('status', '!=', 'completed')->first())
 	                        {
+	                        	$orderedItem->amount_transferred_to_vendor = 0;
+                                $orderedItem->student_store_commission = 0;
+                                $orderedItem->cool_company_commission = 0;
+                                $orderedItem->vat_amount = 0;
+
+                                $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+                                $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
+                                $orderedItem->save();
+
 	                            $refundOrderItemId = $orderedItem->id;
 	                            $refundOrderItemPrice = $orderedItem->price_after_apply_reward_points;
 
@@ -298,6 +307,15 @@ class ContestApplicationController extends Controller
                     {
                         if(Contest::where('id', $orderedItem->contest_id)->where('status', '!=', 'completed')->first())
                         {
+                        	$orderedItem->amount_transferred_to_vendor = 0;
+                            $orderedItem->student_store_commission = 0;
+                            $orderedItem->cool_company_commission = 0;
+                            $orderedItem->vat_amount = 0;
+
+                            $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
+                            $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
+                            $orderedItem->save();
+                                
                             $refundOrderItemId = $orderedItem->id;
                             $refundOrderItemPrice = $orderedItem->price_after_apply_reward_points;
 
