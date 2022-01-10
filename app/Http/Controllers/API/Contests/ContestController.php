@@ -385,7 +385,7 @@ class ContestController extends Controller
         $contest['longitude'] = $contest->addressDetail?$contest->addressDetail->longitude:null;
         $diff_in_hours = \Carbon\Carbon::parse($contest->start_date)->diffInHours();
         $contest['cancel_button_enabled'] = false;
-        if($diff_in_hours > '24' && $contest->status != 'rejected')
+        if(24 >= $diff_in_hours && ($contest->status == 'pending' || $contest->status == 'verified' || $contest->status == 'hold'))
         {
             $contest['cancel_button_enabled'] = true;
         }
