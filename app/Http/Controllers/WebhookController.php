@@ -107,6 +107,9 @@ class WebhookController extends Controller
         $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
         if($subscribedPackage)
         {
+            $subscribedPackage->subscription_status = 0;
+            $subscribedPackage->save();
+
             $delivery_code = NULL;
             $shipping_charge = 0;
 
