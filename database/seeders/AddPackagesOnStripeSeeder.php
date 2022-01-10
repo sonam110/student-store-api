@@ -46,7 +46,7 @@ class AddPackagesOnStripeSeeder extends Seeder
                         'interval_count'  => $package->duration,
                         'product'         => $createProduct->id,
                     ]);
-                    \Log::info($plan);
+                    //\Log::info($plan);
                     $package->stripe_plan_id = $plan->id;
                     $package->save();
                 }

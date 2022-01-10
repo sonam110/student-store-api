@@ -353,7 +353,7 @@ class PackageSeeder extends Seeder
 		$package->type_of_package = 'packages_free';
 		$package->slug = 'packages_free';
 		$package->duration = '365';
-		$package->price = '3900';
+		$package->price = '0';
 		$package->commission_per_sale = '9.9';
 		$package->locations = '1';
 		$package->range_of_age = null;
@@ -590,7 +590,7 @@ class PackageSeeder extends Seeder
 		$package->type_of_package = 'packages_free';
 		$package->slug = 'packages_free';
 		$package->duration = '365';
-		$package->price = '79';
+		$package->price = '0';
 		$package->commission_per_sale = '9.9';
 		$package->locations = '1';
 		$package->range_of_age = null;
