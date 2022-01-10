@@ -33,6 +33,7 @@ use App\Models\FavouriteJob;
 use App\Models\Contest;
 use App\Models\ContestApplication; 
 use App\Http\Resources\UserResource;
+use App\Http\Resources\UserpublicResource;
 use App\Models\ServiceProviderDetail; 
 
 class LandingPageController extends Controller
@@ -90,7 +91,7 @@ class LandingPageController extends Controller
         $user = User::find($user_id);
         if($user)
         {
-            return response()->json(prepareResult(false, new UserResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
+            return response()->json(prepareResult(false, new UserpublicResource($user), getLangByLabelGroups('messages','message_user_list')), config('http_response.success'));
         }    
         return response(prepareResult(true, 'Data Not Found.', 'Data Not Found.'), config('http_response.not_found'));
     }
