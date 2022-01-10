@@ -143,6 +143,11 @@ class User extends Authenticatable
         return $this->hasOne(StudentDetail::class, 'user_id', 'id');
     }
 
+    public function studentDetailPublic()
+    {
+        return $this->hasOne(StudentDetail::class, 'user_id', 'id')->select('id','user_id','avg_rating');
+    }
+
     public function serviceProviderDetail()
     {
         return $this->hasOne(ServiceProviderDetail::class, 'user_id', 'id')->with('registrationTypeDetail','serviceProviderTypeDetail');
