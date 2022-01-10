@@ -2609,7 +2609,6 @@ class OrderController extends Controller
 			$user_package = UserPackageSubscription::where('package_id', $checkPackage->id)->where('user_id', Auth::id())->whereNotNull('subscription_id')->where('payby','stripe')->where('is_canceled', 0)->orderBy('auto_id', 'DESC')->first();
 		}
 
-
 		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 		$subscription = $stripe->subscriptions->create([
 		  'customer' => Auth::user()->stripe_customer_id,
@@ -2631,6 +2630,7 @@ class OrderController extends Controller
 			if($user_package)
 			{
 				$user_package->is_canceled = 1;
+				$user_package->subscription_status = 0;
 				$user_package->canceled_date = date('Y-m-d');
 				$user_package->save();
 
@@ -2650,6 +2650,7 @@ class OrderController extends Controller
 		if($user_package)
 		{
 			$user_package->is_canceled = 1;
+			$user_package->subscription_status = 0;
 			$user_package->canceled_date = date('Y-m-d');
 			$user_package->save();
 

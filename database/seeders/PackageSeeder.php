@@ -14,7 +14,7 @@ class PackageSeeder extends Seeder
      */
     public function run()
     {
-    	\DB::table('packages')->truncate();
+    	//\DB::table('packages')->truncate();
     	
     	//Jobs
         $package = new Package;
