@@ -312,11 +312,11 @@ class ContestController extends Controller
         $authApplication = null;
         if(!empty($request->contest_application_id))
         {
-            $contestApplication = ContestApplication::where('id',$request->contest_application_id)->where('user_id', Auth::id())->first();
+            $contestApplication = ContestApplication::with('orderItem:id,contest_application_id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->where('id',$request->contest_application_id)->where('user_id', Auth::id())->first();
             $applied = true;
             $authApplication = $contestApplication;
         }
-        elseif($contestApplication = ContestApplication::where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->orderBy('auto_id','DESC')->first())
+        elseif($contestApplication = ContestApplication::with('orderItem:id,contest_application_id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->orderBy('auto_id','DESC')->first())
         {
             $applied = true;
             $authApplication = $contestApplication;
