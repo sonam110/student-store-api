@@ -32,7 +32,6 @@ use App\Http\Resources\JobApplicationResource;
 use App\Models\FavouriteJob;
 use App\Models\Contest;
 use App\Models\ContestApplication; 
-use App\Http\Resources\UserResource;
 use App\Http\Resources\UserpublicResource;
 use App\Models\ServiceProviderDetail; 
 
