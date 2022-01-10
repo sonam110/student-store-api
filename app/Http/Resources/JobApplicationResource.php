@@ -24,7 +24,7 @@ class JobApplicationResource extends JsonResource
             'job_end_date'          => $this->job_end_date,
             'application_remark'    => $this->application_remark,
             'attachment_url'        => $this->attachment_url,
-            'applied_by'            => new UserResource($this->user),
+            'applied_by'            => new UserpublicResource($this->user),
             'job'                   => new JobResource($this->job),
         ];
     }

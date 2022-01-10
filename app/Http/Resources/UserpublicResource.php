@@ -38,6 +38,14 @@ class UserpublicResource extends JsonResource
                     'qr_code_number'                     => $this->qr_code_number,
                     'status'                             => $this->status,
                     'student_detail'                     => $this->studentDetailPublic,
+                    'user_packages'                      => array_filter(array(  
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Job')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Product')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(),
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Service')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(),
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Book')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Contest')->where('subscription_status', 1)->orderBy('created_at','DESC')->first()
+                                                    )),
+                    
                     'ratings'                            => RatingAndFeedback::where('to_user',$this->id)->limit(3)->with('customer:id,first_name,last_name,gender,email,contact_number,profile_pic_path,profile_pic_thumb_path')->get(),
                     'ratings_count'                      => $this->ratings->count(),
                     'default_address'                    => new AddressDetailResource($this->defaultAddress),
@@ -67,6 +75,14 @@ class UserpublicResource extends JsonResource
                     'show_email'                    => $this->show_email,
                     'show_contact_number'           => $this->show_contact_number,
                     'service_provider_detail'       => $this->serviceProviderDetail,
+                    'user_packages'                      => array_filter(array(  
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Job')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Product')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(),
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Service')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(),
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Book')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
+                                                            UserPackageSubscription::where('user_id',$this->id)->where('module','Contest')->where('subscription_status', 1)->orderBy('created_at','DESC')->first()
+                                                    )),
+                    
                     'ratings'                       => RatingAndFeedback::where('to_user',$this->id)->limit(3)->with('customer')->get(),
                     'ratings_count'                 => $this->ratings->count(),
                     'default_address'                    => new AddressDetailResource($this->defaultAddress),
