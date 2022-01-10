@@ -234,9 +234,11 @@ class ContestApplicationController extends Controller
                 {
                     //if no policy set then return all amount
                     $orderedItem = OrderItem::where('contest_application_id',$id)->first();
+                    \Log::info($orderedItem);
                     if($orderedItem)
                     {
                         $getContestInfo = Contest::where('id', $orderedItem->contest_id)->where('status', '!=', 'completed')->first();
+                        \Log::info($getContestInfo);
                         if($getContestInfo)
                         {
                             $refundOrderItemId = $orderedItem->id;
