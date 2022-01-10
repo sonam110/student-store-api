@@ -209,30 +209,30 @@ class AuthController extends Controller
 
 		if($request->is_minor == true)
 		{
-			$user->first_name 							= $request->guardian_first_name;
-			$user->last_name 							= $request->guardian_last_name;
-			$user->email 								= $request->guardian_email;
-			$user->contact_number 						= $request->guardian_contact_number;
-			$user->password 							= bcrypt($request->guardian_password);
-			$user->guardian_first_name 					= $request->first_name;
-			$user->guardian_last_name 					= $request->last_name;
-			$user->guardian_email 						= $request->email;
-			$user->guardian_contact_number 				= $request->contact_number;
-			$user->guardian_password 					= bcrypt($request->password);
+			$user->first_name = $request->guardian_first_name;
+			$user->last_name  = $request->guardian_last_name;
+			$user->email = $request->guardian_email;
+			$user->contact_number  = $request->guardian_contact_number;
+			$user->password  = bcrypt($request->guardian_password);
+			$user->guardian_first_name = $request->first_name;
+			$user->guardian_last_name = $request->last_name;
+			$user->guardian_email = $request->email;
+			$user->guardian_contact_number = $request->contact_number;
+			$user->guardian_password = bcrypt($request->password);
 
 		}
 		else
 		{
-			$user->first_name 							= $request->first_name;
-			$user->last_name 							= $request->last_name;
-			$user->email 								= $request->email;
-			$user->contact_number 						= $request->contact_number;
-			$user->password 							= bcrypt($request->password);
-			$user->guardian_first_name 					= $request->guardian_first_name;
-			$user->guardian_last_name 					= $request->guardian_last_name;
-			$user->guardian_email 						= $request->guardian_email;
-			$user->guardian_contact_number 				= $request->guardian_contact_number;
-			$user->guardian_password 					= bcrypt($request->guardian_password);
+			$user->first_name = $request->first_name;
+			$user->last_name = $request->last_name;
+			$user->email = $request->email;
+			$user->contact_number = $request->contact_number;
+			$user->password = bcrypt($request->password);
+			$user->guardian_first_name = $request->guardian_first_name;
+			$user->guardian_last_name = $request->guardian_last_name;
+			$user->guardian_email = $request->guardian_email;
+			$user->guardian_contact_number = $request->guardian_contact_number;
+			$user->guardian_password = bcrypt($request->guardian_password);
 		}
 		
 		$user->is_email_verified 					= false;
@@ -574,14 +574,23 @@ class AuthController extends Controller
 
 		try
 		{
-			$user = User::where('email',$request->contact_number)->orWhere('contact_number',$request->contact_number)->orWhere('guardian_email',$request->contact_number)->orWhere('guardian_contact_number',$request->contact_number)->first(['id','first_name','last_name','email','contact_number','profile_pic_path','profile_pic_thumb_path','user_type_id','language_id','password','guardian_email','guardian_contact_number','is_minor']);
+			$user = User::where('email',$request->contact_number)->orWhere('contact_number',$request->contact_number)->orWhere('guardian_email',$request->contact_number)->orWhere('guardian_contact_number',$request->contact_number)->first(['id','first_name','last_name','email','contact_number','profile_pic_path','profile_pic_thumb_path','user_type_id','language_id','password','guardian_password','guardian_email','guardian_contact_number','is_minor']);
 			
 
 			if (!$user) {
 				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_not_exists')), config('http_response.not_found'));
 			}
 
-			if(Hash::check($request->password,$user->password) || Hash::check($request->password,$user->guardian_password)) 
+			$isLogin = false;
+			if((Hash::check($request->password,$user->password) && (AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'))==$request->contact_number) || AES256::decrypt($user->email, env('ENCRYPTION_KEY'))==$request->contact_number)) 
+			{
+				$isLogin = true;
+			}
+			elseif((Hash::check($request->password,$user->guardian_password) && (AES256::decrypt($user->guardian_contact_number, env('ENCRYPTION_KEY'))==$request->contact_number) || AES256::decrypt($user->guardian_email, env('ENCRYPTION_KEY'))==$request->contact_number))
+			{
+				$isLogin = true;
+			}
+			if($isLogin) 
 			{
 				if($user->status==2)
 				{
