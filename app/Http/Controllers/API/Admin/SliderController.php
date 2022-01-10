@@ -34,7 +34,8 @@ class SliderController extends Controller
     	}
     	catch (\Throwable $exception) 
     	{
-    		return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    		\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
     	}
     }
 
@@ -68,7 +69,8 @@ class SliderController extends Controller
     	catch (\Throwable $exception)
     	{
     		DB::rollback();
-    		return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    		\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
     	}
     }
 
@@ -113,7 +115,8 @@ class SliderController extends Controller
     	catch (\Throwable $exception)
     	{
     		DB::rollback();
-    		return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+    		\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
     	}
     }
 

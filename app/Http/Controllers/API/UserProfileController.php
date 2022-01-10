@@ -54,7 +54,8 @@ class UserProfileController extends Controller
 					}
 					else
 					{
-						return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+						\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 					}
 				}
 				else
@@ -73,7 +74,8 @@ class UserProfileController extends Controller
 					}
 					else
 					{
-						return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+						\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 					}
 				}
 				else
@@ -86,7 +88,8 @@ class UserProfileController extends Controller
 		catch (\Throwable $exception)
 		{
 			DB::rollback();
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
 	}
 	
@@ -164,7 +167,8 @@ class UserProfileController extends Controller
 		}
 		else
 		{
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
 	}
 
@@ -225,7 +229,8 @@ class UserProfileController extends Controller
 		}
 		else
 		{
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
 	}
 
@@ -320,7 +325,8 @@ class UserProfileController extends Controller
 		}
 		else
 		{
-			return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
 	}
 
@@ -379,6 +385,7 @@ class UserProfileController extends Controller
 		catch (\Throwable $exception)
         {
             DB::rollback();
+            \Log::error($exception);
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_validation')), config('http_response.internal_server_error'));
         }
 	}
@@ -456,7 +463,8 @@ class UserProfileController extends Controller
 			}
 			else
 			{
-				return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+				\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
 		}
 		return response()->json(prepareResult(true, ['Already added.'], 'Already added.'), config('http_response.accepted'));
