@@ -169,6 +169,10 @@ class ContestApplicationController extends Controller
     	try
     	{
     		$contestApplication = ContestApplication::find($id);
+            if(!$contestApplication)
+            {
+                return response()->json(prepareResult(true, 'No record found...', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
             if($request->application_status == 'canceled')
             {
                 $contestApplication->reason_for_cancellation = $request->reason_for_cancellation;
@@ -232,7 +236,8 @@ class ContestApplicationController extends Controller
                     $orderedItem = OrderItem::where('contest_application_id',$id)->first();
                     if($orderedItem)
                     {
-                        if(Contest::where('id', $orderedItem->contest_id)->where('status', '!=', 'completed')->first())
+                        $getContestInfo = Contest::where('id', $orderedItem->contest_id)->where('status', '!=', 'completed')->first();
+                        if($getContestInfo)
                         {
                             $refundOrderItemId = $orderedItem->id;
                             $refundOrderItemPrice = $orderedItem->price_after_apply_reward_points;
