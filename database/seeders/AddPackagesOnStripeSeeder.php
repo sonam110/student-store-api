@@ -39,13 +39,13 @@ class AddPackagesOnStripeSeeder extends Seeder
                     } else {
                         $amount = $package->price;
                     }
-                    return [
+                    echo json_encode([
                         'amount'          => $amount * 100,
                         'currency'        => $paymentInfo->stripe_currency,
                         'interval'        => 'day',
                         'interval_count'  => $package->duration,
                         'product'         => $createProduct->id,
-                    ];
+                    ]);
                     $plan = $stripe->plans->create([
                         'amount'          => $amount * 100,
                         'currency'        => $paymentInfo->stripe_currency,
