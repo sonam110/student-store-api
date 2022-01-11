@@ -187,65 +187,68 @@ class PackageController extends Controller
                 $duration = 0;
             }
 
-            if(empty($package->stripe_plan_id))
+            if($duration!=0)
             {
-                $createProduct = $stripe->products->create([
-                    'images'    => [$this->appsetting->logo_path],
-                    'name'      => ucfirst(str_replace('_', ' ', $request->type_of_package)),
-                    'type'      => 'service',
-                    'active'    => ($request->is_published==1) ? true : false
-                ]);
-
-                if($request->subscription>0) {
-                    $amount = $request->subscription;
-                } else {
-                    $amount = $request->price;
-                }
-
-                $plan = $stripe->plans->create([
-                    'amount'          => $amount * 100,
-                    'currency'        => $this->paymentInfo->stripe_currency,
-                    'interval'        => 'day',
-                    'interval_count'  => $duration,
-                    'product'         => $createProduct->id,
-                ]);
-                $package->stripe_plan_id = $plan->id;
-            }
-            else
-            {
-                $planInfo = $stripe->plans->retrieve(
-                    $package->stripe_plan_id,
-                    []
-                );
-                $productInfo = $planInfo->product;
-                $createProduct = $stripe->products->update(
-                    $productInfo,
-                    ['active'    => ($request->is_published==1) ? true : false]
-                );
-
-                if($request->subscription>0) {
-                    $amount = $request->subscription;
-                } else {
-                    $amount = $request->price;
-                }
-
-                if($package->duration != $request->duration || $package->subscription != ($amount * 100))
+                if(empty($package->stripe_plan_id))
                 {
-                    if($duration!=0)
-                    {
-                        $stripe->plans->update(
-                            $package->stripe_plan_id,
-                            ['active' => false]
-                        );
+                    $createProduct = $stripe->products->create([
+                        'images'    => [$this->appsetting->logo_path],
+                        'name'      => ucfirst(str_replace('_', ' ', $request->type_of_package)),
+                        'type'      => 'service',
+                        'active'    => ($request->is_published==1) ? true : false
+                    ]);
 
-                        $plan = $stripe->plans->create([
-                            'amount'          => $request->subscription * 100,
-                            'currency'        => $this->paymentInfo->stripe_currency,
-                            'interval'        => 'day',
-                            'interval_count'  => $duration,
-                            'product'         => $createProduct->id,
-                        ]);
-                        $package->stripe_plan_id = $plan->id;
+                    if($request->subscription>0) {
+                        $amount = $request->subscription;
+                    } else {
+                        $amount = $request->price;
+                    }
+
+                    $plan = $stripe->plans->create([
+                        'amount'          => $amount * 100,
+                        'currency'        => $this->paymentInfo->stripe_currency,
+                        'interval'        => 'day',
+                        'interval_count'  => $duration,
+                        'product'         => $createProduct->id,
+                    ]);
+                    $package->stripe_plan_id = $plan->id;
+                }
+                else
+                {
+                    $planInfo = $stripe->plans->retrieve(
+                        $package->stripe_plan_id,
+                        []
+                    );
+                    $productInfo = $planInfo->product;
+                    $createProduct = $stripe->products->update(
+                        $productInfo,
+                        ['active'    => ($request->is_published==1) ? true : false]
+                    );
+
+                    if($request->subscription>0) {
+                        $amount = $request->subscription;
+                    } else {
+                        $amount = $request->price;
+                    }
+
+                    if($package->duration != $request->duration || $package->subscription != ($amount * 100))
+                    {
+                        if($duration!=0)
+                        {
+                            $stripe->plans->update(
+                                $package->stripe_plan_id,
+                                ['active' => false]
+                            );
+
+                            $plan = $stripe->plans->create([
+                                'amount'          => $request->subscription * 100,
+                                'currency'        => $this->paymentInfo->stripe_currency,
+                                'interval'        => 'day',
+                                'interval_count'  => $duration,
+                                'product'         => $createProduct->id,
+                            ]);
+                            $package->stripe_plan_id = $plan->id;
+                        }
                     }
                 }
             }
