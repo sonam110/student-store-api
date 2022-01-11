@@ -326,12 +326,18 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	    }
 	    else
 	    {
+	    	\Log::info('refund OBJ');
+	    	\Log::info($response);
 	    	$getOrderStatus = getKlarnaOrderInfo($transaction->transaction_id);
 	    	$res = json_decode($getOrderStatus, true);
-	    	\Log::info($getOrderStatus);
+	    	\Log::info('order status OBJ');
 	    	\Log::info($res);
-	    	$refund_id = $res['refunds'][0]['refund_id'];
-	    	$isRefunded = true;
+	    	
+	    	if(!empty($res['refunds']))
+	    	{
+	    		$refund_id = $res['refunds'][0]['refund_id'];
+	    		$isRefunded = true;
+	    	}
 	    }
 	    curl_close($curl);
 		}
