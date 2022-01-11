@@ -283,7 +283,7 @@ class ProductsServicesBookController extends Controller
     {
         $lang_id = $this->lang_id;
 
-        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail','addressDetail','productImages','productTags')
+        $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,user_type_id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail','addressDetail','productImages','productTags')
         ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
