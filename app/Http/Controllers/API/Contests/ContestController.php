@@ -222,15 +222,18 @@ class ContestController extends Controller
 
                 	foreach ($request->cancellation_ranges as $key => $cancellation_range) 
                 	{
-                		if(!empty($cancellation_range["from"]) || $cancellation_range["from"] == '0')
-                		{
-                			$cancellation 							= new ContestCancellationRange;
-                			$cancellation->contest_id 				= $contest->id;
-                			$cancellation->from 					= $cancellation_range["from"];
-                			$cancellation->to 						= $cancellation_range["to"];
-                			$cancellation->deduct_percentage_value 	= $cancellation_range["deduct_percentage_value"];
-                			$cancellation->save();
-                		}
+                        if(!empty($cancellation_range["from"]) && !empty($cancellation_range["to"]))
+                        {
+                            if(!empty($cancellation_range["from"]) || $cancellation_range["from"] == '0')
+                            {
+                                $cancellation                           = new ContestCancellationRange;
+                                $cancellation->contest_id               = $contest->id;
+                                $cancellation->from                     = $cancellation_range["from"];
+                                $cancellation->to                       = $cancellation_range["to"];
+                                $cancellation->deduct_percentage_value  = $cancellation_range["deduct_percentage_value"];
+                                $cancellation->save();
+                            }
+                        }
                 	}
                 }
 
@@ -549,15 +552,18 @@ class ContestController extends Controller
             	ContestCancellationRange::where('contest_id',$contest->id)->delete();
             	foreach ($request->cancellation_ranges as $key => $cancellation_range) 
             	{
-            		if(!empty($cancellation_range["from"]) || $cancellation_range["from"] == '0')
-            		{
-            			$cancellation 							= new ContestCancellationRange;
-            			$cancellation->contest_id 				= $contest->id;
-            			$cancellation->from 					= $cancellation_range["from"];
-            			$cancellation->to 						= $cancellation_range["to"];
-            			$cancellation->deduct_percentage_value 	= $cancellation_range["deduct_percentage_value"];
-            			$cancellation->save();
-            		}
+                    if(!empty($cancellation_range["from"]) && !empty($cancellation_range["to"]))
+                    {
+                		if(!empty($cancellation_range["from"]) || $cancellation_range["from"] == '0')
+                		{
+                			$cancellation 							= new ContestCancellationRange;
+                			$cancellation->contest_id 				= $contest->id;
+                			$cancellation->from 					= $cancellation_range["from"];
+                			$cancellation->to 						= $cancellation_range["to"];
+                			$cancellation->deduct_percentage_value 	= $cancellation_range["deduct_percentage_value"];
+                			$cancellation->save();
+                		}
+                    }
             	}
             }
 
