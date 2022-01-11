@@ -684,7 +684,7 @@ function createFreePackage($userType, $module)
 	if($getFreePackage)
 	{
     $userPackageSubscription = new UserPackageSubscription;
-    $userPackageSubscription->user_id = $package->user_id;
+    $userPackageSubscription->user_id = Auth::id();
     $userPackageSubscription->subscription_id = null;
     $userPackageSubscription->payby = null;
     $userPackageSubscription->package_id = $getFreePackage->id;
@@ -719,6 +719,7 @@ function createFreePackage($userType, $module)
     $userPackageSubscription->range_of_age = $getFreePackage->range_of_age;
     $userPackageSubscription->cost_for_each_attendee = $getFreePackage->cost_for_each_attendee;
     $userPackageSubscription->top_up_fee = $getFreePackage->top_up_fee;
+    $userPackageSubscription->is_recurring_transaction = 0;
     $userPackageSubscription->save();
 
     if($userPackageSubscription)
