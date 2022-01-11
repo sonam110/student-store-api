@@ -724,7 +724,7 @@ function createFreePackage($userType, $module)
     {
         //update price if package changed
         $type = $getFreePackage->module;
-        $userID = $package->user_id;
+        $userID = $userPackageSubscription->user_id;
         packageUpdatePrice($type, $userID);
     }
 	}
