@@ -2619,12 +2619,15 @@ class OrderController extends Controller
 		  'payment_behavior' => 'default_incomplete',
 		  'expand' => ['latest_invoice.payment_intent'],
 		]);
+
+		\Log::info($subscription);
 		$returnObj = [
 			'subscription_id' 	=> $subscription->id,
 			'client_secret' 	=> $subscription->latest_invoice->payment_intent->client_secret,
 			'status' 			=> $subscription->status,
 			'hosted_invoice_url'=> $subscription->latest_invoice->hosted_invoice_url,
 		];
+		\Log::info($returnObj);
 		if($subscription->status=='active') 
 		{
 			//if success then unsubscribe same package which is already subscribed
