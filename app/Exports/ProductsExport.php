@@ -101,7 +101,7 @@ class ProductsExport implements FromCollection, WithHeadings
     		return [
     			'SNO'             				=> $key+1,
     			'id'      						=> $data->id,
-    			'user_name'						=> AES256::decrypt($data->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($data->user->last_name, env('ENCRYPTION_KEY')),
+    			'user_name'						=> AES256::decrypt($data->user->first_name, env('ENCRYPTION_KEY')),
     			'category_master'				=> $data->categoryMaster->title,
     			'title'							=> $data->title,
     			'slug'							=> $data->slug,
