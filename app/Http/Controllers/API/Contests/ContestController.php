@@ -217,7 +217,7 @@ class ContestController extends Controller
 
                 // $user_package->update(['used_number_of_contest'=>($user_package->used_number_of_contest + 1),'used_number_of_event'=>($user_package->used_number_of_event + 1)]);
 
-                if(!empty($request->cancellation_ranges))
+                if($request->use_cancellation_policy==1)
                 {
                     foreach ($request->cancellation_ranges as $key => $cancellation_range) 
                 	{
@@ -546,7 +546,7 @@ class ContestController extends Controller
             $contest->meta_description                      = $request->meta_description;
             $contest->tags                         = (!empty($request->tags)) ? json_encode($request->tags) : null;
             $contest->save();
-            if(!empty($request->cancellation_ranges))
+            if($request->use_cancellation_policy==1)
             {
             	ContestCancellationRange::where('contest_id',$contest->id)->delete();
             	foreach ($request->cancellation_ranges as $key => $cancellation_range) 

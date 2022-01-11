@@ -101,7 +101,7 @@ class WebhookController extends Controller
         }
         elseif ($event->type == "customer.subscription.deleted") {
             $subscriptionSchedule = $event->data->object;
-            $subscription_id = $subscriptionSchedule->subscription;
+            $subscription_id = $subscriptionSchedule->id;
             $this->abortedSubscription($subscription_id);
             Log::channel('webhook')->info('customer.subscription.deleted');
             Log::channel('webhook')->info($subscriptionSchedule);
