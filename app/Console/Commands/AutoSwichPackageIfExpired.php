@@ -84,6 +84,7 @@ class AutoSwichPackageIfExpired extends Command
                     $userPackageSubscription->range_of_age = $getFreePackage->range_of_age;
                     $userPackageSubscription->cost_for_each_attendee = $getFreePackage->cost_for_each_attendee;
                     $userPackageSubscription->top_up_fee = $getFreePackage->top_up_fee;
+                    $userPackageSubscription->is_recurring_transaction = 0;
                     $userPackageSubscription->save();
 
                     if($userPackageSubscription)

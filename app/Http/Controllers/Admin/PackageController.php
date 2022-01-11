@@ -73,6 +73,13 @@ class PackageController extends Controller
         {
             $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 
+
+            $duration = $request->duration;
+            if($request->duration==999)
+            {
+                $duration = 0;
+            }
+            
             $createProduct = $stripe->products->create([
                 'images'    => [$this->appsetting->logo_path],
                 'name'      => ucfirst(str_replace('_', ' ', $request->type_of_package)),
@@ -90,7 +97,7 @@ class PackageController extends Controller
                 'amount'          => $amount * 100,
                 'currency'        => $this->paymentInfo->stripe_currency,
                 'interval'        => 'day',
-                'interval_count'  => $request->duration,
+                'interval_count'  => $duration,
                 'product'         => $createProduct->id,
             ]);
 
@@ -174,6 +181,12 @@ class PackageController extends Controller
         {
             $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 
+            $duration = $request->duration;
+            if($request->duration==999)
+            {
+                $duration = 0;
+            }
+
             if(empty($package->stripe_plan_id))
             {
                 $createProduct = $stripe->products->create([
@@ -193,7 +206,7 @@ class PackageController extends Controller
                     'amount'          => $amount * 100,
                     'currency'        => $this->paymentInfo->stripe_currency,
                     'interval'        => 'day',
-                    'interval_count'  => $request->duration,
+                    'interval_count'  => $duration,
                     'product'         => $createProduct->id,
                 ]);
                 $package->stripe_plan_id = $plan->id;
@@ -227,7 +240,7 @@ class PackageController extends Controller
                         'amount'          => $request->subscription * 100,
                         'currency'        => $this->paymentInfo->stripe_currency,
                         'interval'        => 'day',
-                        'interval_count'  => $request->duration,
+                        'interval_count'  => $duration,
                         'product'         => $createProduct->id,
                     ]);
                     $package->stripe_plan_id = $plan->id;
