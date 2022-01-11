@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 Route::get('/get-language-list-for-ddl', [App\Http\Controllers\API\FrontController::class,'getLanguageListForDDL']);
+Route::get('/get-language-list-for-ddl-wv', [App\Http\Controllers\API\FrontController::class,'getLanguageListForDDLwv']);
 
 
 //Stripe Webhook
