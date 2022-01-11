@@ -2205,7 +2205,7 @@ class OrderController extends Controller
 	            return response()->json(prepareResult(true, $info, "Error while placing klarna order"), config('http_response.internal_server_error'));
 	        }
 	        curl_close($curl);
-	        \Log::info($response);
+	        //\Log::info($response);
 	        $klarna_response = json_decode($response, true);
 
 	        $returnData = [
@@ -2620,14 +2620,17 @@ class OrderController extends Controller
 		  'expand' => ['latest_invoice.payment_intent'],
 		]);
 
-		\Log::info($subscription);
+		if($subscription->latest_invoice->payment_intent==null)
+		{
+			return response()->json(prepareResult(true, 'client_secret not found.', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
+		}
 		$returnObj = [
 			'subscription_id' 	=> $subscription->id,
 			'client_secret' 	=> $subscription->latest_invoice->payment_intent->client_secret,
 			'status' 			=> $subscription->status,
 			'hosted_invoice_url'=> $subscription->latest_invoice->hosted_invoice_url,
 		];
-		\Log::info($returnObj);
+
 		if($subscription->status=='active') 
 		{
 			//if success then unsubscribe same package which is already subscribed
@@ -2645,7 +2648,7 @@ class OrderController extends Controller
 				);
 			}
 		}
-		return response(prepareResult(false, $returnObj, 'Cancel Subscription'), config('http_response.success'));
+		return response(prepareResult(false, $returnObj, 'Subscription Canceled.'), config('http_response.success'));
 	}
 
 	public function cancelStripeSubscription(Request $request)
