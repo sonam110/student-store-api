@@ -2205,6 +2205,7 @@ class OrderController extends Controller
 	            return response()->json(prepareResult(true, $info, "Error while placing klarna order"), config('http_response.internal_server_error'));
 	        }
 	        curl_close($curl);
+	        \Log::info($response);
 	        $klarna_response = json_decode($response, true);
 
 	        $returnData = [
