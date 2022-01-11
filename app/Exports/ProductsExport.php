@@ -53,8 +53,6 @@ class ProductsExport implements FromCollection, WithHeadings
             'is_published',
             'published_at',
             'is_for_sale',
-            'sale_start_at',
-            'sale_end_at',
             'is_promoted',
             'promotion_start_at',
             'promotion_end_at',
@@ -70,9 +68,6 @@ class ProductsExport implements FromCollection, WithHeadings
             'most_popular',
             'is_reward_point_applicable',
             'reward_points',
-            'is_sold',
-            'sold_at_student_store',
-            'days_taken',
             'created_at'
     	];
     }
@@ -127,8 +122,6 @@ class ProductsExport implements FromCollection, WithHeadings
     			'is_published'					=> $data->is_published,
     			'published_at'					=> $data->published_at,
     			'is_for_sale'					=> $data->is_for_sale,
-    			'sale_start_at'					=> $data->sale_start_at,
-    			'sale_end_at'					=> $data->sale_end_at,
     			'is_promoted'					=> $data->is_promoted,
     			'promotion_start_at'			=> $data->promotion_start_at,
     			'promotion_end_at'				=> $data->promotion_end_at,
@@ -144,10 +137,7 @@ class ProductsExport implements FromCollection, WithHeadings
     			'most_popular'					=> $data->most_popular,
     			'is_reward_point_applicable'	=> $data->is_reward_point_applicable,
     			'reward_points'					=> $data->reward_points,
-    			'is_sold'						=> $data->is_sold,
-    			'sold_at_student_store'			=> $data->sold_at_student_store,
-    			'days_taken'					=> $data->days_taken,
-              	'created_at'      				=> $data->created_at,
+    			'created_at'      				=> $data->created_at,
     		];
     	});
     }
