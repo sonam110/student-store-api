@@ -26,64 +26,54 @@ class ProductsExport implements FromCollection, WithHeadings
     public function headings(): array {
     	return [
     		'SNO',
-    		'id',
-    		'user_name',
-    		'category_master',
-    		// 'sub_category',
-    		'title',
-    		'slug',
-    		'meta_description',
-    		'short_summary',
-    		'type',
-    		'sku',
+            'id',
+            'user_name',
+            'category_master',
+            'title',
+            'slug',
+            'meta_description',
+            'short_summary',
+            'type',
+            'sku',
             'basic_price_wo_vat',
-    		'price',
-    		'is_on_offer',
-    		// 'discount_type',
-    		// 'discount_value',
-    		'quantity',
-    		'description',
-          	// 'attribute_details',
-          	// 'condition',
-    		'sell_type',
-    		'service_availability',
-    		'service_online_link',
-    		'service_type',
-    		'service_start_time',
-    		'service_end_time',
-    		'delivery_type',
-    		'available_to',
-    		'is_published',
-    		'published_at',
-    		'is_for_sale',
-    		'sale_start_at',
-    		'sale_end_at',
-    		'is_promoted',
-    		'promotion_start_at',
-    		'promotion_end_at',
-    		'view_count',
-    		'avg_rating',
-    		'status',
-    		'sub_category_slug',
-    		'tags',
-    		'gtin_isbn',
-    		'discounted_price',
-    		'deposit_amount',
-    		'is_used_item',
-    		'item_condition',
-    		'brand',
-    		'most_popular',
-    		'most_popular_start_at',
-    		'most_popular_end_at',
-    		'top_selling',
-    		'top_selling_start_at',
-    		'top_selling_end_at',
-    		'is_reward_point_applicable',
-    		'reward_points',
-    		'is_sold',
-    		'sold_at_student_store',
-    		'days_taken',
-    		'Created at'
+            'price',
+            'is_on_offer',
+            'discount_type',
+            'discount_value',
+            'quantity',
+            'description',
+            'sell_type',
+            'service_availability',
+            'service_online_link',
+            'service_type',
+            'service_start_time',
+            'service_end_time',
+            'delivery_type',
+            'available_to',
+            'is_published',
+            'published_at',
+            'is_for_sale',
+            'sale_start_at',
+            'sale_end_at',
+            'is_promoted',
+            'promotion_start_at',
+            'promotion_end_at',
+            'view_count',
+            'avg_rating',
+            'status',
+            'gtin_isbn',
+            'discounted_price',
+            'deposit_amount',
+            'is_used_item',
+            'item_condition',
+            'brand',
+            'most_popular',
+            'is_reward_point_applicable',
+            'reward_points',
+            'is_sold',
+            'sold_at_student_store',
+            'days_taken',
+            'created_at'
     	];
     }
 
@@ -113,7 +103,6 @@ class ProductsExport implements FromCollection, WithHeadings
     			'id'      						=> $data->id,
     			'user_name'						=> AES256::decrypt($data->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($data->user->last_name, env('ENCRYPTION_KEY')),
     			'category_master'				=> $data->categoryMaster->title,
-    			// 'sub_category'					=> $data->subCategory->title,
     			'title'							=> $data->title,
     			'slug'							=> $data->slug,
     			'meta_description'				=> $data->meta_description,
@@ -123,8 +112,8 @@ class ProductsExport implements FromCollection, WithHeadings
                 'basic_price_wo_vat'            => $data->basic_price_wo_vat,
     			'price'							=> $data->price,
     			'is_on_offer'					=> $data->is_on_offer,
-    			// 'discount_type'					=> $data->discount_type,
-    			// 'discount_value'				=> $data->discount_value,
+    			'discount_type'					=> $data->discount_type,
+    			'discount_value'				=> $data->discount_value,
     			'quantity'						=> $data->quantity,
     			'description'					=> $data->description,
     			'sell_type'						=> $data->sell_type,
@@ -146,8 +135,6 @@ class ProductsExport implements FromCollection, WithHeadings
     			'view_count'					=> $data->view_count,
     			'avg_rating'					=> $data->avg_rating,
     			'status'						=> $data->status,
-    			'sub_category_slug'				=> $data->sub_category_slug,
-    			'tags'							=> $data->tags,
     			'gtin_isbn'						=> $data->gtin_isbn,
     			'discounted_price'				=> $data->discounted_price,
     			'deposit_amount'				=> $data->deposit_amount,
@@ -155,49 +142,13 @@ class ProductsExport implements FromCollection, WithHeadings
     			'item_condition'				=> $data->item_condition,
     			'brand'							=> $data->brand,
     			'most_popular'					=> $data->most_popular,
-    			'most_popular_start_at'			=> $data->most_popular_start_at,
-    			'most_popular_end_at'			=> $data->most_popular_end_at,
-    			'top_selling'					=> $data->top_selling,
-    			'top_selling_start_at'			=> $data->top_selling_start_at,
-    			'top_selling_end_at'			=> $data->top_selling_end_at,
     			'is_reward_point_applicable'	=> $data->is_reward_point_applicable,
     			'reward_points'					=> $data->reward_points,
     			'is_sold'						=> $data->is_sold,
     			'sold_at_student_store'			=> $data->sold_at_student_store,
     			'days_taken'					=> $data->days_taken,
-              	'Created at'      				=> $data->created_at,
+              	'created_at'      				=> $data->created_at,
     		];
     	});
     }
-
-    // public function collection()
-    // {
-    //     $findId = SendSms::select('id')->where('uuid', $this->uuid)->first();
-    //     if($findId)
-    //     {
-    //         $reportData =  ShortLink::where('send_sms_id', $findId->id)->with('linkClickLogs')->get();
-    //         return $array = $reportData->map(function ($data, $key) {
-    //             $relation = $data->linkClickLogs;
-    //             return $relation->map(function ($ndata, $nkey) {
-    //                 return [
-    //                   'SNO'             => $nkey+1,
-    //                   'Mobile'          => $ndata->mobile,
-    //                   'IP address'      => $ndata->ip,
-    //                   'Browser Name'    => $ndata->browserName,
-    //                   'Browser Family'  => $ndata->browserFamily,
-    //                   'Browser Version' => $ndata->browserVersion,
-    //                   'Browser Engine'  => $ndata->browserEngine,
-    //                   'Platform Name'   => $ndata->platformName,
-    //                   'Created at'      => $ndata->created_at,
-    //                 ];
-    //             });
-
-
-    //         });
-    //     }
-    //     else
-    //     {
-    //         return;
-    //     }
-    // }
 }
