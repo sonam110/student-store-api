@@ -270,7 +270,6 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 		}
 		elseif($transaction->gateway_detail=='klarna' && $transaction->transaction_status=='ACCEPTED')
 		{
-			$isRefunded = true;
 			$url = env('KLARNA_URL').'/ordermanagement/v1/orders/'.$transaction->transaction_id.'/refunds';
 			$paymentInfo = PaymentGatewaySetting::first();
 			$username = $paymentInfo->klarna_username;
@@ -326,13 +325,10 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	    }
 	    else
 	    {
-	    	\Log::info('refund OBJ');
+	    	\Log::info($postData);
 	    	\Log::info($response);
 	    	$getOrderStatus = getKlarnaOrderInfo($transaction->transaction_id);
 	    	$res = json_decode($getOrderStatus, true);
-	    	\Log::info('order status OBJ');
-	    	\Log::info($res);
-	    	
 	    	if(!empty($res['refunds']))
 	    	{
 	    		$refund_id = $res['refunds'][0]['refund_id'];
