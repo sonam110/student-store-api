@@ -243,15 +243,19 @@ class UserProfileController extends Controller
 		foreach ($request->user_packages as $key => $user_package) 
 		{
 			$package = Package::find($user_package);
+			if(!$package)
+			{
+				return response()->json(prepareResult(true, 'Package not found.', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			}
 			
 			//update package status before active new one
 			$oldPackages = UserPackageSubscription::select('id','subscription_status')
             ->where('subscription_status', 1)
             ->where('module', $package->module)
             ->get();
-            foreach ($oldPackages as $key => $package) {
-            	$package->subscription_status = 0;
-            	$package->save();
+            foreach ($oldPackages as $key => $oldpackage) {
+            	$oldpackage->subscription_status = 0;
+            	$oldpackage->save();
             }
 			
 			$userPackageSubscription 						= new UserPackageSubscription;

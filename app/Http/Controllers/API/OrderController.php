@@ -505,7 +505,7 @@ class OrderController extends Controller
                 }
 				
 				$transactionDetail = new TransactionDetail;
-				$transactionDetail->order_id                 	= $order->id;
+				$transactionDetail->order_id = $order->id;
 
 				if($paymentCardDetail)
 				{
@@ -2661,6 +2661,13 @@ class OrderController extends Controller
 			);
 			$user_package->response_request = str_replace('Stripe\Subscription JSON: ', '', $cancelSubscription);
 			$user_package->save();
+			if($user_package)
+			{
+				$userType = $user_package->user->user_type_id;
+				$module = $user_package->package->module;
+
+				createFreePackage($userType, $module);
+			}
 
 			$title = 'Package Subscription Canceled';
             $body =  'Your '.$user_package->package->module.' module '.getLangByLabelGroups('packages', $user_package->package->type_of_package).' package is successfully canceled.';

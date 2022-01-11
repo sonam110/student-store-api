@@ -13,6 +13,7 @@ use App\Models\Refund;
 use App\Models\SharedRewardPoint;
 use App\Models\PaymentGatewaySetting;
 use App\Models\UserPackageSubscription;
+use App\Models\Package;
 use App\Models\ProductsServicesBook;
 use App\Models\Contest;
 
@@ -432,7 +433,11 @@ function updateCommissions($amount, $is_on_offer, $discount_type, $discount_valu
 	$appsetting = AppSetting::select('is_enabled_cool_company','coolCompanyCommission','cool_company_social_fee_percentage','cool_company_salary_tax_percentage')->first();
 
 	$ss_commission_percent = 0;
-	$getPackageInfo = UserPackageSubscription::where('user_id', $userId)->where('module', $type)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
+	$getPackageInfo = UserPackageSubscription::where('user_id', $userId)
+		->where('module', $type)
+		->where('subscription_status', 1)
+		->orderBy('auto_id', 'DESC')
+		->first();
 	if($getPackageInfo)
 	{
 		$ss_commission_percent = $getPackageInfo->commission_per_sale;
@@ -658,4 +663,66 @@ function appSettingUpdatePrice()
     $item->save();
 	}
 	return true;
+}
+
+function createFreePackage($userType, $module)
+{
+	$package_for = 'other';
+	if($userType==2) {
+	    $package_for = 'student';
+	}
+
+	$packageModuleType = $module;
+	$getFreePackage = Package::where('module', $packageModuleType)
+	    ->where('package_for', $package_for)
+	    ->where('type_of_package','packages_free')
+	    ->first();
+	if($getFreePackage)
+	{
+    $userPackageSubscription = new UserPackageSubscription;
+    $userPackageSubscription->user_id = $package->user_id;
+    $userPackageSubscription->subscription_id = null;
+    $userPackageSubscription->payby = null;
+    $userPackageSubscription->package_id = $getFreePackage->id;
+    $userPackageSubscription->package_valid_till = date('Y-m-d',strtotime('+'.$getFreePackage->duration .'days'));
+    $userPackageSubscription->subscription_status = 1;
+    $userPackageSubscription->module = $getFreePackage->module;
+    $userPackageSubscription->type_of_package = $getFreePackage->type_of_package;
+    $userPackageSubscription->job_ads = $getFreePackage->job_ads;
+    $userPackageSubscription->publications_day = $getFreePackage->publications_day;
+    $userPackageSubscription->duration = $getFreePackage->duration;
+    $userPackageSubscription->cvs_view = $getFreePackage->cvs_view;
+    $userPackageSubscription->employees_per_job_ad = $getFreePackage->employees_per_job_ad;
+    $userPackageSubscription->no_of_boost = $getFreePackage->no_of_boost;
+    $userPackageSubscription->boost_no_of_days = $getFreePackage->boost_no_of_days;
+    $userPackageSubscription->most_popular = $getFreePackage->most_popular;
+    $userPackageSubscription->most_popular_no_of_days = $getFreePackage->most_popular_no_of_days;
+    $userPackageSubscription->top_selling = $getFreePackage->top_selling;
+    $userPackageSubscription->top_selling_no_of_days = $getFreePackage->top_selling_no_of_days;
+    $userPackageSubscription->price = $getFreePackage->price;
+    $userPackageSubscription->start_up_fee = $getFreePackage->start_up_fee;
+    $userPackageSubscription->subscription = $getFreePackage->subscription;
+    $userPackageSubscription->commission_per_sale = $getFreePackage->commission_per_sale;
+    $userPackageSubscription->number_of_product = $getFreePackage->number_of_product;
+    $userPackageSubscription->number_of_service = $getFreePackage->number_of_service;
+    $userPackageSubscription->number_of_book = $getFreePackage->number_of_book;
+    $userPackageSubscription->number_of_contest = $getFreePackage->number_of_contest;
+    $userPackageSubscription->number_of_event = $getFreePackage->number_of_event;
+    $userPackageSubscription->notice_month = $getFreePackage->notice_month;
+    $userPackageSubscription->locations = $getFreePackage->locations;
+    $userPackageSubscription->organization = $getFreePackage->organization;
+    $userPackageSubscription->attendees = $getFreePackage->attendees;
+    $userPackageSubscription->range_of_age = $getFreePackage->range_of_age;
+    $userPackageSubscription->cost_for_each_attendee = $getFreePackage->cost_for_each_attendee;
+    $userPackageSubscription->top_up_fee = $getFreePackage->top_up_fee;
+    $userPackageSubscription->save();
+
+    if($userPackageSubscription)
+    {
+        //update price if package changed
+        $type = $getFreePackage->module;
+        $userID = $package->user_id;
+        packageUpdatePrice($type, $userID);
+    }
+	}
 }

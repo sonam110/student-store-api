@@ -266,7 +266,6 @@ class LandingPageController extends Controller
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
             $similarProducts = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')
             ->where('id','!=', $request->product_id)
-            ->where('sub_category_slug', $productsServicesBooks->sub_category_slug)
             ->orderBy('created_at','DESC')
             ->where('status', '2')
             ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
@@ -280,6 +279,10 @@ class LandingPageController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
             }]);
+            if($productsServicesBooks)
+            {
+                $similarProducts->where('sub_category_slug', $productsServicesBooks->sub_category_slug);
+            }
             if(!empty($request->per_page_record))
             {
                 $similarProducts = $similarProducts->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);

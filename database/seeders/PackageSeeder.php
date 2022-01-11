@@ -17,7 +17,7 @@ class PackageSeeder extends Seeder
     	//\DB::table('packages')->truncate();
     	
     	//Jobs
-        $package = new Package;
+        /*$package = new Package;
         $package->module = 'Job';
 		$package->package_for = 'Other';
 		$package->type_of_package = 'packages_free';
@@ -101,6 +101,8 @@ class PackageSeeder extends Seeder
 		$package->subscription = '0';
 		$package->commission_per_sale = '14.9';
 		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '0';
 		$package->boost_no_of_days = '0';
 		$package->most_popular = '0';
@@ -122,6 +124,8 @@ class PackageSeeder extends Seeder
 		$package->subscription = '459';
 		$package->commission_per_sale = '12.9';
 		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '0';
 		$package->boost_no_of_days = '0';
 		$package->most_popular = '0';
@@ -143,6 +147,8 @@ class PackageSeeder extends Seeder
 		$package->subscription = '589';
 		$package->commission_per_sale = '9.9';
 		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '5';
 		$package->boost_no_of_days = '3';
 		$package->most_popular = '3';
@@ -164,6 +170,8 @@ class PackageSeeder extends Seeder
 		$package->subscription = '699';
 		$package->commission_per_sale = '5.9';
 		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '10';
 		$package->boost_no_of_days = '10';
 		$package->most_popular = '10';
@@ -186,6 +194,8 @@ class PackageSeeder extends Seeder
 		$package->subscription = '0';
 		$package->commission_per_sale = '14.9';
 		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '0';
 		$package->boost_no_of_days = '0';
 		$package->most_popular = '0';
@@ -207,6 +217,8 @@ class PackageSeeder extends Seeder
 		$package->subscription = '459';
 		$package->commission_per_sale = '12.9';
 		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '0';
 		$package->boost_no_of_days = '0';
 		$package->most_popular = '0';
@@ -228,6 +240,8 @@ class PackageSeeder extends Seeder
 		$package->subscription = '589';
 		$package->commission_per_sale = '9.9';
 		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '5';
 		$package->boost_no_of_days = '3';
 		$package->most_popular = '3';
@@ -249,6 +263,8 @@ class PackageSeeder extends Seeder
 		$package->subscription = '699';
 		$package->commission_per_sale = '5.9';
 		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '10';
 		$package->boost_no_of_days = '10';
 		$package->most_popular = '10';
@@ -270,7 +286,9 @@ class PackageSeeder extends Seeder
 		$package->duration = '365';
 		$package->subscription = '0';
 		$package->commission_per_sale = '14.9';
+		$package->number_of_service = '-1';
 		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '0';
 		$package->boost_no_of_days = '0';
 		$package->most_popular = '0';
@@ -291,7 +309,9 @@ class PackageSeeder extends Seeder
 		$package->duration = '60';
 		$package->subscription = '459';
 		$package->commission_per_sale = '12.9';
+		$package->number_of_service = '-1';
 		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '0';
 		$package->boost_no_of_days = '0';
 		$package->most_popular = '0';
@@ -312,7 +332,9 @@ class PackageSeeder extends Seeder
 		$package->duration = '60';
 		$package->subscription = '589';
 		$package->commission_per_sale = '9.9';
+		$package->number_of_service = '-1';
 		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '5';
 		$package->boost_no_of_days = '3';
 		$package->most_popular = '3';
@@ -333,7 +355,9 @@ class PackageSeeder extends Seeder
 		$package->duration = '90';
 		$package->subscription = '699';
 		$package->commission_per_sale = '5.9';
+		$package->number_of_service = '-1';
 		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '10';
 		$package->boost_no_of_days = '10';
 		$package->most_popular = '10';
@@ -354,6 +378,8 @@ class PackageSeeder extends Seeder
 		$package->slug = 'packages_free';
 		$package->duration = '365';
 		$package->price = '0';
+		$package->number_of_contest = '0';
+		$package->number_of_event = '0';
 		$package->commission_per_sale = '9.9';
 		$package->locations = '1';
 		$package->range_of_age = null;
@@ -372,6 +398,8 @@ class PackageSeeder extends Seeder
 		$package->slug = 'packages_basic';
 		$package->duration = '60';
 		$package->price = '5900';
+		$package->number_of_contest = '2';
+		$package->number_of_event = '2';
 		$package->commission_per_sale = '0';
 		$package->locations = '1';
 		$package->range_of_age = 1;
@@ -390,6 +418,8 @@ class PackageSeeder extends Seeder
 		$package->slug = 'packages_standard';
 		$package->duration = '60';
 		$package->price = '9900';
+		$package->number_of_contest = '5';
+		$package->number_of_event = '5';
 		$package->commission_per_sale = '0';
 		$package->locations = '2';
 		$package->range_of_age = 1;
@@ -408,6 +438,8 @@ class PackageSeeder extends Seeder
 		$package->slug = 'packages_premium';
 		$package->duration = '90';
 		$package->price = '15000';
+		$package->number_of_contest = '10';
+		$package->number_of_event = '10';
 		$package->commission_per_sale = '0';
 		$package->locations = '5';
 		$package->range_of_age = 1;
@@ -430,7 +462,9 @@ class PackageSeeder extends Seeder
 		$package->duration = '365';
 		$package->subscription = '0';
 		$package->commission_per_sale = '9.9';
-		$package->number_of_product = '1';
+		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '0';
 		$package->boost_no_of_days = '0';
 		$package->most_popular = '0';
@@ -511,7 +545,9 @@ class PackageSeeder extends Seeder
 		$package->duration = '365';
 		$package->subscription = '0';
 		$package->commission_per_sale = '9.9';
-		$package->number_of_product = '1';
+		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
 		$package->no_of_boost = '0';
 		$package->boost_no_of_days = '0';
 		$package->most_popular = '0';
@@ -591,6 +627,8 @@ class PackageSeeder extends Seeder
 		$package->slug = 'packages_free';
 		$package->duration = '365';
 		$package->price = '0';
+		$package->number_of_contest = '0';
+		$package->number_of_event = '0';
 		$package->commission_per_sale = '9.9';
 		$package->locations = '1';
 		$package->range_of_age = null;
@@ -609,6 +647,8 @@ class PackageSeeder extends Seeder
 		$package->slug = 'packages_basic';
 		$package->duration = '60';
 		$package->price = '149';
+		$package->number_of_contest = '1';
+		$package->number_of_event = '1';
 		$package->commission_per_sale = '0';
 		$package->locations = '1';
 		$package->range_of_age = 1;
@@ -627,6 +667,8 @@ class PackageSeeder extends Seeder
 		$package->slug = 'packages_standard';
 		$package->duration = '60';
 		$package->price = '249';
+		$package->number_of_contest = '2';
+		$package->number_of_event = '2';
 		$package->commission_per_sale = '0';
 		$package->locations = '2';
 		$package->range_of_age = 1;
@@ -645,6 +687,8 @@ class PackageSeeder extends Seeder
 		$package->slug = 'packages_premium';
 		$package->duration = '90';
 		$package->price = '549';
+		$package->number_of_contest = '5';
+		$package->number_of_event = '5';
 		$package->commission_per_sale = '0';
 		$package->locations = '5';
 		$package->range_of_age = 1;
@@ -652,6 +696,99 @@ class PackageSeeder extends Seeder
 		$package->attendees = '75';
 		$package->cost_for_each_attendee = 1;
 		$package->top_up_fee = '0';
+		$package->is_published = 1;
+		$package->published_at = date('Y-m-d');
+		$package->save();*/
+
+		//Book
+		$package = new Package;
+        $package->module = 'Book';
+		$package->package_for = 'Student';
+		$package->type_of_package = 'packages_free';
+		$package->slug = 'packages_free';
+		$package->duration = '365';
+		$package->subscription = '0';
+		$package->commission_per_sale = '14.9';
+		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
+		$package->no_of_boost = '0';
+		$package->boost_no_of_days = '0';
+		$package->most_popular = '0';
+		$package->most_popular_no_of_days = '0';
+		$package->top_selling = '0';
+		$package->top_selling_no_of_days = '0';
+		$package->start_up_fee = '0';
+		$package->notice_month = '0';
+		$package->is_published = 1;
+		$package->published_at = date('Y-m-d');
+		$package->save();
+
+		$package = new Package;
+        $package->module = 'Book';
+		$package->package_for = 'Student';
+		$package->type_of_package = 'packages_basic';
+		$package->slug = 'packages_basic';
+		$package->duration = '60';
+		$package->subscription = '459';
+		$package->commission_per_sale = '12.9';
+		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
+		$package->no_of_boost = '0';
+		$package->boost_no_of_days = '0';
+		$package->most_popular = '0';
+		$package->most_popular_no_of_days = '0';
+		$package->top_selling = '0';
+		$package->top_selling_no_of_days = '0';
+		$package->start_up_fee = '0';
+		$package->notice_month = '1';
+		$package->is_published = 1;
+		$package->published_at = date('Y-m-d');
+		$package->save();
+
+		$package = new Package;
+        $package->module = 'Book';
+		$package->package_for = 'Student';
+		$package->type_of_package = 'packages_standard';
+		$package->slug = 'packages_standard';
+		$package->duration = '60';
+		$package->subscription = '589';
+		$package->commission_per_sale = '9.9';
+		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
+		$package->no_of_boost = '5';
+		$package->boost_no_of_days = '3';
+		$package->most_popular = '3';
+		$package->most_popular_no_of_days = '3';
+		$package->top_selling = '3';
+		$package->top_selling_no_of_days = '3';
+		$package->start_up_fee = '0';
+		$package->notice_month = '1';
+		$package->is_published = 1;
+		$package->published_at = date('Y-m-d');
+		$package->save();
+
+		$package = new Package;
+        $package->module = 'Book';
+		$package->package_for = 'Student';
+		$package->type_of_package = 'packages_premium';
+		$package->slug = 'packages_premium';
+		$package->duration = '90';
+		$package->subscription = '699';
+		$package->commission_per_sale = '5.9';
+		$package->number_of_service = '-1';
+		$package->number_of_product = '-1';
+		$package->number_of_book = '-1';
+		$package->no_of_boost = '10';
+		$package->boost_no_of_days = '10';
+		$package->most_popular = '10';
+		$package->most_popular_no_of_days = '10';
+		$package->top_selling = '10';
+		$package->top_selling_no_of_days = '10';
+		$package->start_up_fee = '0';
+		$package->notice_month = '1';
 		$package->is_published = 1;
 		$package->published_at = date('Y-m-d');
 		$package->save();

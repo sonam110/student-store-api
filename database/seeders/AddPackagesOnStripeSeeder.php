@@ -20,7 +20,7 @@ class AddPackagesOnStripeSeeder extends Seeder
         $appsetting = AppSetting::select('logo_path')->first();
         $paymentInfo = PaymentGatewaySetting::first();
 
-        $packages = Package::orderBy('module','ASC')->get();
+        $packages = Package::orderBy('module','ASC')->whereNull('stripe_plan_id')->get();
             foreach($packages as $package)
             {
                 if($package->subscription>0 || $package->price>0)
