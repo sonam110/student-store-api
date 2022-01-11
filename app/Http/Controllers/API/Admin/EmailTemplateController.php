@@ -24,11 +24,11 @@ class EmailTemplateController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $emailTemplates = EmailTemplate::simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $emailTemplates = EmailTemplate::with('language')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $emailTemplates = EmailTemplate::get();
+                $emailTemplates = EmailTemplate::with('language')->get();
             }
             return response(prepareResult(false, $emailTemplates, getLangByLabelGroups('messages','message_email_template_list')), config('http_response.success'));
         }
@@ -87,6 +87,7 @@ class EmailTemplateController extends Controller
      */
     public function show(EmailTemplate $emailTemplate)
     {
+        $emailTemplate['language'] = $emailTemplate->language;
         return response()->json(prepareResult(false, $emailTemplate, getLangByLabelGroups('messages','message_email_template_list')), config('http_response.success'));
     }
 
