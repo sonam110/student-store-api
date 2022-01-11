@@ -231,19 +231,22 @@ class PackageController extends Controller
 
                 if($package->duration != $request->duration || $package->subscription != ($amount * 100))
                 {
-                    $stripe->plans->update(
-                        $package->stripe_plan_id,
-                        ['active' => false]
-                    );
+                    if($duration!=0)
+                    {
+                        $stripe->plans->update(
+                            $package->stripe_plan_id,
+                            ['active' => false]
+                        );
 
-                    $plan = $stripe->plans->create([
-                        'amount'          => $request->subscription * 100,
-                        'currency'        => $this->paymentInfo->stripe_currency,
-                        'interval'        => 'day',
-                        'interval_count'  => $duration,
-                        'product'         => $createProduct->id,
-                    ]);
-                    $package->stripe_plan_id = $plan->id;
+                        $plan = $stripe->plans->create([
+                            'amount'          => $request->subscription * 100,
+                            'currency'        => $this->paymentInfo->stripe_currency,
+                            'interval'        => 'day',
+                            'interval_count'  => $duration,
+                            'product'         => $createProduct->id,
+                        ]);
+                        $package->stripe_plan_id = $plan->id;
+                    }
                 }
             }
 
