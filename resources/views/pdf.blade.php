@@ -231,11 +231,13 @@
                             {{getLangByLabelGroups('pdf','Address')}}
                         </strong></span>
                     </div>
+                    @if($user->defaultAddress)
                     <div class="tablerow text-left">
                         <span class="text-left">{{$user->defaultAddress->country}},   
                             {{$user->defaultAddress->state}},
                             {{$user->defaultAddress->city}}</span>
                     </div>
+                    @endif
                 </div>
 
                 @if($user->userCvDetail)
