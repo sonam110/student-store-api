@@ -253,8 +253,11 @@ class UserProfileController extends Controller
             ->where('subscription_status', 1)
             ->where('module', $package->module)
             ->first();
-            $oldpackage->subscription_status = 0;
-            $oldpackage->save();
+            if($oldPackages)
+            {
+            	$oldPackages->subscription_status = 0;
+            	$oldPackages->save();
+            }
 			
 			$userPackageSubscription = new UserPackageSubscription;
 			$userPackageSubscription->user_id 				= Auth::id();
