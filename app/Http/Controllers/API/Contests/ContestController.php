@@ -217,7 +217,7 @@ class ContestController extends Controller
 
                 // $user_package->update(['used_number_of_contest'=>($user_package->used_number_of_contest + 1),'used_number_of_event'=>($user_package->used_number_of_event + 1)]);
 
-                if($request->use_cancellation_policy==1)
+                if(!empty($request->cancellation_ranges))
                 {
                     foreach ($request->cancellation_ranges as $key => $cancellation_range) 
                 	{
@@ -546,22 +546,19 @@ class ContestController extends Controller
             $contest->meta_description                      = $request->meta_description;
             $contest->tags                         = (!empty($request->tags)) ? json_encode($request->tags) : null;
             $contest->save();
-            if($request->use_cancellation_policy==1)
+            if($request->use_cancellation_policy)
             {
             	ContestCancellationRange::where('contest_id',$contest->id)->delete();
             	foreach ($request->cancellation_ranges as $key => $cancellation_range) 
             	{
-                    if(!empty($cancellation_range["from"]) && !empty($cancellation_range["to"]) && !empty($cancellation_range["deduct_percentage_value"]))
+                    if((!empty($cancellation_range["from"]) || $cancellation_range["from"] == '0') && !empty($cancellation_range["to"]) && !empty($cancellation_range["deduct_percentage_value"]))
                     {
-                		if(!empty($cancellation_range["from"]) || $cancellation_range["from"] == '0')
-                		{
-                			$cancellation 							= new ContestCancellationRange;
-                			$cancellation->contest_id 				= $contest->id;
-                			$cancellation->from 					= $cancellation_range["from"];
-                			$cancellation->to 						= $cancellation_range["to"];
-                			$cancellation->deduct_percentage_value 	= $cancellation_range["deduct_percentage_value"];
-                			$cancellation->save();
-                		}
+                		$cancellation                             = new ContestCancellationRange;
+                        $cancellation->contest_id               = $contest->id;
+                        $cancellation->from                     = $cancellation_range["from"];
+                        $cancellation->to                       = $cancellation_range["to"];
+                        $cancellation->deduct_percentage_value  = $cancellation_range["deduct_percentage_value"];
+                        $cancellation->save();
                     }
             	}
             }
