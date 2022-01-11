@@ -219,10 +219,9 @@ class ContestController extends Controller
 
                 if(!empty($request->cancellation_ranges))
                 {
-
-                	foreach ($request->cancellation_ranges as $key => $cancellation_range) 
+                    foreach ($request->cancellation_ranges as $key => $cancellation_range) 
                 	{
-                        if(!empty($cancellation_range["from"]) && !empty($cancellation_range["to"]))
+                        if(!empty($cancellation_range["from"]) && !empty($cancellation_range["to"]) && !empty($cancellation_range["deduct_percentage_value"]))
                         {
                             if(!empty($cancellation_range["from"]) || $cancellation_range["from"] == '0')
                             {
@@ -552,7 +551,7 @@ class ContestController extends Controller
             	ContestCancellationRange::where('contest_id',$contest->id)->delete();
             	foreach ($request->cancellation_ranges as $key => $cancellation_range) 
             	{
-                    if(!empty($cancellation_range["from"]) && !empty($cancellation_range["to"]))
+                    if(!empty($cancellation_range["from"]) && !empty($cancellation_range["to"]) && !empty($cancellation_range["deduct_percentage_value"]))
                     {
                 		if(!empty($cancellation_range["from"]) || $cancellation_range["from"] == '0')
                 		{
