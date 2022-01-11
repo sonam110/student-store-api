@@ -252,13 +252,11 @@ class UserProfileController extends Controller
 			$oldPackages = UserPackageSubscription::select('id','subscription_status')
             ->where('subscription_status', 1)
             ->where('module', $package->module)
-            ->get();
-            foreach ($oldPackages as $key => $oldpackage) {
-            	$oldpackage->subscription_status = 0;
-            	$oldpackage->save();
-            }
+            ->first();
+            $oldpackage->subscription_status = 0;
+            $oldpackage->save();
 			
-			$userPackageSubscription 						= new UserPackageSubscription;
+			$userPackageSubscription = new UserPackageSubscription;
 			$userPackageSubscription->user_id 				= Auth::id();
 			$userPackageSubscription->subscription_id 		= $request->subscription_id;
 			$userPackageSubscription->payby 				= $request->payby;
