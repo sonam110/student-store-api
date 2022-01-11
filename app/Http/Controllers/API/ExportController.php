@@ -53,7 +53,7 @@ class ExportController extends Controller
     {
         $rand = rand(1,9);
         $data = ['auth_applicable' => true, 'ids' => null, 'type' => $request->type ];
-        $excel = Excel::store(new ProductsExport($data), 'export/products'.$rand.'.xlsx' , 'export_path');
+        $excel = Excel::store(new ProductsExport($data), 'export/products'.$rand.'.csv' , 'export_path');
          return response(prepareResult(false, ['url' => env('ASSET_URL').'export/products'.$rand.'.csv'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
          
     }
