@@ -110,7 +110,7 @@ class WebhookController extends Controller
         $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
         if($subscribedPackage)
         {
-            $findUser = User::where('stripe_plan_id', $subscriptionSchedule->customer)->first();
+            $findUser = User::where('stripe_customer_id', $subscriptionSchedule->customer)->first();
             Log::channel('webhook')->info('User Info');
             Log::channel('webhook')->info($findUser);
             if($findUser)
