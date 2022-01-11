@@ -14,10 +14,10 @@ class PackageSeeder extends Seeder
      */
     public function run()
     {
-    	//\DB::table('packages')->truncate();
+    	\DB::table('packages')->delete();
     	
     	//Jobs
-        /*$package = new Package;
+        $package = new Package;
         $package->module = 'Job';
 		$package->package_for = 'Other';
 		$package->type_of_package = 'packages_free';
@@ -698,7 +698,7 @@ class PackageSeeder extends Seeder
 		$package->top_up_fee = '0';
 		$package->is_published = 1;
 		$package->published_at = date('Y-m-d');
-		$package->save();*/
+		$package->save();
 
 		//Book
 		$package = new Package;
