@@ -1573,6 +1573,7 @@ class ProductsServicesBookController extends Controller
                                         ->where('language_id', $lang_id)
                                         ->where('is_parent', '0');
                                 }]);
+
             if($searchType=='promotion' || $searchType=='latest' || $searchType=='bestSelling' || $searchType=='topRated' || $searchType=='random' || $searchType=='popular') 
             {
                 $products->where('products_services_books.type', $type);
@@ -2291,10 +2292,10 @@ class ProductsServicesBookController extends Controller
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::select('products_services_books.*')
             //->where('products_services_books.user_id', '!=', Auth::id())
-            ->where('products_services_books.status', '2')
+            ->where('products_services_books.status', 2)
             ->where('products_services_books.type', $type)
-            ->where('products_services_books.is_published', '1')
-            ->where('products_services_books.quantity','>' ,'0')
+            ->where('products_services_books.is_published', 1)
+            ->where('products_services_books.quantity','>' , 0)
             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
@@ -2623,7 +2624,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
 
             $searchType = $request->searchType; 
-            $products = ProductsServicesBook::where('is_used_item', '1')
+            $products = ProductsServicesBook::where('is_used_item', 1)
                                 ->where('type','book')
                                 //->where('user_id', '!=', Auth::id())
                                 ->where('status', '2')
