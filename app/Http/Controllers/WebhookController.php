@@ -83,9 +83,9 @@ class WebhookController extends Controller
         }
         elseif ($event->type == "customer.subscription.updated")
         { 
-            /*$subscriptionSchedule = $event->data->object;
+            $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->subscription;
-            $this->customerSubscriptionUpdated($subscription_id, $subscriptionSchedule);*/
+            //$this->customerSubscriptionUpdated($subscription_id, $subscriptionSchedule);*/
             Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "customer.subscription.deleted" || $event->type == "subscription_schedule.aborted" || $event->type == "subscription_schedule.canceled") {
