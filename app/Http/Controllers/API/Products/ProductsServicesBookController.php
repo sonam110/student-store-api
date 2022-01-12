@@ -43,6 +43,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             $productsServicesBooks = ProductsServicesBook::where('is_published', '1')->where('status', '2')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -86,6 +90,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             if($request->user_id)
             {
@@ -150,6 +158,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             if($request->user_id)
             {
@@ -213,6 +225,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             if($request->user_id)
             {
@@ -475,6 +491,10 @@ class ProductsServicesBookController extends Controller
     public function show(Request $request,ProductsServicesBook $productsServicesBook)
     {
         $lang_id = $this->lang_id;
+        if(empty($lang_id))
+        {
+            $lang_id = 1;
+        }
 
     	if($request->view_count == true)
     	{
@@ -549,6 +569,10 @@ class ProductsServicesBookController extends Controller
     public function detail(Request $request,$id)
     {
         $lang_id = $this->lang_id;
+        if(empty($lang_id))
+        {
+            $lang_id = 1;
+        }
 
         $productsServicesBook = ProductsServicesBook::find($id);
         if($request->view_count == true)
@@ -775,6 +799,10 @@ class ProductsServicesBookController extends Controller
     public function stockUpdate(Request $request, $id)
     {
         $lang_id = $this->lang_id;
+        if(empty($lang_id))
+        {
+            $lang_id = 1;
+        }
 
         $productsServicesBook = ProductsServicesBook::find($id);
         $productsServicesBook->update(['quantity'=>($productsServicesBook->quantity + $request->quantity)]);
@@ -1087,6 +1115,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             $productsServicesBooks = ProductsServicesBook::where('is_used_item', true)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags')
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -1141,6 +1173,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             $type = 'product';
             if(!empty($request->type))
@@ -1422,6 +1458,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             $searchType = $request->searchType; //filter, promotion, latest, closingSoon, random, criteria users
             $products = ProductsServicesBook::select('products_services_books.*')
@@ -1551,6 +1591,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             $searchType = $request->searchType; 
             $type = 'product';
@@ -1686,6 +1730,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             $searchType = $request->searchType; //filter, promotion, latest, closingSoon, random, criteria users
             $products = ProductsServicesBook::select('products_services_books.*')
@@ -2252,6 +2300,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
             $similarProducts = ProductsServicesBook::where('status', '2')->where('id','!=', $request->product_id)->where('sub_category_slug', $productsServicesBooks->sub_category_slug)->where('is_used_item', $productsServicesBooks->is_used_item)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
@@ -2287,6 +2339,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             $type = 'book';
             $searchType = $request->searchType; 
@@ -2622,6 +2678,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = 1;
+            }
 
             $searchType = $request->searchType; 
             $products = ProductsServicesBook::where('is_used_item', 1)
@@ -2807,6 +2867,10 @@ class ProductsServicesBookController extends Controller
     public function markAsSold(Request $request,$id)
     {
         $lang_id = $this->lang_id;
+        if(empty($lang_id))
+        {
+            $lang_id = 1;
+        }
 
         $productsServicesBook = ProductsServicesBook::find($id);
         $productsServicesBook->update(['is_sold'=>true,'sold_at_student_store'=>$request->sold_at_student_store,'days_taken'=>$request->days_taken]);
