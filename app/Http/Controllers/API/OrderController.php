@@ -2667,6 +2667,7 @@ class OrderController extends Controller
 				'client_secret' 	=> $subscription->latest_invoice->payment_intent->client_secret,
 				'status' 			=> $subscription->status,
 				'hosted_invoice_url'=> $subscription->latest_invoice->hosted_invoice_url,
+				'invoice_id'=> $subscription->latest_invoice->id,
 			];
 
 			if($subscription->status=='active') 

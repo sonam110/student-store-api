@@ -31,7 +31,7 @@ class NotificationController extends Controller
             }
             if($request->read_status)
             {
-                $notifications = $notifications->where('read_status',$request->read_status);
+                $notifications->where('read_status',$request->read_status);
             }
             if(!empty($request->per_page_record))
             {

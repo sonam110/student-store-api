@@ -257,6 +257,7 @@ class WebhookController extends Controller
                     $userPackageSubscription->cost_for_each_attendee= $subscribedPackage->cost_for_each_attendee;
                     $userPackageSubscription->top_up_fee            = $subscribedPackage->top_up_fee;
                     $userPackageSubscription->is_recurring_transaction = 1;
+                    $userPackageSubscription->stripe_invoice_id = $subscriptionSchedule->latest_invoice;
                     $userPackageSubscription->save();
 
                     //Transaction create
