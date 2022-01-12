@@ -252,6 +252,7 @@ class UserProfileController extends Controller
 			$oldPackages = UserPackageSubscription::select('id','subscription_status')
             ->where('subscription_status', 1)
             ->where('module', $package->module)
+            ->where('user_id', Auth::id())
             ->first();
             if($oldPackages)
             {

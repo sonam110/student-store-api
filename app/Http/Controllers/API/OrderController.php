@@ -329,7 +329,7 @@ class OrderController extends Controller
 
 						$title = $productsServicesBook->title;
 
-						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module','contest')->where('subscription_status', 1)->orderBy('created_at','desc')->first();
+						$user_package = UserPackageSubscription::where('user_id',$productsServicesBook->user_id)->where('module','contest')->where('subscription_status', 1)->where('user_id', Auth::id())->orderBy('created_at','desc')->first();
 					}
 					else
 					{
@@ -2653,7 +2653,7 @@ class OrderController extends Controller
 
 	public function cancelStripeSubscription(Request $request)
 	{
-		$user_package = UserPackageSubscription::where('subscription_id', $request->subscription_id)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
+		$user_package = UserPackageSubscription::where('subscription_id', $request->subscription_id)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->where('user_id', Auth::id())->first();
 		if($user_package)
 		{
 			$user_package->is_canceled = 1;
