@@ -2459,6 +2459,11 @@ class OrderController extends Controller
 	        	TempOrder::find($tempOrderSave->id)->delete();
 	            return response()->json(prepareResult(true, $response, "Error while creating Swish Direct Purchase Payment"), config('http_response.internal_server_error'));
 	        }
+	        if(@$response->status == 400)
+	        {
+	        	TempOrder::find($tempOrderSave->id)->delete();
+	            return response()->json(prepareResult(true, $response, "Error in input data Swish Direct Purchase Payment"), config('http_response.internal_server_error'));
+	        }
 
 	        foreach(@$response as $key => $res)
 	        {
