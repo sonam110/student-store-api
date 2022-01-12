@@ -14,12 +14,6 @@ use Log;
 
 class NotificationController extends Controller
 {
-    /**
-         * Display a listing of the resource.
-         *
-         * @return \Illuminate\Http\Response
-         */
-
     public function index(Request $request)
     {
         try
@@ -41,10 +35,8 @@ class NotificationController extends Controller
             {
                 $notifications = $notifications->get();
             }
-            
-            
-            
-            return response(prepareResult(false, NotificationResource::collection($notifications), getLangByLabelGroups('messages','message_notification_list')), config('http_response.success'));
+
+            return response(prepareResult(false, $notifications, getLangByLabelGroups('messages','message_notification_list')), config('http_response.success'));
         }
         catch (\Throwable $exception) 
         {

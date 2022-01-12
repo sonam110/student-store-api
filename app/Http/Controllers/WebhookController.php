@@ -96,8 +96,9 @@ class WebhookController extends Controller
         }
         elseif ($event->type == "invoice.payment_succeeded") {
             $subscriptionSchedule = $event->data->object;
-            $subscription_id = $subscriptionSchedule->id;
-
+            $invoice_id = $subscriptionSchedule->id;
+            $status = $subscriptionSchedule->status;
+            $this->paymentStatus($invoice_id, $status);
             Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "invoice.payment_failed") {
@@ -115,7 +116,7 @@ class WebhookController extends Controller
         elseif ($event->type == "invoice.finalized") {
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->id;
-            
+
             Log::channel('webhook')->info($subscriptionSchedule);
         }
 
@@ -349,5 +350,18 @@ class WebhookController extends Controller
             pushNotification($title,$body,$user,$type,true,$user_type,$module,'no-data','package');
             Log::channel('webhook')->info('Subscription canceled. User Package Subscription Id: '. $subscribedPackage->id);
         }
+    }
+
+    private function paymentStatus($invoice_id, $status) 
+    {
+        $subscribedPackage = UserPackageSubscription::where('stripe_invoice_id', $invoice_id)->first();
+        if($subscribedPackage)
+        {
+            $subscribedPackage->stripe_invoice_status = $status;
+            $subscribedPackage->stripe_subscription_status = $status;
+            $subscribedPackage->stripe_invoice_finalized_date = $status;
+            $subscribedPackage->save();
+        }
+
     }
 }
