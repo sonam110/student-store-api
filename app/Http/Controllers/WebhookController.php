@@ -52,16 +52,7 @@ class WebhookController extends Controller
             exit();
         }
 
-        /*if ($event->type == "subscription_schedule.aborted" || $event->type == "subscription_schedule.canceled")
-        {
-            $subscriptionSchedule = $event->data->object;
-            $subscription_id = $subscriptionSchedule->subscription;
-            $this->abortedSubscription($subscription_id);
-            //$this->sendMail();
-            //Log::channel('webhook')->info('aborted');
-            //Log::channel('webhook')->info($subscriptionSchedule);
-        }
-        elseif ($event->type == "subscription_schedule.completed")
+        /*if ($event->type == "subscription_schedule.completed")
         {            
             $subscriptionSchedule = $event->data->object;
             $this->completedSubscription($subscription_id);
@@ -82,36 +73,58 @@ class WebhookController extends Controller
             Log::channel('webhook')->info('customer.subscription.created');
             Log::channel('webhook')->info($subscriptionSchedule);
         }*/
-        
-        if ($event->type == "customer.subscription.updated")
-        { 
-            /*$subscriptionSchedule = $event->data->object;
-            $subscription_id = $subscriptionSchedule->subscription;
-            $this->customerSubscriptionUpdated($subscription_id, $subscriptionSchedule);*/
-            Log::channel('webhook')->info('customer.subscription.updated');
-            Log::channel('webhook')->info($subscriptionSchedule);
-        }
+        Log::channel('webhook')->info($event->type);
         if ($event->type == "customer.subscription.created")
         { 
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->id;
-            $this->customerSubscriptionUpdated($subscription_id, $subscriptionSchedule);
-            Log::channel('webhook')->info('customer.subscription.created');
+            $this->customerSubscriptionCreated($subscription_id, $subscriptionSchedule);
             Log::channel('webhook')->info($subscriptionSchedule);
         }
-        elseif ($event->type == "customer.subscription.deleted") {
+        elseif ($event->type == "customer.subscription.updated")
+        { 
+            /*$subscriptionSchedule = $event->data->object;
+            $subscription_id = $subscriptionSchedule->subscription;
+            $this->customerSubscriptionUpdated($subscription_id, $subscriptionSchedule);*/
+            Log::channel('webhook')->info($subscriptionSchedule);
+        }
+        elseif ($event->type == "customer.subscription.deleted" || $event->type == "subscription_schedule.aborted" || $event->type == "subscription_schedule.canceled") {
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->id;
             $this->abortedSubscription($subscription_id);
-            Log::channel('webhook')->info('customer.subscription.deleted');
             Log::channel('webhook')->info($subscriptionSchedule);
         }
+        elseif ($event->type == "invoice.payment_succeeded") {
+            $subscriptionSchedule = $event->data->object;
+            $subscription_id = $subscriptionSchedule->id;
+
+            Log::channel('webhook')->info($subscriptionSchedule);
+        }
+        elseif ($event->type == "invoice.payment_failed") {
+            $subscriptionSchedule = $event->data->object;
+            $subscription_id = $subscriptionSchedule->id;
+
+            Log::channel('webhook')->info($subscriptionSchedule);
+        }
+        elseif ($event->type == "invoice.created") {
+            $subscriptionSchedule = $event->data->object;
+            $subscription_id = $subscriptionSchedule->id;
+
+            Log::channel('webhook')->info($subscriptionSchedule);
+        }
+        elseif ($event->type == "invoice.finalized") {
+            $subscriptionSchedule = $event->data->object;
+            $subscription_id = $subscriptionSchedule->id;
+            
+            Log::channel('webhook')->info($subscriptionSchedule);
+        }
+
         //Log::channel('webhook')->info('payload');
         //Log::channel('webhook')->info($payload);
         http_response_code(200);
     }
 
-    private function customerSubscriptionUpdated($subscription_id, $subscriptionSchedule) 
+    private function customerSubscriptionCreated($subscription_id, $subscriptionSchedule) 
     {
         Log::channel('webhook')->info('subscription_id');
         Log::channel('webhook')->info($subscription_id);
