@@ -2608,7 +2608,7 @@ class OrderController extends Controller
 		{
 			$checkPackage = Package::where('id', $request->package_id)->first();
 		}
-		
+
 		if(!empty($request->stripe_plan_id))
 		{
 			$checkPackage = Package::where('stripe_plan_id', $request->stripe_plan_id)->first();
@@ -2659,7 +2659,7 @@ class OrderController extends Controller
 			}
 			return response(prepareResult(false, $returnObj, 'Subscription Canceled.'), config('http_response.success'));
 		}
-		return response()->json(prepareResult(true, 'Package not found.', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));
+		return response()->json(prepareResult(true, 'Package not found.', getLangByLabelGroups('messages','package_not_found_error')), config('http_response.not_found'));
 	}
 
 	public function cancelStripeSubscription(Request $request)
