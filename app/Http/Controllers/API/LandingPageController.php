@@ -39,7 +39,7 @@ class LandingPageController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -103,7 +103,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $productsServicesBooks = ProductsServicesBook::select('products_services_books.*')
@@ -175,9 +175,9 @@ class LandingPageController extends Controller
     {
         $lang_id = $this->lang_id;
         if(empty($lang_id))
-            {
-                $lang_id = 1;
-            }
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
 
         $productsServicesBook = ProductsServicesBook::find($id);
         if(!$productsServicesBook)
@@ -240,7 +240,8 @@ class LandingPageController extends Controller
         $productsServicesBook['cart_id'] = $cartId;
         $productsServicesBook['is_chat_initiated'] = $is_chat_initiated;
         $productsServicesBook['contact_list_id'] = $contactListId;
-        $productsServicesBook['language_id'] = $productsServicesBook->language_id;
+        $productsServicesBook['language_id'] = $productsServicesBook->language;
+        $productsServicesBook['address_detail'] = $productsServicesBook->addressDetail;
         $productsServicesBook['category_detail'] = CategoryDetail::where('category_master_id',$productsServicesBook->category_master_id)->where('language_id',$productsServicesBook->language_id)->first();
         return response()->json(prepareResult(false, $productsServicesBook, getLangByLabelGroups('messages','messages_products_services_book_list')), config('http_response.success'));
     }
@@ -272,7 +273,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
@@ -319,7 +320,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $type = 'product';
@@ -605,7 +606,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; //filter, promotion, latest, closingSoon, random, criteria users
@@ -707,7 +708,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; 
@@ -840,7 +841,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; //filter, promotion, latest, closingSoon, random, criteria users
@@ -1389,7 +1390,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $type = 'book';
@@ -1658,7 +1659,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; 
@@ -1787,9 +1788,9 @@ class LandingPageController extends Controller
     {
         $lang_id = $this->lang_id;
         if(empty($lang_id))
-            {
-                $lang_id = 1;
-            }
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
 
         $jobs = Job::where('is_published', '1')
                         ->where('job_status', '1')
@@ -1823,9 +1824,9 @@ class LandingPageController extends Controller
     {
         $lang_id = $this->lang_id;
         if(empty($lang_id))
-            {
-                $lang_id = 1;
-            }
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
 
         $job = Job::find($id);
         if(!$job)
@@ -1877,7 +1878,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria job
@@ -2230,9 +2231,9 @@ class LandingPageController extends Controller
     {
         $lang_id = $this->lang_id;
         if(empty($lang_id))
-            {
-                $lang_id = 1;
-            }
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
 
         $contests = Contest::where('is_published', '1')
                         ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','cancellationRanges','isApplied','categoryMaster','subCategory')
@@ -2262,9 +2263,9 @@ class LandingPageController extends Controller
     {
         $lang_id = $this->lang_id;
         if(empty($lang_id))
-            {
-                $lang_id = 1;
-            }
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
 
         $contest = Contest::find($id);
         if($contest)
@@ -2314,7 +2315,7 @@ class LandingPageController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria contest

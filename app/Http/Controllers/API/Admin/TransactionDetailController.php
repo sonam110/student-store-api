@@ -14,7 +14,7 @@ class TransactionDetailController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -61,6 +61,10 @@ class TransactionDetailController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria transactionDetail
             $transactionDetails = TransactionDetail::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','transactionDetailTags:id,transactionDetail_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite','order.orderItems')

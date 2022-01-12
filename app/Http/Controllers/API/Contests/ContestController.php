@@ -26,7 +26,7 @@ class ContestController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -38,6 +38,10 @@ class ContestController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             if(!empty($request->per_page_record))
             {
@@ -97,6 +101,10 @@ class ContestController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
             // $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module','Contest')->orderBy('created_at','desc')->first();
             // if(empty($user_package))
             // {
@@ -313,6 +321,10 @@ class ContestController extends Controller
     public function show(Request $request, Contest $contest)
     {
         $lang_id = $this->lang_id;
+        if(empty($lang_id))
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
         $authApplication = null;
         if(!empty($request->contest_application_id))
         {
@@ -742,6 +754,10 @@ class ContestController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria contest
             

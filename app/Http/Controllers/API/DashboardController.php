@@ -16,7 +16,7 @@ class DashboardController extends Controller
 {
 	function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -183,6 +183,10 @@ class DashboardController extends Controller
 		try
 		{
 			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
 			$total_sales_book_list = OrderItem::join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
@@ -309,6 +313,10 @@ class DashboardController extends Controller
 		try
 		{
 			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 			
 			$top_sales_book_list = OrderItem::select('order_items.*',\DB::raw('COUNT(order_items.id) as total_order_count', 'order_items.products_services_book_id'),\DB::raw('sum(order_items.quantity) as total_sell_count','order_items.products_services_book_id'))
 			->join('products_services_books', function ($join) {
@@ -475,6 +483,10 @@ class DashboardController extends Controller
 		try
 		{
 			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
 			$recent_job_list = Job::orderBy('created_at','desc')
 			->limit(10)

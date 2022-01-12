@@ -30,7 +30,7 @@ class JobController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -42,6 +42,10 @@ class JobController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             $jobs = Job::where('is_published', '1')->where('job_status', '1')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory','isApplied','isFavourite')
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -210,6 +214,10 @@ class JobController extends Controller
     public function show(Job $job)
     {
         $lang_id = $this->lang_id;
+        if(empty($lang_id))
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
 
         if($fav = FavouriteJob::where('job_id',$job->id)->where('sa_id',Auth::id())->first())
         {
@@ -396,6 +404,10 @@ class JobController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria job
             $jobs = Job::select('sp_jobs.*')
@@ -891,6 +903,10 @@ class JobController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             if(!empty($request->per_page_record))
             {

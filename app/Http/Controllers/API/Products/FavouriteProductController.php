@@ -14,7 +14,7 @@ class FavouriteProductController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -26,6 +26,10 @@ class FavouriteProductController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             $query = FavouriteProduct::where('user_id', Auth::id())->orderBy('created_at','DESC')
                     ->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')

@@ -30,7 +30,7 @@ class ProductsServicesBookController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -42,6 +42,10 @@ class ProductsServicesBookController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             $productsServicesBooks = ProductsServicesBook::select('products_services_books.*')
                 ->join('users', function ($join) {
@@ -282,6 +286,10 @@ class ProductsServicesBookController extends Controller
     public function show(Request $request,ProductsServicesBook $productsServicesBook)
     {
         $lang_id = $this->lang_id;
+        if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
         $productsServicesBook = ProductsServicesBook::with('categoryMaster', 'subCategory','user:id,user_type_id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail','addressDetail','productImages','productTags')
         ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -753,6 +761,10 @@ class ProductsServicesBookController extends Controller
         try
         { 
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             // return $request->status;
             $type = 'product';

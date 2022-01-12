@@ -19,7 +19,7 @@ class ContestApplicationController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -30,7 +30,11 @@ class ContestApplicationController extends Controller
     {
     	try
     	{
-            $lang_id = $this->lang_id; 
+            $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            } 
 
             if(!empty($request->per_page_record))
             {
@@ -143,6 +147,10 @@ class ContestApplicationController extends Controller
     public function show(ContestApplication $contestApplication)
     {
         $lang_id = $this->lang_id;
+        if(empty($lang_id))
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
 
     	$contestApplication = ContestApplication::where('id',$contestApplication->id)->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')
         ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {

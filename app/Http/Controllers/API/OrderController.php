@@ -46,7 +46,7 @@ class OrderController extends Controller
 	function __construct()
     {
         $this->paymentInfo = PaymentGatewaySetting::first();
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -58,6 +58,10 @@ class OrderController extends Controller
 		try
 		{
 			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
 			$orders = Order::orderBy('created_at','DESC')->with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
 			->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -92,6 +96,10 @@ class OrderController extends Controller
 		try
 		{
 			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
 			if(!empty($request->per_page_record))
 			{
@@ -137,6 +145,10 @@ class OrderController extends Controller
 		try
 		{
 			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
 			$orderItems = OrderItem::select('order_items.*')
 			->join('products_services_books', function ($join) {
@@ -580,6 +592,10 @@ class OrderController extends Controller
 			DB::commit();
 
 			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 			$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
 			->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
@@ -605,6 +621,10 @@ class OrderController extends Controller
 	public function show(Order $order)
 	{
 		$lang_id = $this->lang_id;
+		if(empty($lang_id))
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
 
 		$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
 			->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {

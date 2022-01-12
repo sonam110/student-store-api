@@ -35,7 +35,7 @@ class OrderController extends Controller
 {
 	function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -47,6 +47,10 @@ class OrderController extends Controller
 		try
 		{
 			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+	        {
+	            $lang_id = Language::select('id')->first()->id;
+	        }
 
 			$orders = Order::orderBy('orders.created_at','DESC')->with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
 			->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -102,6 +106,10 @@ class OrderController extends Controller
 	public function show(Order $order)
 	{
 		$lang_id = $this->lang_id;
+		if(empty($lang_id))
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
 
 		$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
 		->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -124,6 +132,10 @@ class OrderController extends Controller
 		try
 		{
 			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+	        {
+	            $lang_id = Language::select('id')->first()->id;
+	        }
 			
 			$orderItems = OrderItem::select('order_items.*','orders.*', 'users.first_name', 'users.last_name', 'users.email', 'order_items.created_at as created_at')->join('orders', function ($join) {
 	                        $join->on('order_items.order_id', '=', 'orders.id');

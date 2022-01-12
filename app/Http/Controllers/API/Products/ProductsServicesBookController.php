@@ -31,7 +31,7 @@ class ProductsServicesBookController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -45,7 +45,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $productsServicesBooks = ProductsServicesBook::where('is_published', '1')->where('status', '2')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
@@ -92,7 +92,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             if($request->user_id)
@@ -160,7 +160,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             if($request->user_id)
@@ -227,7 +227,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             if($request->user_id)
@@ -493,7 +493,7 @@ class ProductsServicesBookController extends Controller
         $lang_id = $this->lang_id;
         if(empty($lang_id))
         {
-            $lang_id = 1;
+            $lang_id = Language::select('id')->first()->id;
         }
 
     	if($request->view_count == true)
@@ -571,7 +571,7 @@ class ProductsServicesBookController extends Controller
         $lang_id = $this->lang_id;
         if(empty($lang_id))
         {
-            $lang_id = 1;
+            $lang_id = Language::select('id')->first()->id;
         }
 
         $productsServicesBook = ProductsServicesBook::find($id);
@@ -801,7 +801,7 @@ class ProductsServicesBookController extends Controller
         $lang_id = $this->lang_id;
         if(empty($lang_id))
         {
-            $lang_id = 1;
+            $lang_id = Language::select('id')->first()->id;
         }
 
         $productsServicesBook = ProductsServicesBook::find($id);
@@ -1117,7 +1117,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $productsServicesBooks = ProductsServicesBook::where('is_used_item', true)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags')
@@ -1175,7 +1175,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $type = 'product';
@@ -1460,7 +1460,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; //filter, promotion, latest, closingSoon, random, criteria users
@@ -1593,7 +1593,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; 
@@ -1732,7 +1732,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; //filter, promotion, latest, closingSoon, random, criteria users
@@ -2302,7 +2302,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
@@ -2341,7 +2341,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $type = 'book';
@@ -2680,7 +2680,7 @@ class ProductsServicesBookController extends Controller
             $lang_id = $this->lang_id;
             if(empty($lang_id))
             {
-                $lang_id = 1;
+                $lang_id = Language::select('id')->first()->id;
             }
 
             $searchType = $request->searchType; 

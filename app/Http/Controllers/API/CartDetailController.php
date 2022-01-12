@@ -18,7 +18,7 @@ class CartDetailController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -30,6 +30,10 @@ class CartDetailController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             $cartDetails = CartDetail::where('user_id',Auth::id())->with('product.user','product.user.shippingConditions','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')
                 ->with(['product.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -142,6 +146,10 @@ class CartDetailController extends Controller
                 $cartDetail->save();
             }
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             $cartDetail =CartDetail::where('id', $cartDetail->id)->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')
                 ->with(['product.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -226,6 +234,10 @@ class CartDetailController extends Controller
             $cartDetail->save();
 
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
             
             $cartDetail =CartDetail::where('id', $cartDetail->id)->with('product.user','product.user.serviceProviderDetail','product.categoryMaster','product.subCategory','product.addressDetail','product.coverImage','product.productTags')
                 ->with(['product.categoryMaster.categoryDetail' => function($q) use ($lang_id) {

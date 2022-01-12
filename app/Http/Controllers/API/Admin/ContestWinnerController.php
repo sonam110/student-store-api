@@ -15,7 +15,7 @@ class ContestWinnerController extends Controller
 {
     function __construct()
     {
-        $this->lang_id = Language::first()->id;
+        $this->lang_id = Language::select('id')->first()->id;
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -27,6 +27,10 @@ class ContestWinnerController extends Controller
 		try
 		{
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
             $contestWinners = ContestWinner::with('contest','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory')
             ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -85,6 +89,10 @@ class ContestWinnerController extends Controller
         try
         {
             $lang_id = $this->lang_id;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
 
         	$winners = ContestWinner::select('contest_winners.*')
         	        ->join('users', function ($join) {
