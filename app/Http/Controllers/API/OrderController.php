@@ -2604,7 +2604,16 @@ class OrderController extends Controller
 	public function createStripeSubscription(Request $request)
 	{
 		//cancel Subcription if exist
-		$checkPackage = Package::where('id', $request->package_id)->first();
+		if(!empty($request->package_id))
+		{
+			$checkPackage = Package::where('id', $request->package_id)->first();
+		}
+		
+		if(!empty($request->stripe_plan_id))
+		{
+			$checkPackage = Package::where('stripe_plan_id', $request->stripe_plan_id)->first();
+		}
+		
 		if($checkPackage)
 		{
 			$user_package = UserPackageSubscription::where('package_id', $checkPackage->id)->where('user_id', Auth::id())->whereNotNull('subscription_id')->where('payby','stripe')->where('is_canceled', 0)->orderBy('auto_id', 'DESC')->first();
@@ -2614,7 +2623,7 @@ class OrderController extends Controller
 			$subscription = $stripe->subscriptions->create([
 			  'customer' => Auth::user()->stripe_customer_id,
 			  'items' => [
-			    ['price' => $request->stripe_plan_id],
+			    ['price' => $checkPackage->stripe_plan_id],
 			  ],
 			  'payment_behavior' => 'default_incomplete',
 			  'expand' => ['latest_invoice.payment_intent'],
