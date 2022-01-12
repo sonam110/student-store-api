@@ -2436,7 +2436,6 @@ class OrderController extends Controller
 
 			$rawResponse = curl_exec($curl);
 			$response = json_decode($rawResponse);
-			dd($response);
 	        if(curl_errno($curl)>0)
 	        {
 	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
