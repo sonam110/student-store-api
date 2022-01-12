@@ -231,7 +231,13 @@ class PackageController extends Controller
                         $amount = $request->price;
                     }
 
-                    if($package->duration != $request->duration || $package->subscription != ($amount * 100))
+                    if($package->subscription>0) {
+                        $packageAmount = $package->subscription;
+                    } else {
+                        $packageAmount = $package->price;
+                    }
+
+                    if($package->duration != $request->duration || $packageAmount != ($amount * 100))
                     {
                         if($duration!=0)
                         {
