@@ -1946,6 +1946,11 @@ class OrderController extends Controller
 		{
 			return response()->json(prepareResult(true, 'Total price must be greater than or equal to 1.', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 		}
+
+		if($total>999999.99)
+		{
+			return response()->json(prepareResult(true, 'Total price must not be greater than 999999.99.', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
 		
         $username = $this->paymentInfo->klarna_username;
         $password = $this->paymentInfo->klarna_password;
@@ -2474,6 +2479,7 @@ class OrderController extends Controller
 	        	'payment_token' => $payment_token,
 	        	'temp_order_id' => $tempOrderSave->id
 	        ];
+	        \Log::info($returnData);
 	        return response()->json(prepareResult(false, $returnData, "Swish direct payment link successfully created."), config('http_response.success'));
 		} elseif($request->payment_method=='swish_checkout') {
 			$user = User::find(Auth::id());
