@@ -33,11 +33,15 @@ class UserCvDetailController extends Controller
 		$userCvDetail = UserCvDetail::firstOrNew(['user_id' =>  Auth::id()]);
 		if($request->present_my_cv==1)
 		{
-			$userCvDetail->is_published         = $request->is_published;
-			$userCvDetail->published_at         = $published_at;
-			$userCvDetail->save();
-
-			return response(prepareResult(false, $userCvDetail, getLangByLabelGroups('messages','message_user_cv_presented')), config('http_response.created'));
+			$publishCV = UserCvDetail::where('user_id', Auth::id())->first();
+			if($publishCV)
+			{
+				$publishCV->is_published         = $request->is_published;
+				$publishCV->published_at         = $published_at;
+				$publishCV->save();
+				return response(prepareResult(false, $publishCV, getLangByLabelGroups('messages','message_user_cv_presented')), config('http_response.created'));
+			}
+			return response(prepareResult(true, [], 'CV not found. please fill other detail before published CV.'), config('http_response.bad_request'));
 		}
 
 		$validation = \Validator::make($request->all(),[ 
