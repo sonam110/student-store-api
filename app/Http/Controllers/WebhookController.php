@@ -98,27 +98,28 @@ class WebhookController extends Controller
             $subscriptionSchedule = $event->data->object;
             $invoice_id = $subscriptionSchedule->id;
             $status = $subscriptionSchedule->status;
-            $this->paymentStatus($invoice_id, $status);
+            $finalized_date = @$subscriptionSchedule->status_transitions->finalized_at;
+            $this->paymentStatus($invoice_id, $status, $finalized_date);
             Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "invoice.payment_failed") {
             $subscriptionSchedule = $event->data->object;
-            $subscription_id = $subscriptionSchedule->id;
-
+            $invoice_id = $subscriptionSchedule->id;
+            $status = $subscriptionSchedule->status;
+            $finalized_date = @$subscriptionSchedule->status_transitions->finalized_at;
+            $this->paymentStatus($invoice_id, $status, $finalized_date);
             Log::channel('webhook')->info($subscriptionSchedule);
         }
-        elseif ($event->type == "invoice.created") {
+        /*elseif ($event->type == "invoice.created") {
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->id;
-
             Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "invoice.finalized") {
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->id;
-
             Log::channel('webhook')->info($subscriptionSchedule);
-        }
+        }*/
 
         //Log::channel('webhook')->info('payload');
         //Log::channel('webhook')->info($payload);
@@ -352,14 +353,14 @@ class WebhookController extends Controller
         }
     }
 
-    private function paymentStatus($invoice_id, $status) 
+    private function paymentStatus($invoice_id, $status, $finalized_date) 
     {
         $subscribedPackage = UserPackageSubscription::where('stripe_invoice_id', $invoice_id)->first();
         if($subscribedPackage)
         {
             $subscribedPackage->stripe_invoice_status = $status;
             $subscribedPackage->stripe_subscription_status = $status;
-            $subscribedPackage->stripe_invoice_finalized_date = $status;
+            $subscribedPackage->stripe_invoice_finalized_date = $finalized_date;
             $subscribedPackage->save();
         }
 
