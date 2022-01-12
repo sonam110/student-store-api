@@ -2478,7 +2478,6 @@ class OrderController extends Controller
 	        	'payment_token' => $payment_token,
 	        	'temp_order_id' => $tempOrderSave->id
 	        ];
-	        \Log::info($returnData);
 	        return response()->json(prepareResult(false, $returnData, "Swish direct payment link successfully created."), config('http_response.success'));
 		} elseif($request->payment_method=='swish_checkout') {
 			$user = User::find(Auth::id());
