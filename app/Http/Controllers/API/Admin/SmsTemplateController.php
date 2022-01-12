@@ -24,11 +24,11 @@ class SmsTemplateController extends Controller
         {
             if(!empty($request->per_page_record))
             {
-                $smsTemplates = SmsTemplate::simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $smsTemplates = SmsTemplate::with('language')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $smsTemplates = SmsTemplate::get();
+                $smsTemplates = SmsTemplate::with('language')->get();
             }
             return response(prepareResult(false, $smsTemplates, getLangByLabelGroups('messages','message_sms_template_list')), config('http_response.success'));
         }
@@ -84,6 +84,7 @@ class SmsTemplateController extends Controller
      */
     public function show(SmsTemplate $smsTemplate)
     {
+        $smsTemplate['language'] = $smsTemplate->language;
         return response()->json(prepareResult(false, $smsTemplate, getLangByLabelGroups('messages','message_sms_template_list')), config('http_response.success'));
     }
 
