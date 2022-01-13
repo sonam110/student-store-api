@@ -2341,8 +2341,8 @@ class LandingPageController extends Controller
                     ->where('contests.type', $request->type)
                     ->where('contests.is_published', '1')
                     ->where('contests.status', 'verified')
-                    ->where('application_start_date','<=', date('Y-m-d'))
-                    ->where('application_end_date','>=', date('Y-m-d'))
+                    /*->where('application_start_date','<=', date('Y-m-d'))
+                    ->where('application_end_date','>=', date('Y-m-d'))*/
                     ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','cancellationRanges','isApplied','categoryMaster','subCategory')
                     ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                         $q->select('id','category_master_id','title','slug')

@@ -779,8 +779,8 @@ class ContestController extends Controller
             		->where('contests.type', $request->type)
                     ->where('contests.is_published', '1')
                     ->where('contests.status', 'verified')
-                    ->where('contests.application_start_date','<=', date('Y-m-d'))
-                    ->where('contests.application_end_date','>=', date('Y-m-d'))
+                    /*->where('contests.application_start_date','<=', date('Y-m-d'))
+                    ->where('contests.application_end_date','>=', date('Y-m-d'))*/
                     ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')
                     ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                         $q->select('id','category_master_id','title','slug')
