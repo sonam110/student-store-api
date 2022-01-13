@@ -52,7 +52,7 @@ class AppSettingController extends Controller
             $appSetting->org_number                 = $request->org_number;
             $appSetting->description                = $request->description;
             $appSetting->logo_path                  = $request->logo_path;
-            $appSetting->logo_thumb_path            = $request->logo_thumb_path;
+            $appSetting->logo_thumb_path            = $request->logo_path;
             $appSetting->copyright_text             = $request->copyright_text;
             $appSetting->fb_ur                      = $request->fb_ur;
             $appSetting->twitter_url                = $request->twitter_url;
