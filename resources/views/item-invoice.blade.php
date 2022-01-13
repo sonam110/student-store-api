@@ -218,6 +218,26 @@
 
             <tr class="total">
                 <td></td>
+                <td colspan="2"><strong>{{getLangByLabelGroups('rewards','used_reward_points')}}:</strong> </td>
+                <td>
+                   <strong><center>{{$order->quantity * $order->price}} Kr</center></strong>
+                </td>
+            </tr>
+
+            <tr class="total">
+                <td></td>
+                <td colspan="2"><strong>{{getLangByLabelGroups('rewards','used_reward_points')}} x {{getLangByLabelGroups('invoice','rewards_point_value')}}</strong>
+                    <small>
+                        ({{ $order->used_item_reward_points }} x  {{ $appsetting->customer_rewards_pt_value }})
+                    </small> 
+                </td>
+                <td>
+                   <strong><center>{{ $order->used_item_reward_points * $appsetting->customer_rewards_pt_value }} Kr</center></strong>
+                </td>
+            </tr>
+                
+            <tr class="total">
+                <td></td>
                 <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Total')}}:</strong> </td>
                 <td>
                    <strong><center>{{$order->quantity * $order->price}} Kr</center></strong>
