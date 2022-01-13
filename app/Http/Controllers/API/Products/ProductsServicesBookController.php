@@ -394,7 +394,7 @@ class ProductsServicesBookController extends Controller
                 $productsServicesBook->author                       = $request->author;
                 $productsServicesBook->published_year               = $request->published_year;
                 $productsServicesBook->publisher                    = $request->publisher;
-                $productsServicesBook->language                     = $request->language;
+                $productsServicesBook->language                     = (!empty($request->language)) ? $request->language : null;
                 $productsServicesBook->no_of_pages                  = $request->no_of_pages;
                 $productsServicesBook->suitable_age                 = $request->suitable_age;
                 $productsServicesBook->book_cover                   = $request->book_cover;
@@ -723,7 +723,7 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->author           = $request->author;
             $productsServicesBook->published_year   = $request->published_year;
             $productsServicesBook->publisher        = $request->publisher;
-            $productsServicesBook->language         = $request->language;
+            $productsServicesBook->language         = (!empty($request->language)) ? $request->language : null;
             $productsServicesBook->no_of_pages      = $request->no_of_pages;
             $productsServicesBook->suitable_age     = $request->suitable_age;
             $productsServicesBook->book_cover       = $request->book_cover;

@@ -219,7 +219,7 @@ class ProductsImport implements ToModel,WithHeadingRow
             $products->dimension_width           = $row['dimension_width_required'];
             $products->dimension_height          = $row['dimension_height_required'];
             $products->weight                    = $row['weight_required'];
-            $products->service_languages         = $languageVal;
+            $products->language                  = !empty(@$row['language_required']) ? $row['language_required'] : null;
             $products->tags                      = $tagVal;
             $products->meta_title                = $row['book_name_required'];
             $products->meta_keywords             = $row['tags_required'];
