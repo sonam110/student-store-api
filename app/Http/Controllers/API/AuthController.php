@@ -147,11 +147,12 @@ class AuthController extends Controller
 
 		try
 		{
-			if(User::where('guardian_email', $request->email)->whereNotNull('guardian_email')->count()>0)
+			$email = strtolower($request->email);
+			if(User::where('guardian_email', $email)->whereNotNull('guardian_email')->count()>0)
 			{
 				return response()->json(prepareResult(true, 'Duplicate entry', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
-			return response()->json(prepareResult(false, ['email'=>$request->email], getLangByLabelGroups('messages','message_email_validated')), config('http_response.success'));
+			return response()->json(prepareResult(false, ['email'=>$email], getLangByLabelGroups('messages','message_email_validated')), config('http_response.success'));
 		}
 		catch (\Throwable $exception)
 		{
@@ -213,12 +214,12 @@ class AuthController extends Controller
 		{
 			$user->first_name = $request->guardian_first_name;
 			$user->last_name  = $request->guardian_last_name;
-			$user->email = $request->guardian_email;
+			$user->email = strtolower($request->guardian_email);
 			$user->contact_number  = $request->guardian_contact_number;
 			$user->password  = bcrypt($request->guardian_password);
 			$user->guardian_first_name = $request->first_name;
 			$user->guardian_last_name = $request->last_name;
-			$user->guardian_email = $request->email;
+			$user->guardian_email = strtolower($request->email);
 			$user->guardian_contact_number = $request->contact_number;
 			$user->guardian_password = bcrypt($request->password);
 
@@ -227,12 +228,12 @@ class AuthController extends Controller
 		{
 			$user->first_name = $request->first_name;
 			$user->last_name = $request->last_name;
-			$user->email = $request->email;
+			$user->email = strtolower($request->email);
 			$user->contact_number = $request->contact_number;
 			$user->password = bcrypt($request->password);
 			$user->guardian_first_name = $request->guardian_first_name;
 			$user->guardian_last_name = $request->guardian_last_name;
-			$user->guardian_email = $request->guardian_email;
+			$user->guardian_email = strtolower($request->guardian_email);
 			$user->guardian_contact_number = $request->guardian_contact_number;
 			$user->guardian_password = bcrypt($request->guardian_password);
 		}
@@ -704,7 +705,7 @@ class AuthController extends Controller
 		{
 			try
 			{
-				$email = $request->email;
+				$email = strtolower($request->email);
 				$user = User::where('email',$email)->orWhere('guardian_email',$email)->first();
 				if(!$user)
 				{
@@ -844,7 +845,7 @@ class AuthController extends Controller
 
 	public function emailVerification($email,$otp)
 	{
-		$email = base64_decode($email);
+		$email = base64_decode(strtolower($email););
 		$otp = base64_decode($otp);
 		try
 		{
