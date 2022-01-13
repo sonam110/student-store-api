@@ -494,7 +494,7 @@ class JobController extends Controller
                     $jobs->join('job_tags', function ($join) {
                         $join->on('sp_jobs.id', '=', 'job_tags.job_id');
                     });
-                    $jobs->where(function($query) use ($request) {
+                    $jobs->groupBy('sp_jobs.id')->where(function($query) use ($request) {
                         foreach ($request->job_tags as $key => $job_tags) {
                             if ($key === 0) {
                                 $query->where('job_tags.title', 'LIKE', '%'.$job_tags.'%');
