@@ -689,7 +689,8 @@ class ContestController extends Controller
                         $q->select('id','category_master_id','title','slug')
                             ->where('language_id', $lang_id)
                             ->where('is_parent', '0');
-                    }]);
+                    }])
+                    ->withCount('contestApplications');
             if(!empty($request->type))
             {
                 $contests->where('contests.type', $request->type);
