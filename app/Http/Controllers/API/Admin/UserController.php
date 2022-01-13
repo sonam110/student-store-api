@@ -439,7 +439,7 @@ class UserController extends Controller
             	->where('package_id',$request->package_id)
             	->where('subscription_status', 1)
             	->orderBy('created_at', 'DESC')
-            	->groupBy('user_id');
+            	->groupBy('user_package_subscriptions.user_id');
             }
 
             if(!empty($request->per_page_record))

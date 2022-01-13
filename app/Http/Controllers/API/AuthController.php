@@ -845,7 +845,7 @@ class AuthController extends Controller
 
 	public function emailVerification($email,$otp)
 	{
-		$email = base64_decode(strtolower($email););
+		$email = base64_decode(strtolower($email));
 		$otp = base64_decode($otp);
 		try
 		{
