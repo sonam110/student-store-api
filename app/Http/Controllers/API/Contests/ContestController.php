@@ -837,7 +837,7 @@ class ContestController extends Controller
                 }
                 if(!empty($request->end_date))
                 {
-                    $contests->whereDate('application_end_date', '<=', date('Y-m-d', strtotime($request->end_date)));
+                    $contests->whereDate('application_start_date', '<=', date('Y-m-d', strtotime($request->end_date)));
                 }
 
                 if(!empty($request->free_subscription))
