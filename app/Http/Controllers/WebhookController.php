@@ -79,20 +79,17 @@ class WebhookController extends Controller
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->id;
             $this->customerSubscriptionCreated($subscription_id, $subscriptionSchedule);
-            Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "customer.subscription.updated")
         { 
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->subscription;
             //$this->customerSubscriptionUpdated($subscription_id, $subscriptionSchedule);*/
-            Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "customer.subscription.deleted" || $event->type == "subscription_schedule.aborted" || $event->type == "subscription_schedule.canceled") {
             $subscriptionSchedule = $event->data->object;
             $subscription_id = $subscriptionSchedule->id;
             $this->abortedSubscription($subscription_id);
-            Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "invoice.payment_succeeded") {
             $subscriptionSchedule = $event->data->object;
@@ -100,7 +97,6 @@ class WebhookController extends Controller
             $status = $subscriptionSchedule->status;
             $finalized_date = @$subscriptionSchedule->status_transitions->finalized_at;
             $this->paymentStatus($invoice_id, $status, $finalized_date);
-            Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "invoice.payment_failed") {
             $subscriptionSchedule = $event->data->object;
@@ -108,7 +104,6 @@ class WebhookController extends Controller
             $status = $subscriptionSchedule->status;
             $finalized_date = @$subscriptionSchedule->status_transitions->finalized_at;
             $this->paymentStatus($invoice_id, $status, $finalized_date);
-            Log::channel('webhook')->info($subscriptionSchedule);
         }
         /*elseif ($event->type == "invoice.created") {
             $subscriptionSchedule = $event->data->object;
@@ -123,6 +118,7 @@ class WebhookController extends Controller
 
         //Log::channel('webhook')->info('payload');
         //Log::channel('webhook')->info($payload);
+        Log::channel('webhook')->info($subscriptionSchedule);
         http_response_code(200);
     }
 
