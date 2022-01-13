@@ -515,6 +515,10 @@ class UserController extends Controller
 	public function rewardPointDetails($id)
 	{
 		$user = User::find($id);
+		if(!$user)
+		{
+			return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_not_exists')), config('http_response.not_found'));
+		}
 		$user['available_reward_pts'] 		= $user->reward_points;
 		$data['pending_reward_for_transfer']= $user->orderItems->where('reward_point_status','pending')->where('earned_reward_points','>', 0)->sum('earned_reward_points');
 		$user['pending_reward_pts'] 		= $user->orderItems->where('reward_point_status','pending')->where('earned_reward_points','>', 0)->count();

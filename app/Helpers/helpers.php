@@ -667,7 +667,7 @@ function appSettingUpdatePrice()
 	return true;
 }
 
-function createFreePackage($userType, $module)
+function createFreePackage($userType, $module, $userId)
 {
 	$package_for = 'other';
 	if($userType==2) {
@@ -682,7 +682,7 @@ function createFreePackage($userType, $module)
 	if($getFreePackage)
 	{
     $userPackageSubscription = new UserPackageSubscription;
-    $userPackageSubscription->user_id = Auth::id();
+    $userPackageSubscription->user_id = $userId;
     $userPackageSubscription->subscription_id = null;
     $userPackageSubscription->payby = null;
     $userPackageSubscription->package_id = $getFreePackage->id;

@@ -2714,7 +2714,7 @@ class OrderController extends Controller
 				$userType = $user_package->user->user_type_id;
 				$module = $user_package->package->module;
 
-				createFreePackage($userType, $module);
+				createFreePackage($userType, $module, Auth::id());
 			}
 
 			$title = 'Package Subscription Canceled';

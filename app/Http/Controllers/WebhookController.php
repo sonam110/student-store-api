@@ -90,8 +90,8 @@ class WebhookController extends Controller
         }
         elseif ($event->type == "customer.subscription.deleted" || $event->type == "subscription_schedule.aborted" || $event->type == "subscription_schedule.canceled") {
             $subscriptionSchedule = $event->data->object;
-            //$subscription_id = $subscriptionSchedule->id;
-            //$this->abortedSubscription($subscription_id);
+            $subscription_id = $subscriptionSchedule->id;
+            $this->abortedSubscription($subscription_id);
             Log::channel('webhook')->info($subscriptionSchedule);
         }
         elseif ($event->type == "invoice.payment_succeeded") {
@@ -335,12 +335,22 @@ class WebhookController extends Controller
 
     private function abortedSubscription($subscription_id) 
     {
-        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
+        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->first();
         if($subscribedPackage)
         {
             $subscribedPackage->is_canceled = 1;
             $subscribedPackage->canceled_date = date('Y-m-d');
             $subscribedPackage->save();
+
+            //if no active package the assign free package with the same module
+            $checkIsPackageExist = UserPackageSubscription::where('module', $subscribedPackage->module)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
+            if(!$checkIsPackageExist)
+            {
+                $userType = $subscribedPackage->user->user_type_id;
+                $module = $subscribedPackage->module;
+                $userId = $subscribedPackage->user_id;
+                createFreePackage($userType, $module, $userId);
+            }
 
             $title = 'Package Subscription Canceled';
             $body =  'Your '.$subscribedPackage->package->module.' module '.getLangByLabelGroups('packages', $subscribedPackage->package->type_of_package).' package is successfully canceled.';
@@ -350,6 +360,7 @@ class WebhookController extends Controller
             $module = 'profile';
             pushNotification($title,$body,$user,$type,true,$user_type,$module,'no-data','package');
             Log::channel('webhook')->info('Subscription canceled. User Package Subscription Id: '. $subscribedPackage->id);
+
         }
     }
 
