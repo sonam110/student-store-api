@@ -1099,7 +1099,7 @@ class JobController extends Controller
 
                 //Title
                 foreach ($jobsIds as $key => $job) {
-                    $usersIds = UserCvDetail::select('user_id')->where('user_cv_details.title', 'LIKE', '%'.$job->title.'%')->limit(100)->inRandomOrder()->get();
+                    $usersIds = UserCvDetail::select('user_id')->where('user_cv_details.title', 'LIKE', '%'.$job->title.'%')->where('is_published', 1)->limit(100)->inRandomOrder()->get();
                     foreach ($usersIds as $key => $user) {
                         $titleMatched[] = ['user_id' => $user->user_id, 'job_id' => $job->id];
                     }
@@ -1109,7 +1109,7 @@ class JobController extends Controller
                 //Skills
                 foreach ($jobsIds as $key => $job) {
                     foreach ($job->jobTags as $tagkey => $tags) {
-                        $usersIds = UserCvDetail::select('user_id')->where('user_cv_details.key_skills', 'LIKE', '%'.$tags->title.'%')->limit(100)->inRandomOrder()->get();
+                        $usersIds = UserCvDetail::select('user_id')->where('user_cv_details.key_skills', 'LIKE', '%'.$tags->title.'%')->where('is_published', 1)->limit(100)->inRandomOrder()->get();
                         foreach ($usersIds as $key => $user) {
                             $skillsMatched[] = ['user_id' => $user->user_id, 'job_id' => $job->id];
                             
@@ -1119,7 +1119,7 @@ class JobController extends Controller
 
                 //Work Exp
                 foreach ($jobsIds as $key => $job) {
-                    $usersIds = UserCvDetail::select('user_id')->where('user_cv_details.total_experience', '>=', $job->years_of_experience)->limit(100)->inRandomOrder()->get();
+                    $usersIds = UserCvDetail::select('user_id')->where('user_cv_details.total_experience', '>=', $job->years_of_experience)->where('is_published', 1)->limit(100)->inRandomOrder()->get();
                     foreach ($usersIds as $key => $user) {
                         $workExpMatched[] = ['user_id' => $user->user_id, 'job_id' => $job->id];
                     }
@@ -1132,6 +1132,7 @@ class JobController extends Controller
                             ->with(['addressDetail' => function($q) use ($city) {
                                 $q->where('city', $city);
                             }])
+                            ->where('is_published', 1)
                             ->limit(100)
                             ->inRandomOrder()
                             ->get();
@@ -1156,6 +1157,7 @@ class JobController extends Controller
                                     $query->orWhere('preferred_job_env', 'LIKE', '%'.$job_environment.'%');
                                 }
                             })
+                            ->where('is_published', 1)
                             ->limit(100)->inRandomOrder()->get();
                         foreach ($usersIds as $key => $user) {
                             $jobEnvMatched[] = ['user_id' => $user->user_id, 'job_id' => $job->id];
