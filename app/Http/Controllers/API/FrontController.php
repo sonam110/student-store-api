@@ -857,4 +857,18 @@ class FrontController extends Controller
 			
 		// }
   //   }
+
+    public function functionChecking()
+    {
+    	$data = Contest::whereNotNull('target_city')->get();
+    	foreach ($data as $key => $value) {
+    		$arr = [];
+    		foreach (json_decode($value->target_city) as $key => $valuearr) {
+    			$arr[] = $valuearr;
+    		}
+    		$value->target_city = json_encode($arr, JSON_UNESCAPED_UNICODE);
+    		$value->save();
+    	}
+    	dd('done');
+    }
 }
