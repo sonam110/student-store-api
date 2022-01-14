@@ -831,13 +831,21 @@ class ContestController extends Controller
                 {
                     $contests->where('contests.application_end_date', '<=',  date("Y-m-d", strtotime($request->applying_date)))->orderBy('contests.application_end_date','asc');
                 }
-                if(!empty($request->start_date))
+                //case 1
+                if(!empty($request->start_date) && empty($request->end_date))
                 {
                     $contests->whereDate('application_start_date', '>=', date('Y-m-d', strtotime($request->start_date)));
                 }
-                if(!empty($request->end_date))
+                //case 2
+                elseif(empty($request->start_date) && !empty($request->end_date))
                 {
-                    $contests->whereDate('application_start_date', '<=', date('Y-m-d', strtotime($request->end_date)));
+                    $contests->whereDate('application_end_date', '<=', date('Y-m-d', strtotime($request->end_date)));
+                }
+                //case 3
+                elseif(!empty($request->start_date) && !empty($request->end_date))
+                {
+                    $contests->whereDate('application_start_date', '>=', date('Y-m-d', strtotime($request->start_date)))
+                    ->whereDate('application_end_date', '<=', date('Y-m-d', strtotime($request->end_date)));
                 }
 
                 if(!empty($request->free_subscription))
