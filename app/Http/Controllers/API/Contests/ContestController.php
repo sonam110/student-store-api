@@ -179,7 +179,7 @@ class ContestController extends Controller
                 $contest->meeting_link            				= $request->meeting_link;
                 $contest->address               				= $request->address;
                 $contest->target_country                        = $request->target_country;
-                $contest->target_city                           = (!empty($request->target_city)) ? $request->target_city : null;
+                $contest->target_city                           = (!empty($request->target_city)) ? json_encode($request->target_city, JSON_UNESCAPED_UNICODE) : null;
                 $contest->education_level                   	= $request->education_level;
                 $contest->educational_institition    			= $request->educational_institition;
                 $contest->age_restriction    					= $request->age_restriction;
