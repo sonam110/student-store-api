@@ -323,7 +323,7 @@ class LabelSeeder extends Seeder
             "quality" => "Quality (%)",
             "duration" => "Duration",
             "dimension" => "Dimensions",
-            "width" => "Bredd",
+            "width" => "Width",
             "height" => "Height",
             "length" => "Length",
             "weight" => "Weight",

@@ -216,6 +216,11 @@ class PaymentCardDetailController extends Controller
                 return response()->json(prepareResult(true, $paymentMethods, getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
             }
 
+            if($request->is_default == true)
+            {
+                PaymentCardDetail::where('user_id',Auth::id())->update(['is_default'=>false]);
+            }
+
             $paymentCardDetail->user_id             = Auth::user()->id;
             $paymentCardDetail->card_number         = $request->card_number;
             $paymentCardDetail->card_type           = $request->card_type;
