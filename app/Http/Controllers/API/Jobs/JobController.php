@@ -1064,8 +1064,15 @@ class JobController extends Controller
                 {
                     $applicants->join('user_work_experiences', function ($join) {
                         $join->on('job_applications.user_id', '=', 'user_work_experiences.user_id');
+                    })
+                    ->join('users', function ($join) {
+                        $join->on('job_applications.user_id', '=', 'users.id');
                     });
-                    $applicants->where('user_work_experiences.title', 'LIKE', '%'.$request->search_title.'%');
+                    $applicants->where(function($query) use ($request) {
+                        $query->where('user_work_experiences.title', 'LIKE', '%'.$request->search_title.'%')
+                            ->orWhere('users.first_name', 'LIKE', '%'.$request->search_title.'%')
+                            ->orWhere('user_cv_details.key_skills', 'LIKE', '%'.$request->search_title.'%');
+                    });
                 }
             }
             elseif($searchType=='criteria')
