@@ -480,10 +480,10 @@ class LandingPageController extends Controller
                     $products->where(function($query) use ($arrForSelecteds) {
                         foreach ($arrForSelecteds as $key => $arrForSelecte) {
                             if ($key === 0) {
-                                $query->where('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte).'%');
+                                $query->where('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte, JSON_UNESCAPED_UNICODE).'%');
                                 continue;
                             }
-                            $query->orWhere('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte).'%');
+                            $query->orWhere('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte, JSON_UNESCAPED_UNICODE).'%');
                         }
                     });
                 }
@@ -975,10 +975,10 @@ class LandingPageController extends Controller
                     $products->where(function($query) use ($arrForSelecteds) {
                         foreach ($arrForSelecteds as $key => $arrForSelecte) {
                             if ($key === 0) {
-                                $query->where('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte).'%');
+                                $query->where('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte, JSON_UNESCAPED_UNICODE).'%');
                                 continue;
                             }
-                            $query->orWhere('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte).'%');
+                            $query->orWhere('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte, JSON_UNESCAPED_UNICODE).'%');
                         }
                     });
                 }
@@ -1537,10 +1537,10 @@ class LandingPageController extends Controller
                     $products->where(function($query) use ($arrForSelecteds) {
                         foreach ($arrForSelecteds as $key => $arrForSelecte) {
                             if ($key === 0) {
-                                $query->where('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte).'%');
+                                $query->where('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte, JSON_UNESCAPED_UNICODE).'%');
                                 continue;
                             }
-                            $query->orWhere('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte).'%');
+                            $query->orWhere('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte, JSON_UNESCAPED_UNICODE).'%');
                         }
                     });
                 }

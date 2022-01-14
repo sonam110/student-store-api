@@ -174,7 +174,7 @@ class ContestController extends Controller
                 $contest->application_end_date          		= $application_end_date;
                 $contest->max_participants              		= $request->max_participants;
                 $contest->no_of_winners                 		= $request->no_of_winners;
-                $contest->winner_prizes                			= (!empty($request->winner_prizes)) ? json_encode($request->winner_prizes) : null;
+                $contest->winner_prizes                			= (!empty($request->winner_prizes)) ? json_encode($request->winner_prizes, JSON_UNESCAPED_UNICODE) : null;
                 $contest->mode                   				= $request->mode;
                 $contest->meeting_link            				= $request->meeting_link;
                 $contest->address               				= $request->address;
@@ -219,7 +219,7 @@ class ContestController extends Controller
                 $contest->meta_description                      = $request->meta_description;
                 $contest->is_deleted                    		= false;
                 $contest->status                    			= 'pending';
-                $contest->tags                         = (!empty($request->tags)) ? json_encode($request->tags) : null;
+                $contest->tags                         = (!empty($request->tags)) ? json_encode($request->tags, JSON_UNESCAPED_UNICODE) : null;
                 //$contest->status                                = 'verified';
                 $contest->save();
 
@@ -511,12 +511,12 @@ class ContestController extends Controller
             $contest->application_end_date          		= $application_end_date;
             $contest->max_participants              		= $request->max_participants;
             $contest->no_of_winners                 		= $request->no_of_winners;
-            $contest->winner_prizes                			= (!empty($request->winner_prizes)) ? json_encode($request->winner_prizes) : null;
+            $contest->winner_prizes                			= (!empty($request->winner_prizes)) ? json_encode($request->winner_prizes, JSON_UNESCAPED_UNICODE) : null;
             $contest->mode                   				= $request->mode;
             $contest->meeting_link            				= $request->meeting_link;
             $contest->address               				= $request->address;
             $contest->target_country                        = $request->target_country;
-            $contest->target_city                           = (!empty($request->target_city)) ? json_encode($request->target_city) : null;
+            $contest->target_city                           = (!empty($request->target_city)) ? json_encode($request->target_city, JSON_UNESCAPED_UNICODE) : null;
             $contest->education_level                   	= $request->education_level;
             $contest->educational_institition    			= $request->educational_institition;
             $contest->age_restriction    					= $request->age_restriction;
@@ -556,7 +556,7 @@ class ContestController extends Controller
             $contest->meta_title                            = $request->meta_title;
             $contest->meta_keywords                         = $request->meta_keywords;
             $contest->meta_description                      = $request->meta_description;
-            $contest->tags                         = (!empty($request->tags)) ? json_encode($request->tags) : null;
+            $contest->tags                         = (!empty($request->tags)) ? json_encode($request->tags, JSON_UNESCAPED_UNICODE) : null;
             $contest->save();
             if($request->use_cancellation_policy)
             {

@@ -57,7 +57,7 @@ class ProductsImport implements ToModel,WithHeadingRow
             {
                 $tag[] = $tags;
             }
-            $tagVal = json_encode($tag);
+            $tagVal = json_encode($tag, JSON_UNESCAPED_UNICODE);
         }
 
         $language = [];
@@ -68,7 +68,7 @@ class ProductsImport implements ToModel,WithHeadingRow
             {
                 $language[] = $lang;
             }
-            $languageVal = json_encode($language);
+            $languageVal = json_encode($language, JSON_UNESCAPED_UNICODE);
         }
 
         //Product

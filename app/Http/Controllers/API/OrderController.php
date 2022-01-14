@@ -440,7 +440,7 @@ class OrderController extends Controller
 					}
 					else
 					{
-						$orderItem->attribute_data					= json_encode(@$orderedItem['attribute_data']);
+						$orderItem->attribute_data					= json_encode(@$orderedItem['attribute_data'], JSON_UNESCAPED_UNICODE);
 					}
 					
 					$orderItem->price = $sellingPrice;
@@ -1695,7 +1695,7 @@ class OrderController extends Controller
 		    'shippingAddressRestrictedToCountryCodes' => ["NO", "SE", "DK"],
 		    'requireShippingAddress' => true,
 		];
-		$postData = json_encode($data);
+		$postData = json_encode($data, JSON_UNESCAPED_UNICODE);
 		$url = env('SWISH_URL').'/psp/consumers';
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
@@ -1986,7 +1986,7 @@ class OrderController extends Controller
 	            'order_tax_amount'  => 0,
 	            'order_lines'       => $itemInfo
 	        ];
-	        $postData = json_encode($data);
+	        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
 
 	        $curl = curl_init();
 	        curl_setopt_array($curl, array(
@@ -2024,7 +2024,7 @@ class OrderController extends Controller
 	            'order_tax_amount'  => 0,
 	            'order_lines'       => $itemInfo
 	        ];
-	        $postData = json_encode($data);
+	        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
 
 	        $curl = curl_init();
 	        curl_setopt_array($curl, array(
@@ -2091,7 +2091,7 @@ class OrderController extends Controller
 	            ]
 	        ];
 
-	        $postData = json_encode($data);
+	        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
 	        
 
 	        $curl = curl_init();
@@ -2136,7 +2136,7 @@ class OrderController extends Controller
 			    'order_tax_amount' 		=>  0,
 			    'order_lines' 			=>  $itemInfo
 	        ];
-	        $postData = json_encode($data);
+	        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
 
 	        $curl = curl_init();
 	        curl_setopt_array($curl, array(
@@ -2204,7 +2204,7 @@ class OrderController extends Controller
 	                'confirmation'  => env('FRONT_APP_URL').'confirmation',
 	            ]
 	        ];
-	        $postData = json_encode($data);
+	        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
 
 	        $curl = curl_init();
 	        curl_setopt_array($curl, array(
@@ -2247,7 +2247,7 @@ class OrderController extends Controller
 
 			$tempOrderSave = new TempOrder;
 			$tempOrderSave->user_id = Auth::id();
-			$tempOrderSave->request_param = json_encode($request->all());
+			$tempOrderSave->request_param = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
 			$tempOrderSave->save();
 
 	      	$temp_order_id = $tempOrderSave->id;
@@ -2266,7 +2266,7 @@ class OrderController extends Controller
 	                'push'          => env('APP_URL').'api/push-notification-klarna?order_id='.$temp_order_id,
 	            ]
 	        ];
-	        $postData = json_encode($data);
+	        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
 
 	        $curl = curl_init();
 	        curl_setopt_array($curl, array(
@@ -2307,7 +2307,7 @@ class OrderController extends Controller
 			//Temp Order create
 			$tempOrderSave = new TempOrder;
 			$tempOrderSave->user_id = Auth::id();
-			$tempOrderSave->request_param = json_encode($request->all());
+			$tempOrderSave->request_param = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
 			$tempOrderSave->save();
 
 	      	$temp_order_id = $tempOrderSave->id;
@@ -2334,7 +2334,7 @@ class OrderController extends Controller
 			$request["url"]["callbacks"] = array();
 			$request["url"]["callbacks"][] = array("url" => env('APP_URL').'bam-callback');
 
-			$requestJson = json_encode($request);
+			$requestJson = json_encode($request, JSON_UNESCAPED_UNICODE);
 
 			$contentLength = isset($requestJson) ? strlen($requestJson) : 0;
 
@@ -2379,7 +2379,7 @@ class OrderController extends Controller
 			//Temp Order create
 			$tempOrderSave = new TempOrder;
 			$tempOrderSave->user_id = Auth::id();
-			$tempOrderSave->request_param = json_encode($request->all());
+			$tempOrderSave->request_param = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
 			$tempOrderSave->save();
 
 	      	$temp_order_id = $tempOrderSave->id;
@@ -2438,7 +2438,7 @@ class OrderController extends Controller
 			    ]
 			];
 
-			$requestJson = json_encode($orderObj);
+			$requestJson = json_encode($orderObj, JSON_UNESCAPED_UNICODE);
 			$headers = [
 				'Content-Type: application/json',
 			  	'Authorization: Bearer '.$accessToken,
@@ -2513,7 +2513,7 @@ class OrderController extends Controller
 			//Temp Order create
 			$tempOrderSave = new TempOrder;
 			$tempOrderSave->user_id = Auth::id();
-			$tempOrderSave->request_param = json_encode($request->all());
+			$tempOrderSave->request_param = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
 			$tempOrderSave->save();
 
 	      	$temp_order_id = $tempOrderSave->id;
@@ -2563,7 +2563,7 @@ class OrderController extends Controller
 			  ],
 			];
 
-			$requestJson = json_encode($orderObj);
+			$requestJson = json_encode($orderObj, JSON_UNESCAPED_UNICODE);
 			$headers = [
 				'Content-Type: application/json',
 			  	'Authorization: Bearer '.$accessToken,

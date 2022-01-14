@@ -137,7 +137,7 @@ class CoolCompanyCreateAssignment extends Command
                     $createAssignment->user_id = $user->user_id;
                     $createAssignment->cool_company_freelancer_id  = $cool_company_freelancer_id;
                     $createAssignment->assignment_name = $resDecode['name'];
-                    $createAssignment->send_object = json_encode($data);
+                    $createAssignment->send_object = json_encode($data, JSON_UNESCAPED_UNICODE);
                     $createAssignment->assignmentId = $resDecode['id'];
                     $createAssignment->agreementId = $resDecode['agreementId'];
                     $createAssignment->totalBudget = $resDecode['totalBudget'];
@@ -296,7 +296,7 @@ class CoolCompanyCreateAssignment extends Command
     private function startAssignment($accessToken, $assignmentId, $data)
     {
         $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Assignments/'.$assignmentId.'/state';
-        $postData = json_encode($data);
+        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $url,
@@ -372,7 +372,7 @@ class CoolCompanyCreateAssignment extends Command
     private function completeAssignment($accessToken, $assignmentId, $teamMemberId, $completeData)
     {
         $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'api/v1/Assignments/'.$assignmentId.'/requests/'.$teamMemberId.'/complete';
-        $postData = json_encode($data);
+        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
 
         $curl = curl_init();
         curl_setopt_array($curl, array(

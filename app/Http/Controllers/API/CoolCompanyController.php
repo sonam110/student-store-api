@@ -358,7 +358,7 @@ class CoolCompanyController extends Controller
     private function startAssignment($accessToken, $assignmentId, $data)
     {
         $url = env('COOL_URL_FUNCTION', 'https://stage-open-api.coolcompany.com').'/api/v1/Assignments/'.$assignmentId.'/state';
-        $postData = json_encode($data);
+        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $url,

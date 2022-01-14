@@ -294,7 +294,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	        'reference'        	=> $orderItem->order->order_number,
 	        'order_lines'       => $itemInfo
 	    ];
-	    $postData = json_encode($data);
+	    $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
 
 	    $curl = curl_init();
 	    curl_setopt_array($curl, array(

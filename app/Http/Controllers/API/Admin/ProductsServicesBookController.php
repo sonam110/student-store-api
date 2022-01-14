@@ -216,8 +216,8 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->service_period_time          = $request->service_period_time;
             $productsServicesBook->service_period_time_type     = $request->service_period_time_type;
             $productsServicesBook->service_online_link          = $request->service_online_link;
-            $productsServicesBook->service_languages            = (!empty($request->service_languages)) ? json_encode($request->service_languages) : null;
-            $productsServicesBook->tags                         = (!empty($request->tags)) ? json_encode($request->tags) : null;
+            $productsServicesBook->service_languages            = (!empty($request->service_languages)) ? json_encode($request->service_languages, JSON_UNESCAPED_UNICODE) : null;
+            $productsServicesBook->tags                         = (!empty($request->tags)) ? json_encode($request->tags, JSON_UNESCAPED_UNICODE) : null;
             $productsServicesBook->meta_title                   = $request->meta_title;
             $productsServicesBook->meta_keywords                = $request->meta_keywords;
             $productsServicesBook->is_promoted                  = $request->is_promoted;
@@ -401,8 +401,8 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->service_period_time      = $request->service_period_time;
             $productsServicesBook->service_period_time_type = $request->service_period_time_type;
             $productsServicesBook->service_online_link      = $request->service_online_link;
-            $productsServicesBook->service_languages        = (!empty($request->service_languages)) ? json_encode($request->service_languages) : null;
-            $productsServicesBook->tags                     = (!empty($request->tags)) ? json_encode($request->tags) : null;
+            $productsServicesBook->service_languages        = (!empty($request->service_languages)) ? json_encode($request->service_languages, JSON_UNESCAPED_UNICODE) : null;
+            $productsServicesBook->tags                     = (!empty($request->tags)) ? json_encode($request->tags, JSON_UNESCAPED_UNICODE) : null;
             $productsServicesBook->meta_title               = $request->meta_title;
             $productsServicesBook->meta_keywords            = $request->meta_keywords;
             /*$productsServicesBook->is_promoted              = $request->is_promoted;*/
@@ -943,10 +943,10 @@ class ProductsServicesBookController extends Controller
                     $products->where(function($query) use ($arrForSelecteds) {
                         foreach ($arrForSelecteds as $key => $arrForSelecte) {
                             if ($key === 0) {
-                                $query->where('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte).'%');
+                                $query->where('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte, JSON_UNESCAPED_UNICODE).'%');
                                 continue;
                             }
-                            $query->orWhere('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte).'%');
+                            $query->orWhere('products_services_books.attribute_details', 'LIKE', '%'.json_encode($arrForSelecte, JSON_UNESCAPED_UNICODE).'%');
                         }
                     });
                 }

@@ -27,7 +27,7 @@ class NotificationTemplateSeeder extends Seeder
             $template->template_for = $rec['template_for'];
             $template->title        = $rec['title'];
             $template->body         = $rec['body'];
-            $template->attributes   = json_encode($rec['attributes']);
+            $template->attributes   = json_encode($rec['attributes'], JSON_UNESCAPED_UNICODE);
             $template->save();
         }
     }

@@ -58,9 +58,9 @@ class UserCvDetailController extends Controller
 	    $userCvDetail->user_id         		= Auth::id();
 		$userCvDetail->address_detail_id    = $request->address_detail_id;
 		$userCvDetail->title         		= $request->title;
-		$userCvDetail->languages_known      = (!empty($request->languages_known)) ? json_encode($request->languages_known) : null;
-		$userCvDetail->key_skills         	= (!empty($request->key_skills)) ? json_encode($request->key_skills) : null;
-		$userCvDetail->preferred_job_env    = (!empty($request->preferred_job_env)) ? json_encode($request->preferred_job_env) : null;
+		$userCvDetail->languages_known      = (!empty($request->languages_known)) ? json_encode($request->languages_known, JSON_UNESCAPED_UNICODE) : null;
+		$userCvDetail->key_skills         	= (!empty($request->key_skills)) ? json_encode($request->key_skills, JSON_UNESCAPED_UNICODE) : null;
+		$userCvDetail->preferred_job_env    = (!empty($request->preferred_job_env)) ? json_encode($request->preferred_job_env, JSON_UNESCAPED_UNICODE) : null;
 		$userCvDetail->other_description    = $request->other_description;
 		$userCvDetail->is_published         = $request->is_published;
 		$userCvDetail->published_at     	= $published_at;

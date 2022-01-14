@@ -121,7 +121,7 @@ class CartDetailController extends Controller
                 $cartDetail->user_id                    = Auth::id();
                 $cartDetail->products_services_book_id  = $productsServicesBook->id;
                 $cartDetail->sku                        = $productsServicesBook->sku;
-                $cartDetail->attribute_data             = (!empty($request->attribute_data)) ? json_encode($request->attribute_data) : null;
+                $cartDetail->attribute_data             = (!empty($request->attribute_data)) ? json_encode($request->attribute_data, JSON_UNESCAPED_UNICODE) : null;
                 $cartDetail->price                      = $price;
                 $cartDetail->discount                   = $discount;
                 $cartDetail->quantity                   = $quantity;
@@ -136,7 +136,7 @@ class CartDetailController extends Controller
                 $cartDetail->user_id                    = Auth::id();
                 $cartDetail->products_services_book_id  = $productsServicesBook->id;
                 $cartDetail->sku                        = $productsServicesBook->sku;
-                $cartDetail->attribute_data             = (!empty($request->attribute_data)) ? json_encode($request->attribute_data) : null;
+                $cartDetail->attribute_data             = (!empty($request->attribute_data)) ? json_encode($request->attribute_data, JSON_UNESCAPED_UNICODE) : null;
                 $cartDetail->price                      = $price;
                 $cartDetail->discount                   = $discount;
                 $cartDetail->quantity                   = $quantity;
