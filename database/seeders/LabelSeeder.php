@@ -485,7 +485,8 @@ class LabelSeeder extends Seeder
             "approved" => "Approved",
             "document_updated" => "Document Updated (Verification Pending)",
             "hold" => "On Hold",
-            "verified" => "Verified"
+            "verified" => "Verified",
+            "expired" => "Expired"
         ),
         "application_status_drop" => array(
             "pending" => "Pending",
@@ -2661,7 +2662,7 @@ class LabelSeeder extends Seeder
             "message_can_not_open_swish_app" => "Can not open swish app",
             "message_please_wait_payment_status" => "Please wait while we are getting your payment\'s status, do not press back or refresh",
             "message_recurring_alert_text" => "Recurring subscribtion will start automatically for this package after you buy it",
-            "message_student_detail_incomplete" => "Please complete your information by updating your profile and add at least one address.",
+            "message_student_detail_incomplete" => "Please complete your information by updating your profile and add at least one default address.",
             "message_stripe_account_success" => "Your stripe account successfully created",
             "message_coming_soon" => "Coming Soon",
             "message_user_account_status_update_alert_to_restart_app" => "Your account status is changed, click Ok to restart the app..!!",
@@ -2823,7 +2824,8 @@ class LabelSeeder extends Seeder
             "message_user_cv_presented" => "CV is published now.",
             "message_contest_completed_cannot_update" => "Contest is completed. cannot update.",
             "message_job_expired_cannot_update" => "Job is expired. cannot update.",
-            "message_registration_type_detail_created" => "Registration Type created successfully."
+            "message_registration_type_detail_created" => "Registration Type created successfully.",
+            "package_not_found_error"=>"Package not found, please reload the page and try again."
         ),
         "messages_screen" => array(
             "date" => "Date : ",
@@ -3055,6 +3057,7 @@ class LabelSeeder extends Seeder
         "notifications" => array(
             "title" => "Notifications",
             "no_data_found" => "Data Not Found.",
+            "mark_all_as_read"=> "Mark all as Read",
             "clear" => "Clear",
             "no_data" => "No Notifications"
         ),
@@ -3751,7 +3754,7 @@ class LabelSeeder extends Seeder
             "dispute_details" => "Dispute Details",
             "via" => "Via",
             "note_to_seller" => "Note To Seller : ",
-            "ss_commission" => "SS commission per sale",
+            "ss_commission" => "SS commission",
             "cool_company_commission" => "Cool Company Charges",
             "net_amount" => "Net amount",
             "reward_points" => "Reward Points",
