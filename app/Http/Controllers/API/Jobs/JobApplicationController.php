@@ -65,7 +65,7 @@ class JobApplicationController extends Controller
     		$jobApplication->job_id             = $request->job_id;
     		$jobApplication->user_cv_detail_id  = $request->user_cv_detail_id;
     		$jobApplication->job_title          = $request->job_title;
-    		$jobApplication->application_status = $request->application_status;
+    		$jobApplication->application_status = !empty($request->application_status) ? $request->application_status : 'pending';
     		$jobApplication->job_start_date     = $job_start_date;
     		$jobApplication->job_end_date       = $job_end_date;
     		$jobApplication->application_remark = $request->application_remark;
@@ -113,7 +113,7 @@ class JobApplicationController extends Controller
     	try
     	{
     		$jobApplication = JobApplication::find($id);
-    		$jobApplication->update(['application_status' => $request->application_status]);
+    		$jobApplication->update(['application_status' => !empty($request->application_status) ? $request->application_status : 'pending']);
             // Notification Start
 
             $title = 'Status Updated';

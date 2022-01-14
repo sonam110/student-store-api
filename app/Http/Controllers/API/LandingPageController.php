@@ -2406,8 +2406,7 @@ class LandingPageController extends Controller
                 //case 3
                 elseif(!empty($request->start_date) && !empty($request->end_date))
                 {
-                    $contests->whereDate('application_start_date', '>=', date('Y-m-d', strtotime($request->start_date)))
-                    ->whereDate('application_end_date', '<=', date('Y-m-d', strtotime($request->end_date)));
+                    $contests->whereDate('application_end_date', '<=', date('Y-m-d', strtotime($request->end_date)));
                 }
 
                 if(!empty($request->free_subscription))
