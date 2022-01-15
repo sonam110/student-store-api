@@ -439,14 +439,17 @@ class ProductsServicesBookController extends Controller
                     }
                 }
 
-                ProductTag::where('products_services_book_id',$productsServicesBook->id)->delete();
-                foreach ($request->tags as $key => $tag) {
-                    $allTypeTag 								= new ProductTag;
-                    $allTypeTag->products_services_book_id      = $productsServicesBook->id;
-                    $allTypeTag->user_id                        = $user_id;
-                    $allTypeTag->title                          = $tag;
-                    $allTypeTag->type                           = $request->type;
-                    $allTypeTag->save();
+                if(!empty($request->tags) && is_array($request->tags))
+                {
+                    ProductTag::where('products_services_book_id',$productsServicesBook->id)->delete();
+                    foreach ($request->tags as $key => $tag) {
+                        $allTypeTag 								= new ProductTag;
+                        $allTypeTag->products_services_book_id      = $productsServicesBook->id;
+                        $allTypeTag->user_id                        = $user_id;
+                        $allTypeTag->title                          = $tag;
+                        $allTypeTag->type                           = $request->type;
+                        $allTypeTag->save();
+                    }
                 }
             }
 
