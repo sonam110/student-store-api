@@ -800,7 +800,7 @@ class AuthController extends Controller
 		try
 		{
 			$user = User::find($request->user_id);
-			if(($request->contact_number == $user->guardian_contact_number) || ($request->contact_number == $user->guardian_email))
+			if(($request->contact_number == AES256::decrypt($user->guardian_contact_number, env('ENCRYPTION_KEY'))) || ($request->contact_number == AES256::decrypt($user->guardian_email, env('ENCRYPTION_KEY'))))
 			{
 				$user->guardian_password   = bcrypt($request->new_password);
 			}
