@@ -44,18 +44,18 @@ class UserProfileController extends Controller
 		try
 		{
 			$user = Auth::user();
-			if(($user->is_minor == true) && ($request->login_with_parent_data == false))
+			if(($user->is_minor == true) && ($request->login_with_guardian_data == false))
 			{
-				if(Hash::check($request->old_password,$user->guardian_password)) {
-					$user->guardian_password           = bcrypt($request->new_password);
+				if(Hash::check($request->old_password, $user->guardian_password)) 
+				{
+					$user->guardian_password = bcrypt($request->new_password);
 					if($user->save())
 					{
 						return response(prepareResult(false, $user, getLangByLabelGroups('messages','message_password_updated')), config('http_response.created'));
 					}
 					else
 					{
-						\Log::error($exception);
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+			            return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 					}
 				}
 				else
@@ -65,17 +65,16 @@ class UserProfileController extends Controller
 			}
 			else
 			{
-				if(Hash::check($request->old_password,$user->password)) 
+				if(Hash::check($request->old_password, $user->password)) 
 				{
-					$user->password           = bcrypt($request->new_password);
+					$user->password = bcrypt($request->new_password);
 					if($user->save())
 					{
 						return response(prepareResult(false, $user, getLangByLabelGroups('messages','message_password_updated')), config('http_response.created'));
 					}
 					else
 					{
-						\Log::error($exception);
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            			return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 					}
 				}
 				else
@@ -465,8 +464,7 @@ class UserProfileController extends Controller
 			}
 			else
 			{
-				\Log::error($exception);
-            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            	return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}
 		}
 		return response()->json(prepareResult(true, ['Already added.'], 'Already added.'), config('http_response.accepted'));
