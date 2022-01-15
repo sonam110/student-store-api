@@ -53,31 +53,12 @@ function getLangByLabelGroups($groupName, $label_name)
 
 function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,$module,$id,$screen)
 {
-	$userDeviceInfo = UserDeviceInfo::where('user_id',$user->id)->whereIn('platform',['Android','iOS'])->orderBy('created_at', 'DESC')->first();
-	if(!empty($userDeviceInfo))
-	{ 
-		if(!empty($userDeviceInfo->fcm_token))
-		{
-			$push = new PushNotification('fcm');
-			$push->setMessage([
-				"notification"=>[
-					'title' => $title,
-					'body'  => $body,
-					'sound' => 'default',
-					'android_channel_id' => '1',
-                    //'timestamp' => date('Y-m-d G:i:s')
-				],
-				'data'=>[
-					'id'  => $id,
-					'user_type'  => $user_type,
-					'module'  => $module,
-					'screen'  => $screen
-				]                        
-			])
-			->setApiKey(env('FIREBASE_KEY'))
-			->setDevicesToken($userDeviceInfo->fcm_token)
-			->send();
-			/*if($userDeviceInfo->platform=='Android')
+	if(!empty($user))
+	{
+		$userDeviceInfo = UserDeviceInfo::where('user_id',$user->id)->whereIn('platform',['Android','iOS'])->orderBy('created_at', 'DESC')->first();
+		if(!empty($userDeviceInfo))
+		{ 
+			if(!empty($userDeviceInfo->fcm_token))
 			{
 				$push = new PushNotification('fcm');
 				$push->setMessage([
@@ -98,49 +79,71 @@ function pushNotification($title,$body,$user,$type,$save_to_database,$user_type,
 				->setApiKey(env('FIREBASE_KEY'))
 				->setDevicesToken($userDeviceInfo->fcm_token)
 				->send();
+				/*if($userDeviceInfo->platform=='Android')
+				{
+					$push = new PushNotification('fcm');
+					$push->setMessage([
+						"notification"=>[
+							'title' => $title,
+							'body'  => $body,
+							'sound' => 'default',
+							'android_channel_id' => '1',
+		                    //'timestamp' => date('Y-m-d G:i:s')
+						],
+						'data'=>[
+							'id'  => $id,
+							'user_type'  => $user_type,
+							'module'  => $module,
+							'screen'  => $screen
+						]                        
+					])
+					->setApiKey(env('FIREBASE_KEY'))
+					->setDevicesToken($userDeviceInfo->fcm_token)
+					->send();
+				}
+				elseif($userDeviceInfo->platform=='iOS')
+				{
+					$push = new PushNotification('apn');
+
+					$push->setMessage([
+						'aps' => [
+			                'alert' => [
+			                    'title' => $title,
+			                    'body' => $body
+			                ],
+			                'sound' => 'default',
+			                'badge' => 1
+
+			            ],
+			            'extraPayLoad' => [
+			                'custom' => 'My custom data',
+			            ]                       
+					])
+					->setDevicesToken($userDeviceInfo->fcm_token);
+					$push = $push->send();
+					//return $push->getFeedback();
+				}*/
 			}
-			elseif($userDeviceInfo->platform=='iOS')
-			{
-				$push = new PushNotification('apn');
-
-				$push->setMessage([
-					'aps' => [
-		                'alert' => [
-		                    'title' => $title,
-		                    'body' => $body
-		                ],
-		                'sound' => 'default',
-		                'badge' => 1
-
-		            ],
-		            'extraPayLoad' => [
-		                'custom' => 'My custom data',
-		            ]                       
-				])
-				->setDevicesToken($userDeviceInfo->fcm_token);
-				$push = $push->send();
-				//return $push->getFeedback();
-			}*/
 		}
-	}
-	if($save_to_database == true)
-	{
-		$notification = new Notification;
-		$notification->user_id          = $user->id;
-		$notification->sender_id        = Auth::id();
-		$notification->device_uuid      = $userDeviceInfo ? $userDeviceInfo->device_uuid : null;
-		$notification->device_platform  = $userDeviceInfo ? $userDeviceInfo->platform : null;
-		$notification->type             = $type;
-		$notification->user_type        = $user_type;
-		$notification->module           = $module;
-		$notification->title            = $title;
-		$notification->sub_title        = $title;
-		$notification->message          = $body;
-		$notification->image_url        = '';
-		$notification->screen        	= $screen;
-		$notification->data_id        	= $id;
-		$notification->read_status      = false;
-		$notification->save();
+		if($save_to_database == true)
+		{
+			$notification = new Notification;
+			$notification->user_id          = $user->id;
+			$notification->sender_id        = Auth::id();
+			$notification->device_uuid      = $userDeviceInfo ? $userDeviceInfo->device_uuid : null;
+			$notification->device_platform  = $userDeviceInfo ? $userDeviceInfo->platform : null;
+			$notification->type             = $type;
+			$notification->user_type        = $user_type;
+			$notification->module           = $module;
+			$notification->title            = $title;
+			$notification->sub_title        = $title;
+			$notification->message          = $body;
+			$notification->image_url        = '';
+			$notification->screen        	= $screen;
+			$notification->data_id        	= $id;
+			$notification->read_status      = false;
+			$notification->save();
+		}
 	}
 }
 
