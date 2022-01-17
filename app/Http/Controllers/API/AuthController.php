@@ -804,8 +804,8 @@ class AuthController extends Controller
 			{
 				if($user->is_minor==1)
 				{
-					\Log::info(AES256::decrypt($user->guardian_contact_number, env('ENCRYPTION_KEY'))));
-					\Log::info(AES256::decrypt($user->guardian_email, env('ENCRYPTION_KEY'))));
+					\Log::info(AES256::decrypt($user->guardian_contact_number, env('ENCRYPTION_KEY')));
+					\Log::info(AES256::decrypt($user->guardian_email, env('ENCRYPTION_KEY')));
 
 					if(($request->contact_number == AES256::decrypt($user->guardian_contact_number, env('ENCRYPTION_KEY'))) || ($request->contact_number == AES256::decrypt($user->guardian_email, env('ENCRYPTION_KEY'))))
 					{
