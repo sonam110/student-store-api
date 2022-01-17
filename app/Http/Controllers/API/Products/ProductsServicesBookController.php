@@ -2842,23 +2842,23 @@ class ProductsServicesBookController extends Controller
         $content->lang_id = $request->lang_id;
         $student_book_promotions = $this->studentBooksFilter($content);
         
-        $content = new Request();
+        /*$content = new Request();
         $content->is_used_item = 'yes';
         $content->type = 'book';
         $content->searchType = 'bestSelling';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
         $content->lang_id = $request->lang_id;
-        $student_book_best_selling = $this->studentBooksFilter($content);
+        $student_book_best_selling = $this->studentBooksFilter($content);*/
         
-        $content = new Request();
+        $/*content = new Request();
         $content->is_used_item = 'yes';
         $content->type = 'book';
         $content->searchType = 'topRated';
         $content->per_page_record = '5';
         $content->other_function = 'yes';
         $content->lang_id = $request->lang_id;
-        $student_book_top_rated = $this->studentBooksFilter($content);
+        $student_book_top_rated = $this->studentBooksFilter($content);*/
         
         $content = new Request();
         $content->is_used_item = 'yes';
@@ -2881,8 +2881,8 @@ class ProductsServicesBookController extends Controller
         $returnObj = [
                 'books' => [
                     'student_book_promotions'    => $student_book_promotions, 
-                    'student_book_best_selling'  => $student_book_best_selling, 
-                    'student_book_top_rated'     => $student_book_top_rated,
+                    //'student_book_best_selling'  => $student_book_best_selling, 
+                    //'student_book_top_rated'     => $student_book_top_rated,
                     'student_book_random'        => $student_book_random, 
                     'student_book_latest'        => $student_book_latest,
                     'student_book_popular'       => $student_book_random 
