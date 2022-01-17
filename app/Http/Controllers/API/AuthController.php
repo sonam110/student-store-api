@@ -802,22 +802,16 @@ class AuthController extends Controller
 			$user = User::find($request->user_id);
 			if($user)
 			{
+				$contact_number = str_replace(' ', '', $request->contact_number);
 				if($user->is_minor==1)
 				{
-					\Log::info(AES256::decrypt($user->guardian_contact_number, env('ENCRYPTION_KEY')));
-					\Log::info(AES256::decrypt($user->guardian_email, env('ENCRYPTION_KEY')));
-					\Log::info($request->all());
-
-					if(($request->contact_number == AES256::decrypt($user->guardian_contact_number, env('ENCRYPTION_KEY'))) || ($request->contact_number == AES256::decrypt($user->guardian_email, env('ENCRYPTION_KEY'))))
+					if(($contact_number == AES256::decrypt($user->guardian_contact_number, env('ENCRYPTION_KEY'))) || ($contact_number == AES256::decrypt($user->guardian_email, env('ENCRYPTION_KEY'))))
 					{
-
 						$user->guardian_password   = bcrypt($request->new_password);
-						\Log::info('guardian_password');
 					}
 					else
 					{
 						$user->password   = bcrypt($request->new_password);
-						\Log::info('password');
 					}
 				}
 				else
