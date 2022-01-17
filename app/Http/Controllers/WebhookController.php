@@ -131,7 +131,10 @@ class WebhookController extends Controller
     {
         Log::channel('webhook')->info('subscription_id');
         Log::channel('webhook')->info($subscription_id);
-        $subscribedPackage = UserPackageSubscription::where('subscription_id', $subscription_id)->where('subscription_status', 1)->orderBy('auto_id', 'DESC')->first();
+        $subscribedPackage = UserPackageSubscription::where('subscription_status', 1)
+            ->where('subscription_id', $subscription_id)
+            ->orderBy('auto_id', 'DESC')
+            ->first();
         if($subscribedPackage)
         {
             $findUser = User::where('stripe_customer_id', $subscriptionSchedule->customer)->first();
@@ -223,6 +226,9 @@ class WebhookController extends Controller
                     $orderItem->save();
 
                     // create UserPackageSubscription
+
+                    \Log::info('trigger webhook and added new userPackageSubscription. please recheck');
+                    \Log::info($subscribedPackage);
                     $userPackageSubscription = new UserPackageSubscription;
                     $userPackageSubscription->user_id = $userInfo->id;
                     $userPackageSubscription->subscription_id = $subscribedPackage->subscription_id;
@@ -259,7 +265,7 @@ class WebhookController extends Controller
                     $userPackageSubscription->range_of_age          = $subscribedPackage->range_of_age;
                     $userPackageSubscription->cost_for_each_attendee= $subscribedPackage->cost_for_each_attendee;
                     $userPackageSubscription->top_up_fee            = $subscribedPackage->top_up_fee;
-                    $userPackageSubscription->is_recurring_transaction = 1;
+                    $userPackageSubscription->is_recurring_transactionis_recurring_transaction = 1;
                     $userPackageSubscription->stripe_invoice_id = $subscriptionSchedule->latest_invoice;
                     $userPackageSubscription->save();
 
