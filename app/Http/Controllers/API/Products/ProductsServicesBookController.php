@@ -2141,23 +2141,23 @@ class ProductsServicesBookController extends Controller
         $content->lang_id = $request->lang_id;
         $student_product_promotions = $this->studentProductsFilter($content);
         
-        $content = new Request();
-        $content->is_used_item = 'yes';
-        $content->type = 'product';
-        $content->searchType = 'bestSelling';
-        $content->per_page_record = '5';
-        $content->other_function = 'yes';
-        $content->lang_id = $request->lang_id;
-        $student_product_best_selling = $this->studentProductsFilter($content);
+        // $content = new Request();
+        // $content->is_used_item = 'yes';
+        // $content->type = 'product';
+        // $content->searchType = 'bestSelling';
+        // $content->per_page_record = '5';
+        // $content->other_function = 'yes';
+        // $content->lang_id = $request->lang_id;
+        // $student_product_best_selling = $this->studentProductsFilter($content);
         
-        $content = new Request();
-        $content->is_used_item = 'yes';
-        $content->type = 'product';
-        $content->searchType = 'topRated';
-        $content->per_page_record = '5';
-        $content->other_function = 'yes';
-        $content->lang_id = $request->lang_id;
-        $student_product_top_rated = $this->studentProductsFilter($content);
+        // $content = new Request();
+        // $content->is_used_item = 'yes';
+        // $content->type = 'product';
+        // $content->searchType = 'topRated';
+        // $content->per_page_record = '5';
+        // $content->other_function = 'yes';
+        // $content->lang_id = $request->lang_id;
+        // $student_product_top_rated = $this->studentProductsFilter($content);
         
         $content = new Request();
         $content->is_used_item = 'yes';
@@ -2260,14 +2260,14 @@ class ProductsServicesBookController extends Controller
         $content->lang_id = $request->lang_id;
         $student_book_popular = $this->studentBooksFilter($content);
         
-        $content = new Request();
-        $content->type = 'book';
-        $content->is_used_item = 'yes';
-        $content->searchType = 'topRated';
-        $content->per_page_record = '5';
-        $content->other_function = 'yes';
-        $content->lang_id = $request->lang_id;
-        $student_book_top_rated = $this->studentBooksFilter($content);
+        // $content = new Request();
+        // $content->type = 'book';
+        // $content->is_used_item = 'yes';
+        // $content->searchType = 'topRated';
+        // $content->per_page_record = '5';
+        // $content->other_function = 'yes';
+        // $content->lang_id = $request->lang_id;
+        // $student_book_top_rated = $this->studentBooksFilter($content);
         
         $content = new Request();
         $content->type = 'book';
@@ -2278,20 +2278,20 @@ class ProductsServicesBookController extends Controller
         $content->lang_id = $request->lang_id;
         $student_book_random = $this->studentBooksFilter($content);
 
-        $content = new Request();
-        $content->type = 'book';
-        $content->searchType = 'bestSelling';
-        $content->per_page_record = '5';
-        $content->other_function = 'yes';
-        $content->lang_id = $request->lang_id;
-        $student_book_best_selling = $this->studentBooksFilter($content);
+        // $content = new Request();
+        // $content->type = 'book';
+        // $content->searchType = 'bestSelling';
+        // $content->per_page_record = '5';
+        // $content->other_function = 'yes';
+        // $content->lang_id = $request->lang_id;
+        // $student_book_best_selling = $this->studentBooksFilter($content);
         
         
         $returnObj = [
                 'products' => [
                     'student_product_promotions'    => $student_product_promotions, 
-                    'student_product_best_selling'  => $student_product_best_selling, 
-                    'student_product_top_rated'     => $student_product_top_rated,
+                    //'student_product_best_selling'  => $student_product_best_selling, 
+                    //'student_product_top_rated'     => $student_product_top_rated,
                     'student_product_random'        => $student_product_random, 
                     'student_product_latest'        => $student_product_latest,
                     'student_product_popular'       => $student_product_popular 
@@ -2308,9 +2308,9 @@ class ProductsServicesBookController extends Controller
                     'student_book_promotions'    => $student_book_promotions, 
                     'student_book_latest'        => $student_book_latest, 
                     'student_book_popular'       => $student_book_popular,
-                    'student_book_top_rated'     => $student_book_top_rated, 
+                    //'student_book_top_rated'     => $student_book_top_rated, 
                     'student_book_random'        => $student_book_random,
-                    'student_book_best_selling'  => $student_book_best_selling
+                    //'student_book_best_selling'  => $student_book_best_selling
                 ]
             ];
         
