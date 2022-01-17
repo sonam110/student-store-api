@@ -845,12 +845,16 @@ class ContestController extends Controller
         try
         {
             $contest = Contest::find($contest_id);
-            if($contest->contestApplications->count() > 0)
+            if($contest)
             {
-                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','messages_contest_applicatons_exists')), config('http_response.success'));
+                if($contest->contestApplications->count() > 0)
+                {
+                    return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','messages_contest_applicatons_exists')), config('http_response.success'));
+                }
+                $contest->delete();
+                return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','messages_contest_deleted')), config('http_response.success'));
             }
-            $contest->delete();
-            return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','messages_contest_deleted')), config('http_response.success'));
+            return response()->json(prepareResult(true, [], getLangByLabelGroups('contest_home_page','no_data_found')), config('http_response.not_found'));
         }
         catch (\Throwable $exception) 
         {

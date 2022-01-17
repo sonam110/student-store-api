@@ -1360,23 +1360,23 @@ class ProductsServicesBookController extends Controller
                 if($products->count() <= 0)
                 {
                 	 $products = ProductsServicesBook::select('products_services_books.*')
-					            //->where('products_services_books.user_id', '!=', Auth::id())
-					            ->where('products_services_books.status', '2')
-					            ->where('products_services_books.type', $type)
-					            ->where('products_services_books.is_published', '1')
-                                ->where('products_services_books.quantity','>' ,'0')
-                	 			->withCount('orderItems')->orderBy('order_items_count','desc')
-					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
-                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '1');
-                                }])
-                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '0');
-                                }]); 
+			            //->where('products_services_books.user_id', '!=', Auth::id())
+			            ->where('products_services_books.status', '2')
+			            ->where('products_services_books.type', $type)
+			            ->where('products_services_books.is_published', '1')
+                        ->where('products_services_books.quantity','>' ,'0')
+        	 			->withCount('orderItems')->orderBy('order_items_count','desc')
+			            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '1');
+                        }])
+                        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '0');
+                        }]); 
                         if($request->is_used_item!='both')
                         {
                             if($request->is_used_item=='yes')
@@ -2089,6 +2089,15 @@ class ProductsServicesBookController extends Controller
         $content->other_function = 'yes';
         $content->lang_id = $request->lang_id;
         $company_book_random = $this->companyBooksFilter($content);
+
+        $content = new Request();
+        $content->type = 'book';
+        $content->is_used_item = 'no';
+        $content->searchType = 'bestSelling';
+        $content->per_page_record = '5';
+        $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
+        $company_book_best_selling = $this->companyBooksFilter($content);
         
         
         $returnObj = [
@@ -2114,7 +2123,7 @@ class ProductsServicesBookController extends Controller
                     'company_book_popular'       => $company_book_popular,
                     'company_book_top_rated'     => $company_book_top_rated, 
                     'company_book_random'        => $company_book_random,
-                    'company_book_best_selling'  => $company_book_random
+                    'company_book_best_selling'  => $company_book_best_selling
                 ]
             ];
         
@@ -2311,26 +2320,30 @@ class ProductsServicesBookController extends Controller
             }
 
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
-            $similarProducts = ProductsServicesBook::where('status', '2')->where('id','!=', $request->product_id)->where('sub_category_slug', $productsServicesBooks->sub_category_slug)->where('is_used_item', $productsServicesBooks->is_used_item)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
-            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                $q->select('id','category_master_id','title','slug')
-                    ->where('language_id', $lang_id)
-                    ->where('is_parent', '1');
-            }])
-            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                $q->select('id','category_master_id','title','slug')
-                    ->where('language_id', $lang_id)
-                    ->where('is_parent', '0');
-            }]);
-            if(!empty($request->per_page_record))
+            if($productsServicesBooks)
             {
-                $similarProducts = $similarProducts->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $similarProducts = ProductsServicesBook::where('status', '2')->where('id','!=', $request->product_id)->where('sub_category_slug', $productsServicesBooks->sub_category_slug)->where('is_used_item', $productsServicesBooks->is_used_item)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }]);
+                if(!empty($request->per_page_record))
+                {
+                    $similarProducts = $similarProducts->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                }
+                else
+                {
+                    $similarProducts = $similarProducts->get();
+                }
+                return response(prepareResult(false, $similarProducts, getLangByLabelGroups('messages','messages_products_services_book_list')), config('http_response.success'));
             }
-            else
-            {
-                $similarProducts = $similarProducts->get();
-            }
-            return response(prepareResult(false, $similarProducts, getLangByLabelGroups('messages','messages_products_services_book_list')), config('http_response.success'));
+            return response()->json(prepareResult(true, [], getLangByLabelGroups('contest_home_page','no_data_found')), config('http_response.not_found'));
         }
         catch (\Throwable $exception) 
         {

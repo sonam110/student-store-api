@@ -1187,6 +1187,14 @@ class LandingPageController extends Controller
         $content->other_function = 'yes';
         $content->lang_id = $request->lang_id;
         $company_book_random = $this->companyBooksFilter($content);
+
+        $content = new Request();
+        $content->type = 'book';
+        $content->searchType = 'bestSelling';
+        $content->per_page_record = '5';
+        $content->other_function = 'yes';
+        $content->lang_id = $request->lang_id;
+        $company_book_best_selling = $this->companyBooksFilter($content);
         
         
         $returnObj = [
@@ -1212,7 +1220,7 @@ class LandingPageController extends Controller
                     'company_book_popular'       => $company_book_popular,
                     'company_book_top_rated'     => $company_book_top_rated, 
                     'company_book_random'        => $company_book_random,
-                    'company_book_best_selling'  => $company_book_random
+                    'company_book_best_selling'  => $company_book_best_selling
                 ]
             ];
         
