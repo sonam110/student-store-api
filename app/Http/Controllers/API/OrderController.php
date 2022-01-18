@@ -2687,12 +2687,7 @@ class OrderController extends Controller
 					);
 				}
 			}
-
-			//update price if package changed
-            $type = $checkPackage->module;
-            $userID = Auth::id();
-            packageUpdatePrice($type, $userID);
-
+			
 			return response(prepareResult(false, $returnObj, 'Subscription Canceled.'), config('http_response.success'));
 		}
 		return response()->json(prepareResult(true, 'Package not found.', getLangByLabelGroups('messages','package_not_found_error')), config('http_response.not_found'));
