@@ -2645,14 +2645,12 @@ class OrderController extends Controller
 		
 		if($checkPackage)
 		{
-			$user_package = UserPackageSubscription::where('package_id', $checkPackage->id)
-				->where('user_id', Auth::id())
+			$user_package = UserPackageSubscription::where('user_id', Auth::id())
 				->whereNotNull('subscription_id')
 				->where('payby','stripe')
 				->where('is_canceled', 0)
 				->orderBy('auto_id', 'DESC')
 				->first();
-			\Log::info($user_package);
 		
 			$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 			$subscription = $stripe->subscriptions->create([
@@ -2681,7 +2679,6 @@ class OrderController extends Controller
 				//if success then unsubscribe same package which is already subscribed
 				if($user_package)
 				{
-					\Log::info('$user_package found and try to cancel');
 					$user_package->is_canceled = 1;
 					$user_package->subscription_status = 0;
 					$user_package->canceled_date = date('Y-m-d');
@@ -2692,7 +2689,6 @@ class OrderController extends Controller
 					  	$user_package->subscription_id,
 					  	[]
 					);
-					\Log::info($cancelSubscription);
 				}
 			/*}*/
 			
