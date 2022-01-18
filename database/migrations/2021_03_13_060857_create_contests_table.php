@@ -68,19 +68,19 @@ class CreateContestsTable extends Migration
             $table->string('condition_file_path')->nullable();
             $table->text('jury_members')->nullable();
             $table->boolean('is_free')->default(false)->nullable();
-            $table->float('basic_price_wo_vat')->nullable()->comment('this is basic price without vat');
-            $table->float('subscription_fees')->nullable()->default('0');
+            $table->double('basic_price_wo_vat', 12, 2)->nullable()->comment('this is basic price without vat');
+            $table->double('subscription_fees', 12, 2)->nullable()->default('0');
             $table->boolean('use_cancellation_policy')->nullable();
             $table->boolean('provide_participation_certificate')->nullable();
             $table->boolean('is_on_offer')->default(false)->nullable();
             $table->string('discount_type',100)->nullable();
-            $table->float('discount_value')->nullable();
-            $table->float('discounted_price')->nullable();
+            $table->double('discount_value', 12, 2)->nullable();
+            $table->double('discounted_price', 12, 2)->nullable();
 
-            $table->float('vat_percentage')->nullable()->default(0);
-            $table->float('vat_amount')->nullable()->default(0);
-            $table->float('ss_commission_percent')->nullable()->default(0);
-            $table->float('ss_commission_amount')->nullable()->default(0);
+            $table->double('vat_percentage', 12, 2)->nullable()->default(0);
+            $table->double('vat_amount', 12, 2)->nullable()->default(0);
+            $table->double('ss_commission_percent', 12, 2)->nullable()->default(0);
+            $table->double('ss_commission_amount', 12, 2)->nullable()->default(0);
             
             $table->boolean('is_published')->default(false)->nullable();
             $table->dateTime('published_at')->nullable();

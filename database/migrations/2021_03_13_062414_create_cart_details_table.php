@@ -23,10 +23,10 @@ class CreateCartDetailsTable extends Migration
             $table->foreign('products_services_book_id')->references('id')->on('products_services_books')->onDelete('cascade');
 
             $table->string('sku',100)->nullable();
-            $table->float('price')->nullable();
+            $table->double('price', 12, 2)->nullable();
             $table->string('discount')->nullable();
             $table->bigInteger('quantity')->nullable();
-            $table->float('sub_total')->nullable();
+            $table->double('sub_total', 12, 2)->nullable();
             $table->string('item_status',100)->nullable();
             $table->text('note_to_seller')->nullable();
             $table->longText('attribute_data')->nullable();

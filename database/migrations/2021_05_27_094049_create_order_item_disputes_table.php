@@ -26,7 +26,7 @@ class CreateOrderItemDisputesTable extends Migration
             $table->string('products_services_book_id', 50);
             $table->foreign('products_services_book_id')->references('id')->on('products_services_books')->onDelete('cascade');
             $table->bigInteger('quantity')->nullable();
-            $table->float('amount_to_be_returned')->nullable();
+            $table->double('amount_to_be_returned', 12, 2)->nullable();
             $table->text('reason_id_for_dispute')->nullable();
             $table->string('dispute')->nullable();
             $table->string('reply')->nullable();

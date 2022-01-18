@@ -33,7 +33,7 @@ class CreateServiceProviderDetailsTable extends Migration
             $table->string('vat_number',50)->nullable();
             $table->string('vat_registration_file_path',200)->nullable();
             $table->integer('year_of_establishment')->nullable();
-            $table->float('avg_rating')->nullable();
+            $table->double('avg_rating', 12, 2)->nullable();
             $table->boolean('status')->default(false)->nullable();
             $table->timestamps();
         });

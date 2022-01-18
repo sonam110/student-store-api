@@ -22,7 +22,7 @@ class CreateContestCancellationRangesTable extends Migration
 
             $table->string('from',100);
             $table->string('to',100);
-            $table->float('deduct_percentage_value',100);
+            $table->double('deduct_percentage_value', 12, 2);
             $table->timestamps();
         });
     }

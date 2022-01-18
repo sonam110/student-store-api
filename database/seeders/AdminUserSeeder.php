@@ -24,14 +24,14 @@ class AdminUserSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('languages')->truncate();
+        DB::table('languages')->delete();
         $language = new Language;
         $language->title                = 'English';
         $language->value                = 'en';
         $language->status               = true;
         $language->save();
 
-    	DB::table('reward_point_settings')->truncate();
+    	DB::table('reward_point_settings')->delete();
 		$rewardPointSetting = new RewardPointSetting;
 		$rewardPointSetting->reward_points             	= "10";
 		$rewardPointSetting->equivalent_currency_value 	= "1";
@@ -46,7 +46,7 @@ class AdminUserSeeder extends Seeder
 		$rewardPointSetting->status      				= true;
 		$rewardPointSetting->save();
 
-    	DB::table('app_settings')->truncate();
+    	DB::table('app_settings')->delete();
     	$appSetting             				= new AppSetting();
     	$appSetting->reward_point_setting_id   = $rewardPointSetting->id;
         $appSetting->app_name   = 'Student Store';
@@ -74,7 +74,7 @@ class AdminUserSeeder extends Seeder
     	$appSetting->save();
 
 
-        DB::table('user_types')->truncate();
+        DB::table('user_types')->delete();
         $userType = new UserType;
         $userType->title                = 'Admin';
         $userType->description          = 'Can perform every action';
@@ -95,7 +95,7 @@ class AdminUserSeeder extends Seeder
         $userType->description          = 'Limited access';
         $userType->save();
 
-    	DB::table('users')->truncate();
+    	DB::table('users')->delete();
     	$user 							= new User();
     	$user->user_type_id      		= '1';
     	$user->language_id      		= '1';
@@ -131,7 +131,7 @@ class AdminUserSeeder extends Seeder
     	$userAddressDetail->save();
 
         //registration_types
-        DB::table('registration_types')->truncate();
+        DB::table('registration_types')->delete();
         $regType = 'Printing and Packaging, Art, Marketing, Real Estate, Business, Educational, Health, Retail, Sports, Tourism & Entertainment Sector, Electronics, Work';
 
         $serviceproviders[0] = 'Printing & Packaging,Printing,Packaging';

@@ -27,7 +27,7 @@ class CreateStudentDetailsTable extends Migration
             $table->smallInteger('no_of_years_of_study')->nullable();
             $table->string('student_id_card_img_path',191)->default('https://www.nrtsms.com/images/no-image.png')->nullable();
             $table->bigInteger('completion_year')->nullable();
-            $table->float('avg_rating')->nullable();
+            $table->double('avg_rating', 12, 2)->nullable();
             $table->boolean('status')->default(false)->nullable();
             $table->string('cool_company_id', 50)->nullable();
             $table->timestamps();

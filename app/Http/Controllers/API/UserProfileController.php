@@ -297,6 +297,13 @@ class UserProfileController extends Controller
 			$userPackageSubscription->cost_for_each_attendee= $package->cost_for_each_attendee;
 			$userPackageSubscription->top_up_fee            = $package->top_up_fee;
 			$userPackageSubscription->save();
+			if($userPackageSubscription)
+            {
+                //update price if package changed
+                $type = $userPackageSubscription->module;
+                $userID = $package->user_id;
+                packageUpdatePrice($type, $userID);
+            }
 		}
 		$user = Auth::user();
 

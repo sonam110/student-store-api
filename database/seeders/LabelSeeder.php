@@ -16,8 +16,8 @@ class LabelSeeder extends Seeder
      */
     public function run()
     {
-      DB::table('labels')->truncate();
-      DB::table('label_groups')->truncate();
+      DB::table('labels')->delete();
+      DB::table('label_groups')->delete();
 
       $labels = array(
         "products" => array(

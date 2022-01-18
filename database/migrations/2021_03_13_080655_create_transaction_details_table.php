@@ -36,7 +36,7 @@ class CreateTransactionDetailsTable extends Migration
             $table->string('transaction_type',100)->nullable();
             $table->string('transaction_mode',100)->nullable();
             $table->string('transaction_status')->nullable();
-            $table->float('transaction_amount')->nullable();
+            $table->double('transaction_amount', 12 ,2)->nullable();
             $table->string('gateway_detail',100)->nullable();
 
             $table->string('transaction_timestamp',50)->nullable();

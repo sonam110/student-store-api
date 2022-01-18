@@ -33,19 +33,19 @@ class CreateProductsServicesBooksTable extends Migration
             $table->string('title')->nullable();
             $table->string('slug')->nullable();
 
-            $table->float('basic_price_wo_vat')->nullable()->comment('this is basic price without vat');
-            $table->float('price')->nullable()->comment('this is price with vat before applied discount');
-            $table->float('discounted_price')->nullable()->comment('this is price with vat after applied discount');
+            $table->double('basic_price_wo_vat', 12, 2)->nullable()->comment('this is basic price without vat');
+            $table->double('price', 12, 2)->nullable()->comment('this is price with vat before applied discount');
+            $table->double('discounted_price', 12, 2)->nullable()->comment('this is price with vat after applied discount');
             $table->boolean('is_on_offer')->default(0);
             $table->integer('discount_type')->nullable()->comment('0:fixed amount, 1:percentage');
-            $table->float('discount_value')->nullable()->comment('amount or percentage value');
-            $table->float('vat_percentage')->nullable()->default(0);
-            $table->float('vat_amount')->nullable()->default(0);
-            $table->float('ss_commission_percent')->nullable()->default(0);
-            $table->float('ss_commission_amount')->nullable()->default(0);
-            $table->float('cc_commission_percent_all')->nullable()->default(0);
-            $table->float('cc_commission_amount_all')->nullable()->default(0);
-            $table->float('shipping_charge')->nullable()->default(0)->comment('for product and book');
+            $table->double('discount_value', 12, 2)->nullable()->comment('amount or percentage value');
+            $table->double('vat_percentage', 12, 2)->nullable()->default(0);
+            $table->double('vat_amount', 12, 2)->nullable()->default(0);
+            $table->double('ss_commission_percent', 12, 2)->nullable()->default(0);
+            $table->double('ss_commission_amount', 12, 2)->nullable()->default(0);
+            $table->double('cc_commission_percent_all', 12, 2)->nullable()->default(0);
+            $table->double('cc_commission_amount_all', 12, 2)->nullable()->default(0);
+            $table->double('shipping_charge', 12, 2)->nullable()->default(0)->comment('for product and book');
 
             $table->bigInteger('quantity')->nullable()->default(0);
 
@@ -55,7 +55,7 @@ class CreateProductsServicesBooksTable extends Migration
             $table->text('meta_description')->nullable();
 
             $table->string('sell_type',50)->nullable()->comment('for books: free, for_sale, for_rent');
-            $table->float('deposit_amount')->nullable()->comment('if sell_type is for_rent');
+            $table->double('deposit_amount', 12, 2)->nullable()->comment('if sell_type is for_rent');
             $table->boolean('is_used_item')->nullable()->default(0)->comment('for Books - 0:No, 1:Yes');
             $table->string('item_condition', 20)->nullable()->comment('current condition of the item in percentage.');
             $table->string('author')->nullable()->comment('Author information');
@@ -92,7 +92,7 @@ class CreateProductsServicesBooksTable extends Migration
 
             $table->boolean('is_published')->nullable()->default('0');
             $table->dateTime('published_at')->nullable();
-            $table->float('avg_rating')->nullable();
+            $table->double('avg_rating', 12, 2)->nullable();
             $table->bigInteger('view_count')->nullable();
 
             $table->boolean('is_reward_point_applicable')->nullable()->default(false);

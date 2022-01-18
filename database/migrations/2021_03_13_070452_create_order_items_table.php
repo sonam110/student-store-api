@@ -34,9 +34,9 @@ class CreateOrderItemsTable extends Migration
             $table->string('title',100)->nullable();
             $table->string('sku',100)->nullable();
             $table->longText('attribute_data')->nullable();
-            $table->float('price')->nullable();
-            $table->float('used_item_reward_points')->default(0)->nullable();
-            $table->float('price_after_apply_reward_points')->default(0)->nullable();
+            $table->double('price', 12, 2)->nullable();
+            $table->double('used_item_reward_points', 12, 2)->default(0)->nullable();
+            $table->double('price_after_apply_reward_points', 12, 2)->default(0)->nullable();
             $table->bigInteger('quantity')->nullable();
             $table->string('discount')->nullable();
             $table->string('sell_type',100)->nullable();
@@ -51,8 +51,8 @@ class CreateOrderItemsTable extends Migration
             $table->string('delivery_type', 50)->nullable();
             $table->integer('delivery_code')->nullable();
             $table->dateTime('return_applicable_date')->nullable();
-            $table->float('amount_returned')->nullable();
-            $table->float('canceled_refunded_amount')->nullable();
+            $table->double('amount_returned', 12, 2)->nullable();
+            $table->double('canceled_refunded_amount', 12, 2)->nullable();
             $table->integer('returned_rewards')->nullable();
             $table->boolean('is_returned')->nullable()->default(0);
             $table->boolean('is_replaced')->nullable()->default(0);
@@ -77,16 +77,16 @@ class CreateOrderItemsTable extends Migration
             $table->date('sent_to_cool_company_date')->nullable();
 
             $table->boolean('is_transferred_to_vendor')->nullable()->default(0);
-            $table->decimal('amount_transferred_to_vendor', 12,2)->default(0)->nullable();
+            $table->double('amount_transferred_to_vendor', 12,2)->default(0)->nullable();
             $table->string('fund_transferred_date', 50)->nullable();
             
-            $table->decimal('student_store_commission', 12,2)->default(0)->nullable();
-            $table->decimal('cool_company_commission', 12,2)->default(0)->nullable();
+            $table->double('student_store_commission', 12,2)->default(0)->nullable();
+            $table->double('cool_company_commission', 12,2)->default(0)->nullable();
 
-            $table->decimal('student_store_commission_percent', 12,2)->default(0)->nullable();
-            $table->decimal('cool_company_commission_percent', 12,2)->default(0)->nullable();
-            $table->decimal('vat_percent', 12,2)->default(0)->nullable();
-            $table->decimal('vat_amount', 12,2)->default(0)->nullable();
+            $table->double('student_store_commission_percent', 12,2)->default(0)->nullable();
+            $table->double('cool_company_commission_percent', 12,2)->default(0)->nullable();
+            $table->double('vat_percent', 12,2)->default(0)->nullable();
+            $table->double('vat_amount', 12,2)->default(0)->nullable();
 
             $table->timestamps();
         });

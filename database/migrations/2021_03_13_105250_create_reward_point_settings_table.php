@@ -17,7 +17,7 @@ class CreateRewardPointSettingsTable extends Migration
             $table->bigInteger('auto_id');
             $table->uuid('id')->primary();
             $table->bigInteger('reward_points')->nullable();
-            $table->float('equivalent_currency_value')->nullable();
+            $table->double('equivalent_currency_value', 12 ,2)->nullable();
             $table->dateTime('applicable_from')->nullable();
             $table->dateTime('applicable_to')->nullable();
             $table->string('min_range',200)->nullable();
