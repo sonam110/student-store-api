@@ -608,9 +608,11 @@ function updatePrice($categoryID, $vat_percentage, $type)
 
 function packageUpdatePrice($type, $userID)
 {
+	\Log::info($type, $userID);
 	// Update product price
 	$items = ProductsServicesBook::where('user_id', $userID)->where('type', $type)->get();
 	foreach ($items as $key => $item) {
+		\Log::info($item);
 		$getCommVal = updateCommissions($item->basic_price_wo_vat, $item->is_on_offer, $item->discount_type, $item->discount_value, $item->categoryMaster->vat, $item->user_id, $item->type);
 
 		//update Price
@@ -623,6 +625,7 @@ function packageUpdatePrice($type, $userID)
     $item->cc_commission_percent_all = $getCommVal['totalCCPercent'];
     $item->cc_commission_amount_all = $getCommVal['totalCCAmount'];
     $item->save();
+    \Log::info($getCommVal);
 	}
 
 	//Update Contest Price

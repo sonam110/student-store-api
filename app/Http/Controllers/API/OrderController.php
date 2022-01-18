@@ -2686,7 +2686,6 @@ class OrderController extends Controller
 					  	[]
 					);
 				}
-				\Log::info('createStripeSubscription triggered');
 			/*}*/
 			
 			return response(prepareResult(false, $returnObj, 'Subscription Canceled.'), config('http_response.success'));
