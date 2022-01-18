@@ -608,7 +608,8 @@ function updatePrice($categoryID, $vat_percentage, $type)
 
 function packageUpdatePrice($type, $userID)
 {
-	\Log::info($type, $userID);
+	\Log::info($type);
+	\Log::info($userID);
 	// Update product price
 	$items = ProductsServicesBook::where('user_id', $userID)->where('type', $type)->get();
 	foreach ($items as $key => $item) {

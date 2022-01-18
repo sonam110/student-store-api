@@ -300,7 +300,7 @@ class UserProfileController extends Controller
 			if($userPackageSubscription)
             {
                 //update price if package changed
-                $type = $userPackageSubscription->module;
+                $type = $package->module;
                 $userID = $package->user_id;
                 packageUpdatePrice($type, $userID);
             }
