@@ -2652,14 +2652,7 @@ class OrderController extends Controller
 				->where('is_canceled', 0)
 				->orderBy('auto_id', 'DESC')
 				->first();
-			\Log::info(UserPackageSubscription::where('package_id', $checkPackage->id)
-				->where('user_id', Auth::id())
-				->whereNotNull('subscription_id')
-				->where('payby','stripe')
-				->where('is_canceled', 0)
-				->orderBy('auto_id', 'DESC')
-				->toSql());
-			die;
+			\Log::info($user_package);
 		
 			$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
 			$subscription = $stripe->subscriptions->create([
