@@ -558,6 +558,7 @@ class JobController extends Controller
                 //     ->where('application_end_date','>=', date('Y-m-d'))
                 //     ->inRandomOrder();
                 $jobs->where('application_end_date','>=', date('Y-m-d'))
+                    ->orderBy('sp_jobs.auto_id', 'ASC')
                     ->inRandomOrder();
             }
             elseif($searchType=='criteria')
@@ -1237,6 +1238,7 @@ class JobController extends Controller
                     ->where('sp_jobs.is_published', '1')
                     ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                     ->where('sp_jobs.application_end_date','>=', date('Y-m-d'))
+                    ->orderBy('sp_jobs.auto_id', 'ASC')
                     ->inRandomOrder();
             }
             elseif($searchType=='recent')

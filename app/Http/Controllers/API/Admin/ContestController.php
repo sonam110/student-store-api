@@ -714,15 +714,15 @@ class ContestController extends Controller
             {
                 if(!empty($request->category_master_id))
                 {
-                    $contests->where('category_master_id',$request->category_master_id);
+                    $contests->where('contests.category_master_id',$request->category_master_id);
                 }
                 if(!empty($request->sub_category_slug))
                 {
-                    $contests->where('sub_category_slug',$request->sub_category_slug);
+                    $contests->where('contests.sub_category_slug',$request->sub_category_slug);
                 }
                 if(!empty($request->mode))
                 {
-                    $contests->where('mode', $request->mode);
+                    $contests->where('contests.mode', $request->mode);
                 }
                 if(!empty($request->published_date))
                 {
@@ -734,11 +734,11 @@ class ContestController extends Controller
                 }
                 if(!empty($request->start_date))
                 {
-                    $contests->where('start_date', '>=', date("Y-m-d", strtotime($request->start_date)));
+                    $contests->where('contests.start_date', '>=', date("Y-m-d", strtotime($request->start_date)));
                 }
                 if(!empty($request->end_date))
                 {
-                    $contests->where('start_date', '<=', date("Y-m-d", strtotime($request->end_date)));
+                    $contests->where('contests.start_date', '<=', date("Y-m-d", strtotime($request->end_date)));
                 }
                 /*if(!empty($request->free_subscription))
                 {
@@ -757,12 +757,12 @@ class ContestController extends Controller
 
                 if(!empty($request->available_for))
                 {
-                    $contests->where('available_for', $request->available_for);
+                    $contests->where('contests.available_for', $request->available_for);
                 }
 
                 if(!empty($request->title))
                 {
-                    $contests->where('title', 'LIKE', '%'.$request->title.'%');
+                    $contests->where('contests.title', 'LIKE', '%'.$request->title.'%');
                 }
 
                 //future: distance filter implement
@@ -770,22 +770,23 @@ class ContestController extends Controller
                 {
                     $contests->where('distance', $request->distance);
                 }
+
                 if(!empty($request->city))
                 {
-                    $contests->where('target_city','LIKE', '%'.$request->city.'%');
+                    $contests->where('contests.target_city','LIKE', '%'.$request->city.'%');
                 }
                 if(!empty($request->status))
                 {
-                    $contests->where('status', $request->status);
+                    $contests->where('contests.status', $request->status);
                 }
                 if(!empty($request->type))
                 {
-                    $contests->where('type', $request->type);
+                    $contests->where('contests.type', $request->type);
                 }
 
                 if(!empty($request->user_id))
                 {
-                    $contests->where('user_id', $request->user_id);
+                    $contests->where('contests.user_id', $request->user_id);
                 }
                 // $contests->where('application_start_date','<=', date('Y-m-d'))
                 //     ->where('application_end_date','>=', date('Y-m-d'));
@@ -816,6 +817,7 @@ class ContestController extends Controller
             {
                 $contests->where('application_start_date','<=', date('Y-m-d'))
                     ->where('application_end_date','>=', date('Y-m-d'))
+                    ->orderBy('contests.auto_id', 'ASC')
                     ->inRandomOrder();
             }
 

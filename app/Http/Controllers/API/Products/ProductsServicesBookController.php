@@ -1397,7 +1397,7 @@ class ProductsServicesBookController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             elseif($searchType=='popular')
             {
@@ -1533,7 +1533,7 @@ class ProductsServicesBookController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             elseif($searchType=='popular')
             {
@@ -1672,7 +1672,7 @@ class ProductsServicesBookController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             elseif($searchType=='popular')
             {
@@ -2573,7 +2573,7 @@ class ProductsServicesBookController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             elseif($searchType=='popular')
             {
@@ -2775,7 +2775,7 @@ class ProductsServicesBookController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             elseif($searchType=='popular')
             {

@@ -1011,7 +1011,7 @@ class ProductsServicesBookController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             if(!empty($request->per_page_record))
             {

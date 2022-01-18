@@ -737,6 +737,7 @@ class JobController extends Controller
             {
                 $jobs->where('application_start_date','<=', date('Y-m-d'))
                     ->where('application_end_date','>=', date('Y-m-d'))
+                    ->orderBy('sp_jobs.auto_id', 'ASC')
                     ->inRandomOrder();
             }
             elseif($searchType=='criteria')

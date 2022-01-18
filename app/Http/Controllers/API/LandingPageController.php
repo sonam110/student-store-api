@@ -543,7 +543,7 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             elseif($searchType=='popular')
             {
@@ -679,7 +679,7 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             if(!empty($request->per_page_record))
             {
@@ -780,7 +780,7 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             elseif($searchType=='popular')
             {
@@ -1616,7 +1616,7 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             elseif($searchType=='popular')
             {
@@ -1750,7 +1750,7 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='random')
             {
-                $products->inRandomOrder();
+                $products->orderBy('products_services_books.auto_id', 'ASC')->inRandomOrder();
             }
             elseif($searchType=='popular')
             {
@@ -2048,6 +2048,7 @@ class LandingPageController extends Controller
                     // ->where('sp_jobs.application_end_date','>=', date('Y-m-d'))
                     // ->inRandomOrder();
                 $jobs->where('sp_jobs.application_end_date','>=', date('Y-m-d'))
+                    ->orderBy('sp_jobs.auto_id', 'ASC')
                     ->inRandomOrder();
             }
             elseif($searchType=='criteria')
@@ -2484,6 +2485,7 @@ class LandingPageController extends Controller
             {
                 $contests->where('application_start_date','<=', date('Y-m-d'))
                     ->where('application_end_date','>=', date('Y-m-d'))
+                    ->orderBy('contests.auto_id', 'ASC')
                     ->inRandomOrder();
             }
 

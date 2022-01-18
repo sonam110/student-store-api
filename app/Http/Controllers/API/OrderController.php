@@ -1827,7 +1827,12 @@ class OrderController extends Controller
 		$getAppSetting = AppSetting::first();
 
 		$reward_point_value = round($getAppSetting->customer_rewards_pt_value * $request->used_reward_points * 100, 2);
+		$cartAmountTotal = 0;
 		foreach ($request->items as $key => $orderedItem) {
+
+			//For match price
+			$cartAmountTotal += $orderedItem['price'] * $orderedItem['quantity'];
+
 			$used_item_reward_points_value = round($getAppSetting->customer_rewards_pt_value * $orderedItem['used_item_reward_points'] * 100, 2);
 
 			if(!empty($orderedItem['product_id']))

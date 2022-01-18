@@ -902,6 +902,7 @@ class ContestController extends Controller
             {
                 $contests->where('application_start_date','<=', date('Y-m-d'))
                     ->where('application_end_date','>=', date('Y-m-d'))
+                    ->orderBy('contests.auto_id', 'ASC')
                     ->inRandomOrder();
             }
 

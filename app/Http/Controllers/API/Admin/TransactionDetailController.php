@@ -193,6 +193,7 @@ class TransactionDetailController extends Controller
             {
                 $transactionDetails->where('application_start_date','<=', date('Y-m-d'))
                     ->where('application_end_date','>=', date('Y-m-d'))
+                    ->orderBy('transaction_details.auto_id', 'ASC')
                     ->inRandomOrder();
             }
             elseif($searchType=='criteria')
