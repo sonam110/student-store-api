@@ -2670,8 +2670,8 @@ class OrderController extends Controller
 				'invoice_id'=> $subscription->latest_invoice->id,
 			];
 
-			if($subscription->status=='active') 
-			{
+			/*if($subscription->status=='active') 
+			{*/
 				//if success then unsubscribe same package which is already subscribed
 				if($user_package)
 				{
@@ -2686,7 +2686,7 @@ class OrderController extends Controller
 					  	[]
 					);
 				}
-			}
+			/*}*/
 			
 			return response(prepareResult(false, $returnObj, 'Subscription Canceled.'), config('http_response.success'));
 		}
