@@ -2646,6 +2646,7 @@ class OrderController extends Controller
 		if($checkPackage)
 		{
 			$user_package = UserPackageSubscription::where('user_id', Auth::id())
+				->where('module', $checkPackage->module)
 				->whereNotNull('subscription_id')
 				->where('payby','stripe')
 				->where('is_canceled', 0)
