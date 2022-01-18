@@ -255,6 +255,7 @@ class UserProfileController extends Controller
             ->first();
             if($oldPackages)
             {
+            	\Log::info('oldPackages update status');
             	$oldPackages->subscription_status = 0;
             	$oldPackages->save();
             }
@@ -297,11 +298,13 @@ class UserProfileController extends Controller
 			$userPackageSubscription->cost_for_each_attendee= $package->cost_for_each_attendee;
 			$userPackageSubscription->top_up_fee            = $package->top_up_fee;
 			$userPackageSubscription->save();
+			\Log::info('userPackageSubscription created');
 			if($userPackageSubscription)
             {
                 //update price if package changed
                 $type = $userPackageSubscription->module;
                 $userID = $package->user_id;
+                \Log::info('packageUpdatePrice triggered');
                 packageUpdatePrice($type, $userID);
             }
 		}
