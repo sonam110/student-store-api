@@ -301,7 +301,7 @@ class UserProfileController extends Controller
             {
                 //update price if package changed
                 $type = $package->module;
-                $userID = $package->user_id;
+                $userID = Auth::id();
                 packageUpdatePrice($type, $userID);
             }
 		}
