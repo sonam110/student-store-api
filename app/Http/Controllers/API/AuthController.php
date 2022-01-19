@@ -294,13 +294,13 @@ class AuthController extends Controller
 				{
 					$userDeviceInfo 					= new UserDeviceInfo;
 					$userDeviceInfo->user_id 			= $user->id;
-					$userDeviceInfo->fcm_token 			= $deviceInfo['fcm_token'];
-					$userDeviceInfo->device_uuid 		= $deviceInfo['device_uuid'];
-					$userDeviceInfo->platform 			= $deviceInfo['platform'];
-					$userDeviceInfo->model 				= $deviceInfo['model'];
-					$userDeviceInfo->os_version 		= $deviceInfo['os_version'];
-					$userDeviceInfo->manufacturer 		= $deviceInfo['manufacturer'];
-					$userDeviceInfo->serial_number 		= $deviceInfo['serial_number'];
+					$userDeviceInfo->fcm_token 			= @$deviceInfo['fcm_token'];
+					$userDeviceInfo->device_uuid 		= @$deviceInfo['device_uuid'];
+					$userDeviceInfo->platform 			= @$deviceInfo['platform'];
+					$userDeviceInfo->model 				= @$deviceInfo['model'];
+					$userDeviceInfo->os_version 		= @$deviceInfo['os_version'];
+					$userDeviceInfo->manufacturer 		= @$deviceInfo['manufacturer'];
+					$userDeviceInfo->serial_number 		= @$deviceInfo['serial_number'];
 					$userDeviceInfo->system_ip_address 	= $request->ip();
 					$userDeviceInfo->status 			= 1;
 					$userDeviceInfo->save();
