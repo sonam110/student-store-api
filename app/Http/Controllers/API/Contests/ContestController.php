@@ -900,8 +900,7 @@ class ContestController extends Controller
             }
             elseif($searchType=='random')
             {
-                $contests->orderBy('contests.auto_id', 'ASC')
-                    ->inRandomOrder();
+                $contests->inRandomOrder('auto_id');
             }
 
             if(!empty($request->per_page_record))
