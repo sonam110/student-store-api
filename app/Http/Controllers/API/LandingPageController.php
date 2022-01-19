@@ -2483,7 +2483,7 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='random')
             {
-                $contests->inRandomOrder('auto_id');
+                $contests->inRandomOrder('contests.auto_id');
             }
 
             if(!empty($request->per_page_record))
