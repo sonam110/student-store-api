@@ -2483,9 +2483,7 @@ class LandingPageController extends Controller
             }
             elseif($searchType=='random')
             {
-                $contests->where('application_start_date','<=', date('Y-m-d'))
-                    ->where('application_end_date','>=', date('Y-m-d'))
-                    ->orderBy('contests.auto_id', 'ASC')
+                $contests->orderBy('contests.auto_id', 'ASC')
                     ->inRandomOrder();
             }
 
