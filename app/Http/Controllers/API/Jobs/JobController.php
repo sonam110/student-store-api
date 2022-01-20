@@ -997,7 +997,8 @@ class JobController extends Controller
             $applicants = JobApplication::select('job_applications.*')
                     ->join('sp_jobs', function ($join) {
                         $join->on('job_applications.job_id', '=', 'sp_jobs.id')
-                        ->where('sp_jobs.job_status', '1');
+                        ->where('sp_jobs.job_status', '1')
+                        ->where('sp_jobs.user_id', Auth::id());
                     })
                     // ->join('users', function ($join) {
                     //     $join->on('job_applications.user_id', '=', 'users.id');
@@ -1014,10 +1015,10 @@ class JobController extends Controller
 
             if($searchType=='filter')
             {
-                if($request->auth_applicable == true)
+                /*if($request->auth_applicable == true)
                 {
                     $applicants->where('sp_jobs.user_id', Auth::id());
-                }
+                }*/
                 if(!empty($request->job_environment))
                 {
                     $applicants->where(function($query) use ($request) {
@@ -1085,12 +1086,13 @@ class JobController extends Controller
                         ->with('jobTags:id,job_id,title', 'addressDetail:id,city')
                         ->where('sp_jobs.is_published', '1')
                         ->where('sp_jobs.job_status', '1')
+                        ->where('sp_jobs.user_id', Auth::id())
                         ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                         ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
-                if($request->auth_applicable == true)
+                /*if($request->auth_applicable == true)
                 {
                     $jobsIds->where('sp_jobs.user_id', Auth::id());
-                }
+                }*/
 
                 if(!empty($request->per_page_record))
                 {
@@ -1232,10 +1234,10 @@ class JobController extends Controller
             }
             elseif($searchType=='random')
             {
-                if($request->auth_applicable == true)
+                /*if($request->auth_applicable == true)
                 {
                     $applicants->where('sp_jobs.user_id', Auth::id());
-                }
+                }*/
                 $applicants->orderBy('job_applications.id','DESC')
                     ->where('sp_jobs.is_published', '1')
                     ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
@@ -1245,10 +1247,10 @@ class JobController extends Controller
             }
             elseif($searchType=='recent')
             {
-                if($request->auth_applicable == true)
+                /*if($request->auth_applicable == true)
                 {
                     $applicants->where('sp_jobs.user_id', Auth::id());
-                }
+                }*/
                 $applicants->orderBy('job_applications.id','DESC')
                     ->where('sp_jobs.is_published', '1')
                     ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
