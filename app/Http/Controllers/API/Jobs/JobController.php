@@ -996,7 +996,8 @@ class JobController extends Controller
             //in criteria: title, skills, city, job type, work exp.
             $applicants = JobApplication::select('job_applications.*')
                     ->join('sp_jobs', function ($join) {
-                        $join->on('job_applications.job_id', '=', 'sp_jobs.id');
+                        $join->on('job_applications.job_id', '=', 'sp_jobs.id')
+                        ->where('sp_jobs.job_status', '1');
                     })
                     // ->join('users', function ($join) {
                     //     $join->on('job_applications.user_id', '=', 'users.id');
@@ -1083,6 +1084,7 @@ class JobController extends Controller
                 $jobsIds = Job::select('sp_jobs.id','sp_jobs.title','sp_jobs.job_environment','sp_jobs.years_of_experience','sp_jobs.address_detail_id')
                         ->with('jobTags:id,job_id,title', 'addressDetail:id,city')
                         ->where('sp_jobs.is_published', '1')
+                        ->where('sp_jobs.job_status', '1')
                         ->where('sp_jobs.application_start_date','<=', date('Y-m-d'))
                         ->where('sp_jobs.application_end_date','>=', date('Y-m-d'));
                 if($request->auth_applicable == true)
