@@ -2667,7 +2667,7 @@ class OrderController extends Controller
 			  'payment_behavior' => 'default_incomplete',
 			  'expand' => ['latest_invoice.payment_intent'],
 			]);
-			\Log::info($subscription);
+
 			if($subscription->latest_invoice->payment_intent==null)
 			{
 				return response()->json(prepareResult(true, 'client_secret not found.', getLangByLabelGroups('messages','message_error')), config('http_response.not_found'));

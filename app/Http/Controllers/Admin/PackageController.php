@@ -79,27 +79,36 @@ class PackageController extends Controller
             {
                 $duration = 0;
             }
-            
-            $createProduct = $stripe->products->create([
-                'images'    => [$this->appsetting->logo_path],
-                'name'      => ucfirst(str_replace('_', ' ', $request->type_of_package)),
-                'type'      => 'service',
-                'active'    => ($request->is_published==1) ? true : false
-            ]);
 
             if($request->subscription>0) {
                 $amount = $request->subscription;
             } else {
                 $amount = $request->price;
             }
+            if($amount<1 && $request->type_of_package!='packages_free')
+            {
+                return response()->json(prepareResult(true, 'Invalid Price. price must be greater than 0.', getLangByLabelGroups('messages','message_invalid_price')), config('http_response.internal_server_error'));
+            }
+            $planId = null;
+            if($request->type_of_package!='packages_free')
+            {
+                $createProduct = $stripe->products->create([
+                    'images'    => [$this->appsetting->logo_path],
+                    'name'      => ucfirst(str_replace('_', ' ', $request->type_of_package)),
+                    'type'      => 'service',
+                    'active'    => ($request->is_published==1) ? true : false
+                ]);
 
-            $plan = $stripe->plans->create([
-                'amount'          => $amount * 100,
-                'currency'        => $this->paymentInfo->stripe_currency,
-                'interval'        => 'day',
-                'interval_count'  => $duration,
-                'product'         => $createProduct->id,
-            ]);
+                $plan = $stripe->plans->create([
+                    'amount'          => $amount * 100,
+                    'currency'        => $this->paymentInfo->stripe_currency,
+                    'interval'        => 'day',
+                    'interval_count'  => $duration,
+                    'product'         => $createProduct->id,
+                ]);
+                $planId = $plan->id;
+            }
+            
 
             $package  = new Package;
             $package->module                    = $request->module;
@@ -134,7 +143,7 @@ class PackageController extends Controller
             $package->cost_for_each_attendee    = $request->cost_for_each_attendee;
             $package->top_up_fee                = $request->top_up_fee;
             $package->is_published              = $request->is_published;
-            $package->stripe_plan_id            = $plan->id;
+            $package->stripe_plan_id            = $planId;
             if($request->is_published)
             {
                 $package->published_at = date('Y-m-d');
@@ -187,73 +196,85 @@ class PackageController extends Controller
                 $duration = 0;
             }
 
+            if($request->subscription>0) {
+                $amount = $request->subscription;
+            } else {
+                $amount = $request->price;
+            }
+
+            if($amount<1 && $request->type_of_package!='packages_free')
+            {
+                return response()->json(prepareResult(true, 'Invalid Price. price must be greater than 0.', getLangByLabelGroups('messages','message_invalid_price')), config('http_response.internal_server_error'));
+            }
+
             if($duration!=0)
             {
                 if(empty($package->stripe_plan_id))
                 {
-                    $createProduct = $stripe->products->create([
-                        'images'    => [$this->appsetting->logo_path],
-                        'name'      => ucfirst(str_replace('_', ' ', $request->type_of_package)),
-                        'type'      => 'service',
-                        'active'    => ($request->is_published==1) ? true : false
-                    ]);
+                    
+                    if($request->type_of_package!='packages_free')
+                    {
+                        $createProduct = $stripe->products->create([
+                            'images'    => [$this->appsetting->logo_path],
+                            'name'      => ucfirst(str_replace('_', ' ', $request->type_of_package)),
+                            'type'      => 'service',
+                            'active'    => ($request->is_published==1) ? true : false
+                        ]);
 
-                    if($request->subscription>0) {
-                        $amount = $request->subscription;
-                    } else {
-                        $amount = $request->price;
+                        $plan = $stripe->plans->create([
+                            'amount'          => $amount * 100,
+                            'currency'        => $this->paymentInfo->stripe_currency,
+                            'interval'        => 'day',
+                            'interval_count'  => $duration,
+                            'product'         => $createProduct->id,
+                        ]);
+                        $package->stripe_plan_id = $plan->id;
                     }
-
-                    $plan = $stripe->plans->create([
-                        'amount'          => $amount * 100,
-                        'currency'        => $this->paymentInfo->stripe_currency,
-                        'interval'        => 'day',
-                        'interval_count'  => $duration,
-                        'product'         => $createProduct->id,
-                    ]);
-                    $package->stripe_plan_id = $plan->id;
                 }
                 else
                 {
-                    $planInfo = $stripe->plans->retrieve(
-                        $package->stripe_plan_id,
-                        []
-                    );
-                    $productInfo = $planInfo->product;
-                    $createProduct = $stripe->products->update(
-                        $productInfo,
-                        ['active'    => ($request->is_published==1) ? true : false]
-                    );
-
-                    if($request->subscription>0) {
-                        $amount = $request->subscription;
-                    } else {
-                        $amount = $request->price;
-                    }
-
-                    if($package->subscription>0) {
-                        $packageAmount = $package->subscription;
-                    } else {
-                        $packageAmount = $package->price;
-                    }
-
-                    if($package->duration != $request->duration || $packageAmount != ($amount * 100))
+                    if($request->type_of_package!='packages_free')
                     {
-                        if($duration!=0)
-                        {
-                            $stripe->plans->update(
-                                $package->stripe_plan_id,
-                                ['active' => false]
-                            );
+                        $planInfo = $stripe->plans->retrieve(
+                            $package->stripe_plan_id,
+                            []
+                        );
+                        $productInfo = $planInfo->product;
+                        $createProduct = $stripe->products->update(
+                            $productInfo,
+                            ['active'    => ($request->is_published==1) ? true : false]
+                        );
 
-                            $plan = $stripe->plans->create([
-                                'amount'          => $request->subscription * 100,
-                                'currency'        => $this->paymentInfo->stripe_currency,
-                                'interval'        => 'day',
-                                'interval_count'  => $duration,
-                                'product'         => $createProduct->id,
-                            ]);
-                            $package->stripe_plan_id = $plan->id;
+                        if($request->subscription>0) {
+                            $amount = $request->subscription;
+                        } else {
+                            $amount = $request->price;
+                        }
+
+                        if($package->subscription>0) {
+                            $packageAmount = $package->subscription;
+                        } else {
+                            $packageAmount = $package->price;
+                        }
+
+                        if($package->duration != $request->duration || $packageAmount != ($amount * 100))
+                        {
+                            if($duration!=0)
+                            {
+                                $stripe->plans->update(
+                                    $package->stripe_plan_id,
+                                    ['active' => false]
+                                );
+
+                                $plan = $stripe->plans->create([
+                                    'amount'          => $request->subscription * 100,
+                                    'currency'        => $this->paymentInfo->stripe_currency,
+                                    'interval'        => 'day',
+                                    'interval_count'  => $duration,
+                                    'product'         => $createProduct->id,
+                                ]);
+                                $package->stripe_plan_id = $plan->id;
+                            }
                         }
                     }
                 }
