@@ -1180,6 +1180,7 @@ class LabelSeeder extends Seeder
             "completed" => "Completed"
         ),
         "contest_detail" => array(
+            "full" => "Full",
             "condition_for_joining" => "Conditions for Joining",
             "application_status" => "Aplication Status",
             "contest_status" => "Contest Status",
@@ -2764,6 +2765,7 @@ class LabelSeeder extends Seeder
             "message_success_event_updated" => "Event has been updated successfully",
             "message_success_participated" => "Successfully participated",
             "message_enter_max_participant_number" => "Please enter participant max number",
+            "message_max_number_participant_reached" => "Sorry the max number of participants reached.",
             "message_select_user_type" => "Please select user type",
             "message_select_target_country" => "Please select target country",
             "message_select_target_city" => "Please select target city",

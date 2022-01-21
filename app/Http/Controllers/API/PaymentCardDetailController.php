@@ -257,14 +257,16 @@ class PaymentCardDetailController extends Controller
         $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
         $checkUser = User::find(Auth::id());
         $customerId = $checkUser->stripe_customer_id;
-        if(!empty($paymentCardDetail->stripe_payment_method_id))
+        $stripe_payment_method_id = $paymentCardDetail->stripe_payment_method_id;
+        $paymentCardDetail->delete();
+        if(!empty($stripe_payment_method_id))
         {
             $stripe->paymentMethods->detach(
-                $paymentCardDetail->stripe_payment_method_id,
+                $stripe_payment_method_id,
                 []
             );
         }
-        $paymentCardDetail->delete();
+        
         return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_payment_card_detail_deleted')), config('http_response.success'));
     }
 }

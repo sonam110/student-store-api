@@ -93,6 +93,11 @@ class ContestApplicationController extends Controller
 
             $contest = Contest::find($request->contest_id);
 
+            if(ContestApplication::where('application_status', 'joined')->where('contest_id',$contest->id)->count() >= $contest->max_participants)
+            {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
+
             if($contestApplication = ContestApplication::where('user_id',Auth::id())->where('contest_id',$contest->id)->where('application_status','!=','canceled')->first())
             {
                 $contestApplication->document = $request->document;
