@@ -885,11 +885,12 @@ class JobController extends Controller
     	    if(!empty($request->per_page_record))
     	    {
     	        $jobApplications = JobApplication::where('job_id',$id)->orderBy('created_at','DESC')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
-    	    }
+            }
     	    else
     	    {
     	        $jobApplications = jobApplication::where('job_id',$id)->orderBy('created_at','DESC')->get();
     	    }
+            $jobApplications['total_accepted'] = JobApplication::where('job_id',$id)->where('application_status', 'accepted')->count();
     	    return response(prepareResult(false, JobApplicationResource::collection($jobApplications), getLangByLabelGroups('messages','messages_job_application_list')), config('http_response.success'));
     	}
     	catch (\Throwable $exception) 
