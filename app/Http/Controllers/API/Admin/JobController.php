@@ -910,6 +910,11 @@ class JobController extends Controller
         try
         {
             $job = Job::find($job_id);
+            if(!$job)
+            {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('product_module','data_not_found')), config('http_response.not_found'));
+            }
+
             if($job->jobApplications->count() > 0)
             {
                 return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','messages_job_applicatons_exists')), config('http_response.success'));
