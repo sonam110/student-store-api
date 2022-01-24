@@ -59,17 +59,15 @@ class LandingPageController extends Controller
             ->limit(6)
             ->get();
 
-
-        $jobsSpIds = Job::where('user_id','!=', Auth::id())
-            ->where('job_status', '1')
-            ->distinct()
+        $jobSps = Job::select('service_provider_details.id','service_provider_details.user_id','service_provider_details.company_name','service_provider_details.company_logo_path','service_provider_details.company_logo_thumb_path')
+            ->join('service_provider_details', function($join){
+                $join->on('sp_jobs.user_id','=','service_provider_details.user_id');
+            })
+            ->groupBy('sp_jobs.user_id')
+            ->where('sp_jobs.job_status', '1')
             ->inRandomOrder()
             ->limit(6)
-            ->get(['user_id']);
-        foreach ($jobsSpIds as $key => $value) {
-            $jspids[] = $value->user_id;
-        }
-        $jobSps = ServiceProviderDetail::whereIn('user_id',$jspids)->with('user:id')->get(['id','user_id','company_name','company_logo_path','company_logo_thumb_path']);
+            ->get();
 
         $contests = Contest::where('is_published', '1')
             ->where('application_end_date','>=', date('Y-m-d'))
