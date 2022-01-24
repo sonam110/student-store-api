@@ -480,7 +480,7 @@ class JobController extends Controller
         DB::beginTransaction();
         try
         {
-            $jobs = Job::whereIn('id',$request->job_id)->get();
+            $jobs = Job::whereIn('id',$request->job_id)->whereIn('job_status', [0, 1, 2])->get();
             if($request->job_status == "1")
             {
                 $status_text = 'Active';
