@@ -87,7 +87,7 @@ class LandingPageController extends Controller
                 ->with('coverImage')
                 ->get(['id','title']);
         $returnData = [
-            'product_sps'   => $productSps, 
+            'product_sps'   => $productsSpIds, 
             'job_sps'       => $jobSps, 
             'contests'      => $contests, 
             'books'         => $books
