@@ -50,38 +50,50 @@ class LandingPageController extends Controller
     {
         $pspids = [];
         $jspids = [];
-        $productsSpIds = ProductsServicesBook::distinct()->inRandomOrder()->limit(6)->get(['user_id']);
-        foreach ($productsSpIds as $key => $value) {
-            $pspids[] = $value->user_id;
-        }
-        $productSps = ServiceProviderDetail::whereIn('user_id',$pspids)->with('user:id')->get(['id','user_id','company_name','company_logo_path','company_logo_thumb_path']);
+        $productsSpIds = ProductsServicesBook::select('service_provider_details.id','service_provider_details.user_id','service_provider_details.company_name','service_provider_details.company_logo_path','service_provider_details.company_logo_thumb_path')
+            ->join('service_provider_details', function($join){
+                $join->on('products_services_books.user_id','=','service_provider_details.user_id');
+            })
+            ->groupBy('products_services_books.user_id')
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
 
-        $jobsSpIds = Job::where('user_id','!=', Auth::id())->where('job_status', '1')->distinct()->inRandomOrder()->limit(6)->get(['user_id']);
+
+        $jobsSpIds = Job::where('user_id','!=', Auth::id())
+            ->where('job_status', '1')
+            ->distinct()
+            ->inRandomOrder()
+            ->limit(6)
+            ->get(['user_id']);
         foreach ($jobsSpIds as $key => $value) {
             $jspids[] = $value->user_id;
         }
         $jobSps = ServiceProviderDetail::whereIn('user_id',$jspids)->with('user:id')->get(['id','user_id','company_name','company_logo_path','company_logo_thumb_path']);
 
         $contests = Contest::where('is_published', '1')
-                            // ->where('application_start_date','<=', date('Y-m-d'))
-                            ->where('application_end_date','>=', date('Y-m-d'))
-                            ->where('status', 'verified')
-                            // ->where('user_id','!=', Auth::id())
-                            ->limit(2)
-                            ->inRandomOrder()
-                            ->get(['id','title','subscription_fees','start_date','cover_image_path','cover_image_thumb_path']);
+            ->where('application_end_date','>=', date('Y-m-d'))
+            ->where('status', 'verified')
+            ->limit(2)
+            ->inRandomOrder()
+            ->get(['id','title','subscription_fees','start_date','cover_image_path','cover_image_thumb_path']);
 
         $books = ProductsServicesBook::where('type','book')
-                                    ->where('is_published', '1')
-                                    ->where('status',2)
-                                    ->where('quantity','>' ,'0')
-                                    // ->where('user_id','!=', Auth::id())
-                                    ->limit(3)
-                                    ->inRandomOrder()
-                                    ->with('coverImage')
-                                    ->get(['id','title']);
+                ->where('is_published', '1')
+                ->where('status',2)
+                ->where('quantity','>' ,'0')
+                ->limit(3)
+                ->inRandomOrder()
+                ->with('coverImage')
+                ->get(['id','title']);
+        $returnData = [
+            'product_sps'   => $productSps, 
+            'job_sps'       => $jobSps, 
+            'contests'      => $contests, 
+            'books'         => $books
+        ];
 
-        return response(prepareResult(false, ['product_sps'=>$productSps, 'job_sps'=>$jobSps, 'contests'=>$contests, 'books'=>$books], getLangByLabelGroups('messages','messages_initial_screen')), config('http_response.success'));
+        return response(prepareResult(false, $returnData, getLangByLabelGroups('messages','messages_initial_screen')), config('http_response.success'));
 
     }
 

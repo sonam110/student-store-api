@@ -31,3 +31,7 @@ Route::get('/bam-callback', 'App\Http\Controllers\BamboraController@bamCallback'
 Route::post('/swish-payment-callback', 'App\Http\Controllers\SwishController@swishPaymentCallback');
 
 Route::get('/login', [App\Http\Controllers\Admin\MasterController::class,'login'])->name('login');
+
+Route::get('get-all-scrapping-url', 'App\Http\Controllers\ScrapDataController@getAllScrappingUrl')->name('get-all-scrapping-url');
+
+Route::post('post-all-scrapping-url', 'App\Http\Controllers\ScrapDataController@postAllScrappingUrl')->name('post-all-scrapping-url');
