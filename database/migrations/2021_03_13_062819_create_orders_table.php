@@ -48,6 +48,7 @@ class CreateOrdersTable extends Migration
             $table->double('payable_amount', 12, 2)->nullable();
             $table->string('order_for')->nullable();
             $table->enum('payment_status', ['processing','paid','failed'])->default('processing')->nullable();
+            $table->string('swish_payment_token')->nullable();
             $table->timestamps();
         });
     }

@@ -655,6 +655,13 @@ class OrderController extends Controller
             		{
             			$contestApplication->payment_status = $request->payment_status;
             			$contestApplication->save();
+
+            			// Notification Start
+		                $title = 'New Contest Application';
+		                $body =  'New Application Received for Contest '.$contestApplication->contest->title;
+		                $user = $contestApplication->contest->user;
+		                $type = 'Contest Application';
+		                pushNotification($title,$body,$user,$type,true,'seller','contest',$contestApplication->id,'created');
             		}
                 }
 			}
@@ -1888,6 +1895,11 @@ class OrderController extends Controller
 
 	public function createStripeIntent(Request $request)
 	{
+		$checkOrder = Order::find($request->order_id);
+        if(!$checkOrder)
+        {
+        	return response(prepareResult(true, [], getLangByLabelGroups('orderDetails','order_not_found')), config('http_response.bad_request'));
+        }
 		$sub_total = 0;
 		$shipping_charge = 0;
 		$itemInfo = [];
@@ -2318,12 +2330,7 @@ class OrderController extends Controller
 
 			$url = env('KLARNA_URL').'/checkout/v3/orders';
 
-			$tempOrderSave = new TempOrder;
-			$tempOrderSave->user_id = Auth::id();
-			$tempOrderSave->request_param = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
-			$tempOrderSave->save();
-
-	      	$temp_order_id = $tempOrderSave->id;
+	      	$order_id = $request->order_id;
 
 	        $data = [
 	            'purchase_currency' => 'SEK',
@@ -2334,9 +2341,9 @@ class OrderController extends Controller
 	            'order_lines'       => $itemInfo,
 	            'merchant_urls'     => [
 	                'terms'         => env('FRONT_APP_URL').'page/return-policy',
-	                'checkout'      => env('FRONT_APP_URL').'cart?order_id='.$temp_order_id,
-	                'confirmation'  => env('FRONT_APP_URL').'confirmation?order_id='.$temp_order_id,
-	                'push'          => env('APP_URL').'api/push-notification-klarna?order_id='.$temp_order_id,
+	                'checkout'      => env('FRONT_APP_URL').'cart?order_id='.$order_id,
+	                'confirmation'  => env('FRONT_APP_URL').'confirmation?order_id='.$order_id,
+	                'push'          => env('APP_URL').'api/push-notification-klarna?order_id='.$order_id,
 	            ]
 	        ];
 	        $postData = json_encode($data, JSON_UNESCAPED_UNICODE);
@@ -2377,13 +2384,7 @@ class OrderController extends Controller
 		} elseif($request->payment_method=='bambora_checkout_token') {
 			$user = User::find(Auth::id());
 
-			//Temp Order create
-			$tempOrderSave = new TempOrder;
-			$tempOrderSave->user_id = Auth::id();
-			$tempOrderSave->request_param = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
-			$tempOrderSave->save();
-
-	      	$temp_order_id = $tempOrderSave->id;
+			$order_id = $request->order_id;
 
 			$accessToken = $this->paymentInfo->bambora_access_key;
 			$merchantNumber = $this->paymentInfo->bambora_merchant_number;
@@ -2397,7 +2398,7 @@ class OrderController extends Controller
 
 			$request = array();
 			$request["order"] = array();
-			$request["order"]["id"] = $temp_order_id;
+			$request["order"]["id"] = $order_id;
 			$request["order"]["amount"] = round($total * 100);
 			$request["order"]["currency"] = "SEK";
 
@@ -2449,13 +2450,7 @@ class OrderController extends Controller
 
 			$checkoutUrl = env('SWISH_URL').'/psp/swish/payments';
 
-			//Temp Order create
-			$tempOrderSave = new TempOrder;
-			$tempOrderSave->user_id = Auth::id();
-			$tempOrderSave->request_param = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
-			$tempOrderSave->save();
-
-	      	$temp_order_id = $tempOrderSave->id;
+	      	$order_id = $request->order_id;
 
 	        $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
 	        $phone = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
@@ -2483,9 +2478,9 @@ class OrderController extends Controller
 			        0 => 'https://studentstore.se/',
 			        1 => 'https://api.studentstore.se/',
 			      ],
-			      'paymentUrl' => 'https://studentstore.se/perform-payment/'.$tempOrderSave->id,
-			      'completeUrl' => 'https://studentstore.se/payment-completed/'.$tempOrderSave->id,
-			      'cancelUrl' => 'https://studentstore.se/payment-canceled/'.$tempOrderSave->id,
+			      'paymentUrl' => 'https://studentstore.se/perform-payment/'.$order_id,
+			      'completeUrl' => 'https://studentstore.se/payment-completed/'.$order_id,
+			      'cancelUrl' => 'https://studentstore.se/payment-canceled/'.$order_id,
 			      'callbackUrl' => 'https://api.studentstore.com/swish-payment-callback',
 			      'logoUrl' => $getAppSetting->logo_path,
 			      'termsOfServiceUrl' => 'https://studentstore.se/page/privacy-policy',
@@ -2495,7 +2490,7 @@ class OrderController extends Controller
 			      'payeeReference' => $payeeReference,
 			      'payeeName' => $getAppSetting->app_name,
 			      'productCategory' => 'SS-123',
-			      'orderReference' => date('Y-m-d').'-'.$temp_order_id,
+			      'orderReference' => $order_id,
 			      'subsite' => 'StudentsStore',
 			    ],
 			    'payer' => [
@@ -2532,7 +2527,6 @@ class OrderController extends Controller
 	        if(curl_errno($curl)>0)
 	        {
 	            $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
-	            TempOrder::find($tempOrderSave->id)->delete();
 	            return response()->json(prepareResult(true, $info, "Error while creating swish direct payment"), config('http_response.internal_server_error'));
 	        }
 	        curl_close($curl);
@@ -2549,12 +2543,10 @@ class OrderController extends Controller
 	        $payment_token = null;
 	        if($response==null)
 	        {
-	        	TempOrder::find($tempOrderSave->id)->delete();
 	            return response()->json(prepareResult(true, $response, "Error while creating Swish Direct Purchase Payment"), config('http_response.internal_server_error'));
 	        }
 	        if(@$response->status == 400)
 	        {
-	        	TempOrder::find($tempOrderSave->id)->delete();
 	            return response()->json(prepareResult(true, $response, "Error in input data Swish Direct Purchase Payment"), config('http_response.internal_server_error'));
 	        }
 
@@ -2564,8 +2556,10 @@ class OrderController extends Controller
 	        	$payment_token = $paymentID[4];
 	        	break;
 	        }
-	        $tempOrderSave->payment_token = $payment_token;
-	        $tempOrderSave->save();
+
+	        $checkOrder->swish_payment_token = $payment_token;
+	        $checkOrder->save();
+
 	        $returnData = [
 	        	'created' 	=> time(),
 	        	'amount'	=> $total,
@@ -2574,7 +2568,7 @@ class OrderController extends Controller
 	        	'for_capture_obj' => $forCaptureObj,
 	        	'msisdn' => '+'.$phone_number_with_country_code,
 	        	'payment_token' => $payment_token,
-	        	'temp_order_id' => $tempOrderSave->id
+	        	'temp_order_id' => $order_id
 	        ];
 	        return response()->json(prepareResult(false, $returnData, "Swish direct payment link successfully created."), config('http_response.success'));
 		} elseif($request->payment_method=='swish_checkout') {
@@ -2583,13 +2577,7 @@ class OrderController extends Controller
 
 			$checkoutUrl = env('SWISH_URL').'/psp/paymentorders';
 
-			//Temp Order create
-			$tempOrderSave = new TempOrder;
-			$tempOrderSave->user_id = Auth::id();
-			$tempOrderSave->request_param = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
-			$tempOrderSave->save();
-
-	      	$temp_order_id = $tempOrderSave->id;
+			$order_id = $request->order_id;
 
 	        $email = AES256::decrypt($user->email, env('ENCRYPTION_KEY'));
 	        $phone = AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'));
@@ -2625,7 +2613,7 @@ class OrderController extends Controller
 			      'payeeReference' => $payeeReference,
 			      'payeeName' => $getAppSetting->app_name,
 			      'productCategory' => 'SS-123',
-			      'orderReference' => date('Y-m-d').'-'.$temp_order_id,
+			      'orderReference' => $order_id,
 			      'subsite' => 'StudentsStore',
 			    ],
 			    'payer' => [
