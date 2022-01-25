@@ -610,6 +610,13 @@ class OrderController extends Controller
 			//Send Notification and update other things
 			foreach ($order->orderItems as $key => $orderedItem) 
 			{
+				if($request->payment_status=='failed')
+                {
+                	$orderedItem->item_status = 'canceled';
+                	$orderedItem->reason_for_cancellation = 'Payment Failed.';
+                	$orderedItem->save();
+                }
+	                
 				if(!empty($orderedItem->products_services_book_id))
 				{
 					$orderTracking                  = new OrderTracking;
@@ -621,6 +628,7 @@ class OrderController extends Controller
 
 					//update Stock
 					$productsServicesBook = ProductsServicesBook::find($orderedItem->products_services_book_id);
+
 					if($request->payment_status=='paid')
 					{
 						$checkItemType = ProductsServicesBook::select('type','user_id')->find($orderedItem->products_services_book_id);
@@ -652,11 +660,6 @@ class OrderController extends Controller
 	                    ];
 	                    
 	                    Mail::to(AES256::decrypt($orderedItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($seller_details));
-	                }
-	                elseif($request->payment_status=='failed')
-	                {
-	                	$orderedItem->item_status = 'canceled';
-	                	$orderedItem->save();
 	                }
                 }
                 elseif(!empty($orderedItem->contest_application_id))
