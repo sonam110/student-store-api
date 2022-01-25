@@ -52,8 +52,8 @@ class ContestStart extends Command
                     $title = '0 days left for contest';
                     $body =  $contest->title.' will start today at '.\Carbon\Carbon::parse($contest->start_time)->format('h:i A').'.';
                 }
-                
-                foreach ($contest->contestApplications as $key => $applications) {
+                $contestApplications = $contest->contestApplications()->where('payment_status', 'paid')->get();
+                foreach ($contestApplications as $key => $applications) {
                     
                     $user = $applications->user;
                     pushNotification($title,$body,$user,$type,true,'buyer','contest',$contest->id,'joined');

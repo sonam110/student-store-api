@@ -529,6 +529,10 @@ class OrderController extends Controller
 		try
 		{
 			$order->payment_status = $request->payment_status;
+			if($request->payment_status=='failed')
+			{
+				$order->order_status = 'canceled';
+			}
 			$order->save();
 			if($order)
 			{
@@ -610,7 +614,7 @@ class OrderController extends Controller
 				{
 					$orderTracking                  = new OrderTracking;
 					$orderTracking->order_item_id   = $orderedItem->id;
-					$orderTracking->status          = 'payment_'.$request->order_status;
+					$orderTracking->status          = 'payment_'.$request->payment_status;
 					$orderTracking->comment         = '';
 					$orderTracking->type         	= 'delivery';
 					$orderTracking->save();

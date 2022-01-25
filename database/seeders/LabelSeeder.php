@@ -1575,6 +1575,12 @@ class LabelSeeder extends Seeder
             "pending" => "Pending",
             "no_data_found" => "No Data Found"
         ),
+        "payment_status" =>  array(
+            "paid" =>  "Paid",
+            "failed" =>  "Failed",
+            "processing" =>  "Processing",
+            "pending" =>  "Pending"
+        )
         "create_new_contest" => array(
             "image_size_info" => "Please select image less than 5 MB in size and greater than or equal to 720 X 720 resolution for better look and feel.",
             "price_with_vat" => "Price With VAT",
@@ -3780,7 +3786,8 @@ class LabelSeeder extends Seeder
             "points" => "Points",
             "delivering_to" => "Delivering to :",
             "continue_shopping" => "Continue Shopping",
-            "go_to_my_orders" => "Go To My Orders"
+            "go_to_my_orders" => "Go To My Orders",
+            "payment_status" => "Payment status"
         ),
         "product_place_order_screen" => array(
             "seller" => "Seller",

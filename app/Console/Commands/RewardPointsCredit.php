@@ -40,8 +40,11 @@ class RewardPointsCredit extends Command
     public function handle()
     {
         $date = date('Y-m-d',strtotime('-14 days'));
-        $orderItems = OrderItem::whereDate('return_applicable_date','<=',$date)
+        $orderItems = OrderItem::select('order_items.*')
+            ->join('orders', 'orders.id','=','order_items.order_id')
+            ->whereDate('return_applicable_date','<=',$date)
             ->whereNotNull('return_applicable_date')
+            ->where('orders.payment_status', 'paid')
             ->where('earned_reward_points', '>', 0)
             ->where('reward_point_status','pending')
             ->whereIn('item_status',['completed', 'replaced', 'returned'])

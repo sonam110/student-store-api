@@ -45,7 +45,7 @@ class ContestOnHold extends Command
             } else {
                 $min_participants = $contest->min_participants;
             }
-            if($contest->contestApplications->count() < $min_participants) {
+            if($contest->contestApplications()->where('payment_status', 'paid')->count() < $min_participants) {
 
                 $contest->update(['status' => 'hold']);
                 // Notification Start

@@ -57,10 +57,10 @@ class ContestExpire extends Command
           foreach($contests as $contest) 
           {
             $contest->update(['status' => 'completed']);
-            ContestApplication::where('contest_id',$contest->id)->where('application_status','joined')->update(['application_status'=>'completed']);
+            ContestApplication::where('contest_id',$contest->id)->where('application_status','joined')->where('payment_status','paid')->update(['application_status'=>'completed']);
 
             //OrderStatus Update
-            $getAllContApplications = ContestApplication::select('id')->where('contest_id',$contest->id)->where('application_status','completed')->get();
+            $getAllContApplications = ContestApplication::select('id')->where('contest_id',$contest->id)->where('payment_status','paid')->where('application_status','completed')->get();
             foreach($getAllContApplications as $key => $apllications)
             {
                 $changeOrderStatus = OrderItem::where('contest_application_id', $apllications->id)->first();
