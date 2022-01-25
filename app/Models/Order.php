@@ -16,7 +16,7 @@ class Order extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'user_id','address_detail_id','order_status','sub_total','item_discount','tax','shipping_charge','total','promo_code','promo_code_discount','grand_total','remark','first_name','last_name','email','contact_number','latitude','longitude','country','state','city','full_address','order_number','used_reward_points','reward_point_status','payable_amount','vat','order_for'
+        'user_id','address_detail_id','order_status','sub_total','item_discount','tax','shipping_charge','total','promo_code','promo_code_discount','grand_total','remark','first_name','last_name','email','contact_number','latitude','longitude','country','state','city','full_address','order_number','used_reward_points','reward_point_status','payable_amount','vat','order_for','payment_status'
     ];
 
     public function getFirstNameAttribute($value)

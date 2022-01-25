@@ -15,7 +15,7 @@ class ContestApplication extends Model
     use HasFactory, Uuid;
 
     protected $fillable = [
-        'user_id','contest_id','contest_type','contest_title','application_status','subscription_status','application_remark','subscription_remark','document','reason_id_for_rejection','reason_for_rejection','reason_id_for_cancellation','reason_for_cancellation','cancelled_by','winner'
+        'user_id','contest_id', 'payment_status','contest_type','contest_title','application_status','subscription_status','application_remark','subscription_remark','document','reason_id_for_rejection','reason_for_rejection','reason_id_for_cancellation','reason_for_cancellation','cancelled_by','winner'
     ];
 
 

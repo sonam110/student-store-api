@@ -22,6 +22,7 @@ class CreateContestApplicationsTable extends Migration
             $table->string('contest_id', 50);
             $table->foreign('contest_id')->references('id')->on('contests')->onDelete('cascade');
 
+            $table->enum('payment_status', ['processing','paid','failed'])->default('processing')->nullable();
             $table->string('contest_type',50)->nullable();
             $table->string('contest_title',100)->nullable();
             $table->string('application_status',100)->nullable();

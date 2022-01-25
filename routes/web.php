@@ -33,5 +33,6 @@ Route::post('/swish-payment-callback', 'App\Http\Controllers\SwishController@swi
 Route::get('/login', [App\Http\Controllers\Admin\MasterController::class,'login'])->name('login');
 
 Route::get('get-all-scrapping-url', 'App\Http\Controllers\ScrapDataController@getAllScrappingUrl')->name('get-all-scrapping-url');
+Route::get('/sub-category-list/{catId}/{language_id}', 'App\Http\Controllers\ScrapDataController@subCategoryList');
 
 Route::post('post-all-scrapping-url', 'App\Http\Controllers\ScrapDataController@postAllScrappingUrl')->name('post-all-scrapping-url');

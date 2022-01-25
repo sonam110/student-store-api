@@ -47,6 +47,7 @@ class CreateOrdersTable extends Migration
             $table->string('reward_point_status')->nullable()->default('used');
             $table->double('payable_amount', 12, 2)->nullable();
             $table->string('order_for')->nullable();
+            $table->enum('payment_status', ['processing','paid','failed'])->default('processing')->nullable();
             $table->timestamps();
         });
     }

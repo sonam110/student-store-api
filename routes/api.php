@@ -235,6 +235,9 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::apiResource('/cart-detail', 'App\Http\Controllers\API\CartDetailController', ['as' => 'api']);
 	Route::get('/empty-cart', [App\Http\Controllers\API\CartDetailController::class,'emptyCart']);
 	Route::apiResource('/order', 'App\Http\Controllers\API\OrderController', ['as' => 'api']);
+
+	Route::post('/update-order-payment-status/{order_id}', [App\Http\Controllers\API\OrderController::class,'updateOrderPaymentStatus']);
+
 	Route::get('/all-orders-by-user', [App\Http\Controllers\API\OrderController::class,'allOrdersByUser']);
 	Route::get('/all-orders-for-user', [App\Http\Controllers\API\OrderController::class,'allOrdersForUser']);
 	Route::post('/order-status-update/{id}', [App\Http\Controllers\API\OrderController::class,'orderStatusUpdate']);

@@ -245,6 +245,7 @@ class OrderController extends Controller
 			$order->used_reward_points 	= $request->used_reward_points;
 			$order->order_for 			= $request->order_for;
 			$order->reward_point_status = 'used';
+			$order->payment_status = $request->payment_status;
 			$order->save();
 
 			if($order)
@@ -409,13 +410,6 @@ class OrderController extends Controller
 						$orderItem->products_services_book_id = $orderedItem['product_id'];
 						$orderItem->product_type = $productsServicesBook->type;
 						$orderItem->note_to_seller = $orderedItem['note_to_seller'];
-
-						$checkItemType = ProductsServicesBook::select('type','user_id')->find($orderedItem['product_id']);
-						$vendor_user_id = $checkItemType->user_id;
-						if($checkItemType->type=='product' || $checkItemType->type=='book')
-						{
-							ProductsServicesBook::where('id',$orderedItem['product_id'])->update(['quantity' => $productsServicesBook->quantity - $orderedItem['quantity']]);
-						}	
 					}
 					elseif(!empty($orderedItem['contest_application_id']))
 					{
@@ -474,104 +468,8 @@ class OrderController extends Controller
 						$orderTracking->comment         = '';
 						$orderTracking->type         	= 'delivery';
 						$orderTracking->save();
-
-
-	                    // Notification Start
-
-						$title = 'New Order Received';
-						$body =  'New Order Received for product '.$productsServicesBook->title;
-						$user = $productsServicesBook->user;
-						$type = 'Order Received';
-						$user_type = 'seller';
-						if($productsServicesBook->type == 'book')
-						{
-							$module = 'book';
-						}
-						else
-						{
-							$module = 'product_service';
-						}
-						pushNotification($title,$body,$user,$type,true,$user_type,$module,$order->id,'market-place-request');
-
-	                    // Notification End
-
-	                    //Mail Start
-
-	                    ///to Seller
-
-	                    $seller_details = [
-	                    	'title' => $title,
-	                    	'body' => $body
-	                    ];
-	                    
-	                    Mail::to(AES256::decrypt($orderItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($seller_details));
-
-	                    //Mail End
-	                }
+					}
 				}
-
-				$paymentCardDetail = false;
-                if(!empty($request->transaction_detail['payment_card_detail_id']))
-                {
-                	$paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);
-                }
-				
-				$transactionDetail = new TransactionDetail;
-				$transactionDetail->order_id = $order->id;
-
-				if($paymentCardDetail)
-				{
-					$transactionDetail->payment_card_detail_id   	= $request->transaction_detail['payment_card_detail_id'];
-					$transactionDetail->user_package_subscription_id   	= @$request->transaction_detail['user_package_subscription_id'];
-					$transactionDetail->card_number              	= $paymentCardDetail->card_number;
-					$transactionDetail->card_type                	= $paymentCardDetail->card_type;
-					$transactionDetail->card_cvv                 	= $paymentCardDetail->card_cvv;
-					$transactionDetail->card_expiry              	= $paymentCardDetail->card_expiry;
-					$transactionDetail->card_holder_name         	= $paymentCardDetail->card_holder_name;
-				}
-
-                $transactionDetail->transaction_id           	= $request->transaction_detail['transaction_id'];
-                $transactionDetail->description              	= $request->transaction_detail['description'];
-                $transactionDetail->receipt_email            	= $request->transaction_detail['receipt_email'];
-                $transactionDetail->receipt_number           	= $request->transaction_detail['receipt_number'];
-                $transactionDetail->receipt_url              	= $request->transaction_detail['receipt_url'];
-                $transactionDetail->refund_url               	= $request->transaction_detail['refund_url'];
-                $transactionDetail->transaction_status       	= $request->transaction_detail['transaction_status'];
-                $transactionDetail->transaction_reference_no 	= $request->transaction_detail['transaction_reference_no'];
-                $transactionDetail->transaction_amount       	= $request->transaction_detail['transaction_amount'];
-                $transactionDetail->transaction_type         	= $request->transaction_detail['transaction_type'];
-                $transactionDetail->transaction_mode         	= $request->transaction_detail['transaction_mode'];
-                $transactionDetail->gateway_detail           	= $request->transaction_detail['gateway_detail'];
-                $transactionDetail->transaction_timestamp    	= $request->transaction_detail['transaction_timestamp'];
-                $transactionDetail->currency       		     	= $request->transaction_detail['currency'];
-				$transactionDetail->save();
-
-				//Update reward points
-				Auth::user()->update(['reward_points'=>(Auth::user()->reward_points - $request->used_reward_points)]);
-
-				//Mail-start-buyer
-                $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id',$order->user->language_id)->first();
-                if(empty($emailTemplate))
-                {
-                	$emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
-                }
-
-                $email_body = $emailTemplate->body;
-                $arrayVal = [
-                	'{{user_name}}' => AES256::decrypt($order->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($order->user->last_name, env('ENCRYPTION_KEY')),
-                	'{{order_number}}' => $order->order_number,
-                ];
-                $email_body = strReplaceAssoc($arrayVal, $email_body);
-                
-                $details = [
-                	'title' => $emailTemplate->subject,
-                	'body' => $email_body,
-                	// 'order_details' => Order::with('orderItems')->find($order->id),
-                	'order_details' => $order,
-                ];
-                
-                Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
-                //mail-end
 			}
 
 			$reward_point_value = $getAppSetting->customer_rewards_pt_value * $request->used_reward_points;
@@ -590,6 +488,176 @@ class OrderController extends Controller
 			]);
 
 			DB::commit();
+
+			$lang_id = $this->lang_id;
+			if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
+			$order = Order::with('orderItems.productsServicesBook.user','orderItems.productsServicesBook.addressDetail','orderItems.productsServicesBook.categoryMaster','orderItems.productsServicesBook.subCategory','orderItems.orderTrackings','orderItems.return','orderItems.replacement','orderItems.dispute','orderItems.ratingAndFeedback')
+			->with(['orderItems.productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['orderItems.productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->find($order->id);
+			return response()->json(prepareResult(false, $order, getLangByLabelGroups('messages','messages_order_created')), config('http_response.created'));
+		}
+		catch (\Throwable $exception)
+		{
+			DB::rollback();
+			\Log::error($exception);
+            return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+		}
+	}
+
+	public function updateOrderPaymentStatus(Request $request, $orderId)
+	{
+		$order = Order::find($orderId);
+		if(!$order)
+		{
+			return response(prepareResult(true, [], getLangByLabelGroups('orderDetails','order_not_found')), config('http_response.bad_request'));
+		}
+		DB::beginTransaction();
+		try
+		{
+			$order->payment_status = $request->payment_status;
+			$order->save();
+			if($order)
+			{
+				$paymentCardDetail = false;
+	            if(!empty($request->transaction_detail['payment_card_detail_id']))
+	            {
+	            	$paymentCardDetail = PaymentCardDetail::find($request->transaction_detail['payment_card_detail_id']);
+	            }
+				$transactionDetail = new TransactionDetail;
+				$transactionDetail->order_id = $order->id;
+
+				if($paymentCardDetail)
+				{
+					$transactionDetail->payment_card_detail_id   	= $request->transaction_detail['payment_card_detail_id'];
+					$transactionDetail->user_package_subscription_id   	= @$request->transaction_detail['user_package_subscription_id'];
+					$transactionDetail->card_number              	= $paymentCardDetail->card_number;
+					$transactionDetail->card_type                	= $paymentCardDetail->card_type;
+					$transactionDetail->card_cvv                 	= $paymentCardDetail->card_cvv;
+					$transactionDetail->card_expiry              	= $paymentCardDetail->card_expiry;
+					$transactionDetail->card_holder_name         	= $paymentCardDetail->card_holder_name;
+				}
+
+	            $transactionDetail->payment_status           	= $request->transaction_detail['payment_status'];
+	            $transactionDetail->transaction_id           	= $request->transaction_detail['transaction_id'];
+	            $transactionDetail->description              	= $request->transaction_detail['description'];
+	            $transactionDetail->receipt_email            	= $request->transaction_detail['receipt_email'];
+	            $transactionDetail->receipt_number           	= $request->transaction_detail['receipt_number'];
+	            $transactionDetail->receipt_url              	= $request->transaction_detail['receipt_url'];
+	            $transactionDetail->refund_url               	= $request->transaction_detail['refund_url'];
+	            $transactionDetail->transaction_status       	= $request->transaction_detail['transaction_status'];
+	            $transactionDetail->transaction_reference_no 	= $request->transaction_detail['transaction_reference_no'];
+	            $transactionDetail->transaction_amount       	= $request->transaction_detail['transaction_amount'];
+	            $transactionDetail->transaction_type         	= $request->transaction_detail['transaction_type'];
+	            $transactionDetail->transaction_mode         	= $request->transaction_detail['transaction_mode'];
+	            $transactionDetail->gateway_detail           	= $request->transaction_detail['gateway_detail'];
+	            $transactionDetail->transaction_timestamp    	= $request->transaction_detail['transaction_timestamp'];
+	            $transactionDetail->currency       		     	= $request->transaction_detail['currency'];
+				$transactionDetail->save();
+			}
+			DB::commit();
+
+			if($request->payment_status=='paid')
+			{
+				//Update reward points
+				Auth::user()->update(['reward_points'=>(Auth::user()->reward_points - $order->used_reward_points)]);
+
+				//Mail-start-buyer
+	            $emailTemplate = EmailTemplate::where('template_for','order_placed')->where('language_id',$order->user->language_id)->first();
+	            if(empty($emailTemplate))
+	            {
+	            	$emailTemplate = EmailTemplate::where('template_for','order_placed')->first();
+	            }
+
+	            if($emailTemplate)
+	            {
+	            	$email_body = $emailTemplate->body;
+		            $arrayVal = [
+		            	'{{user_name}}' => AES256::decrypt($order->user->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($order->user->last_name, env('ENCRYPTION_KEY')),
+		            	'{{order_number}}' => $order->order_number,
+		            	'{{payment_status}}' => $order->payment_status,
+		            ];
+		            $email_body = strReplaceAssoc($arrayVal, $email_body);
+		            
+		            $details = [
+		            	'title' => $emailTemplate->subject,
+		            	'body' => $email_body,
+		            	// 'order_details' => Order::with('orderItems')->find($order->id),
+		            	'order_details' => $order,
+		            ];
+		            
+		            Mail::to(AES256::decrypt($order->email, env('ENCRYPTION_KEY')))->send(new OrderPlacedMail($details));
+	            }
+			}
+
+			//Send Notification and update other things
+			foreach ($order->orderItems as $key => $orderedItem) 
+			{
+				if(!empty($orderedItem->products_services_book_id))
+				{
+					$orderTracking                  = new OrderTracking;
+					$orderTracking->order_item_id   = $orderedItem->id;
+					$orderTracking->status          = 'payment_'.$request->order_status;
+					$orderTracking->comment         = '';
+					$orderTracking->type         	= 'delivery';
+					$orderTracking->save();
+
+					//update Stock
+					$productsServicesBook = ProductsServicesBook::find($orderedItem->products_services_book_id);
+					if($request->payment_status=='paid')
+					{
+						$checkItemType = ProductsServicesBook::select('type','user_id')->find($orderedItem->products_services_book_id);
+						$vendor_user_id = $checkItemType->user_id;
+						if($checkItemType->type=='product' || $checkItemType->type=='book')
+						{
+							ProductsServicesBook::where('id',$orderedItem->products_services_book_id)->update(['quantity' => $productsServicesBook->quantity - $orderedItem->quantity]);
+						}
+
+	                    // Notification Start
+						$title = 'New Order Received';
+						$body =  'New Order Received for product '.$productsServicesBook->title;
+						$user = $productsServicesBook->user;
+						$type = 'Order Received';
+						$user_type = 'seller';
+						if($productsServicesBook->type == 'book')
+						{
+							$module = 'book';
+						}
+						else
+						{
+							$module = 'product_service';
+						}
+						pushNotification($title,$body,$user,$type,true,$user_type,$module,$order->id,'market-place-request');
+
+	                    $seller_details = [
+	                    	'title' => $title,
+	                    	'body' => $body
+	                    ];
+	                    
+	                    Mail::to(AES256::decrypt($orderedItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($seller_details));
+	                }
+                }
+                elseif(!empty($orderedItem->contest_application_id))
+                {
+                	$contestApplication = ContestApplication::find($orderedItem->contest_application_id);
+            		if($contestApplication)
+            		{
+            			$contestApplication->payment_status = $request->payment_status;
+            			$contestApplication->save();
+            		}
+                }
+			}
 
 			$lang_id = $this->lang_id;
 			if(empty($lang_id))

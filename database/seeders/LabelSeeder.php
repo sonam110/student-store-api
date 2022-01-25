@@ -3065,6 +3065,7 @@ class LabelSeeder extends Seeder
             "no_data" => "No Notifications"
         ),
         "orderDetails" => array(
+            "order_not_found" => "Order not found.",
             "view_order" => "View Order",
             "list_of_products" => "List Of Products",
             "cool_company_commission" => "Cool Company Commission",

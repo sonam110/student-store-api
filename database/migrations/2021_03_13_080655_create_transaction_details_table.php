@@ -24,12 +24,7 @@ class CreateTransactionDetailsTable extends Migration
             $table->foreign('payment_card_detail_id')->references('id')->on('payment_card_details')->onDelete('cascade');
 
             $table->string('user_package_subscription_id', 50)->nullable();
-
-            $table->text('description')->nullable();
-            $table->string('receipt_email')->nullable();
-            $table->string('receipt_number')->nullable();
-            $table->string('receipt_url')->nullable();
-            $table->string('refund_url')->nullable();
+            $table->enum('payment_status', ['processing','paid','failed'])->default('processing')->nullable();
             
             $table->string('transaction_id',100)->nullable();
             $table->string('transaction_reference_no',100)->nullable();
@@ -41,6 +36,12 @@ class CreateTransactionDetailsTable extends Migration
 
             $table->string('transaction_timestamp',50)->nullable();
             $table->string('currency',50)->nullable();
+
+            $table->text('description')->nullable();
+            $table->string('receipt_email')->nullable();
+            $table->string('receipt_number')->nullable();
+            $table->string('receipt_url')->nullable();
+            $table->string('refund_url')->nullable();
 
             $table->string('card_number')->nullable();
             $table->string('card_type')->nullable();

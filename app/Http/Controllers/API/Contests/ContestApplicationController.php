@@ -124,18 +124,9 @@ class ContestApplicationController extends Controller
                 $contestApplication->application_status = $request->application_status;
                 $contestApplication->subscription_status= $request->subscription_status;
                 $contestApplication->subscription_remark= $request->subscription_remark;
-                $contestApplication->document= $request->document;
+                $contestApplication->document = $request->document;
+                $contestApplication->payment_status = 'processing';
                 $contestApplication->save();
-
-                // Notification Start
-
-                $title = 'New Contest Application';
-                $body =  'New Application Received for Contest '.$contest->title;
-                $user = $contest->user;
-                $type = 'Contest Application';
-                pushNotification($title,$body,$user,$type,true,'seller','contest',$contestApplication->id,'created');
-
-                // Notification End
             }
             
     		DB::commit();

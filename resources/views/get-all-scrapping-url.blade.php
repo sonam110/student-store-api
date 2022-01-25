@@ -152,42 +152,77 @@ h1 small {
   text-decoration: underline;
 }
 </style>
-
+<script type="text/javascript">
+  var appurl = '{{url("/")}}/';
+</script>
 </head>
 <body>
 
 <h1> Scrap Data</h1>
 <section class="contact-wrap">
-  <form action="" class="scrap-form">
+  <form method="post" action="{{route('post-all-scrapping-url')}}" autocomplete="off" class="scrap-form">
+    @csrf
     <div class="col-sm-6">
       <div class="input-block">
-        <label for="">First Name</label>
-        <input type="text" class="form-control">
+        <label for="">Select Category</label>
+        <select name="category" required class="form-control" onchange="getSubCat(this.value)">
+          <option value="0">--Select Category--</option>
+          @foreach($categories as $cat)
+            <option value="{{$cat->id}}">{{$cat->title}}</option>
+          @endforeach
+        </select>
       </div>
     </div>
     <div class="col-sm-6">
       <div class="input-block">
-        <label for="">Last Name</label>
-        <input type="text" class="form-control">
+        <label for="">Select Sub Category</label>
+        <select name="subcategory" id="subcategory" required class="form-control">
+          <option value="0">--Select Sub Category--</option>
+          @foreach($categories as $cat)
+            <option value="{{$cat->id}}">{{$cat->title}}</option>
+          @endforeach
+        </select>
       </div>
     </div>
     <div class="col-sm-12">
       <div class="input-block">
-        <label for="">Email</label>
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="col-sm-12">
-      <div class="input-block">
-        <label for="">Message Subject</label>
-        <input type="text" class="form-control">
+        <label for="">Enter order.se Category URL</label>
+        <input type="text" name="url" class="form-control" required>
       </div>
     </div>
     <div class="col-sm-12">
       <button class="square-button">Submit</button>
+      <br>
     </div>
   </form>
 </section>
+<div>
+  <div class="col-md-12">
+    <br>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th width="5%">#</th>
+                <th>Category</th>
+                <th>Sub Category</th>
+                <th>URL</th>
+                <th>Read at</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($data as $key => $value)
+                <tr>
+                    <td>{{$key + 1}}</td>
+                    <td>{{$value->category}}</td>
+                    <td>{{$value->subcategory}}</td>
+                    <td>{{$value->url}}</td>
+                    <td>{{$value->read_at}}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+  </div>
+</div>
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script><script  src="./script.js"></script>
 <script type="text/javascript">
@@ -216,6 +251,18 @@ h1 small {
       }, 300);
     }
   })
+
+  function getSubCat(catId)
+  {
+    $.ajax({
+      type: "GET",
+      url: appurl+"sub-category-list/"+catId+"/1",
+      data:'',
+      success: function(data){
+        $("#subcategory").html(data);
+      }
+  });
+  }
 </script>
 </body>
 </html>
