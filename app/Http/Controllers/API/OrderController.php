@@ -653,6 +653,11 @@ class OrderController extends Controller
 	                    
 	                    Mail::to(AES256::decrypt($orderedItem->productsServicesBook->user->email, env('ENCRYPTION_KEY')))->send(new OrderMail($seller_details));
 	                }
+	                elseif($request->payment_status=='failed')
+	                {
+	                	$orderedItem->item_status = 'canceled';
+	                	$orderedItem->save();
+	                }
                 }
                 elseif(!empty($orderedItem->contest_application_id))
                 {
@@ -660,14 +665,21 @@ class OrderController extends Controller
             		if($contestApplication)
             		{
             			$contestApplication->payment_status = $request->payment_status;
+            			if($request->payment_status=='failed')
+						{
+							$contestApplication->application_status = 'canceled';
+						}
             			$contestApplication->save();
 
-            			// Notification Start
-		                $title = 'New Contest Application';
-		                $body =  'New Application Received for Contest '.$contestApplication->contest->title;
-		                $user = $contestApplication->contest->user;
-		                $type = 'Contest Application';
-		                pushNotification($title,$body,$user,$type,true,'seller','contest',$contestApplication->id,'created');
+            			if($request->payment_status=='paid')
+						{
+	            			// Notification Start
+			                $title = 'New Contest Application';
+			                $body =  'New Application Received for Contest '.$contestApplication->contest->title;
+			                $user = $contestApplication->contest->user;
+			                $type = 'Contest Application';
+			                pushNotification($title,$body,$user,$type,true,'seller','contest',$contestApplication->id,'created');
+			            }
             		}
                 }
 			}
