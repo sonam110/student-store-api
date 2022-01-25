@@ -56,6 +56,7 @@ class OrdersExport implements FromCollection, WithHeadings
             'quantity',
             'discount',
             'item_status',
+            'payment_status',
     		'Created At'
     	];
     }
@@ -141,7 +142,8 @@ class OrdersExport implements FromCollection, WithHeadings
     			'price'							=> $data->price,
     			'quantity'						=> $data->quantity,
     			'discount'						=> $data->discount,
-    			'item_status'					=> $data->item_status,
+                'item_status'                   => $data->item_status,
+    			'payment_status'				=> $data->payment_status,
               	'Created At'      				=> $data->created_at,
     		];
     	});

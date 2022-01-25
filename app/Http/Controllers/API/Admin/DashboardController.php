@@ -41,54 +41,86 @@ class DashboardController extends Controller
 				$data['total_jobs']             = Job::select('id')->where('user_id',$request->user_id)->count();
                 // $data['total_orders']        = Order::select('id')->count();
 
-
+				$data['total_spends']           = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.user_id', $request->user_id)
+				->sum(\DB::raw('order_items.price * order_items.quantity'));
+				
 				$data['total_orders']           = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.vendor_user_id', $request->user_id)
 				->count();
 				
 				$data['order_completed']        = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
 				->where('order_items.item_status','completed')
 				->count();
 				
 				$data['order_under_process']    = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
 				->where('order_items.item_status','processing')
 				->count();
 				
 				$data['order_delivered']        = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
 				->where('order_items.item_status','delivered')
 				->count();
 				
 				$data['total_earnings'] = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
 				->sum('order_items.amount_transferred_to_vendor');
 
 				$data['total_amount_refunded']  = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
 				->sum('order_items.amount_returned');
 				
 				$data['total_returned_items']   = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->join('order_item_returns', 'order_item_returns.order_item_id','=','order_items.id')
 				->where('order_items.vendor_user_id', $request->user_id)
 				->where('order_items.item_status','returned')
-				->count();
+				->sum('order_item_returns.quantity');
 				
-				$data['student_store_commission'] = OrderItem::where('order_items.vendor_user_id', $request->user_id)
+				$data['student_store_commission'] = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.vendor_user_id', $request->user_id)
 				->sum('student_store_commission');
 
-				$data['cool_company_commission'] = OrderItem::where('order_items.vendor_user_id', $request->user_id)
+				$data['cool_company_commission'] = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.vendor_user_id', $request->user_id)
 				->sum('cool_company_commission');
 
-				$data['amount_transferred_to_vendor'] = OrderItem::where('order_items.vendor_user_id', $request->user_id)
+				$data['amount_transferred_to_vendor'] = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.vendor_user_id', $request->user_id)
 				->where('order_items.is_transferred_to_vendor', '1')
 				->sum('amount_transferred_to_vendor');
 
-				$data['pending_amount_transferred_to_vendor'] = OrderItem::where('order_items.vendor_user_id', $request->user_id)
+				$data['pending_amount_transferred_to_vendor'] = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.vendor_user_id', $request->user_id)
 				->where('order_items.is_transferred_to_vendor', '0')
 				->sum('amount_transferred_to_vendor');
 			}
 			else
 			{
+				$data['total_spends']           = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->sum(\DB::raw('order_items.price * order_items.quantity'));
+
 				$data['total_students']         = User::select('id')->where('user_type_id',2)->count();
 				$data['total_companies']        = User::select('id')->where('user_type_id',3)->count();
 				$data['total_normal_users']     = User::select('id')->where('user_type_id',4)->count();
@@ -99,30 +131,62 @@ class DashboardController extends Controller
 				$data['total_events']           = Contest::select('id')->where('type','event')->count();
 				$data['total_jobs']             = Job::select('id')->count();
                 // $data['total_orders']        = Order::select('id')->count();
-				$data['total_orders']           = OrderItem::select('order_items.id')->count();
-				$data['order_completed']        = OrderItem::select('order_items.id')->where('order_items.item_status','completed')
+				$data['total_orders']           = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->count();
 
-				$data['order_under_process']    = OrderItem::select('order_items.id')->where('order_items.item_status','processing')
+				$data['order_completed']        = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.item_status','completed')
 				->count();
 
-				$data['order_delivered']        = OrderItem::select('order_items.id')->where('order_items.item_status','delivered')
+				$data['order_under_process']    = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.item_status','processing')
 				->count();
 
-				$data['total_earnings']         = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))->get()[0]['total_amount'];
-
-				$data['total_amount_refunded']  = OrderItem::select('order_items.id')->sum('amount_returned');
-
-				$data['total_returned_items']   = OrderItem::select('order_items.id')->where('order_items.item_status','returned')
+				$data['order_delivered']        = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.item_status','delivered')
 				->count();
 
-				$data['student_store_commission']  = OrderItem::sum('student_store_commission');
+				$data['total_earnings']         = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->get()[0]['total_amount'];
 
-				$data['cool_company_commission']= OrderItem::sum('cool_company_commission');
+				$data['total_amount_refunded']  = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->sum('amount_returned');
 
-				$data['amount_transferred_to_vendor']  = OrderItem::where('is_transferred_to_vendor', '1')->sum('amount_transferred_to_vendor');
+				$data['total_returned_items']   = OrderItem::select('order_items.id')
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('order_items.item_status','returned')
+				->count();
 
-				$data['pending_amount_transferred_to_vendor']  = OrderItem::where('is_transferred_to_vendor', '0')->sum('amount_transferred_to_vendor');
+				$data['student_store_commission']  = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->sum('student_store_commission');
+
+				$data['cool_company_commission']= OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->sum('cool_company_commission');
+
+				$data['amount_transferred_to_vendor']  = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('is_transferred_to_vendor', '1')
+				->sum('amount_transferred_to_vendor');
+
+				$data['pending_amount_transferred_to_vendor']  = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->where('is_transferred_to_vendor', '0')
+				->sum('amount_transferred_to_vendor');
 			}
 
 			return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
@@ -151,6 +215,8 @@ class DashboardController extends Controller
 					->join('products_services_books', function ($join) {
 						$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.product_type','book')
 					->where('order_items.created_at','like','%'.$date.'%')
 					->where('products_services_books.user_id',$request->user_id);
@@ -160,6 +226,8 @@ class DashboardController extends Controller
 					->join('products_services_books', function ($join) {
 						$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.product_type','service')
 					->where('order_items.created_at','like','%'.$date.'%')
 					->where('products_services_books.user_id',$request->user_id);
@@ -169,6 +237,8 @@ class DashboardController extends Controller
 					->join('products_services_books', function ($join) {
 						$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.product_type','product')
 					->where('order_items.created_at','like','%'.$date.'%')
 					->where('products_services_books.user_id',$request->user_id);
@@ -181,6 +251,8 @@ class DashboardController extends Controller
 					->join('contests', function ($join) {
 						$join->on('contest_applications.contest_id', '=', 'contests.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.contest_type','contest')
 					->whereDate('order_items.created_at','like','%'.$date.'%')
 					->where('contests.user_id',$request->user_id);
@@ -194,6 +266,8 @@ class DashboardController extends Controller
 					->join('contests', function ($join) {
 						$join->on('contest_applications.contest_id', '=', 'contests.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.contest_type','event')
 					->where('order_items.created_at','like','%'.$date.'%')
 					->where('contests.user_id',$request->user_id);
@@ -205,6 +279,8 @@ class DashboardController extends Controller
 					->join('products_services_books', function ($join) {
 						$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.product_type','book')
 					->where('order_items.created_at','like','%'.$date.'%');
 
@@ -213,6 +289,8 @@ class DashboardController extends Controller
 					->join('products_services_books', function ($join) {
 						$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.product_type','service')
 					->where('order_items.created_at','like','%'.$date.'%');
 
@@ -221,6 +299,8 @@ class DashboardController extends Controller
 					->join('products_services_books', function ($join) {
 						$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.product_type','product')
 					->where('order_items.created_at','like','%'.$date.'%');
 
@@ -232,6 +312,8 @@ class DashboardController extends Controller
 					->join('contests', function ($join) {
 						$join->on('contest_applications.contest_id', '=', 'contests.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.contest_type','contest')
 					->whereDate('order_items.created_at','like','%'.$date.'%');
 
@@ -243,6 +325,8 @@ class DashboardController extends Controller
 					->join('contests', function ($join) {
 						$join->on('contest_applications.contest_id', '=', 'contests.id');
 					})
+					->join('orders', 'orders.id','=','order_items.order_id')
+					->where('orders.payment_status', 'paid')
 					->where('order_items.contest_type','event')
 					->where('order_items.created_at','like','%'.$date.'%');
 				}
@@ -282,7 +366,10 @@ class DashboardController extends Controller
 			$total_sales_book_list = OrderItem::join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.product_type','book')
+			->where('order_items.quantity', '>','0')
 			->limit(10)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory','order.user:id,first_name,last_name,user_type_id')
 			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -304,6 +391,8 @@ class DashboardController extends Controller
 			$total_sales_service_list = OrderItem::join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.product_type','service')
 			->limit(10)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory','order.user:id,first_name,last_name,user_type_id')
@@ -326,6 +415,8 @@ class DashboardController extends Controller
 			$total_sales_product_list = OrderItem::join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.product_type','product')
 			->limit(10)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory','order.user:id,first_name,last_name,user_type_id')
@@ -351,6 +442,8 @@ class DashboardController extends Controller
 			->join('contests', function ($join) {
 				$join->on('contest_applications.contest_id', '=', 'contests.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.contest_type','contest')
 			->limit(10)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory','order.user:id,first_name,last_name,user_type_id')
@@ -376,6 +469,8 @@ class DashboardController extends Controller
 			->join('contests', function ($join) {
 				$join->on('contest_applications.contest_id', '=', 'contests.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.contest_type','event')
 			->limit(10)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory','order.user:id,first_name,last_name,user_type_id')
@@ -422,6 +517,8 @@ class DashboardController extends Controller
 			->join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.product_type','book')
 			->limit(5)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory')
@@ -446,6 +543,8 @@ class DashboardController extends Controller
 			->join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.product_type','service')
 			->limit(5)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory')
@@ -470,6 +569,8 @@ class DashboardController extends Controller
 			->join('products_services_books', function ($join) {
 				$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.product_type','product')
 			->limit(5)
 			->with('productsServicesBook.user:id,first_name,last_name,user_type_id','productsServicesBook.categoryMaster','productsServicesBook.subCategory')
@@ -497,6 +598,8 @@ class DashboardController extends Controller
 			->join('contests', function ($join) {
 				$join->on('contest_applications.contest_id', '=', 'contests.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.contest_type','contest')
 			->limit(5)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory')
@@ -524,6 +627,8 @@ class DashboardController extends Controller
 			->join('contests', function ($join) {
 				$join->on('contest_applications.contest_id', '=', 'contests.id');
 			})
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
 			->where('order_items.contest_type','event')
 			->limit(5)
 			->with('contestApplication.contest.user:id,first_name,last_name,user_type_id','contestApplication.contest.categoryMaster','contestApplication.contest.subCategory')
@@ -568,6 +673,8 @@ class DashboardController extends Controller
 				->join('products_services_books',function ($join) {
 					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 				})
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->where('products_services_books.user_id',$request->user_id)
 				->whereDate('order_items.created_at',date('Y-m-d'))
 				->get()[0]['total_amount'];
@@ -578,6 +685,8 @@ class DashboardController extends Controller
 				->join('contests',function ($join) {
 					$join->on('contest_applications.contest_id', '=', 'contests.id');
 				})
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->whereDate('order_items.created_at',date('Y-m-d'))
 				->where('contests.user_id',$request->user_id)
 				->get()[0]['total_amount'];
@@ -586,6 +695,8 @@ class DashboardController extends Controller
 				->join('products_services_books',function ($join) {
 					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 				})
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->where('products_services_books.user_id',$request->user_id)
 				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-7days')))
 				->get()[0]['total_amount'];
@@ -596,6 +707,8 @@ class DashboardController extends Controller
 				->join('contests',function ($join) {
 					$join->on('contest_applications.contest_id', '=', 'contests.id');
 				})
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-7days')))
 				->where('contests.user_id',$request->user_id)
 				->get()[0]['total_amount'];
@@ -604,6 +717,8 @@ class DashboardController extends Controller
 				->join('products_services_books',function ($join) {
 					$join->on('order_items.products_services_book_id', '=', 'products_services_books.id');
 				})
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->where('products_services_books.user_id',$request->user_id)
 				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-30days')))
 				->get()[0]['total_amount'];
@@ -614,16 +729,30 @@ class DashboardController extends Controller
 				->join('contests',function ($join) {
 					$join->on('contest_applications.contest_id', '=', 'contests.id');
 				})
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
 				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-30days')))
 				->where('contests.user_id',$request->user_id)
 				->get()[0]['total_amount'];
 			}
 			else
 			{
-				$data['total_earnings_of_today'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))->whereDate('order_items.created_at',date('Y-m-d'))->get()[0]['total_amount'];
+				$data['total_earnings_of_today'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->whereDate('order_items.created_at',date('Y-m-d'))
+				->get()[0]['total_amount'];
 
-				$data['total_earnings_of_week'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-7days')))->get()[0]['total_amount'];
-				$data['total_earnings_of_month'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-30days')))->get()[0]['total_amount'];
+				$data['total_earnings_of_week'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-7days')))
+				->get()[0]['total_amount'];
+				$data['total_earnings_of_month'] = OrderItem::select('order_items.id',\DB::raw('sum(order_items.price * order_items.quantity) as total_amount'))
+				->join('orders', 'orders.id','=','order_items.order_id')
+				->where('orders.payment_status', 'paid')
+				->whereDate('order_items.created_at','>=',date('Y-m-d',strtotime('-30days')))
+				->get()[0]['total_amount'];
 			}
 			return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_list')), config('http_response.success'));
 		}

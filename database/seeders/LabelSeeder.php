@@ -3143,7 +3143,9 @@ class LabelSeeder extends Seeder
             "declined" => "Declined",
             "dispute_initiated" => "Dispute",
             "reviewed_by_seller" => "Review",
-            "pending" => "Pending"
+            "pending" => "Pending",
+            "payment_failed" => "Payment Failed",
+            "payment_paid" => "Payment Success"
         ),
         "order_status_custom" => array(
             "all" => "All",
@@ -3707,6 +3709,8 @@ class LabelSeeder extends Seeder
             "creator" => "Creator : "
         ),
         "product_myorders_detail" => array(
+            "payment_method" => "Payment Method",
+            "transaction_id" => "Transaction Id",
             "order_number" => "Order Number",
             "seller" => "Seller",
             "address_type" => "Address type :",
