@@ -407,6 +407,8 @@ class OrderController extends Controller
 					$orderItem->order_id						= $order->id;
 					if(!empty($orderedItem['product_id']))
 					{
+						$checkItemType = ProductsServicesBook::select('type','user_id')->find($orderedItem->products_services_book_id);
+						$vendor_user_id = $checkItemType->user_id;
 						$orderItem->products_services_book_id = $orderedItem['product_id'];
 						$orderItem->product_type = $productsServicesBook->type;
 						$orderItem->note_to_seller = $orderedItem['note_to_seller'];
