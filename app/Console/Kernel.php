@@ -18,6 +18,7 @@ use App\Console\Commands\StripeFundTransferred;
 use App\Console\Commands\StripeAccountStatusCheck;
 use App\Console\Commands\AutoSwichPackageIfExpired;
 use App\Console\Commands\ExportFileRemove;
+use App\Console\Commands\CheckSwishPaymentStatus;
 
 
 class Kernel extends ConsoleKernel
@@ -42,6 +43,7 @@ class Kernel extends ConsoleKernel
         StripeAccountStatusCheck::class,
         AutoSwichPackageIfExpired::class,
         ExportFileRemove::class,
+        CheckSwishPaymentStatus::class,
     ];
 
     /**
@@ -69,6 +71,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('subscribedPackage:expire')->dailyAt('09:00');
         $schedule->command('expiredpackage:switchtofree')->dailyAt('00:01');
         $schedule->command('file:remove')->dailyAt('02:00');
+        
+        $schedule->command('checkswish:paymentstatus')->everyMinute();;
         
     }
 
