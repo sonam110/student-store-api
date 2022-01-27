@@ -23,35 +23,36 @@ class CheckSwishPaymentStatus extends Command
             ->whereNotNull('swish_payment_token')->get();
         if($getOrders->count()>0)
         {
-            $paymentInfo = PaymentGatewaySetting::select('swish_access_token')->first();
-            $accessToken = $paymentInfo->swish_access_token;
-            $transactionUrl = env('SWISH_URL').'/psp/swish/payments/'.$transaction_token.'/sales';
-            $headers = [
-                'Content-Type: application/json',
-                'Authorization: Bearer '.$accessToken,
-            ];
-
-            $curl = curl_init();
-
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-            curl_setopt($curl, CURLOPT_URL, $transactionUrl);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($curl, CURLOPT_FAILONERROR, false);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-
-            $rawResponse = curl_exec($curl);
-            $response = json_decode($rawResponse);
-            if(curl_errno($curl)>0)
+            foreach ($getOrders as $key => $order) 
             {
-                $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
-                return response()->json(prepareResult(true, $info, "Error while getting swish transaction information."), config('http_response.internal_server_error'));
+                $paymentInfo = PaymentGatewaySetting::select('swish_access_token')->first();
+                $accessToken = $paymentInfo->swish_access_token;
+                $transactionUrl = env('SWISH_URL').'/psp/swish/payments/'.$order->swish_payment_token.'/sales';
+                $headers = [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer '.$accessToken,
+                ];
+
+                $curl = curl_init();
+
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+                curl_setopt($curl, CURLOPT_URL, $transactionUrl);
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($curl, CURLOPT_FAILONERROR, false);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+                $rawResponse = curl_exec($curl);
+                $response = json_decode($rawResponse);
+                if(curl_errno($curl)>0)
+                {
+                    $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
+                    \Log::error('Swish while checking payment status. order no. is: '.$order->id);
+                    \Log::error($info);
+                }
+                curl_close($curl);
+                \Log::info($response);
             }
-            curl_close($curl);
-            $returnData = [
-                'created'   => time(),
-                'swish_response' => $response
-            ];
         }
     }
 }
