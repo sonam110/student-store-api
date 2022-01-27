@@ -256,6 +256,7 @@ Route::group(['middleware' => 'auth:api'],function () {
 	Route::post('/checkin-swish', [App\Http\Controllers\API\OrderController::class,'checkinSwish']);
 	Route::post('/create-commerce-sale-transaction', [App\Http\Controllers\API\OrderController::class,'createCommerceSaleTransaction']);
 	Route::post('/get-the-payment-status', [App\Http\Controllers\API\OrderController::class,'getThePaymentStatus']);
+	Route::get('/get-swish-transactions/{transaction_id}', [App\Http\Controllers\API\OrderController::class,'getSwishTransactions']);
 
 	//Swedbankpay capture
 	Route::post('/swedbankpay-capture', [App\Http\Controllers\API\OrderController::class,'swedbankpayCapture']);
