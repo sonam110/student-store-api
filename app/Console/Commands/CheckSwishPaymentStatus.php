@@ -48,7 +48,7 @@ class CheckSwishPaymentStatus extends Command
                 {
                     $info = curl_errno($curl)>0 ? array("curl_error_".curl_errno($curl)=>curl_error($curl)) : curl_getinfo($curl);
                     \Log::error('Swish while checking payment status. order no. is: '.$order->id);
-                    \Log::error($info);
+                    //\Log::error($info);
                 }
                 curl_close($curl);
                 \Log::info($response);
