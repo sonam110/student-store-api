@@ -87,11 +87,14 @@ class RatingAndFeedbackController extends Controller
             try
             {
                 $contest = Contest::find($request->contest_id);
+
+                $orderItem = OrderItem::where('contest_id', $request->contest_id)->where('user_id', auth()->id())->first();
+
                 // $orderItem = OrderItem::find($request->order_item_id);
                 $ratingAndFeedback = new RatingAndFeedback;
                 $ratingAndFeedback->from_user                   = Auth::id();
                 $ratingAndFeedback->to_user                     = $contest->user_id;
-                $ratingAndFeedback->order_item_id               = null;
+                $ratingAndFeedback->order_item_id               = @$orderItem->id;
                 $ratingAndFeedback->products_services_book_id   = null;
                 $ratingAndFeedback->contest_id                  = $request->contest_id;
                 $ratingAndFeedback->product_feedback            = $request->product_feedback;
@@ -101,7 +104,11 @@ class RatingAndFeedbackController extends Controller
                 $ratingAndFeedback->is_feedback_approved        = 0;
                 $ratingAndFeedback->save();
 
-                OrderItem::where('contest_id', $request->contest_id)->where('user_id', auth()->id())->update(['is_rated'=>true]);
+                if($orderItem)
+                {
+                    $orderItem->is_rated = true;
+                    $orderItem->save();
+                }
 
                 $user = User::find($ratingAndFeedback->to_user);
                 $userRating = (RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->sum('user_rating'))/(RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->count());
