@@ -101,6 +101,8 @@ class RatingAndFeedbackController extends Controller
                 $ratingAndFeedback->is_feedback_approved        = 0;
                 $ratingAndFeedback->save();
 
+                OrderItem::where('contest_id', $request->contest_id)->where('user_id', auth()->id())->update(['is_rated'=>true]);
+
                 $user = User::find($ratingAndFeedback->to_user);
                 $userRating = (RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->sum('user_rating'))/(RatingAndFeedback::where('to_user',$ratingAndFeedback->to_user)->count());
 
