@@ -979,6 +979,7 @@ class OrderController extends Controller
 				$replaceOrderItem->item_payment_status = true;
 				$replaceOrderItem->note_to_seller = $orderItem->note_to_seller;
 				$replaceOrderItem->order_type = 1;
+				$replaceOrderItem->delivery_type = $orderItem->delivery_type;
 				$replaceOrderItem->save();
 
 				$orderTracking                  = new OrderTracking;
