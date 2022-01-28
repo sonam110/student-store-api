@@ -48,22 +48,23 @@ class ContactUsController extends Controller
             {
                 $emailTemplate = EmailTemplate::where('template_for','contact-us')->first();
             }
+            if($emailTemplate)
+            {
+                $body = $emailTemplate->body;
 
-            $body = $emailTemplate->body;
+                $arrayVal = [
+                    '{{user_name}}' => $request->name,
+                ];
+                $body = strReplaceAssoc($arrayVal, $body);
+                
+                $details = [
+                    'title' => $emailTemplate->subject,
+                    'body' => $body,
+                ];
 
-            $arrayVal = [
-                '{{user_name}}' => $request->name,
-            ];
-            $body = strReplaceAssoc($arrayVal, $body);
+                Mail::to($request->email)->send(new ContactUsMail($details));
+            }
             
-            $details = [
-                'title' => $emailTemplate->subject,
-                'body' => $body,
-            ];
-
-            Mail::to($request->email)->send(new ContactUsMail($details));
-
-
             DB::commit();
             return response()->json(prepareResult(false, $contactUs, getLangByLabelGroups('messages','message_contact_us_created')), config('http_response.created'));
         }
