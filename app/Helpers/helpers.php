@@ -732,3 +732,35 @@ function createFreePackage($userType, $module, $userId)
     }
 	}
 }
+
+function sendTestPushNoti()
+{
+	$push = new PushNotification('fcm');
+	$push->setMessage([
+		"notification"=>[
+			'title' => 'testing title from SS',
+			'body'  => 'Testing Body from SS',
+			'sound' => 'default',
+			'android_channel_id' => '1',
+		],
+		'data'=>[
+			'id'  => 'test',
+			'user_type'  => 'creator',
+			'module'  => 'test',
+			'screen'  => 'test screen'
+		]                        
+	])
+	->setApiKey(env('FIREBASE_KEY'))
+	->setDevicesToken('fbL6N3VoRS2YiC7oDUrOtX:APA91bEBfzj1_vIBe0aTq_kW3jtcE2wazQ1W_JtfrI2zn-ZT6W2TqKyuroRgLW-ngWnuSJpu4g0P0kfjNUHuzjk_2vLlgTV8sysR2ocsXQvfL_cHtMIF9srOTdhmUaApBaq7WUbp7akl')
+	->send();
+	return $push->getFeedback();
+
+	//change code vendor\edujugon\push-notification\src\Gcm.php
+	/*protected function addRequestHeaders() 
+  { 
+      return [ 
+          'Authorization' => 'key=' . $this->config['apiKey'], 
+          'Content-Type'  =>'application/json' 
+      ]; 
+  }*/
+}

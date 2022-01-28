@@ -17,6 +17,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/check-push-notification', 'App\Http\Controllers\API\FrontController@checkPushNotification');
+
 Route::get('/function-checking', 'App\Http\Controllers\API\FrontController@functionChecking');
 
 Route::get('/payout', 'App\Http\Controllers\API\FrontController@payout');

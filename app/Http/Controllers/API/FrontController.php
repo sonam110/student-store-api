@@ -871,4 +871,10 @@ class FrontController extends Controller
     	}*/
     	dd('done');
     }
+
+    public function checkPushNotification()
+    {
+    	$status = sendTestPushNoti();
+    	return $status;
+    }
 }

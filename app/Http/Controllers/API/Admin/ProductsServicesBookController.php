@@ -826,6 +826,10 @@ class ProductsServicesBookController extends Controller
                 {
                     $products->where('products_services_books.title', 'LIKE', '%'.$request->title.'%');
                 }
+                if(!empty($request->search_title))
+                {
+                    $products->where('products_services_books.title', 'LIKE', '%'.$request->search_title.'%');
+                }
                 if(!empty($request->avg_rating))
                 {
                     $products->where('products_services_books.avg_rating', '>=', $request->avg_rating);
