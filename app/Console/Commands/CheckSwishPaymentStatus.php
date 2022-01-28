@@ -51,7 +51,7 @@ class CheckSwishPaymentStatus extends Command
                     //\Log::error($info);
                 }
                 curl_close($curl);
-                \Log::info($response);
+                \Log::info($rawResponse);
             }
         }
     }
