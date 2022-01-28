@@ -189,21 +189,37 @@ class ProductsImport implements ToModel,WithHeadingRow
                     $products->sku                       = $row['sku_required'];
                 }
 
-                
-                $products->basic_price_wo_vat        = $row['original_price_required'];
-                $products->price                     = $getCommVal['price_with_all_com_vat'];
-                $products->is_on_offer               = $is_on_offer;
-                $products->discount_type             = $discount_type;
-                $products->discount_value            = $discount_value;
-                $products->discounted_price          = $getCommVal['totalAmount'];
 
                 $products->vat_percentage = $vat_percentage;
-                $products->vat_amount = $getCommVal['vat_amount'];
-                $products->ss_commission_percent = $getCommVal['ss_commission_percent'];
-                $products->ss_commission_amount = $getCommVal['ss_commission_amount'];
-                $products->cc_commission_percent_all = $getCommVal['totalCCPercent'];
-                $products->cc_commission_amount_all = $getCommVal['totalCCAmount'];
-                
+                if($row['sell_type_required']=='free')
+                {
+                    $products->basic_price_wo_vat        = 0;
+                    $products->price                     = 0;
+                    $products->is_on_offer               = 0;
+                    $products->discount_type             = 1;
+                    $products->discount_value            = 0;
+                    $products->discounted_price          = 0;
+                    $products->vat_amount = 0;
+                    $products->ss_commission_percent = $getCommVal['ss_commission_percent'];
+                    $products->ss_commission_amount = 0;
+                    $products->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+                    $products->cc_commission_amount_all = 0;
+                }
+                else
+                {
+                    $products->basic_price_wo_vat        = $row['original_price_required'];
+                    $products->price                     = $getCommVal['price_with_all_com_vat'];
+                    $products->is_on_offer               = $is_on_offer;
+                    $products->discount_type             = $discount_type;
+                    $products->discount_value            = $discount_value;
+                    $products->discounted_price          = $getCommVal['totalAmount'];
+                    $products->vat_amount = $getCommVal['vat_amount'];
+                    $products->ss_commission_percent = $getCommVal['ss_commission_percent'];
+                    $products->ss_commission_amount = $getCommVal['ss_commission_amount'];
+                    $products->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+                    $products->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+                }
+                     
                 $products->quantity                  = $row['quantity_required'];
                 $products->short_summary             = Str::limit(strip_tags($row['book_description_required']), 250);
                 $products->description               = $row['book_description_required'];
