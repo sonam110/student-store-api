@@ -2252,6 +2252,7 @@ class LabelSeeder extends Seeder
             "enter_otp" => "Enter Otp"
         ),
         "message" => array(
+            "message_tracking_number_length" => "Tracking number length should be between 8 to 15 characters.",
             "keywords_tooltip" => "You can add multiple keywords, max 50, use enter key to add multiple tags",
             "packages_can_not_be_deleted" => "Package in use, unable not delete package.",
             "no_more_data_to_show" => "No More Data To Show",
