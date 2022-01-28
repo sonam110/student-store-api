@@ -299,10 +299,10 @@ class UserController extends Controller
 	    try
 	    {
 	        $users = User::whereIn('id',$request->user_id)->get();
-	        foreach ($users as $key => $user) {
+	        foreach ($users as $key => $user) 
+	        {
 	            $user->status = $request->status;
 	            $user->save();
-
 
 	            if($user->user_type_id == 2)
 	            {

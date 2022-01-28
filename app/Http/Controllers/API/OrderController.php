@@ -156,7 +156,7 @@ class OrderController extends Controller
 			})
 			->orderBy('order_items.created_at','DESC')
 			->where('products_services_books.user_id',Auth::id())
-			->with('productsServicesBook.user.serviceProviderDetail','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','productsServicesBook.subCategory','user','orderTrackings','return','replacement','dispute','ratingAndFeedback','order:id,order_number,first_name,last_name,email,contact_number,latitude,longitude,country,state,city,full_address,zip_code','order.addressDetail')
+			->with('productsServicesBook.user.serviceProviderDetail','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','productsServicesBook.subCategory','user','orderTrackings','return','replacement','dispute','ratingAndFeedback','order:id,order_number,first_name,last_name,email,contact_number,latitude,longitude,country,state,city,full_address,zip_code,payment_status','order.addressDetail')
 			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
