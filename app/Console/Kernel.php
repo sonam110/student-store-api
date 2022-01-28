@@ -72,7 +72,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('expiredpackage:switchtofree')->dailyAt('00:01');
         $schedule->command('file:remove')->dailyAt('02:00');
         
-        $schedule->command('checkswish:paymentstatus')->everyMinute();;
+        //$schedule->command('checkswish:paymentstatus')->everyMinute();;
         
     }
 
