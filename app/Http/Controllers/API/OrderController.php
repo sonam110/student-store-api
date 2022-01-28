@@ -925,9 +925,9 @@ class OrderController extends Controller
 			$orderItemReplacement->replacement_status             	= $request->item_status;
 			$orderItemReplacement->save();
 
-			//Temp comment gourav
-			//if(empty($request->replacement_code))
-			//{
+			
+			if(empty($request->replacement_code))
+			{
 				$orderItem = OrderItem::find($orderItemReplacement->order_item_id);
 				$used_item_reward_points = $orderItem->used_item_reward_points;
 				$earned_reward_points = $orderItem->earned_reward_points;
@@ -989,7 +989,7 @@ class OrderController extends Controller
 				$orderTracking->save();
 
 				$orderQuantity = $orderItemReplacement->quantity;
-			//}
+			}
 
 			$title = 'Replacement Request Accepted';
 			$body =  'Request for replacement of ordered product '.$orderItem->title.' has Accepted.';
