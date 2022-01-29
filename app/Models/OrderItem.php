@@ -54,7 +54,7 @@ class OrderItem extends Model
     
     public function orderTrackings()
     {
-        return $this->hasMany(OrderTracking::class,'order_item_id','id')->orderBy('created_at','ASC');
+        return $this->hasMany(OrderTracking::class,'order_item_id','id')->orderBy('auto_id','ASC');
     }
 
     public function ratingAndFeedback()
