@@ -626,6 +626,16 @@ class OrderController extends Controller
 					$orderTracking->type         	= 'delivery';
 					$orderTracking->save();
 
+					if($request->payment_status=='failed')
+					{
+						$orderTracking                  = new OrderTracking;
+						$orderTracking->order_item_id   = $orderedItem->id;
+						$orderTracking->status          = 'canceled';
+						$orderTracking->comment         = 'canceled because payment failed.';
+						$orderTracking->type         	= 'delivery';
+						$orderTracking->save();
+					}
+
 					//update Stock
 					$productsServicesBook = ProductsServicesBook::find($orderedItem->products_services_book_id);
 
