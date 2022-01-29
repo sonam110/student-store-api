@@ -2876,7 +2876,7 @@ class ProductsServicesBookController extends Controller
         $content->is_used_item = 'yes';
         $content->type = 'book';
         $content->searchType = 'random';
-        $content->per_page_record = '5';
+        $content->per_page_record = !empty($request->per_page_record) ? $request->per_page_record : '5';
         $content->other_function = 'yes';
         $content->lang_id = $request->lang_id;
         $student_book_random = $this->studentBooksFilter($content);
