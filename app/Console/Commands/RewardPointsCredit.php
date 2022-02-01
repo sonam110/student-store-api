@@ -46,9 +46,9 @@ class RewardPointsCredit extends Command
             ->whereNotNull('order_items.return_applicable_date')
             ->where('orders.payment_status', 'paid')
             ->where('order_items.earned_reward_points', '>', 0)
-            ->where('reward_point_status','pending')
+            ->where('order_items.reward_point_status','pending')
             ->whereIn('order_items.item_status',['completed', 'replaced', 'returned'])
-            ->whereRaw("(CASE WHEN is_disputed = 1 THEN disputes_resolved_in_favour = 1 ELSE is_disputed=0 END)")
+            ->whereRaw("(CASE WHEN order_items.is_disputed = 1 THEN order_items.disputes_resolved_in_favour = 1 ELSE order_items.is_disputed=0 END)")
             ->get();
           foreach($orderItems as $orderItem) 
           {
