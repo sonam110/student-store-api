@@ -451,7 +451,7 @@ class DashboardController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
             }])
-			->groupBy('order_items.contest_application_id')
+			->groupBy('order_items.contest_id')
 			->orderBy('total_order_count', 'DESC')
 			->where('contests.user_id',Auth::id());
 
@@ -478,7 +478,7 @@ class DashboardController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
             }])
-			->groupBy('order_items.contest_application_id')
+			->groupBy('order_items.contest_id')
 			->orderBy('total_order_count', 'DESC')
 			->where('contests.user_id',Auth::id());
 
