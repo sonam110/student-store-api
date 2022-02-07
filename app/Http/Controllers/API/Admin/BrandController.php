@@ -10,10 +10,20 @@ use Str;
 use DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\BrandsImport;
+use App\Models\Language;
 use Auth;
 
 class BrandController extends Controller
 {
+    function __construct()
+    {
+        $this->lang_id = Language::select('id')->first()->id;
+        if(!empty(request()->lang_id))
+        {
+            $this->lang_id = request()->lang_id;
+        }
+    }
+
 	public function index(Request $request)
 	{
         try
@@ -99,7 +109,18 @@ class BrandController extends Controller
      */
     public function show(Brand $brand)
     {
-    	return response()->json(prepareResult(false, $brand, getLangByLabelGroups('messages','message_brand_list')), config('http_response.success'));
+        $lang_id = $this->lang_id;
+        if(empty($lang_id))
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
+        $brandInfo = Brand::with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->find($brand->id);
+    	return response()->json(prepareResult(false, $brandInfo, getLangByLabelGroups('messages','message_brand_list')), config('http_response.success'));
     }
 
     /**

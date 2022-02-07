@@ -131,7 +131,7 @@ class PackageController extends Controller
             $package->subscription              = $request->subscription;
             $package->commission_per_sale       = $request->commission_per_sale;
             $package->number_of_contest         = $request->number_of_contest;
-            $package->number_of_event           = $request->number_of_event;
+            $package->number_of_event           = $request->number_of_contest;
             $package->number_of_product         = $request->number_of_product;
             $package->number_of_service         = $request->number_of_service;
             $package->number_of_book            = $request->number_of_book;
@@ -296,7 +296,7 @@ class PackageController extends Controller
             $package->subscription              = $request->subscription;
             $package->commission_per_sale       = $request->commission_per_sale;
             $package->number_of_contest         = $request->number_of_contest;
-            $package->number_of_event           = $request->number_of_event;
+            $package->number_of_event           = $request->number_of_contest;
             $package->number_of_product         = $request->number_of_product;
             $package->number_of_service         = $request->number_of_service;
             $package->number_of_book            = $request->number_of_book;

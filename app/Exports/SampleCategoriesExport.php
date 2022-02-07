@@ -14,7 +14,6 @@ class SampleCategoriesExport implements FromCollection, WithHeadings
 {
 	use Exportable;
 
-
 	public function __construct()
 	{
         //

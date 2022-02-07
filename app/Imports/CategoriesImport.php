@@ -60,8 +60,6 @@ class CategoriesImport implements ToModel,WithHeadingRow
                 }
             }
         }
-        
-        
         return;
     }
 }

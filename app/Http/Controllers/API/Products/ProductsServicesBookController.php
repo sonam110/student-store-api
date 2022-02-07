@@ -300,7 +300,7 @@ class ProductsServicesBookController extends Controller
 
         if ($validation->fails()) {
             \Log::info($request->all());
-            \Log::info($validation);
+            \Log::info($validation->messages());
             return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
         }
         DB::beginTransaction();

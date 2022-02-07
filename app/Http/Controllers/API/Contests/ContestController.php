@@ -84,7 +84,6 @@ class ContestController extends Controller
 
     public function store(Request $request)
     {
-        
         $validation = Validator::make($request->all(), [
             // 'address_detail_id' 		=> 'required',
             'title'             		=> 'required',
@@ -105,17 +104,17 @@ class ContestController extends Controller
             {
                 $lang_id = Language::select('id')->first()->id;
             }
-            // $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module','Contest')->orderBy('created_at','desc')->first();
-            // if(empty($user_package))
-            // {
-            //     return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
-            // }
-            // elseif($user_package->number_of_contest == $user_package->used_number_of_contest)
-            // {
-            //     return response()->json(prepareResult(true, ['Package Use Exhausted'], getLangByLabelGroups('messages','message_job_ads_exhausted_error')), config('http_response.internal_server_error'));
-            // }
-            // else
-            // {
+            $user_package = UserPackageSubscription::where('user_id',Auth::id())->where('module','Contest')->orderBy('created_at','desc')->first();
+            if(!$user_package)
+            {
+                return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
+            }
+            elseif($user_package->number_of_contest == $user_package->used_number_of_contest)
+            {
+                return response()->json(prepareResult(true, ['Package Use Exhausted'], getLangByLabelGroups('messages','message_contest_exhausted_error')), config('http_response.internal_server_error'));
+            }
+            else
+            {
                 $getLastContest = Contest::select('id')->orderBy('created_at','DESC')->first();
                 if($getLastContest) {
                     $contestNumber = $getLastContest->auto_id;
@@ -223,7 +222,13 @@ class ContestController extends Controller
                 //$contest->status                                = 'verified';
                 $contest->save();
 
-                // $user_package->update(['used_number_of_contest'=>($user_package->used_number_of_contest + 1),'used_number_of_event'=>($user_package->used_number_of_event + 1)]);
+                if($contest)
+                {
+                    $user_package->update([
+                        'used_number_of_contest'=>($user_package->used_number_of_contest + 1),
+                        'used_number_of_event'=>($user_package->used_number_of_event + 1)
+                    ]);
+                }
 
                 if(!empty($request->cancellation_ranges))
                 {
@@ -295,20 +300,21 @@ class ContestController extends Controller
                   ->where('student_details.institute_name',$request->educational_institition);           
                }
                
-            DB::commit();
-            $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','addressDetail','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')
-            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                $q->select('id','category_master_id','title','slug')
-                    ->where('language_id', $lang_id)
-                    ->where('is_parent', '1');
-            }])
-            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                $q->select('id','category_master_id','title','slug')
-                    ->where('language_id', $lang_id)
-                    ->where('is_parent', '0');
-            }])
-            ->find($contest->id);
-            return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_created')), config('http_response.created'));
+                DB::commit();
+                $contest = Contest::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','categoryMaster','subCategory','addressDetail','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path')
+                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }])
+                ->find($contest->id);
+                return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_created')), config('http_response.created'));
+            }
         }
         catch (\Throwable $exception)
         {

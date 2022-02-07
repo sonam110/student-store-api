@@ -681,6 +681,7 @@ class OrderController extends Controller
             			if($request->payment_status=='failed')
 						{
 							$contestApplication->application_status = 'canceled';
+							$contestApplication->reason_for_cancellation = 'Payment Failed';
 						}
             			$contestApplication->save();
 

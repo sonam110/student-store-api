@@ -59,12 +59,12 @@ class Contest extends Model
     }
     public function contestApplications()
     {
-        return $this->hasMany(ContestApplication::class, 'contest_id', 'id')->where('application_status', '!=', 'canceled');
+        return $this->hasMany(ContestApplication::class, 'contest_id', 'id')->where('application_status', '!=', 'canceled')->where('payment_status', 'paid');
     }
 
     public function isApplied()
     {
-        return $this->hasOne(ContestApplication::class,'contest_id','id')->where('user_id',Auth::id())->select(['id','contest_id','user_id'])->where('application_status', '!=', 'canceled');
+        return $this->hasOne(ContestApplication::class,'contest_id','id')->where('user_id',Auth::id())->select(['id','contest_id','user_id'])->where('application_status', '!=', 'canceled')->where('payment_status', 'paid');
     }
 
     // public function isAppliedNotCanceled()

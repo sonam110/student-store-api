@@ -82,7 +82,7 @@ class ExportController extends Controller
 
     public function labelsExport(Request $request) 
     {
-        $rand = null;
+        $rand = rand(1,9);
         // $data = ['ids' => $request->category_master_id,'module_type_id' => $request->module_type_id, 'language_id' => $request->language_id];
         $excel = Excel::store(new LabelsExport(), 'export/labels'.$rand.'.xlsx' , 'export_path');
          return response(prepareResult(false, ['url' => env('ASSET_URL').'export/labels'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));

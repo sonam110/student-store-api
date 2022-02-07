@@ -2443,7 +2443,9 @@ class LabelSeeder extends Seeder
             "buyer" => "Buyer"
         ),
         "messages" => array(
+            "message_contest_exhausted_error" => "Contest / event limit exhausted. Please upgrade your package.",
             "message_invalid_price" => "Invalid Price. price must be greater than 0.",
+            "message_tag_required" => "Please select/add tags.",
             "message_invalid_year_dob" => "Invalid Date of Birth!",
             "message_rated_successfully" => "Rated Successfully",
             "message_valid_rating" => "Please give a valid rating",
