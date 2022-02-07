@@ -22,61 +22,64 @@ class ExportController extends Controller
 {
     public function productsExport(Request $request) 
     {
-    	$rand = null;
+    	$rand = time();
     	$data = ['auth_applicable' => false, 'ids' => $request->product_id, 'type' => $request->type ];
-        $excel = Excel::store(new ProductsExport($data), 'export/products'.$rand.'.xlsx' , 'export_path');
-         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/products'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
+        if(file_exists('public/export/products/'.$rand.'.csv')){ 
+            unlink('public/export/products/'.$rand.'.csv');
+        }
+        $excel = Excel::store(new ProductsExport($data), 'export/products/'.$rand.'.csv' , 'export_path');
+         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/products/'.$rand.'.csv'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
          
     }
 
     public function jobsExport(Request $request) 
     {
-    	$rand = null;
+    	$rand = time();
     	$data = ['auth_applicable' => false, 'ids' => $request->job_id];
-        $excel = Excel::store(new JobsExport($data), 'export/jobs'.$rand.'.xlsx' , 'export_path');
-         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/jobs'.$rand.'.xlsx' ], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
+        $excel = Excel::store(new JobsExport($data), 'export/jobs/'.$rand.'.csv' , 'export_path');
+         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/jobs/'.$rand.'.csv' ], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
          
     }
 
     public function contestsExport(Request $request) 
     {
-    	$rand = null;
+    	$rand = time();
     	$data = ['auth_applicable' => false, 'ids' => $request->contest_id, 'type' => $request->type ];
-        $excel = Excel::store(new ContestsExport($data), 'export/contests'.$rand.'.xlsx' , 'export_path');
-         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/contests'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
+        $excel = Excel::store(new ContestsExport($data), 'export/contests/'.$rand.'.csv' , 'export_path');
+         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/contests/'.$rand.'.csv'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
     }
 
     public function ordersExport(Request $request) 
     {
-    	$rand = null;
+    	$rand = time();
     	$data = ['auth_applicable' => false, 'ids' => $request->order_id, 'product_type' => $request->product_type, 'contest_type' => $request->contest_type, 'order_for' => $request->order_for ];
-        $excel = Excel::store(new OrdersExport($data), 'export/orders'.$rand.'.xlsx' , 'export_path');
-         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/orders'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
+        $excel = Excel::store(new OrdersExport($data), 'export/orders/'.$rand.'.csv' , 'export_path');
+         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/orders/'.$rand.'.csv'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
          
     }
 
     public function languagesExport(Request $request) 
     {
-        $rand = null;
+        $rand = time();
         $data = ['ids' => $request->language_id];
-        $excel = Excel::store(new LanguagesExport($data), 'export/languages'.$rand.'.xlsx' , 'export_path');
-         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/languages'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
+        $excel = Excel::store(new LanguagesExport($data), 'export/languages/'.$rand.'.csv' , 'export_path');
+         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/languages/'.$rand.'.csv'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
          
     }
 
     public function categoriesExport(Request $request) 
     {
-        $rand = null;
+        $rand = time();
         $data = ['ids' => $request->category_master_id,'module_type_id' => $request->module_type_id, 'language_id' => $request->language_id];
-        $excel = Excel::store(new CategoriesExport($data), 'export/categories'.$rand.'.xlsx' , 'export_path');
-         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/categories'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
+        $excel = Excel::store(new CategoriesExport($data), 'export/categories/'.$rand.'.csv' , 'export_path');
+         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/categories/'.$rand.'.csv'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
          
     }
     public function sampleCategoriesExport(Request $request) 
     {
-        $rand = null;
-        $excel = Excel::store(new SampleCategoriesExport(), 'export/sample_categories'.$rand.'.xlsx' , 'export_path');
-         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/sample_categories'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
+        $rand = time();
+        $excel = Excel::store(new SampleCategoriesExport(), 'export/categories/sample_categories'.$rand.'.csv' , 'export_path');
+         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/categories/sample_categories'.$rand.'.csv'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
          
     }
 
@@ -84,8 +87,8 @@ class ExportController extends Controller
     {
         $rand = rand(1,9);
         // $data = ['ids' => $request->category_master_id,'module_type_id' => $request->module_type_id, 'language_id' => $request->language_id];
-        $excel = Excel::store(new LabelsExport(), 'export/labels'.$rand.'.xlsx' , 'export_path');
-         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/labels'.$rand.'.xlsx'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
+        $excel = Excel::store(new LabelsExport(), 'export/labels/'.$rand.'.csv' , 'export_path');
+         return response(prepareResult(false, ['url' => env('ASSET_URL').'export/labels/'.$rand.'.csv'], getLangByLabelGroups('messages','message_created')), config('http_response.success'));
          
     }
 }
