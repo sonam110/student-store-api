@@ -35,6 +35,7 @@ class ContestApplicationController extends Controller
 	        }
 
 			$contestApplications = ContestApplication::with('contest','user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','contest.cancellationRanges','contest.categoryMaster','contest.subCategory')
+			->where('contest_applications.payment_status', 'paid')
 			->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
@@ -77,6 +78,7 @@ class ContestApplicationController extends Controller
         }
 
 		$contestApplication = ContestApplication::with('contest','user','contest.cancellationRanges','contest.categoryMaster','contest.subCategory')
+		->where('contest_applications.payment_status', 'paid')
 		->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
             $q->select('id','category_master_id','title','slug')
                 ->where('language_id', $lang_id)
@@ -118,6 +120,7 @@ class ContestApplicationController extends Controller
 			->join('contests', function ($join) {
 				$join->on('contest_applications.contest_id', '=', 'contests.id');
 			})
+			->where('contest_applications.payment_status', 'paid')
 			->orderBy('contest_applications.created_at','DESC')
 			->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,status','user.cvDetail','user.defaultAddress');
 
@@ -202,7 +205,11 @@ class ContestApplicationController extends Controller
 	{
 		try
 		{
-			$contestApplication = ContestApplication::find($id);
+			$contestApplication = ContestApplication::where('contest_applications.payment_status', 'paid')->find($id);
+			if(!$contestApplication)
+            {
+                return response()->json(prepareResult(true, 'No record found...', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
+            }
             // return $contestApplication;
 			if($request->application_status == 'canceled')
 			{

@@ -39,6 +39,7 @@ class ContestApplicationController extends Controller
             if(!empty($request->per_page_record))
             {
                 $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user','orderItem:id,contest_application_id,order_id','orderItem.order:id,order_number')
+                    ->where('contest_applications.payment_status', 'paid')
                     ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                         $q->select('id','category_master_id','title','slug')
                             ->where('language_id', $lang_id)
@@ -54,6 +55,7 @@ class ContestApplicationController extends Controller
             else
             {
                 $contestApplications = ContestApplication::where('user_id',Auth::id())->orderBy('created_at','DESC')->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user','orderItem:id,contest_application_id,order_id','orderItem.order:id,order_number')
+                    ->where('contest_applications.payment_status', 'paid')
                     ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                         $q->select('id','category_master_id','title','slug')
                             ->where('language_id', $lang_id)
@@ -93,12 +95,12 @@ class ContestApplicationController extends Controller
 
             $contest = Contest::find($request->contest_id);
 
-            if(ContestApplication::where('application_status', 'joined')->where('contest_id',$contest->id)->count() >= $contest->max_participants)
+            if(ContestApplication::where('application_status', 'joined')->where('contest_id',$contest->id)->where('contest_applications.payment_status', 'paid')->count() >= $contest->max_participants)
             {
                 return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
             }
 
-            if($contestApplication = ContestApplication::where('user_id',Auth::id())->where('contest_id',$contest->id)->where('application_status','!=','canceled')->first())
+            if($contestApplication = ContestApplication::where('user_id',Auth::id())->where('contest_id',$contest->id)->where('contest_applications.payment_status', 'paid')->where('application_status','!=','canceled')->first())
             {
                 $contestApplication->document = $request->document;
                 $contestApplication->application_status = $request->application_status;
@@ -149,6 +151,7 @@ class ContestApplicationController extends Controller
         }
 
     	$contestApplication = ContestApplication::where('id',$contestApplication->id)->with('contest.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','contest.categoryMaster','contest.subCategory','contest.cancellationRanges','user')
+        ->where('contest_applications.payment_status', 'paid')
         ->with(['contest.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
             $q->select('id','category_master_id','title','slug')
                 ->where('language_id', $lang_id)
@@ -174,7 +177,7 @@ class ContestApplicationController extends Controller
     {
     	try
     	{
-    		$contestApplication = ContestApplication::find($id);
+    		$contestApplication = ContestApplication::where('contest_applications.payment_status', 'paid')->find($id);
             if(!$contestApplication)
             {
                 return response()->json(prepareResult(true, 'No record found...', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
