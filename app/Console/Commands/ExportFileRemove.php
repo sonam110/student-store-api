@@ -52,6 +52,14 @@ class ExportFileRemove extends Command
 
         $folderToDelete = base_path('public/export/products/');
         $fs = new Filesystem;
+        $fs->cleanDirectory($folderToDelete);
+
+        $folderToDelete = base_path('public/export/labels/');
+        $fs = new Filesystem;
+        $fs->cleanDirectory($folderToDelete); 
+
+        $folderToDelete = base_path('public/export/categories/');
+        $fs = new Filesystem;
         $fs->cleanDirectory($folderToDelete);   
         return true;
     }
