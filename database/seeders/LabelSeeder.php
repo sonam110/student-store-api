@@ -3172,6 +3172,8 @@ class LabelSeeder extends Seeder
             "reviewed_by_seller" => "Reviewed"
         ),
         "packages" => array(
+            "range_of_age" => "Range of age",
+            "range_of_age_detail_msg" => "Can you choose range of age"
             "unlimited" => "Unlimited",
             "number_of_contest" => "Number Of Contest",
             "number_of_event" => "Number Of Event",
@@ -3427,6 +3429,7 @@ class LabelSeeder extends Seeder
             "save" => "Save"
         ),
         "product_detail_screen" => array(
+            "product_can_not_be_unsold" => "Product can not be unsold",
             "quantity" => "Quantity",
             "shipping" => "Shipping",
             "location" => "Location",
