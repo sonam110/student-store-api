@@ -2446,8 +2446,8 @@ class LandingPageController extends Controller
                 //case 3
                 elseif(!empty($request->start_date) && !empty($request->end_date))
                 {
-                    $contests->whereBetween('application_start_date', [$request->start_date, $request->end_date])
-                        ->orWhereBetween('application_end_date', [$request->start_date, $request->end_date]);
+                    $contests->whereBetween('application_start_date', [date('Y-m-d', strtotime($request->start_date)), date('Y-m-d', strtotime($request->end_date))])
+                        ->orWhereBetween('application_end_date', [date('Y-m-d', strtotime($request->start_date)), date('Y-m-d', strtotime($request->end_date))]);
                 }
 
                 if(!empty($request->free_subscription))
