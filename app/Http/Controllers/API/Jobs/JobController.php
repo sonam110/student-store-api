@@ -1000,7 +1000,7 @@ class JobController extends Controller
         {
             $searchType = $request->searchType; //filter, criteria, random, recent
             //in criteria: title, skills, city, job type, work exp.
-            $applicants = JobApplication::select('job_applications.*')
+            $applicants = JobApplication::select('job_applications.*', 'sp_jobs.title')
                     ->join('sp_jobs', function ($join) {
                         $join->on('job_applications.job_id', '=', 'sp_jobs.id')
                         ->where('sp_jobs.job_status', '1')
@@ -1266,11 +1266,11 @@ class JobController extends Controller
 
             if(!empty($request->per_page_record))
             {
-                $applicantsData = $applicants->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $applicantsData = $applicants->groupBy('job_applications.id')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $applicantsData = $applicants->get();
+                $applicantsData = $applicants->groupBy('job_applications.id')->get();
             }
             return response(prepareResult(false, $applicantsData, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
         }
