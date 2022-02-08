@@ -19,6 +19,7 @@ use App\Console\Commands\StripeAccountStatusCheck;
 use App\Console\Commands\AutoSwichPackageIfExpired;
 use App\Console\Commands\ExportFileRemove;
 use App\Console\Commands\CheckSwishPaymentStatus;
+use App\Console\Commands\BoostingItemReversed;
 
 
 class Kernel extends ConsoleKernel
@@ -44,6 +45,7 @@ class Kernel extends ConsoleKernel
         AutoSwichPackageIfExpired::class,
         ExportFileRemove::class,
         CheckSwishPaymentStatus::class,
+        BoostingItemReversed::class,
     ];
 
     /**
@@ -71,6 +73,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('subscribedPackage:expire')->dailyAt('09:00');
         $schedule->command('expiredpackage:switchtofree')->dailyAt('00:01');
         $schedule->command('file:remove')->dailyAt('02:00');
+        $schedule->command('boosting:update')->dailyAt('00:01');
         
         //$schedule->command('checkswish:paymentstatus')->everyMinute();;
         
