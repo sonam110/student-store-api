@@ -1013,6 +1013,9 @@ class JobController extends Controller
                     ->join('user_cv_details', function ($join) {
                         $join->on('job_applications.user_id', '=', 'user_cv_details.user_id');
                     })
+                    ->join('address_details', function ($join) {
+                        $join->on('sp_jobs.address_detail_id', '=', 'address_details.id');
+                    })
                     ->with('job:id,title','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.cvDetail.jobTags','user.defaultAddress')
                     ->with(['job' => function($query){
                         $query->select('id')
@@ -1037,6 +1040,20 @@ class JobController extends Controller
                         }
                     });
                 }
+
+                if(!empty($request->city))
+                {
+                    $applicants->where(function($query) use ($request) {
+                        foreach ($request->city as $key => $city) {
+                            if ($key === 0) {
+                                $query->where('address_details.city', 'LIKE', '%'.$city.'%');
+                                continue;
+                            }
+                            $query->orWhere('address_details.city', 'LIKE', '%'.$city.'%');
+                        }
+                    });
+                }
+
                 if(!empty($request->category_master_id))
                 {
                     $applicants->where('sp_jobs.category_master_id', $request->category_master_id);
