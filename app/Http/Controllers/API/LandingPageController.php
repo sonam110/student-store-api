@@ -1972,7 +1972,7 @@ class LandingPageController extends Controller
                     $jobs->where('sp_jobs.application_end_date', '<=',  date("Y-m-d", strtotime($request->applying_date)))->orderBy('sp_jobs.application_end_date','asc');
                 }
 
-                if($request->min_years_of_experience==0 || $request->max_years_of_experience==0)
+                if((($request->min_years_of_experience!='') && ($request->min_years_of_experience==0)) || (($request->max_years_of_experience!='') && ($request->max_years_of_experience==0)))
                 {
                     $jobs->where('sp_jobs.years_of_experience', 0);
                 }
