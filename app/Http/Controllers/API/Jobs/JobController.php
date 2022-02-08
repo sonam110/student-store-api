@@ -1037,6 +1037,11 @@ class JobController extends Controller
                         }
                     });
                 }
+                if(!empty($request->category_master_id))
+                {
+                    $applicants->where('sp_jobs.category_master_id', $request->category_master_id);
+                }
+
                 if(!empty($request->min_years_of_experience))
                 {
                     $applicants->where('user_cv_details.total_experience', '>=', $request->min_years_of_experience);
