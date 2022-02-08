@@ -2223,7 +2223,7 @@ class LandingPageController extends Controller
             }
             else
             {
-                $jobsData = $jobs->toSql();
+                $jobsData = $jobs->get();
             }
             if($request->other_function=='yes')
             {
