@@ -134,7 +134,12 @@ class RegistrationTypeDetailController extends Controller
 	{
 		if(ServiceProviderDetail::where('registration_type_id', $id)->count()<1)
 		{
-			RegistrationType::find($id)->delete();
+			$isExist = RegistrationType::find($id);
+			if(!$isExist)
+			{
+				return response()->json(prepareResult(true, [], "Record not found."), config('http_response.bad_request'));
+			}
+			$isExist->delete();
 			return response()->json(prepareResult(false, [], "Deleted successfully."), config('http_response.success'));
 		}
 		return response()->json(prepareResult(true, [], "This registration type cannot be removed because some users are registered with it."), config('http_response.bad_request'));

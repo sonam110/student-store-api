@@ -96,8 +96,7 @@ class AuthController extends Controller
 		{
 			if($request->otp_for == 'registration')
 			{
-				$user = User::where('contact_number',$request->contact_number)->first();
-				if($user)
+				if((User::where('contact_number',$request->contact_number)->count()>0) || User::where('guardian_contact_number',$request->contact_number)->count()>0)
 				{
 					return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_exists')), config('http_response.internal_server_error'));
 				}
@@ -148,7 +147,7 @@ class AuthController extends Controller
 		try
 		{
 			$email = strtolower($request->email);
-			if(User::where('guardian_email', $email)->whereNotNull('guardian_email')->count()>0)
+			if((User::where('guardian_email', $email)->whereNotNull('guardian_email')->count()>0) || User::where('email', $email)->count()>0)
 			{
 				return response()->json(prepareResult(true, 'Duplicate entry', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
 			}

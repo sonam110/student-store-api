@@ -17,7 +17,7 @@ class CreateOtpVerificationsTable extends Migration
             $table->id();
             $table->string('mobile_number', 150);
             $table->integer('otp');
-            $table->string('otp_for', 50);
+            $table->string('otp_for', 50)->nullable()->comment('email_verification,forget-password,registration');
             $table->timestamps();
         });
     }

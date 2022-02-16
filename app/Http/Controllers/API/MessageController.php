@@ -109,7 +109,8 @@ class MessageController extends Controller
         }
         try
         {
-            $seller_id = '';
+            $seller_id = null;
+            $module = null;
             if(!empty($request->products_services_book_id))
             {
                 $seller_id = ProductsServicesBook::find($request->products_services_book_id)->user_id;
@@ -120,10 +121,15 @@ class MessageController extends Controller
                 $seller_id = Job::find($request->job_id)->user_id;
                 $module = 'job';
             }
-            else
+            elseif(!empty($request->contest_id))
             {
                 $seller_id = Contest::find($request->contest_id)->user_id;
                 $module = 'contest';
+            }
+
+            if(empty($seller_id) || empty($module))
+            {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_not_exists')), config('http_response.not_found'));
             }
 
             if(Auth::id() == $seller_id)
