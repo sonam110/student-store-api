@@ -53,11 +53,11 @@ class ContestExpire extends Command
             pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
         }
 
-        $contests = Contest::where('start_date','<',date('Y-m-d'))->whereIn('status',['verified','expired'])->get();
+        $contests = Contest::where('start_date','<',date('Y-m-d'))->whereIn('status',['verified','expired','completed'])->get();
           foreach($contests as $contest) 
           {
             $contest->update(['status' => 'completed']);
-            ContestApplication::where('contest_id',$contest->id)->where('application_status','joined')->where('payment_status','paid')->update(['application_status'=>'completed']);
+            ContestApplication::where('contest_id',$contest->id)->whereIn('application_status',['joined','approved'])->where('payment_status','paid')->update(['application_status'=>'completed']);
 
             //OrderStatus Update
             $getAllContApplications = ContestApplication::select('id')->where('contest_id',$contest->id)->where('payment_status','paid')->where('application_status','completed')->get();
@@ -82,7 +82,7 @@ class ContestExpire extends Command
             $body =  'Status for Contest '.$contest->title.' is updated to completed.';
             $user = $contest->user;
             $type = 'Contest completed';
-            pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
+            //pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
         }
     }
 }

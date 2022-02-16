@@ -2443,6 +2443,7 @@ class LabelSeeder extends Seeder
             "buyer" => "Buyer"
         ),
         "messages" => array(
+            "message_tracking_number_length" => "Tracking number length should be between 8 to 15 characters",
             "message_contest_exhausted_error" => "Contest / event limit exhausted. Please upgrade your package.",
             "message_invalid_price" => "Invalid Price. price must be greater than 0.",
             "message_tag_required" => "Please select/add tags.",
