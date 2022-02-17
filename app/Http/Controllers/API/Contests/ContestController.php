@@ -334,11 +334,11 @@ class ContestController extends Controller
         $authApplication = null;
         if(!empty($request->contest_application_id))
         {
-            $contestApplication = ContestApplication::with('orderItem:id,contest_application_id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->where('id',$request->contest_application_id)->where('user_id', Auth::id())->first();
+            $contestApplication = ContestApplication::with('orderItem:id,contest_application_id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->where('id',$request->contest_application_id)->where('user_id', Auth::id())->where('payment_status', 'paid')->first();
             $applied = true;
             $authApplication = $contestApplication;
         }
-        elseif($contestApplication = ContestApplication::with('orderItem:id,contest_application_id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->orderBy('auto_id','DESC')->first())
+        elseif($contestApplication = ContestApplication::with('orderItem:id,contest_application_id,price,used_item_reward_points,price_after_apply_reward_points,item_status,canceled_refunded_amount,returned_rewards,earned_reward_points,reward_point_status')->where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->where('payment_status', 'paid')->orderBy('auto_id','DESC')->first())
         {
             $applied = true;
             $authApplication = $contestApplication;
@@ -420,14 +420,17 @@ class ContestController extends Controller
 
         if($contest->user_id==auth()->id())
         {
-            $contestCal = OrderItem::where('contest_id', $contest->id);
+            $contestCal = OrderItem::select('order_items.*')
+                ->where('order_items.contest_id', $contest->id)
+                ->join('orders', 'orders.id','=','order_items.order_id')
+                ->where('orders.payment_status', 'paid');
             $contest['total_ordered_amount'] = round($contestCal->sum(\DB::raw('order_items.price * order_items.quantity')), 2);
-            $contest['total_canceled_refunded_amount'] = round($contestCal->sum('canceled_refunded_amount'), 2);
-            $contest['total_earned_reward_points'] = round($contestCal->sum('earned_reward_points'), 2);
-            $contest['total_amount_transferred_to_vendor'] = round($contestCal->sum('amount_transferred_to_vendor'), 2);
-            $contest['total_student_store_commission'] = round($contestCal->sum('student_store_commission'), 2);
-            $contest['total_cool_company_commission'] = round($contestCal->sum('cool_company_commission'), 2);
-            $contest['total_vat_amount'] = round($contestCal->sum('vat_amount'), 2);
+            $contest['total_canceled_refunded_amount'] = round($contestCal->sum('order_items.canceled_refunded_amount'), 2);
+            $contest['total_earned_reward_points'] = round($contestCal->sum('order_items.earned_reward_points'), 2);
+            $contest['total_amount_transferred_to_vendor'] = round($contestCal->sum('order_items.amount_transferred_to_vendor'), 2);
+            $contest['total_student_store_commission'] = round($contestCal->sum('order_items.student_store_commission'), 2);
+            $contest['total_cool_company_commission'] = round($contestCal->sum('order_items.cool_company_commission'), 2);
+            $contest['total_vat_amount'] = round($contestCal->sum('order_items.vat_amount'), 2);
         }
 
         return response()->json(prepareResult(false, $contest, getLangByLabelGroups('messages','messages_contest_list')), config('http_response.success'));

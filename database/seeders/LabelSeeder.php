@@ -2443,6 +2443,8 @@ class LabelSeeder extends Seeder
             "buyer" => "Buyer"
         ),
         "messages" => array(
+            "invalid_mobile_number" => "Invalid mobile number length.",
+            "cannot_use_same_email_or_mobile_number" => "Cannot use same email or mobile number.",
             "you_cannot_send_this_to_self" => "Cannot send to yourself.",
             "cannot_send_0_reward" => "Cannot send 0 reward.",
             "message_tracking_number_length" => "Tracking number length should be between 8 to 15 characters",
@@ -2821,7 +2823,7 @@ class LabelSeeder extends Seeder
             "message_not_accepting_any_application_now" => "Not accepting any application now",
             "message_successfully_reported" => "Reported successfully",
             "message_incorrect_OTP" => "OTP that you have entered is incorrect !!",
-            "message_user_exists" => "User exists with the entered number. Please try with another one.",
+            "message_user_exists" => "User exists with the entered number or email. Please try with another one.",
             "message_user_not_student" => "User is not student.",
             "messages_job_applicatons_exists" => "Can not be deleted. Applicants on job  Exists.",
             "messages_products_order_exists" => "Can not be deleted. Order Exists.",

@@ -175,6 +175,59 @@ class AuthController extends Controller
 			return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
 		}
 
+		$length = str_replace('_', '', $request->contact_number);
+		if(strlen($length)<10)
+		{
+			return response(prepareResult(true, 'Invalid mobile number length.', getLangByLabelGroups('messages','invalid_mobile_number')), config('http_response.bad_request'));
+		}
+
+		if($request->is_minor == true)
+		{
+			$length = str_replace('_', '', $request->guardian_contact_number);
+			if(strlen($length)<10)
+			{
+				return response(prepareResult(true, 'Invalid mobile number length.', getLangByLabelGroups('messages','invalid_mobile_number')), config('http_response.bad_request'));
+			}
+
+			if((($request->contact_number == $request->guardian_contact_number) || ($request->email == $request->guardian_email)))
+			{
+				return response(prepareResult(true, 'Cannot use same email or mobile number.', getLangByLabelGroups('messages','cannot_use_same_email_or_mobile_number')), config('http_response.bad_request'));
+			}
+
+			$emailCheck = User::where(function ($query) use ($request) {
+			    $query->where('email', $request->email)
+			          ->orWhere('email', $request->guardian_email)
+			          ->orWhere('guardian_email', $request->email)
+			          ->orWhere('guardian_email', $request->guardian_email);
+			})->count();
+			$mobileCheck = User::where(function ($query) use ($request) {
+			    $query->where('contact_number', $request->contact_number)
+			          ->orWhere('contact_number', $request->guardian_contact_number)
+			          ->orWhere('guardian_contact_number', $request->contact_number)
+			          ->orWhere('guardian_contact_number', $request->guardian_contact_number);
+			})->count();
+			if(($emailCheck>0) || ($mobileCheck>0))
+			{
+				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_exists')), config('http_response.internal_server_error'));
+			}
+		}
+		else
+		{
+			$emailCheck = User::where(function ($query) use ($request) {
+			    $query->where('email', $request->email)
+			          ->orWhere('guardian_email', $request->email);
+			})->count();
+			$mobileCheck = User::where(function ($query) use ($request) {
+			    $query->where('contact_number', $request->contact_number)
+			          ->orWhere('guardian_contact_number', $request->contact_number);
+			})->count();
+			if(($emailCheck>0) || ($mobileCheck>0))
+			{
+				return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_user_exists')), config('http_response.internal_server_error'));
+			}
+		}
+
+
 		//QR Code
 		$qrCodeNumber = User::QR_NUMBER_PREFIX.User::QR_NUMBER_SEPRATOR.(User::QR_NUMBER_START + User::count());
 		$addressDetail = null;
