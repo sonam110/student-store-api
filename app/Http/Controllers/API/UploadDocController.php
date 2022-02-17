@@ -42,7 +42,7 @@ class UploadDocController extends Controller
                 foreach ($file as $key => $value) {
                     
                     $fileName   = strip_tags(Str::limit(Str::slug($value), 50)).time().'-'.rand(0,99999).'.' . $value->getClientOriginalExtension();
-                    $extension = $value->getClientOriginalExtension();
+                    $extension = strtolower($value->getClientOriginalExtension());
 
                     if($extension == 'jpg' || $extension == 'jpeg' || $extension == 'png')
                     {
@@ -83,7 +83,7 @@ class UploadDocController extends Controller
             else
             {
                 $fileName   = strip_tags(Str::limit(Str::slug($request->file_title), 50)).time().'-'.rand(0,99999).'.' . $file->getClientOriginalExtension();
-                $extension = $file->getClientOriginalExtension();
+                $extension = strtolower($file->getClientOriginalExtension());
                 if($extension == 'jpg' || $extension == 'jpeg' || $extension == 'png')
                 {
                     $img = Image::make($file->getRealPath());

@@ -39,6 +39,8 @@ class RewardPointsCredit extends Command
      */
     public function handle()
     {
+        //select order_number, `order_items`.* from `order_items` inner join `orders` on `orders`.`id` = `order_items`.`order_id` where date(`return_applicable_date`) <= "2022-02-05" and `order_items`.`return_applicable_date` is not null and `orders`.`payment_status` = "paid" and `order_items`.`earned_reward_points` > 0 and `order_items`.`reward_point_status` = "pending" and `order_items`.`item_status` in ('completed', 'replaced', 'returned') and (CASE WHEN order_items.is_disputed = 1 THEN order_items.disputes_resolved_in_favour = 1 ELSE order_items.is_disputed=0 END)
+
         $date = date('Y-m-d',strtotime('-14 days'));
         $orderItems = OrderItem::select('order_items.*')
             ->join('orders', 'orders.id','=','order_items.order_id')
@@ -52,34 +54,6 @@ class RewardPointsCredit extends Command
             ->get();
           foreach($orderItems as $orderItem) 
           {
-            /*
-            $creditRewardPoint = 0;
-            $checkReturnQty = 0;
-            $checkReplacedQty = 0;
-            $creditReturnPoint = 0;
-
-            $oneItemRewardValue = ceil($orderItem->earned_reward_points / $orderItem->quantity);
-
-            // if returned
-            if($orderItem->is_returned==1)
-            {
-                $checkReturnQty = $orderItem->return->quantity;
-            }
-
-            // if replaced
-            if($orderItem->is_replaced==1)
-            {
-                $checkReplacedQty = $orderItem->replacement->quantity;
-            }
-
-            $remainingOrderActiveQty = ($orderItem->quantity - ($checkReturnQty + $checkReplacedQty));
-            if($remainingOrderActiveQty>0)
-            {
-                $creditReturnPoint = $remainingOrderActiveQty * $oneItemRewardValue;
-            }
-            */
-
-
             $orderItem->update(['reward_point_status' => 'credited']);
             $user = User::find($orderItem->user_id);
             User::find($orderItem->user_id)->update(['reward_points' => $user->reward_points + $orderItem->earned_reward_points]);
