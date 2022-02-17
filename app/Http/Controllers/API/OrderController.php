@@ -993,7 +993,7 @@ class OrderController extends Controller
 				$replaceOrderItem->delivery_type = $orderItem->delivery_type;
 				if($orderItem->delivery_type=='pickup_from_location')
 				{
-					$replaceOrderItem->delivery_code = rand(100000,999999)
+					$replaceOrderItem->delivery_code = rand(100000,999999);
 				}
 				$replaceOrderItem->save();
 

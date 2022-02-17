@@ -667,7 +667,6 @@ class ContestController extends Controller
                     
                     $orderedItems = OrderItem::whereIn('contest_application_id',$joinedContestApplicationId)
                         ->where('item_status','!=', 'canceled')
-                        ->where('is_refunded', '!=', 1)
                         ->get();
                     foreach ($orderedItems as $key => $orderedItem) {
                         $refundOrderItemId = $orderedItem->id;
