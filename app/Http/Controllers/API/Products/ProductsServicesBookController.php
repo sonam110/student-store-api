@@ -1206,7 +1206,7 @@ class ProductsServicesBookController extends Controller
             {
                 if($request->is_used_item=='yes')
                 {
-                    $products->where('products_services_books.is_used_item', 1);
+                    $products->where('products_services_books.is_used_item', 1)->where('products_services_books.is_sold', '0');
                 }
                 else
                 {
@@ -1386,7 +1386,7 @@ class ProductsServicesBookController extends Controller
                         {
                             if($request->is_used_item=='yes')
                             {
-                                $products->where('products_services_books.is_used_item', '1');
+                                $products->where('products_services_books.is_used_item', '1')->where('products_services_books.is_sold', '0');
                             }
                             else
                             {
