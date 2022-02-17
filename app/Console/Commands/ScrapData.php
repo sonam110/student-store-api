@@ -49,6 +49,8 @@ class ScrapData extends Command
     public function handle()
     {
         $getScrapDataUrls = ScrapDataUrl::whereNull('read_at')->limit(1)->get();
+        $user_id = '17fae766-a361-4113-ac83-70012d1624fe';
+        $address_detail_id = '00c0036c-7604-4801-931f-326bb24554b9';
         foreach($getScrapDataUrls as $key => $urlData)
         {
             $jsonPrepare = [];
@@ -99,17 +101,67 @@ class ScrapData extends Command
             });
 
             $description = trim($description[0],chr(0xC2).chr(0xA0));
+            if(sizeof($selling_price)>0)
+            {
+                $jsonPrepare['products'] = [
+                    'url' => $url,
+                    'title' => $title[0],
+                    'selling_price' => $selling_price[0],
+                    'product_info' => $productInfo,
+                    'images' => $images,
+                    'description' => $description,
+                ];
+            }
+            $urlData->read_at = date('Y-m-d H:i:s');
+            $urlData->save();
 
-            $jsonPrepare['products'] = [
-                'url' => $url,
-                'title' => $title[0],
-                'selling_price' => $selling_price[0],
-                'product_info' => $productInfo,
-                'images' => $images,
-                'description' => $description,
-            ];
-            dd($jsonPrepare['products']);
+            if(sizeof($selling_price)>0)
+            {
+                $getCommVal = updateCommissions($selling_price[0],0,0,0,$urlData->vat,$user_id,'product');
+
+                $products = new ProductsServicesBook;
+                $products->user_id = $user_id;
+                $products->address_detail_id = $address_detail_id;
+                $products->category_master_id = $urlData->category;
+                $products->sub_category_slug = $urlData->subcategory;
+                $products->type = 'product';
+                $products->title = $title[0];
+                $products->slug = Str::slug($title[0]);
+                $products->gtin_isbn = @$productInfo['EAN_code'];
+                $products->sku = @$productInfo['species_no'];
+                $products->quantity = @$productInfo['for_whole_cartons_order'];
+                $products->basic_price_wo_vat = $selling_price[0];
+                $products->is_on_offer = 0;
+                $products->discount_type = 0;
+                $products->discount_value = 0;
+
+                $products->price = $getCommVal['price_with_all_com_vat'];
+                $products->discounted_price = $getCommVal['totalAmount'];
+
+                $products->vat_percentage = $urlData->vat;
+                $products->vat_amount = $getCommVal['vat_amount'];
+                $products->ss_commission_percent = $getCommVal['ss_commission_percent'];
+                $products->ss_commission_amount = $getCommVal['ss_commission_amount'];
+                $products->cc_commission_percent_all = $getCommVal['totalCCPercent'];
+                $products->cc_commission_amount_all = $getCommVal['totalCCAmount'];
+                $products->short_summary = Str::words(strip_tags($description), '50');
+                $products->description = $description;
+                $products->save();
+
+                if(is_array($images[0]) && sizeof($images[0])>0)
+                {
+                    foreach ($images[0] as $key => $image) {
+                        $productImage = new ProductImage;
+                        $productImage->products_services_book_id = $products->id;
+                        $productImage->image_path = $image;
+                        $productImage->thumb_image_path = $image;
+                        $productImage->cover = ($key==0) ? 1 : 0;
+                        $productImage->save();
+                    }
+                }
+            }
         }
+        echo 'done';
     }
 
     private function get_string_between($string, $start, $end)

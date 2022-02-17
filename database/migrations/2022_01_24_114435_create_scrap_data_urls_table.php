@@ -17,6 +17,7 @@ class CreateScrapDataUrlsTable extends Migration
             $table->id();
             $table->string('category');
             $table->string('subcategory');
+            $table->string('vat');
             $table->string('url');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();

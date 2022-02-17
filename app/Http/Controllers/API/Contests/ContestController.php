@@ -454,7 +454,7 @@ class ContestController extends Controller
 
         if($contest->status=='completed')
         {
-            return response()->json(prepareResult(true, 'Contest is comppleted so you can not update this contest after completion.', getLangByLabelGroups('messages','message_contest_completed_cannot_update')), config('http_response.success'));
+            return response()->json(prepareResult(true, 'Contest is completed so you can not update this contest after completion.', getLangByLabelGroups('messages','message_contest_completed_cannot_update')), config('http_response.success'));
         }
 
         DB::beginTransaction();
@@ -651,7 +651,7 @@ class ContestController extends Controller
             $getContest = Contest::find($contest_id);
             if(!$getContest)
             {
-                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_validation')), config('http_response.internal_server_error'));
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('book_home_page','data_not_found')), config('http_response.internal_server_error'));
             }
 
             //For Update contest status
@@ -659,13 +659,16 @@ class ContestController extends Controller
             {
                 if($request->status == 'canceled')
                 {
-                    $joinedApplications = ContestApplication::where('contest_id',$contest_id)->where('application_status','joined')->get();
+                    $joinedApplications = ContestApplication::where('contest_id',$contest_id)->whereIn('application_status', ['joined','approved'])->get();
                     $joinedContestApplicationId = [];
                     foreach ($joinedApplications as $key => $value) {
                         $joinedContestApplicationId[] = $value->id;
                     }
                     
-                    $orderedItems = OrderItem::whereIn('contest_application_id',$joinedContestApplicationId)->where('item_status','!=', 'canceled')->get();
+                    $orderedItems = OrderItem::whereIn('contest_application_id',$joinedContestApplicationId)
+                        ->where('item_status','!=', 'canceled')
+                        ->where('is_refunded', '!=', 1)
+                        ->get();
                     foreach ($orderedItems as $key => $orderedItem) {
                         $refundOrderItemId = $orderedItem->id;
                         $refundOrderItemPrice = $orderedItem->price_after_apply_reward_points;
@@ -690,7 +693,7 @@ class ContestController extends Controller
                     }
 
                     $joinedApplicationsStatusUpdate = ContestApplication::where('contest_id',$contest_id)
-                        ->where('application_status','joined')
+                        ->whereIn('application_status', ['joined', 'approved'])
                         ->update([
                             'application_status'=>'canceled',
                             'reason_for_cancellation' => $request->reason_for_cancellation,
@@ -704,7 +707,7 @@ class ContestController extends Controller
                 $getContest->status = $request->status;
                 if($request->status == 'completed')
                 {
-                    ContestApplication::where('contest_id',$contest_id)->where('application_status','joined')->update(['application_status'=>'completed']);
+                    ContestApplication::where('contest_id',$contest_id)->whereIn('application_status',['joined','approved'])->update(['application_status'=>'completed']);
                 }
             }
             if($request->action=='publish') 

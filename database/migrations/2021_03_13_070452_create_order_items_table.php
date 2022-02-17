@@ -53,6 +53,7 @@ class CreateOrderItemsTable extends Migration
             $table->dateTime('return_applicable_date')->nullable();
             $table->double('amount_returned', 12, 2)->nullable();
             $table->double('canceled_refunded_amount', 12, 2)->nullable();
+            $table->boolean('is_refunded')->default(0);
             $table->integer('returned_rewards')->nullable();
             $table->boolean('is_returned')->nullable()->default(0);
             $table->boolean('is_replaced')->nullable()->default(0);

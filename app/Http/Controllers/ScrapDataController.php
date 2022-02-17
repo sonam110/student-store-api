@@ -48,7 +48,7 @@ class ScrapDataController extends Controller
         foreach ($subcategory->categoryDetails as $key => $cat) 
         {
             ?>
-            <option value="<?php echo $cat->id; ?>"><?php echo $cat->title; ?></option>
+            <option value="<?php echo $cat->slug; ?>"><?php echo $cat->title; ?></option>
             <?php
         }
         ?>
@@ -60,6 +60,7 @@ class ScrapDataController extends Controller
     {
         $category = $request->category;
         $subcategory = $request->subcategory;
+        $vat = $request->vat;
         $client = new Client();
         $crawler = $client->request('GET', $request->url);
 
@@ -88,6 +89,7 @@ class ScrapDataController extends Controller
                     $insert = new ScrapDataUrl;
                     $insert->category = $category;
                     $insert->subcategory = $subcategory;
+                    $insert->vat = $vat;
                     $insert->url = $link;
                     $insert->save();
                 }

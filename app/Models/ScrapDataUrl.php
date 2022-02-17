@@ -9,5 +9,5 @@ class ScrapDataUrl extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['category', 'subcategory', 'url', 'read_at'];
+    protected $fillable = ['category', 'subcategory', 'vat', 'url', 'read_at'];
 }

@@ -184,7 +184,13 @@ h1 small {
         </select>
       </div>
     </div>
-    <div class="col-sm-12">
+    <div class="col-sm-3">
+      <div class="input-block">
+        <label for="">VAT</label>
+        <input type="text" name="vat" class="form-control" required>
+      </div>
+    </div>
+    <div class="col-sm-9">
       <div class="input-block">
         <label for="">Enter order.se Category URL</label>
         <input type="text" name="url" class="form-control" required>
@@ -205,6 +211,7 @@ h1 small {
                 <th width="5%">#</th>
                 <th>Category</th>
                 <th>Sub Category</th>
+                <th>Vat</th>
                 <th>URL</th>
                 <th>Read at</th>
             </tr>
@@ -215,6 +222,7 @@ h1 small {
                     <td>{{$key + 1}}</td>
                     <td>{{$value->category}}</td>
                     <td>{{$value->subcategory}}</td>
+                    <td>{{$value->vat}}</td>
                     <td>{{$value->url}}</td>
                     <td>{{$value->read_at}}</td>
                 </tr>

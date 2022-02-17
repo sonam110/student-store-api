@@ -242,6 +242,11 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 {
 	$isRefunded = false;
 	$orderItem = OrderItem::find($refundOrderItemId);
+	
+	//just confirm the refunded
+	if($orderItem->is_refunded==1) {
+		return 'success';
+	}
 	$orderId = $orderItem->order->id;
 	$transaction = $orderItem->order->transaction;
 	$refund_id = time().'-SYS-GEN';
@@ -350,6 +355,10 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	
 	if($isRefunded)
 	{
+		//order refunded status update
+		$orderItem->is_refunded = true;
+		$orderItem->save();
+
 		if($orderItem->used_item_reward_points>0)
 		{
 			//reward points revert 
