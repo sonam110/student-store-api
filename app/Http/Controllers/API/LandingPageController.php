@@ -55,6 +55,7 @@ class LandingPageController extends Controller
             ->join('service_provider_details', function($join){
                 $join->on('products_services_books.user_id','=','service_provider_details.user_id');
             })
+            ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
             ->groupBy('products_services_books.user_id')
             ->inRandomOrder()
             ->limit(6)
@@ -81,6 +82,7 @@ class LandingPageController extends Controller
                 ->where('is_published', '1')
                 ->where('status',2)
                 ->where('quantity','>' ,'0')
+                ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                 ->limit(3)
                 ->inRandomOrder()
                 ->with('coverImage')
@@ -118,23 +120,24 @@ class LandingPageController extends Controller
             }
 
             $productsServicesBooks = ProductsServicesBook::select('products_services_books.*')
-                                        ->join('users', function ($join) {
-                                            $join->on('products_services_books.user_id', '=', 'users.id');
-                                        })
-                                        ->where('products_services_books.status', '2')
-                                        ->where('products_services_books.is_published', '1')
-                                        ->orderBy('products_services_books.created_at','DESC')
-                                        ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
-                                        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                                            $q->select('id','category_master_id','title','slug')
-                                                ->where('language_id', $lang_id)
-                                                ->where('is_parent', '1');
-                                        }])
-                                        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                                            $q->select('id','category_master_id','title','slug')
-                                                ->where('language_id', $lang_id)
-                                                ->where('is_parent', '0');
-                                        }]);
+                ->join('users', function ($join) {
+                    $join->on('products_services_books.user_id', '=', 'users.id');
+                })
+                ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
+                ->where('products_services_books.status', '2')
+                ->where('products_services_books.is_published', '1')
+                ->orderBy('products_services_books.created_at','DESC')
+                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }]);
             if($request->type=='product' || $request->type=='book')
             {
                 $productsServicesBooks = $productsServicesBooks->where('quantity', '>', 0);
@@ -290,6 +293,7 @@ class LandingPageController extends Controller
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
             $similarProducts = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')
             ->where('id','!=', $request->product_id)
+            ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
             ->orderBy('created_at','DESC')
             ->where('status', '2')
             ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
@@ -343,6 +347,7 @@ class LandingPageController extends Controller
             $products = ProductsServicesBook::select('products_services_books.id','products_services_books.user_id', 'products_services_books.category_master_id', 'products_services_books.address_detail_id', 'products_services_books.title', 'products_services_books.slug', 'products_services_books.brand', 'products_services_books.short_summary', 'products_services_books.type', 'products_services_books.price', 'products_services_books.is_on_offer', 'products_services_books.discount_type', 'products_services_books.discount_value','products_services_books.sell_type', 'products_services_books.service_online_link', 'products_services_books.service_type','products_services_books.service_period_time','products_services_books.service_period_time_type','products_services_books.service_languages', 'products_services_books.delivery_type', 'products_services_books.avg_rating', 'products_services_books.status','products_services_books.discounted_price','products_services_books.deposit_amount','products_services_books.is_used_item','products_services_books.sub_category_slug')
             ->where('products_services_books.status', '2')
             ->where('products_services_books.quantity','>' ,'0')
+            ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
             ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
@@ -522,22 +527,23 @@ class LandingPageController extends Controller
                 {
                      $products = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')
                                 // ->where('products_services_books.user_id', '!=', Auth::id())
-                                ->where('products_services_books.status', '2')
-                                ->where('products_services_books.type', $type)
-                                ->where('products_services_books.quantity','>' ,'0')
-                                ->where('products_services_books.is_published', '1')
-                                ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
-                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '1');
-                                }])
-                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '0');
-                                }]);
+                        ->where('products_services_books.status', '2')
+                        ->where('products_services_books.type', $type)
+                        ->where('products_services_books.quantity','>' ,'0')
+                        ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
+                        ->where('products_services_books.is_published', '1')
+                        ->withCount('orderItems')->orderBy('order_items_count','desc')
+                        ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '1');
+                        }])
+                        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '0');
+                        }]);
                     if($request->is_used_item!='both')
                     {
                         if($request->is_used_item=='yes')
@@ -574,6 +580,7 @@ class LandingPageController extends Controller
                     })
                     ->where('products_services_books.status', '2')
                     ->where('products_services_books.is_published', '1')
+                    ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                     ->where('products_services_books.quantity','>', '0')
                     //->where('products_services_books.user_id', '!=', Auth::id())
                     ->where('users.user_type_id','3')
@@ -1443,6 +1450,7 @@ class LandingPageController extends Controller
             ->where('products_services_books.quantity','>' ,'0')
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', '1')
+            ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
             ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
@@ -1606,22 +1614,23 @@ class LandingPageController extends Controller
                 {
                      $products = ProductsServicesBook::select('id','user_id', 'category_master_id', 'address_detail_id', 'title', 'slug', 'short_summary', 'type', 'price', 'is_on_offer', 'discount_type', 'discount_value','sell_type', 'service_online_link', 'service_type','service_period_time','service_period_time_type','service_languages', 'delivery_type', 'avg_rating', 'status','discounted_price','deposit_amount','is_used_item','sub_category_slug')
                                 // ->where('products_services_books.user_id', '!=', Auth::id())
-                                ->where('products_services_books.status', '2')
-                                ->where('products_services_books.type', $type)
-                                ->where('products_services_books.is_published', '1')
-                                ->where('products_services_books.quantity','>' ,'0')
-                                ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
-                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '1');
-                                }])
-                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '0');
-                                }]);
+                        ->where('products_services_books.status', '2')
+                        ->where('products_services_books.type', $type)
+                        ->where('products_services_books.is_published', '1')
+                        ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
+                        ->where('products_services_books.quantity','>' ,'0')
+                        ->withCount('orderItems')->orderBy('order_items_count','desc')
+                        ->with('user:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail:id,user_id,company_name,company_logo_path,company_logo_thumb_path','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite','addressDetail')
+                        ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '1');
+                        }])
+                        ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                            $q->select('id','category_master_id','title','slug')
+                                ->where('language_id', $lang_id)
+                                ->where('is_parent', '0');
+                        }]);
                     if($request->is_used_item!='both')
                     {
                         if($request->is_used_item=='yes')
@@ -1658,6 +1667,7 @@ class LandingPageController extends Controller
                     })
                     ->where('products_services_books.status', '2')
                     ->where('products_services_books.is_published', '1')
+                    ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                     ->where('products_services_books.quantity','>', '0')
                     //->where('products_services_books.user_id', '!=', Auth::id())
                     ->where('users.user_type_id','3')

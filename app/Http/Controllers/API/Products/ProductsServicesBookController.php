@@ -49,6 +49,7 @@ class ProductsServicesBookController extends Controller
             }
 
             $productsServicesBooks = ProductsServicesBook::where('is_published', '1')->where('status', '2')->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+            ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
@@ -99,6 +100,7 @@ class ProductsServicesBookController extends Controller
             {
                 $products = ProductsServicesBook::where('user_id', $request->user_id)
                     ->where('type','product')
+                    ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                     ->orderBy('created_at','DESC')
                     ->with('user.serviceProviderDetail','categoryMaster','subCategory','addressDetail','coverImage','productTags')
                     ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -116,6 +118,7 @@ class ProductsServicesBookController extends Controller
             {
                 $products = ProductsServicesBook::where('user_id', Auth::id())
                     ->where('type','product')
+                    ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                     ->orderBy('created_at','DESC')
                     ->with('categoryMaster','subCategory','addressDetail','coverImage','productTags')
                     ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -234,6 +237,7 @@ class ProductsServicesBookController extends Controller
             {
                 $products = ProductsServicesBook::where('user_id', $request->user_id)
                     ->where('type','book')
+                    ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                     ->orderBy('created_at','DESC')
                     ->with('user.serviceProviderDetail','categoryMaster','subCategory','addressDetail','coverImage','productTags')
                     ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -251,6 +255,7 @@ class ProductsServicesBookController extends Controller
             {
                 $products = ProductsServicesBook::where('user_id', Auth::id())
                     ->where('type','book')
+                    ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                     ->orderBy('created_at','DESC')
                     ->with('categoryMaster','subCategory','addressDetail','coverImage','productTags')
                     ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -1121,7 +1126,9 @@ class ProductsServicesBookController extends Controller
                 $lang_id = Language::select('id')->first()->id;
             }
 
-            $productsServicesBooks = ProductsServicesBook::where('is_used_item', true)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags')
+            $productsServicesBooks = ProductsServicesBook::where('is_used_item', true)
+            ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
+            ->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags')
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
@@ -1656,24 +1663,24 @@ class ProductsServicesBookController extends Controller
                 if($products->count() <= 0)
                 {
                 	$products = ProductsServicesBook::where('is_used_item', '1')
-                                ->where('type','product')
-                                //->where('user_id', '!=', Auth::id())
-                                ->where('status', '2')
-                                ->where('is_sold', '0')
-                                ->where('is_published', '1')
-                                ->where('quantity','>' ,'0')
-                	 			->withCount('orderItems')->orderBy('order_items_count','desc')
-					            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
-                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '1');
-                                }])
-                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '0');
-                                }]); 
+                    ->where('type','product')
+                    //->where('user_id', '!=', Auth::id())
+                    ->where('status', '2')
+                    ->where('is_sold', '0')
+                    ->where('is_published', '1')
+                    ->where('quantity','>' ,'0')
+    	 			->withCount('orderItems')->orderBy('order_items_count','desc')
+		            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]); 
                 }
             }
             elseif($searchType=='topRated')
@@ -2345,7 +2352,11 @@ class ProductsServicesBookController extends Controller
             $productsServicesBooks = ProductsServicesBook::find($request->product_id);
             if($productsServicesBooks)
             {
-                $similarProducts = ProductsServicesBook::where('status', '2')->where('id','!=', $request->product_id)->where('sub_category_slug', $productsServicesBooks->sub_category_slug)->where('is_used_item', $productsServicesBooks->is_used_item)->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                $similarProducts = ProductsServicesBook::where('status', '2')->where('id','!=', $request->product_id)
+                ->where('sub_category_slug', $productsServicesBooks->sub_category_slug)
+                ->where('is_used_item', $productsServicesBooks->is_used_item)
+                ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
+                ->orderBy('created_at','DESC')->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
                 ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                     $q->select('id','category_master_id','title','slug')
                         ->where('language_id', $lang_id)
@@ -2399,6 +2410,7 @@ class ProductsServicesBookController extends Controller
             ->where('products_services_books.type', $type)
             ->where('products_services_books.is_published', 1)
             ->where('products_services_books.quantity','>' , 0)
+            ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
@@ -2562,22 +2574,23 @@ class ProductsServicesBookController extends Controller
                 {
                      $products = ProductsServicesBook::select('products_services_books.*')
                                 //->where('products_services_books.user_id', '!=', Auth::id())
-                                ->where('products_services_books.status', '2')
-                                ->where('products_services_books.type', $type)
-                                ->where('products_services_books.is_published', '1')
-                                ->where('products_services_books.quantity','>' ,'0')
-                                ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
-                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '1');
-                                }])
-                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '0');
-                                }]);
+                    ->where('products_services_books.status', '2')
+                    ->where('products_services_books.type', $type)
+                    ->where('products_services_books.is_published', '1')
+                    ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
+                    ->where('products_services_books.quantity','>' ,'0')
+                    ->withCount('orderItems')->orderBy('order_items_count','desc')
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]);
                     if($request->is_used_item!='both')
                     {
                         if($request->is_used_item=='yes')
@@ -2612,6 +2625,7 @@ class ProductsServicesBookController extends Controller
                     ->join('users', function ($join) {
                         $join->on('products_services_books.user_id', '=', 'users.id');
                     })
+                    ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                     ->where('products_services_books.status', '2')
                     ->where('products_services_books.is_published', '1')
                     ->where('products_services_books.quantity','>', '0')
@@ -2742,6 +2756,7 @@ class ProductsServicesBookController extends Controller
                 ->where('status', '2')
                 ->where('is_published', '1')
                 ->where('quantity','>' ,'0')
+                ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                 ->where('products_services_books.is_sold', '0')
                 ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
                 ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -2776,24 +2791,24 @@ class ProductsServicesBookController extends Controller
                 if($products->count() <= 0)
                 {
                     $products = ProductsServicesBook::where('is_used_item', '1')
-                                ->where('type','book')
-                                //->where('user_id', '!=', Auth::id())
-                                ->where('status', '2')
-                                ->where('is_published', '1')
-                                ->where('quantity','>' ,'0')
-                                ->where('products_services_books.is_sold', '0')
-                                ->withCount('orderItems')->orderBy('order_items_count','desc')
-                                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
-                                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '1');
-                                }])
-                                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                                    $q->select('id','category_master_id','title','slug')
-                                        ->where('language_id', $lang_id)
-                                        ->where('is_parent', '0');
-                                }]); 
+                    ->where('type','book')
+                    //->where('user_id', '!=', Auth::id())
+                    ->where('status', '2')
+                    ->where('is_published', '1')
+                    ->where('quantity','>' ,'0')
+                    ->where('products_services_books.is_sold', '0')
+                    ->withCount('orderItems')->orderBy('order_items_count','desc')
+                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.studentDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
+                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '1');
+                    }])
+                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                        $q->select('id','category_master_id','title','slug')
+                            ->where('language_id', $lang_id)
+                            ->where('is_parent', '0');
+                    }]); 
                 }
             }
             elseif($searchType=='topRated')
