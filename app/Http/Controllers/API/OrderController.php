@@ -806,7 +806,7 @@ class OrderController extends Controller
 
 		if($request->item_status == 'delivered') 
 		{
-			if(!empty($request->delivery_code) && $request->delivery_code != $delivery_code)
+			if((!empty($request->delivery_code) || $request->delivery_code==0) && $request->delivery_code != $delivery_code)
 			{
 				return response()->json(prepareResult(true, [], 'Delivery code not matched.'), config('http_response.internal_server_error'));
 			}
