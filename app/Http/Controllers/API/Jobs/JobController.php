@@ -816,6 +816,11 @@ class JobController extends Controller
                 return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_validation')), config('http_response.internal_server_error'));
             }
 
+            f($getJob->job_status==3)
+            {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_job_expired_cannot_update')), config('http_response.internal_server_error'));
+            }
+
             //For Update job status
             if($request->action=='update-status')
             {

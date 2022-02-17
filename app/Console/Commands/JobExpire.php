@@ -38,9 +38,14 @@ class JobExpire extends Command
      */
     public function handle()
     {
-        $jobs = Job::where('application_end_date','<',date('Y-m-d'))->where('job_status', '!=','3')->get();
+        $jobs = Job::where('application_end_date','<',date('Y-m-d'))->where('job_status', '!=', 3)->get();
           foreach($jobs as $job) {
-            $job->update(['job_status' => '3']);
+            $job->update([
+                'job_status' => 3,
+                'is_promoted' => null,
+                'promotion_start_date' => null,
+                'promotion_end_date' => null,
+            ]);
             // Notification Start
 
             $title = 'Job Expired';

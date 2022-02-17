@@ -19,6 +19,11 @@ class ServiceProviderDetail extends Model
         'user_id','registration_type_id','service_provider_type_id','company_name','organization_number','about_company','company_website_url','company_logo_path', 'company_logo_thumb_path','vat_number','vat_registration_file_path','year_of_establishment','avg_rating','status'
     ];
 
+    public function getAvgRatingAttribute($value)
+    {
+        return round($value, 2);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class,'user_id','id');
