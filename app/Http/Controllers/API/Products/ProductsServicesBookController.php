@@ -1190,6 +1190,7 @@ class ProductsServicesBookController extends Controller
             ->where('products_services_books.status', '2')
             ->where('products_services_books.is_published', '1')
             ->where('products_services_books.quantity','>' ,'0')
+            ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
             ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
             ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
@@ -1370,6 +1371,7 @@ class ProductsServicesBookController extends Controller
 			            ->where('products_services_books.type', $type)
 			            ->where('products_services_books.is_published', '1')
                         ->where('products_services_books.quantity','>' ,'0')
+                        ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
         	 			->withCount('orderItems')->orderBy('order_items_count','desc')
 			            ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','categoryMaster','subCategory','coverImage','productTags','inCart','isFavourite')
                         ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
@@ -1419,6 +1421,7 @@ class ProductsServicesBookController extends Controller
                     ->where('products_services_books.status', '2')
                     ->where('products_services_books.is_published', '1')
                     ->where('products_services_books.quantity','>', '0')
+                    ->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
                     //->where('products_services_books.user_id', '!=', Auth::id())
                     ->where('users.user_type_id','3')
                     ->orderBy('products_services_books.view_count', 'DESC')->limit(10)
@@ -2931,7 +2934,7 @@ class ProductsServicesBookController extends Controller
             'sold_at_student_store' => $request->sold_at_student_store,
             'days_taken' => $request->days_taken
         ]);
-        
+
         $productsServicesBook = ProductsServicesBook::with('categoryMaster','subCategory','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.serviceProviderDetail','user.shippingConditions','addressDetail','productImages','productTags')
         ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
             $q->select('id','category_master_id','title','slug')
