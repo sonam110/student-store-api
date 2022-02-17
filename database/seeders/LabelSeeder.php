@@ -2443,6 +2443,8 @@ class LabelSeeder extends Seeder
             "buyer" => "Buyer"
         ),
         "messages" => array(
+            "you_cannot_send_this_to_self" => "Cannot send to yourself.",
+            "cannot_send_0_reward" => "Cannot send 0 reward.",
             "message_tracking_number_length" => "Tracking number length should be between 8 to 15 characters",
             "message_contest_exhausted_error" => "Contest / event limit exhausted. Please upgrade your package.",
             "message_invalid_price" => "Invalid Price. price must be greater than 0.",
@@ -3173,6 +3175,7 @@ class LabelSeeder extends Seeder
             "reviewed_by_seller" => "Reviewed"
         ),
         "packages" => array(
+            "applicants_that_you_can_accept_reject" => "No. of applicants that you can accept/reject per job",
             "range_of_age" => "Range of age",
             "range_of_age_detail_msg" => "Can you choose range of age"
             "unlimited" => "Unlimited",

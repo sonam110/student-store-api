@@ -84,6 +84,9 @@ class RewardPointsCredit extends Command
             $user = User::find($orderItem->user_id);
             User::find($orderItem->user_id)->update(['reward_points' => $user->reward_points + $orderItem->earned_reward_points]);
 
+            //reward credit log
+            rewardCreditLog($orderItem->user_id,$orderItem->id,$orderItem->earned_reward_points);
+
             // Notification Start
 
             $title = 'Reward Points Credited';

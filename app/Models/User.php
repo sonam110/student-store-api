@@ -37,6 +37,7 @@ use App\Models\CoolCompanyFreelancer;
 use App\Models\VendorFundTransfer;
 use App\Models\ChatList;
 use App\Models\CartDetail;
+use App\Models\RewardCreditLog;
 use mervick\aesEverywhere\AES256;
 use Laravel\Cashier\Billable;
 
@@ -344,5 +345,10 @@ class User extends Authenticatable
     public function vendorFundTransfers()
     {
         return $this->hasMany(VendorFundTransfer::class,'user_id','id');
+    }
+
+    public function rewardCreditLog()
+    {
+        return $this->hasMany(RewardCreditLog::class, 'user_id', 'id');
     }
 }

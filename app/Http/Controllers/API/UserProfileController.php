@@ -347,13 +347,19 @@ class UserProfileController extends Controller
 	{
 		$validation = \Validator::make($request->all(),[ 
 			'contact_number'	=> 'required',
-			'reward_points'		=> 'required'
+			'reward_points'		=> 'required|numeric'
 		]);
 
 		if($request->reward_points > Auth::user()->reward_points)
 		{
-			return response()->json(prepareResult(true, ['yoh have only '.Auth::user()->reward_points.' reward points to share.'], getLangByLabelGroups('messages','message_less_reward_points')), config('http_response.internal_server_error'));
+			return response()->json(prepareResult(true, ['you have only '.Auth::user()->reward_points.' reward points to share.'], getLangByLabelGroups('messages','message_less_reward_points')), config('http_response.internal_server_error'));
 		}
+
+		if($request->reward_points<1)
+		{
+			return response()->json(prepareResult(true, ['cannot send 0 reward.'], getLangByLabelGroups('messages','cannot_send_0_reward')), config('http_response.internal_server_error'));
+		}
+
 		$receiver = User::where('contact_number',str_replace(' ','', $request->contact_number))->first();
 
 		if(!$receiver)
@@ -366,6 +372,11 @@ class UserProfileController extends Controller
 			return response()->json(prepareResult(true, ['Not Student'], getLangByLabelGroups('messages','message_user_not_student')), config('http_response.internal_server_error'));
 		}
 
+		if($receiver == Auth::id())
+		{
+			return response()->json(prepareResult(true, ['Not Allowd'], getLangByLabelGroups('messages','you_cannot_send_this_to_self')), config('http_response.internal_server_error'));
+		}
+
 		DB::beginTransaction();
         try
         {
@@ -375,17 +386,15 @@ class UserProfileController extends Controller
 			$sharedRewardPoint->reward_points 		= $request->reward_points;
 			$sharedRewardPoint->save();
 
-
-			
 			User::find($receiver->id)->update(['reward_points' => $receiver->reward_points + $request->reward_points]);
 
 			$sender = Auth::user();
 			User::find(Auth::id())->update(['reward_points' => $sender->reward_points - $request->reward_points]);
 
+			//reward credit log
+            rewardCreditLog($receiver->id,null,$request->reward_points);
+
 			// Notification Start
-
-			
-
 			$title = 'Reward Points Shared';
 			$body =  AES256::decrypt($sender->first_name, env('ENCRYPTION_KEY')).' '.AES256::decrypt($sender->last_name, env('ENCRYPTION_KEY')).' has shared '.$request->reward_points.' reward points for you.';
 			$user = $receiver;

@@ -16,6 +16,7 @@ use App\Models\UserPackageSubscription;
 use App\Models\Package;
 use App\Models\ProductsServicesBook;
 use App\Models\Contest;
+use App\Models\RewardCreditLog;
 
 function prepareResult($error, $data, $msg)
 {
@@ -772,4 +773,14 @@ function sendTestPushNoti()
           'Content-Type'  =>'application/json' 
       ]; 
   }*/
+}
+
+function rewardCreditLog($user_id,$order_item_id=null,$reward)
+{
+	$rewardLog = new RewardCreditLog;
+	$rewardLog->user_id = $user_id;
+	$rewardLog->order_item_id = $order_item_id;
+	$rewardLog->reward = $reward;
+	$rewardLog->save();
+	return true;
 }
