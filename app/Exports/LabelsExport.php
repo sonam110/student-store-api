@@ -31,17 +31,14 @@ class LabelsExport implements FromCollection, WithHeadings
     	// return $labels;
 
     	return $labels->map(function ($data, $key) {
-            if($data->labelGroup)
-            {
-                return [
-                    'SNO' => $key+1,
-                    'label_group_name' => $data->labelGroup->name,
-                    'label_name' => $data->label_name,
-                    'label_value_in_english' => trim($data->label_value),
-                    'label_value_in_entered_language' => '',
-                    // 'Created At'                    => $data->created_at,
-                ];
-            }
+            return [
+                'SNO' => $key+1,
+                'label_group_name' => ($data->labelGroup) ? $data->labelGroup->name : null,
+                'label_name' => $data->label_name,
+                'label_value_in_english' => trim($data->label_value),
+                'label_value_in_entered_language' => '',
+                // 'Created At'                    => $data->created_at,
+            ];
     	});
     }
 }
