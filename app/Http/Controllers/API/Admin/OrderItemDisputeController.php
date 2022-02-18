@@ -65,6 +65,14 @@ class OrderItemDisputeController extends Controller
 
     public function resolve(Request $request, $id)
     {
+        $validation = Validator::make($request->all(), [
+            'status'    => 'required'
+        ]);
+
+        if ($validation->fails()) {
+            return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
+
         $orderItemDispute = OrderItemDispute::find($id);
         $orderItem = OrderItem::find($orderItemDispute->order_item_id);
 
