@@ -286,6 +286,7 @@ class CategoryMasterController extends Controller
         DB::beginTransaction();
         try
         {
+            $catInfo = CategoryMaster::find($request->category_master_id);
             $category = $request->category;
             $cat_slug_prefix = (string) \Uuid::generate(4);
             $sub_cat_slug_prefix = (string) \Uuid::generate(4);
@@ -330,7 +331,7 @@ class CategoryMasterController extends Controller
                     $mainCat->language_id        = $language->id;
                     $mainCat->is_parent          = 1;
                     $mainCat->title              = $value['category_title'];
-                    $mainCat->slug               = $cat_slug_prefix.'-'.Str::slug($value['category_title']);
+                    $mainCat->slug               = $catInfo->slug;
                     $mainCat->status             = 1;
                     $mainCat->save();
                 }
