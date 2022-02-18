@@ -4,6 +4,13 @@
 /storage/*.key
 /vendor
 /public/uploads
+/public/export/languages
+/public/export/orders
+/public/export/products
+/public/export/contests
+/public/export/labels
+/public/export/jobs
+/public/export/categories
 /db
 .env
 .phpunit.result.cache
