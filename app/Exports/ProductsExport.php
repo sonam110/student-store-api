@@ -88,11 +88,15 @@ class ProductsExport implements FromCollection, WithHeadings
         {
             $products = $products->where('user_id',Auth::id());
         }
-    	$products = $products->get();
+    	$products = $products->with('productImages')->get();
 
     	// return $products;
 
     	return $products->map(function ($data, $key) {
+            $images = null;
+            foreach ($$data->productImages as $key => $image) {
+                $images = $image->image_path.',';
+            }
     		return [
     			'SNO'             				=> $key+1,
     			'id'      						=> $data->id,
@@ -136,7 +140,8 @@ class ProductsExport implements FromCollection, WithHeadings
     			'brand'							=> $data->brand,
     			'most_popular'					=> $data->most_popular,
     			'is_reward_point_applicable'	=> $data->is_reward_point_applicable,
-    			'reward_points'					=> $data->reward_points,
+                'reward_points'                 => $data->reward_points,
+    			'images' => $images,
     			'created_at'      				=> $data->created_at,
     		];
     	});
