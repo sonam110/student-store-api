@@ -50,6 +50,7 @@ class SearchController extends Controller
 			->where('products_services_books.is_published', 1)
 			->where('products_services_books.status', 2)
 			->where('products_services_books.quantity',">", 0)
+			->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
 			->orderBy('products_services_books.created_at','desc')
 			->with('coverImage','addressDetail')
 			->join('category_masters', function ($join) {
@@ -214,6 +215,7 @@ class SearchController extends Controller
 		->where('is_published', '1')
 		->where('status', '2')
 		->where('quantity','>' ,'0')
+		->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
 		->limit(10)
 		->get();
 
@@ -276,6 +278,7 @@ class SearchController extends Controller
 			->where('is_published', '1')
 			->where('status', '2')
 			->where('quantity','>' ,'0')
+			->whereRaw("(CASE WHEN products_services_books.is_used_item = 1 THEN products_services_books.is_sold = 0 ELSE products_services_books.is_used_item=0 END)")
 			->limit(10)
 			->get();
 
