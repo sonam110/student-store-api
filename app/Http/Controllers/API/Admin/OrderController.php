@@ -65,11 +65,11 @@ class OrderController extends Controller
             }]);
 			if(!empty($request->from_date))
 			{
-				$orders = $orders->where('orders.created_at','>=',$request->from_date);
+				$orders = $orders->whereDate('orders.created_at','>=',$request->from_date);
 			}
 			if(!empty($request->to_date))
 			{
-				$orders = $orders->where('orders.created_at','<=',$request->to_date);
+				$orders = $orders->whereDate('orders.created_at','<=',$request->to_date);
 			}
 			if(!empty($request->order_for))
 			{
@@ -137,31 +137,32 @@ class OrderController extends Controller
 	            $lang_id = Language::select('id')->first()->id;
 	        }
 			
-			$orderItems = OrderItem::select('order_items.*','orders.*', 'users.first_name', 'users.last_name', 'users.email', 'order_items.created_at as created_at')->join('orders', function ($join) {
-	                        $join->on('order_items.order_id', '=', 'orders.id');
-	                    })
-						->join('users', function ($join) {
-	                        $join->on('order_items.user_id', '=', 'users.id');
-	                    })
-						->orderBy('order_items.created_at','DESC')
-						->with('productsServicesBook.user','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','productsServicesBook.subCategory','orderTrackings','return','replacement','dispute','ratingAndFeedback','contestApplication.contest.user:id,first_name,last_name','contestApplication.contest.cancellationRanges','contestApplication.contest.contestWinners','contestApplication.contest.ratingAndFeedback')
-						->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-				            $q->select('id','category_master_id','title','slug')
-				                ->where('language_id', $lang_id)
-				                ->where('is_parent', '1');
-				        }])
-				        ->with(['productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-				            $q->select('id','category_master_id','title','slug')
-				                ->where('language_id', $lang_id)
-				                ->where('is_parent', '0');
-				        }]);
+			$orderItems = OrderItem::select('order_items.*','orders.*', 'users.first_name', 'users.last_name', 'users.email', 'order_items.created_at as created_at')
+			->join('orders', function ($join) {
+                $join->on('order_items.order_id', '=', 'orders.id');
+            })
+			->join('users', function ($join) {
+                $join->on('order_items.user_id', '=', 'users.id');
+            })
+			->orderBy('order_items.created_at','DESC')
+			->with('productsServicesBook.user','productsServicesBook.addressDetail','productsServicesBook.categoryMaster','productsServicesBook.subCategory','orderTrackings','return','replacement','dispute','ratingAndFeedback','contestApplication.contest.user:id,first_name,last_name','contestApplication.contest.cancellationRanges','contestApplication.contest.contestWinners','contestApplication.contest.ratingAndFeedback')
+			->with(['productsServicesBook.categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+	            $q->select('id','category_master_id','title','slug')
+	                ->where('language_id', $lang_id)
+	                ->where('is_parent', '1');
+	        }])
+	        ->with(['productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+	            $q->select('id','category_master_id','title','slug')
+	                ->where('language_id', $lang_id)
+	                ->where('is_parent', '0');
+	        }]);
 			if(!empty($request->from_date))
 			{
-				$orderItems = $orderItems->where('order_items.created_at','>=',$request->from_date);
+				$orderItems = $orderItems->whereDate('order_items.created_at','>=',$request->from_date);
 			}
 			if(!empty($request->to_date))
 			{
-				$orderItems = $orderItems->where('order_items.created_at','<=',$request->to_date);
+				$orderItems = $orderItems->whereDate('order_items.created_at','<=',$request->to_date);
 			}
 			if(!empty($request->product_type))
 			{
