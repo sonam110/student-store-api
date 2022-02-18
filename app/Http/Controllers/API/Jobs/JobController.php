@@ -1112,6 +1112,7 @@ class JobController extends Controller
                     $applicants->where(function($query) use ($request) {
                         $query->where('user_work_experiences.title', 'LIKE', '%'.$request->search_title.'%')
                             ->orWhere('users.first_name', 'LIKE', '%'.$request->search_title.'%')
+                            ->orWhere('users.last_name', 'LIKE', '%'.$request->search_title.'%')
                             ->orWhere('user_cv_details.key_skills', 'LIKE', '%'.$request->search_title.'%');
                     });
                 }
