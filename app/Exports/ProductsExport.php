@@ -68,6 +68,7 @@ class ProductsExport implements FromCollection, WithHeadings
             'most_popular',
             'is_reward_point_applicable',
             'reward_points',
+            'images',
             'created_at'
     	];
     }
@@ -93,10 +94,11 @@ class ProductsExport implements FromCollection, WithHeadings
     	// return $products;
 
     	return $products->map(function ($data, $key) {
-            $images = null;
+            $images = [];
             foreach ($data->productImages as $key => $image) {
-                $images = $image->image_path.',';
+                $images[] = $image->image_path;
             }
+            $imagesComma = implode(', ', $images);
     		return [
     			'SNO'             				=> $key+1,
     			'id'      						=> $data->id,
@@ -141,7 +143,7 @@ class ProductsExport implements FromCollection, WithHeadings
     			'most_popular'					=> $data->most_popular,
     			'is_reward_point_applicable'	=> $data->is_reward_point_applicable,
                 'reward_points'                 => $data->reward_points,
-    			'images' => $images,
+    			'images'                        => $imagesComma,
     			'created_at'      				=> $data->created_at,
     		];
     	});
