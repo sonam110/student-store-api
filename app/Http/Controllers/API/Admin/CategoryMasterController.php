@@ -287,6 +287,7 @@ class CategoryMasterController extends Controller
         try
         {
             $category = $request->category;
+            $cat_slug_prefix = (string) \Uuid::generate(4);
             $sub_cat_slug_prefix = (string) \Uuid::generate(4);
             CategoryDetail::where('category_master_id',$request->category_master_id)->where('is_parent', '0')->delete();
             $slugArray = [];
@@ -321,6 +322,17 @@ class CategoryMasterController extends Controller
                 {
                     $detailInfo->title = $value['category_title'];
                     $detailInfo->save();
+                }
+                else
+                {
+                    $mainCat = new CategoryDetail;
+                    $mainCat->category_master_id = $categoryMaster->id;
+                    $mainCat->language_id        = $language->id;
+                    $mainCat->is_parent          = 1;
+                    $mainCat->title              = $value['category_title'];
+                    $mainCat->slug               = $cat_slug_prefix.'-'.Str::slug($value['category_title']);
+                    $mainCat->status             = 1;
+                    $mainCat->save();
                 }
                     
 
