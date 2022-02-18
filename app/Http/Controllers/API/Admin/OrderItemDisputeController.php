@@ -73,6 +73,11 @@ class OrderItemDisputeController extends Controller
             return response(prepareResult(true, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
         }
 
+        if($request->status=='undefined')
+        {
+            return response(prepareResult(true, ['status is undefined.'], getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
+        }
+
         $orderItemDispute = OrderItemDispute::find($id);
         $orderItem = OrderItem::find($orderItemDispute->order_item_id);
 
