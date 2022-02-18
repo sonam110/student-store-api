@@ -95,7 +95,7 @@ class ProductsExport implements FromCollection, WithHeadings
 
     	return $products->map(function ($data, $key) {
             $images = [];
-            foreach ($data->productImages as $key => $image) {
+            foreach ($data->productImages as $image) {
                 $images[] = $image->image_path;
             }
             $imagesComma = implode(', ', $images);
