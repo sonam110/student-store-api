@@ -173,7 +173,7 @@ class ContestController extends Controller
             $contest->meta_keywords                         = $request->meta_keywords;
             $contest->meta_description                      = $request->meta_description;
             $contest->is_deleted                            = false;
-            $contest->status                                = $request->status;
+            $contest->status                                = (!empty($request->status)) ? $request->status : 'pending';
             $contest->tags                         = (!empty($request->tags)) ? json_encode($request->tags, JSON_UNESCAPED_UNICODE) : null;
             $contest->save();
             if(!empty($request->cancellation_ranges))
