@@ -202,15 +202,17 @@ class OrderController extends Controller
 		{
 			if($request->used_reward_points > auth()->user()->reward_points)
 			{
-				if(!empty($request->items[0]->contest_application_id))
-				{
-					$isFind = ContestApplication::find($request->items[0]->contest_application_id);
-					if($isFind)
+				foreach ($request->items as $key => $orderedItem) {
+					if(!empty($orderedItem['contest_application_id']))
 					{
-						$isFind->delete();
+						$contestApplication = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
+						if($contestApplication)
+						{
+							$contestApplication->delete();
+						}
 					}
 				}
-				return response(prepareResult(true, ['Invalid use of reward points. '.$request->items[0]->contest_application_id], getLangByLabelGroups('messages','invalid_use_of_reward_points')), config('http_response.bad_request'));
+				return response(prepareResult(true, ['Invalid use of reward points.'], getLangByLabelGroups('messages','invalid_use_of_reward_points')), config('http_response.bad_request'));
 			}
 			$delivery_code = NULL;
 			$shipping_charge = 0;
