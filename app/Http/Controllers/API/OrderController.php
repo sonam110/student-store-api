@@ -205,7 +205,7 @@ class OrderController extends Controller
 				foreach ($request->items as $key => $orderedItem) {
 					if(!empty($orderedItem['contest_application_id']))
 					{
-						$contestApplication = ContestApplication::find($orderedItem['contest_application_id'])->contest_id;
+						$contestApplication = ContestApplication::find($orderedItem['contest_application_id']);
 						if($contestApplication)
 						{
 							$contestApplication->delete();
