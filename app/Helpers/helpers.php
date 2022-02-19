@@ -202,14 +202,14 @@ function pushMultipleNotification($title,$body,$users,$type,$save_to_database,$u
 
 function createResume($fileName,$user)
 {
-	if(file_exists('public/uploads/'.$fileName)){ 
-		unlink('public/uploads/'.$fileName);
+	if(file_exists('public/cvs/'.$fileName)){ 
+		unlink('public/cvs/'.$fileName);
 	}
 	$data = [
 		'user' => $user,
 	];
 	$pdf = PDF::loadView('pdf', $data);
-	return $pdf->save('uploads/'.$fileName);
+	return $pdf->save('cvs/'.$fileName);
 }
 
 function getKlarnaOrderInfo($klarna_transaction_id)
