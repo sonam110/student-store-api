@@ -440,9 +440,10 @@ class UserProfileController extends Controller
 			$user_package = UserPackageSubscription::where('user_id', Auth::id())
 				->where('module','job')
 				->whereDate('package_valid_till','>=', date('Y-m-d'))
-				->whereDate('subscription_status', 1)
+				->where('subscription_status', 1)
 				->orderBy('created_at','desc')
-				->first();
+				->toSql();
+			return $user_package;
 
 			if(!$user_package)
 			{
