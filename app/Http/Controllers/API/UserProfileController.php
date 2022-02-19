@@ -442,8 +442,7 @@ class UserProfileController extends Controller
 				->whereDate('package_valid_till','>=', date('Y-m-d'))
 				->where('subscription_status', 1)
 				->orderBy('created_at','desc')
-				->toSql();
-			return $user_package;
+				->first();
 
 			if(!$user_package)
 			{
