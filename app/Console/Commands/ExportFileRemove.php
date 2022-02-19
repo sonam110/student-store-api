@@ -62,7 +62,7 @@ class ExportFileRemove extends Command
         $fs = new Filesystem;
         $fs->cleanDirectory($folderToDelete);  
 
-        $folderToDelete = base_path('public/export/cvs/');
+        $folderToDelete = base_path('public/cvs/');
         $fs = new Filesystem;
         $fs->cleanDirectory($folderToDelete); 
         return true;

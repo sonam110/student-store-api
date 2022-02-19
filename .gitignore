@@ -4,6 +4,7 @@
 /storage/*.key
 /vendor
 /public/uploads
+/public/cvs
 /public/export/languages
 /public/export/orders
 /public/export/products
