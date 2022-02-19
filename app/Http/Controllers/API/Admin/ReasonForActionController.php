@@ -32,12 +32,12 @@ class ReasonForActionController extends Controller
 
             if(!empty($request->action))
             {
-                $reasonForActions->where('action',$request->action);
+                $reasonForActions->where('action','LIKE','%'.$request->action.'%');
             }
 
             if(!empty($request->reason_for_action))
             {
-                $reasonForActions->where('reason_for_action',$request->reason_for_action);
+                $reasonForActions->where('reason_for_action','LIKE','%'.$request->reason_for_action.'%');
             }
 
             if(!empty($request->per_page_record))
