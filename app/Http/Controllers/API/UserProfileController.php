@@ -416,18 +416,41 @@ class UserProfileController extends Controller
 	{
 		$data = [];
 		$data['available_reward_pts'] 		= Auth::user()->reward_points;
-		$data['pending_reward_for_transfer']= Auth::user()->orderItems->where('reward_point_status','pending')->where('earned_reward_points','>', 0)->join('orders', 'orders.id','=','order_items.order_id')->where('orders.payment_status', 'paid')->sum('earned_reward_points');
-		$user['pending_reward_pts'] 		= Auth::user()->orderItems->where('reward_point_status','pending')->where('earned_reward_points','>', 0)->count();
-		$data['used_reward_pts'] 			= Auth::user()->orders->where('reward_point_status','used')->count();
+
+		$data['pending_reward_for_transfer']= Auth::user()->orderItems()
+			->where('order_items.reward_point_status','pending')
+			->where('order_items.earned_reward_points','>', 0)
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
+			->sum('order_items.earned_reward_points');
+
+		$user['pending_reward_pts'] 		= Auth::user()->orderItems()
+			->where('order_items.reward_point_status','pending')
+			->where('order_items.earned_reward_points','>', 0)
+			->join('orders', 'orders.id','=','order_items.order_id')
+			->where('orders.payment_status', 'paid')
+			->count();
+
+		$data['used_reward_pts'] 			= Auth::user()->orders
+			->where('reward_point_status','used')
+			->where('orders.payment_status', 'paid')
+			->count();
+
 		$data['reward_pt_policy'] 			= AppSetting::first()->reward_points_policy;
 		$data['customer_reward_pt_value'] 	= AppSetting::first()->customer_rewards_pt_value;
-		$data['reward_pts_used_on_orders'] 	= Order::where('user_id',Auth::id())->where('used_reward_points','>','0')->get(['order_number','grand_total','created_at','order_status','used_reward_points']);
+		$data['reward_pts_used_on_orders'] 	= Order::where('user_id',Auth::id())
+			->where('used_reward_points','>','0')
+			->where('orders.payment_status', 'paid')
+			->get(['order_number','grand_total','created_at','order_status','used_reward_points']);
+
 		$data['reward_pts_earned_on_items'] = OrderItem::join('orders', function ($join) {
                 $join->on('order_items.order_id', '=', 'orders.id');
             })
 		->where('order_items.user_id',Auth::id())
+		->where('orders.payment_status', 'paid')
 		->where('order_items.earned_reward_points', '>', 0)
 		->get(['orders.order_number','order_items.created_at','order_items.title','order_items.product_type','order_items.cover_image','order_items.item_status','order_items.price','order_items.quantity','order_items.earned_reward_points','order_items.reward_point_status']);
+		
 		$data['reward_points_sharing_history'] 		= SharedRewardPoint::where('sender_id',Auth::id())->orWhere('receiver_id',Auth::id())->with('receiver:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','sender:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path')->orderBy('created_at','desc')->get();
 
 		return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_reward_points_detail')), config('http_response.created'));
