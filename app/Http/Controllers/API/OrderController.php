@@ -197,23 +197,24 @@ class OrderController extends Controller
 			}
 		}
 
+		if($request->used_reward_points > auth()->user()->reward_points)
+		{
+			foreach ($request->items as $key => $orderedItem) {
+				if(!empty($orderedItem['contest_application_id']))
+				{
+					$contestApplication = ContestApplication::find($orderedItem['contest_application_id']);
+					if($contestApplication)
+					{
+						$contestApplication->delete();
+					}
+				}
+			}
+			return response(prepareResult(true, ['Invalid use of reward points.'], getLangByLabelGroups('messages','invalid_use_of_reward_points')), config('http_response.bad_request'));
+		}
+		
 		DB::beginTransaction();
 		try
 		{
-			if($request->used_reward_points > auth()->user()->reward_points)
-			{
-				foreach ($request->items as $key => $orderedItem) {
-					if(!empty($orderedItem['contest_application_id']))
-					{
-						$contestApplication = ContestApplication::find($orderedItem['contest_application_id']);
-						if($contestApplication)
-						{
-							$contestApplication->delete();
-						}
-					}
-				}
-				return response(prepareResult(true, ['Invalid use of reward points.'], getLangByLabelGroups('messages','invalid_use_of_reward_points')), config('http_response.bad_request'));
-			}
 			$delivery_code = NULL;
 			$shipping_charge = 0;
 			$vat_amount = 0;
