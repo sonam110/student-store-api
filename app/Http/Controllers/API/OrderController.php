@@ -204,7 +204,7 @@ class OrderController extends Controller
 			{
 				if(!empty(@$request->items[0]->contest_application_id))
 				{
-					$isFind = ContestApplication::find(@$request->items[0]->contest_application_id)
+					$isFind = ContestApplication::find(@$request->items[0]->contest_application_id);
 					if($isFind)
 					{
 						$isFind->delete();
