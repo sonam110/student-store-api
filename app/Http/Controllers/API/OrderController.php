@@ -2732,7 +2732,6 @@ class OrderController extends Controller
 
 	public function createStripeSubscription(Request $request)
 	{
-		//cancel Subcription if exist
 		if(!empty($request->package_id))
 		{
 			$checkPackage = Package::where('id', $request->package_id)->first();

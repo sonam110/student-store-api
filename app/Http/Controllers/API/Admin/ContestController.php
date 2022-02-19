@@ -675,26 +675,27 @@ class ContestController extends Controller
             $searchType = $request->searchType; //filter, promotions, latest, closingSoon, random, criteria contest
 
             $contests = Contest::select('contests.*')
-                    // ->where('contests.user_id', '!=', Auth::id())
-                    
-                    // ->where('contests.is_published', '1')
-                    ->orderBy('contests.created_at','DESC')
-                    ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')
-                    ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
-                        $q->select('id','category_master_id','title','slug')
-                            ->where('language_id', $lang_id)
-                            ->where('is_parent', '1');
-                    }])
-                    ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
-                        $q->select('id','category_master_id','title','slug')
-                            ->where('language_id', $lang_id)
-                            ->where('is_parent', '0');
-                    }])
-                    ->withCount('contestApplications');
+                // ->where('contests.user_id', '!=', Auth::id())
+                
+                // ->where('contests.is_published', '1')
+                ->orderBy('contests.created_at','DESC')
+                ->with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','addressDetail','categoryMaster','subCategory','cancellationRanges','user.serviceProviderDetail:id,user_id,company_logo_path,company_logo_thumb_path','isApplied','contestWinners')
+                ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '1');
+                }])
+                ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                    $q->select('id','category_master_id','title','slug')
+                        ->where('language_id', $lang_id)
+                        ->where('is_parent', '0');
+                }])
+                ->withCount('contestApplications');
             if(!empty($request->type))
             {
                 $contests->where('contests.type', $request->type);
             }
+            
             if($request->user_type == 'student')
             {
                 $contests->join('users', function ($join) {

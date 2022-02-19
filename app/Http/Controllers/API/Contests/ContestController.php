@@ -822,6 +822,7 @@ class ContestController extends Controller
                     $contests->where(function ($query) use ($available_for) {
                         $query->whereNull('contests.available_for')
                               ->orWhere('contests.available_for', 'all')
+                              ->orWhere('contests.available_for', NULL)
                               ->orWhere('contests.available_for', $available_for);
                     });
                 }

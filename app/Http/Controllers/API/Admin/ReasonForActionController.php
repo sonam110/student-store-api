@@ -23,13 +23,30 @@ class ReasonForActionController extends Controller
     {
         try
         {
+            $reasonForActions = ReasonForAction::select('*');
+            
+            if(!empty($request->module_type_id))
+            {
+                $reasonForActions->where('module_type_id',$request->module_type_id);
+            }
+
+            if(!empty($request->action))
+            {
+                $reasonForActions->where('action',$request->action);
+            }
+
+            if(!empty($request->reason_for_action))
+            {
+                $reasonForActions->where('reason_for_action',$request->reason_for_action);
+            }
+
             if(!empty($request->per_page_record))
             {
-                $reasonForActions = ReasonForAction::simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                $reasonForActions = $reasonForActions->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
             }
             else
             {
-                $reasonForActions = ReasonForAction::get();
+                $reasonForActions = $reasonForActions->get();
             }
             return response(prepareResult(false, $reasonForActions, getLangByLabelGroups('messages','message_reason_for_action_list')), config('http_response.success'));
         }
