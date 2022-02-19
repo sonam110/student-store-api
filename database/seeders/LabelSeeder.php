@@ -2443,6 +2443,7 @@ class LabelSeeder extends Seeder
             "buyer" => "Buyer"
         ),
         "messages" => array(
+            "invalid_use_of_reward_points" => "Invalid use of reward points.",
             "invalid_mobile_number" => "Invalid mobile number length.",
             "cannot_use_same_email_or_mobile_number" => "Cannot use same email or mobile number.",
             "you_cannot_send_this_to_self" => "Cannot send to yourself.",

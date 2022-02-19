@@ -267,7 +267,7 @@ class PackageController extends Controller
                                 );
 
                                 $plan = $stripe->plans->create([
-                                    'amount'          => $request->subscription * 100,
+                                    'amount'          => $amount * 100,
                                     'currency'        => $this->paymentInfo->stripe_currency,
                                     'interval'        => 'day',
                                     'interval_count'  => $duration,

@@ -200,6 +200,18 @@ class OrderController extends Controller
 		DB::beginTransaction();
 		try
 		{
+			if($request->used_reward_points> auth()->user()->reward_points)
+			{
+				if(!empty(@$request->items[0]->contest_application_id))
+				{
+					$isFind = ContestApplication::find(@$request->items[0]->contest_application_id)
+					if($isFind)
+					{
+						$isFind->delete();
+					}
+				}
+				return response(prepareResult(true, ['Invalid use of reward points.'], getLangByLabelGroups('messages','invalid_use_of_reward_points')), config('http_response.bad_request'));
+			}
 			$delivery_code = NULL;
 			$shipping_charge = 0;
 			$vat_amount = 0;
