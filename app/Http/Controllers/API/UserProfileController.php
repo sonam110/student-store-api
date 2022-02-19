@@ -444,7 +444,7 @@ class UserProfileController extends Controller
 				->orderBy('created_at','desc')
 				->first();
 
-			if(empty($user_package))
+			if(!$user_package)
 			{
 			    return response()->json(prepareResult(true, ['No Package Subscribed'], getLangByLabelGroups('messages','message_no_package_subscribed_error')), config('http_response.internal_server_error'));
 			}
