@@ -254,8 +254,8 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	$getOneItemReward = 0;
 	if(!empty($transaction->transaction_id) && $refundOrderItemPrice > 0)
 	{
-		//recheck payment status
-		if($transaction->gateway_detail=='stripe' && $transaction->transaction_status!='succeeded' && $transaction->transaction_id!=null)
+		//recheck payment status Stripe
+		if($transaction->gateway_detail=='stripe' && \Str::lower($transaction->transaction_status)!='succeeded' && $transaction->transaction_id!=null)
 		{
 			$stripe = new \Stripe\StripeClient(
 				  env('STRIPE_SECRET')
@@ -266,6 +266,39 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 			);
 
 			$transaction->transaction_status = $transection->status;
+			$transaction->save();
+		}
+
+		//recheck payment status Klarna
+		if($transaction->gateway_detail=='klarna' && \Str::lower($transaction->transaction_status)!='captured' && $transaction->transaction_id!=null)
+		{
+			$url = env('KLARNA_URL').'/ordermanagement/v1/orders/'.$transaction->transaction_id;
+			$paymentInfo = PaymentGatewaySetting::first();
+			$username = $paymentInfo->klarna_username;
+	    $password = $paymentInfo->klarna_password;
+	    $auth     = base64_encode($username.":".$password);
+
+	    $curl = curl_init();
+	    curl_setopt_array($curl, array(
+	      CURLOPT_URL => $url,
+	      CURLOPT_RETURNTRANSFER => true,
+	      CURLOPT_ENCODING => '',
+	      CURLOPT_MAXREDIRS => 10,
+	      CURLOPT_TIMEOUT => 0,
+	      CURLOPT_FOLLOWLOCATION => true,
+	      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	      CURLOPT_CUSTOMREQUEST => 'GET',
+	      CURLOPT_HTTPHEADER => array(
+	        'Authorization: Basic '.$auth,
+	        'Content-Type: application/json',
+	      ),
+	    ));
+
+	    $response = curl_exec($curl);
+	    $jsonData = json_decode($response, true);
+	    curl_close($curl);
+
+			$transaction->transaction_status = $jsonData['status'];
 			$transaction->save();
 		}
 
