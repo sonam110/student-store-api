@@ -1005,6 +1005,87 @@ class JobController extends Controller
         {
             $searchType = $request->searchType; //filter, criteria, random, recent
             //in criteria: title, skills, city, job type, work exp.
+            if($request->aspirant_type=='global')
+            {
+                $studentDetail = StudentDetail::select('student_details.*')
+                    ->orderBy('student_details.created_at','DESC')
+                    ->join('user_cv_details', function ($join) {
+                        $join->on('student_details.user_id', '=', 'user_cv_details.user_id');
+                    })
+                    ->join('address_details', function ($join) {
+                        $join->on('user_cv_details.address_detail_id', '=', 'address_details.id');
+                    })
+                    ->with('user.cvDetail.jobTags','user.defaultAddress')
+                if(!empty($request->job_environment))
+                {
+                    $studentDetail->where(function($query) use ($request) {
+                        foreach ($request->job_environment as $key => $job_environment) {
+                            if ($key === 0) {
+                                $query->where('user_cv_details.preferred_job_env', 'LIKE', '%'.$job_environment.'%');
+                                continue;
+                            }
+                            $query->orWhere('user_cv_details.preferred_job_env', 'LIKE', '%'.$job_environment.'%');
+                        }
+                    });
+                }
+
+                if(!empty($request->city))
+                {
+                    $studentDetail->where(function($query) use ($request) {
+                        foreach ($request->city as $key => $city) {
+                            if ($key === 0) {
+                                $query->where('address_details.city', 'LIKE', '%'.$city.'%');
+                                continue;
+                            }
+                            $query->orWhere('address_details.city', 'LIKE', '%'.$city.'%');
+                        }
+                    });
+                }
+
+                if(!empty($request->min_years_of_experience))
+                {
+                    $studentDetail->where('user_cv_details.total_experience', '>=', $request->min_years_of_experience);
+                }
+                if(!empty($request->max_years_of_experience))
+                {
+                    $studentDetail->where('user_cv_details.total_experience', '<=', $request->max_years_of_experience);
+                }
+                if(!empty($request->known_languages))
+                {
+                    $studentDetail->where(function($query) use ($request) {
+                        foreach ($request->known_languages as $key => $known_languages) {
+                            if ($key === 0) {
+                                $query->where('user_cv_details.languages_known', 'LIKE', '%'.$known_languages.'%');
+                                continue;
+                            }
+                            $query->orWhere('user_cv_details.languages_known', 'LIKE', '%'.$known_languages.'%');
+                        }
+                    });
+                }
+                if(!empty($request->job_tags))
+                {
+                    $studentDetail->where(function($query) use ($request) {
+                        foreach ($request->job_tags as $key => $job_tags) {
+                            if ($key === 0) {
+                                $query->where('user_cv_details.key_skills', 'LIKE', '%'.$job_tags.'%');
+                                continue;
+                            }
+                            $query->orWhere('user_cv_details.key_skills', 'LIKE', '%'.$job_tags.'%');
+                        }
+                    });
+                }
+
+                if(!empty($request->per_page_record))
+                {
+                    $studentDetailData = $studentDetail->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+                }
+                else
+                {
+                    $studentDetailData = $studentDetail->get();
+                }
+                return response(prepareResult(false, $studentDetailData, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
+            }
+
             $applicants = JobApplication::select('job_applications.*', 'sp_jobs.title')
                     ->join('sp_jobs', function ($join) {
                         $join->on('job_applications.job_id', '=', 'sp_jobs.id')
