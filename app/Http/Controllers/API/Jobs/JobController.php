@@ -24,6 +24,7 @@ use App\Models\Abuse;
 use App\Models\LangForDDL;
 use mervick\aesEverywhere\AES256;
 use App\Models\Language;
+use App\Models\StudentDetail;
 
 
 class JobController extends Controller
