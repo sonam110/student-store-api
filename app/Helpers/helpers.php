@@ -298,8 +298,13 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	    $jsonData = json_decode($response, true);
 	    curl_close($curl);
 
-			$transaction->transaction_status = $jsonData['status'];
+	    $transaction->transaction_status = $jsonData['status'];
 			$transaction->save();
+	    if($jsonData['refunded_amount']>0) {
+	    	$orderItem->is_refunded = true;
+				$orderItem->save();
+				return 'success';
+	    }
 		}
 
 		if($transaction->gateway_detail=='stripe' && \Str::lower($transaction->transaction_status)=='succeeded')
