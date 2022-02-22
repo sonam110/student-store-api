@@ -1015,7 +1015,7 @@ class JobController extends Controller
                     ->join('address_details', function ($join) {
                         $join->on('user_cv_details.address_detail_id', '=', 'address_details.id');
                     })
-                    ->with('user.cvDetail.jobTags','user.defaultAddress')
+                    ->with('user.cvDetail.jobTags','user.defaultAddress');
                 if(!empty($request->job_environment))
                 {
                     $studentDetail->where(function($query) use ($request) {
