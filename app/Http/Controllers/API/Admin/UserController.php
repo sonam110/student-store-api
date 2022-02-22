@@ -417,6 +417,10 @@ class UserController extends Controller
             {
             	$users->where('users.contact_number', 'LIKE', '%'.$request->contact_number.'%')->orWhere('users.guardian_contact_number', 'LIKE', '%'.$request->contact_number.'%');
             }
+            if(!empty($request->cp_contact_number))
+            {
+            	$users->where('users.cp_contact_number', 'LIKE', '%'.$request->cp_contact_number.'%');
+            }
             if(!empty($request->userStatus))
             {
                 $users->whereIn('users.status', $request->userStatus);
