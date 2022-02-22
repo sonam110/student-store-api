@@ -254,6 +254,21 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	$getOneItemReward = 0;
 	if(!empty($transaction->transaction_id) && $refundOrderItemPrice > 0)
 	{
+		//recheck payment status
+		if($transaction->gateway_detail=='stripe' && $transaction->transaction_status!='succeeded' && $transaction->transaction_id!=null)
+		{
+			$stripe = new \Stripe\StripeClient(
+				  env('STRIPE_SECRET')
+				);
+			$transection = $stripe->paymentIntents->retrieve(
+			  $transaction->transaction_id,
+			  []
+			);
+
+			$transaction->transaction_status = $transection->status;
+			$transaction->save();
+		}
+
 		if($transaction->gateway_detail=='stripe' && \Str::lower($transaction->transaction_status)=='succeeded')
 		{
 			try 

@@ -1989,6 +1989,9 @@ class LabelSeeder extends Seeder
             "online" => "Online"
         ),
         "job_filter" => array(
+            "aspirant_type" => "Aspirant Type",
+            "all" => "All",
+            "my_applicant" => "My Applicants",
             "apply_filter" => "Apply Filter",
             "reset_filter" => "Reset Filter",
             "applying_date" => "Application Date",
@@ -2443,6 +2446,8 @@ class LabelSeeder extends Seeder
             "buyer" => "Buyer"
         ),
         "messages" => array(
+            "message_cv_view_exhausted_alert" => "Your CV views are exhasted, please upgrade your job package to see aspirant's detail",
+            "message_cv_view_alert" => "Your CV views will be used if you view detail or download CV of any aspirant from best matches section.",
             "invalid_use_of_reward_points" => "Invalid use of reward points.",
             "invalid_mobile_number" => "Invalid mobile number length.",
             "cannot_use_same_email_or_mobile_number" => "Cannot use same email or mobile number.",
@@ -3178,6 +3183,7 @@ class LabelSeeder extends Seeder
             "reviewed_by_seller" => "Reviewed"
         ),
         "packages" => array(
+            "number_of_contest_or_events" => "Number of Contests/Events",
             "applicants_that_you_can_accept_reject" => "No. of applicants that you can accept/reject per job",
             "range_of_age" => "Range of age",
             "range_of_age_detail_msg" => "Can you choose range of age"

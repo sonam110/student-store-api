@@ -684,6 +684,7 @@ class FrontController extends Controller
 
         dd($createProduct);*/
 
+
         \Stripe\Stripe::setApiKey($this->paymentInfo->payment_gateway_secret);
 		/*$cancelSubscription = $stripe->subscriptions->cancel(
 		  	'sub_1JhYEPD6j8NkE89KA5XVE8jO',
@@ -705,6 +706,15 @@ class FrontController extends Controller
 		  []
 		);
 		dd($accountStatus->verification->disabled_reason);*/
+		
+		//check transaction status
+		$stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
+
+		$transection = $stripe->paymentIntents->retrieve(
+		  'pi_3KVwSFD6j8NkE89K0ofRqIFL',
+		  []
+		);
+		dd($transection->status);
 	}
 
 	public function strReplaceAssoc(array $replace, $subject) { 
