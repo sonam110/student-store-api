@@ -325,7 +325,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 	      return 'failed';
 			}
 		}
-		elseif($transaction->gateway_detail=='klarna' && $transaction->transaction_status=='ACCEPTED')
+		elseif($transaction->gateway_detail=='klarna' && \Str::lower($transaction->transaction_status)=='captured')
 		{
 			$url = env('KLARNA_URL').'/ordermanagement/v1/orders/'.$transaction->transaction_id.'/refunds';
 			$paymentInfo = PaymentGatewaySetting::first();
