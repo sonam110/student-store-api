@@ -2368,7 +2368,7 @@ class LandingPageController extends Controller
             if(auth()->id()!=$contest->user_id)
             {
                 $notAllowedStatus = ['pending','rejected'];
-                if (!in_array($contest->status, $notAllowedStatus))
+                if (in_array($contest->status, $notAllowedStatus))
                 {
                     return response()->json(prepareResult(true, [], getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
                 }
