@@ -216,7 +216,12 @@ class JobController extends Controller
     {
         if(auth()->id()!=$job->user_id)
         {
-            if($job->job_status!=1 || $job->is_published!=1)
+            if($job->job_status!=1)
+            {
+                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+            }
+
+            if($job->is_published!=1)
             {
                 return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
             }

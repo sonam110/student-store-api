@@ -329,7 +329,11 @@ class ContestController extends Controller
         if(auth()->id()!=$contest->user_id)
         {
             $notAllowedStatus = ['pending','rejected'];
-            if (!in_array($contest->status, $notAllowedStatus) || $contest->is_published!=1)
+            if (!in_array($contest->status, $notAllowedStatus))
+            {
+                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+            }
+            if ($contest->is_published!=1)
             {
                 return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
             }
