@@ -30,6 +30,12 @@ class ContactUsController extends Controller
             return response(prepareResult(false, $validation->messages(), getLangByLabelGroups('messages','message_validation')), config('http_response.bad_request'));
         }
 
+        $length = str_replace('_', '', $request->phone);
+        if(strlen($length)<10)
+        {
+            return response(prepareResult(true, 'Invalid mobile number length.', getLangByLabelGroups('messages','invalid_mobile_number')), config('http_response.bad_request'));
+        }
+
         DB::beginTransaction();
         try
         {
