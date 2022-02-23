@@ -496,6 +496,14 @@ class ProductsServicesBookController extends Controller
 
     public function show(Request $request,ProductsServicesBook $productsServicesBook)
     {
+        if(auth()->id()!=$productsServicesBook->user_id)
+        {
+            if($productsServicesBook->status!=2 || $productsServicesBook->is_published!=1)
+            {
+                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+            }
+        }
+        
         $lang_id = $this->lang_id;
         if(empty($lang_id))
         {

@@ -214,6 +214,14 @@ class JobController extends Controller
 
     public function show(Job $job)
     {
+        if(auth()->id()!=$job->user_id)
+        {
+            if($job->job_status!=1 || $job->is_published!=1)
+            {
+                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+            }
+        }
+
         $lang_id = $this->lang_id;
         if(empty($lang_id))
         {

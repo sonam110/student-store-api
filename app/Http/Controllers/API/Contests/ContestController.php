@@ -326,6 +326,15 @@ class ContestController extends Controller
 
     public function show(Request $request, Contest $contest)
     {
+        if(auth()->id()!=$contest->user_id)
+        {
+            $notAllowedStatus = ['pending','rejected'];
+            if (!in_array($contest->status, $notAllowedStatus) || $contest->is_published!=1)
+            {
+                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+            }
+        }
+
         $lang_id = $this->lang_id;
         if(empty($lang_id))
         {
