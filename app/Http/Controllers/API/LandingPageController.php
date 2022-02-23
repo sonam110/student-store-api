@@ -187,7 +187,18 @@ class LandingPageController extends Controller
 
     public function productDetail(Request $request,$id)
     {
+        $lang_id = $this->lang_id;
+        if(empty($lang_id))
+        {
+            $lang_id = Language::select('id')->first()->id;
+        }
+
         $productsServicesBook = ProductsServicesBook::find($id);
+        if(!$productsServicesBook)
+        {
+            return response(prepareResult(true, 'Data Not Found.', 'Data Not Found.'), config('http_response.not_found'));
+        }
+
         if(auth()->id()!=$productsServicesBook->user_id)
         {
             if($productsServicesBook->status!=2)
@@ -200,17 +211,6 @@ class LandingPageController extends Controller
             }
         }
 
-        $lang_id = $this->lang_id;
-        if(empty($lang_id))
-        {
-            $lang_id = Language::select('id')->first()->id;
-        }
-
-        
-        if(!$productsServicesBook)
-        {
-            return response(prepareResult(true, 'Data Not Found.', 'Data Not Found.'), config('http_response.not_found'));
-        }
         if($request->view_count == true)
         {
             $productsServicesBook->update(['view_count' => $productsServicesBook->view_count + 1]);
@@ -1907,6 +1907,20 @@ class LandingPageController extends Controller
         {
             return response(prepareResult(true, 'Data Not Found.', 'Data Not Found.'), config('http_response.not_found'));
         }
+
+        if(auth()->id()!=$job->user_id)
+        {
+            if($job->job_status!=1)
+            {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+            }
+
+            if($job->is_published!=1)
+            {
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+            }
+        }
+
         if($fav = FavouriteJob::where('job_id',$job->id)->where('sa_id',Auth::id())->first())
         {
             $favouriteJob = true;
@@ -2351,6 +2365,19 @@ class LandingPageController extends Controller
         $contest = Contest::find($id);
         if($contest)
         {
+            if(auth()->id()!=$contest->user_id)
+            {
+                $notAllowedStatus = ['pending','rejected'];
+                if (!in_array($contest->status, $notAllowedStatus))
+                {
+                    return response()->json(prepareResult(true, [], getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+                }
+                if ($contest->is_published!=1)
+                {
+                    return response()->json(prepareResult(true, [], getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+                }
+            }
+
             if(ContestApplication::where('application_status','!=','canceled')->where('contest_id',$contest->id)->where('user_id',Auth::id())->first())
             {
                 $applied = true;
