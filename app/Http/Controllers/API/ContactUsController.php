@@ -22,7 +22,7 @@ class ContactUsController extends Controller
     {        
         $validation = Validator::make($request->all(), [
             'message'  => 'required',
-            'email'  => 'required',
+            'email'  => 'required|email',
             'message_for' => 'required'
         ]);
 
