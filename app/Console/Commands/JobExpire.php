@@ -54,5 +54,7 @@ class JobExpire extends Command
             $type = 'Job Expired';
             pushNotification($title,$body,$user,$type,true,'seller','job',$job->id,'posted-jobs');
           }
+
+        \Log::channel('cron')->info('job:expire command executed successfully.');
     }
 }

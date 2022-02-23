@@ -54,6 +54,8 @@ class ResumePdfGenerate extends Command
             }
             
         }
+
+        \Log::channel('cron')->info('resumePdf:generate command executed successfully.');
         return 0;
     }
 

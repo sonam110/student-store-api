@@ -112,6 +112,8 @@ class CoolCompanyRegFreelancer extends Command
                 Log::channel('customlog')->info($student->id.' :Student registration failed. Please Check');
             }
         }
+
+        \Log::channel('cron')->info('create:freelancer command executed successfully.');
     }
 
     private function getAccessToken()

@@ -66,5 +66,6 @@ class StripeAccountStatusCheck extends Command
             $user->stripe_create_timestamp = date('Y-m-d H:i:s');
             $user->save();
         }
+        \Log::channel('cron')->info('stripe:account command executed successfully.');
     }
 }

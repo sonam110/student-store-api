@@ -59,6 +59,8 @@ class ContestOnHold extends Command
                 // Notification End
             }
           }
+
+        \Log::channel('cron')->info('contests:onHold command executed successfully.');
         return 0;
     }
 }

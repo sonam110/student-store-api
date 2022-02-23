@@ -139,6 +139,8 @@ class StripeFundTransferred extends Command
                 }
             }
         }
+
+        \Log::channel('cron')->info('stripevendor:findtransfer command executed successfully.');
         return 0;
     }
 }

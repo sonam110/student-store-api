@@ -123,6 +123,7 @@ class AutoSwichPackageIfExpired extends Command
                 }
             }
         }
+        \Log::channel('cron')->info('expiredpackage:switchtofree command executed successfully.');
         return 0;
     }
 }

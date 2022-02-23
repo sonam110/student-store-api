@@ -41,8 +41,10 @@ class ContestExpire extends Command
      */
     public function handle()
     {
-        $contests = Contest::where('application_end_date','<',date('Y-m-d'))->where('status','verified')->get();
-          foreach($contests as $contest) {
+        $contests = Contest::whereDate('application_end_date','<',date('Y-m-d'))
+            ->where('status','verified')
+            ->get();
+        foreach($contests as $contest) {
             $contest->update(['status' => 'expired']);
             // Notification Start
 
@@ -53,17 +55,28 @@ class ContestExpire extends Command
             pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
         }
 
-        $contests = Contest::where('start_date','<',date('Y-m-d'))->whereIn('status',['verified','expired'])->get();
+        $contests = Contest::whereDate('start_date','<',date('Y-m-d'))
+            ->whereIn('status',['verified','expired'])
+            ->get();
           foreach($contests as $contest) 
           {
             $contest->update(['status' => 'completed']);
-            ContestApplication::where('contest_id',$contest->id)->whereIn('application_status',['joined','approved'])->where('payment_status','paid')->update(['application_status'=>'completed']);
+
+            ContestApplication::where('contest_id',$contest->id)
+                ->whereIn('application_status',['joined','approved'])
+                ->where('payment_status','paid')
+                ->update(['application_status'=>'completed']);
 
             //OrderStatus Update
-            $getAllContApplications = ContestApplication::select('id')->where('contest_id',$contest->id)->where('payment_status','paid')->where('application_status','completed')->get();
+            $getAllContApplications = ContestApplication::select('id')
+                ->where('contest_id',$contest->id)
+                ->where('payment_status','paid')
+                ->where('application_status','completed')
+                ->get();
             foreach($getAllContApplications as $key => $apllications)
             {
-                $changeOrderStatus = OrderItem::where('contest_application_id', $apllications->id)->first();
+                $changeOrderStatus = OrderItem::where('contest_application_id', $apllications->id)
+                ->first();
                 if($changeOrderStatus)
                 {
                     $changeOrderStatus->item_status = 'completed';
@@ -84,5 +97,7 @@ class ContestExpire extends Command
             $type = 'Contest completed';
             pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
         }
+
+        \Log::channel('cron')->info('contest:expire command executed successfully.');
     }
 }

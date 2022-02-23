@@ -54,5 +54,7 @@ class CheckSwishPaymentStatus extends Command
                 \Log::info($rawResponse);
             }
         }
+
+        \Log::channel('cron')->info('checkswish:paymentstatus command executed successfully.');
     }
 }

@@ -69,6 +69,8 @@ class RewardPointsCredit extends Command
             $type = 'Reward Points';
             pushNotification($title,$body,$user,$type,true,'buyer','orderItem',$orderItem->id,'my-orders');
           }
+
+        \Log::channel('cron')->info('rewardPoints:credit command executed successfully.');
         return 0;
     }
 }

@@ -212,6 +212,8 @@ class CoolCompanyCreateAssignment extends Command
             }
             
         }
+
+        \Log::channel('cron')->info('create:assignment command executed successfully.');
     }
 
     private function getAccessToken()

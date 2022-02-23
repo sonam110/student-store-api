@@ -75,6 +75,8 @@ class SubscribedPackageExpire extends Command
             }
             pushNotification($title,$body,$user,$type,true,'seller',$module,$subscribedPackage->id,'landing-page');
         }
+
+        \Log::channel('cron')->info('subscribedPackage:expire command executed successfully.');
         return 0;
     }
 }

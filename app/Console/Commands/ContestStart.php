@@ -60,6 +60,8 @@ class ContestStart extends Command
                 }
             }
           }
+
+        \Log::channel('cron')->info('contests:start command executed successfully.');
         return 0;
     }
 }

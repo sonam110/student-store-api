@@ -92,6 +92,8 @@ class OrderStatus extends Command
     			}
     		}
     	}
+
+        \Log::channel('cron')->info('order:status command executed successfully.');
     	return 0;
     }
 }

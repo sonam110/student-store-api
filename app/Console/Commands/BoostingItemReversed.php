@@ -75,5 +75,7 @@ class BoostingItemReversed extends Command
                 'top_selling_start_at' => null,
                 'top_selling_end_at' => null,
             ]);
+
+        \Log::channel('cron')->info('boosting:update command executed successfully.');
     }
 }

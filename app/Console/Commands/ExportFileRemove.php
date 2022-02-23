@@ -65,6 +65,8 @@ class ExportFileRemove extends Command
         $folderToDelete = base_path('public/cvs/');
         $fs = new Filesystem;
         $fs->cleanDirectory($folderToDelete); 
+
+        \Log::channel('cron')->info('file:remove command executed successfully.');
         return true;
     }
 }
