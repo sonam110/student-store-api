@@ -500,11 +500,11 @@ class ProductsServicesBookController extends Controller
         {
             if($productsServicesBook->status!=2)
             {
-                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
             }
             if($productsServicesBook->is_published!=1)
             {
-                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+                return response()->json(prepareResult(true, [], getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
             }
         }
         
