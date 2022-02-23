@@ -22,13 +22,19 @@ class SubscriberController extends Controller
     {
     	try
     	{
+            $subscriber = Subscriber::select('*');
+            if(!empty($request->email))
+            {
+                $subscriber->where('email', 'LIKE', '%'.$request->email.'%');
+            }
+
     		if(!empty($request->per_page_record))
     		{
-    			$subscribers = Subscriber::simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
+    			$subscribers = $subscriber->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
     		}
     		else
     		{
-    			$subscribers = Subscriber::get();
+    			$subscribers = $subscriber->get();
     		}
     		return response(prepareResult(false, $subscribers, getLangByLabelGroups('messages','message_subscriber_list')), config('http_response.success'));
     	}
