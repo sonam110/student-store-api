@@ -187,13 +187,26 @@ class LandingPageController extends Controller
 
     public function productDetail(Request $request,$id)
     {
+        $productsServicesBook = ProductsServicesBook::find($id);
+        if(auth()->id()!=$productsServicesBook->user_id)
+        {
+            if($productsServicesBook->status!=2)
+            {
+                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+            }
+            if($productsServicesBook->is_published!=1)
+            {
+                return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('not_found','page_not_found')), config('http_response.not_found'));
+            }
+        }
+
         $lang_id = $this->lang_id;
         if(empty($lang_id))
         {
             $lang_id = Language::select('id')->first()->id;
         }
 
-        $productsServicesBook = ProductsServicesBook::find($id);
+        
         if(!$productsServicesBook)
         {
             return response(prepareResult(true, 'Data Not Found.', 'Data Not Found.'), config('http_response.not_found'));
