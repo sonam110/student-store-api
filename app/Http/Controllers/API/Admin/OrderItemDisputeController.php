@@ -43,7 +43,7 @@ class OrderItemDisputeController extends Controller
 
 	public function show($id)
 	{	
-        $orderItemDispute = OrderItemDispute::with('orderItem','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','vendor:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->find($id);	
+        $orderItemDispute = OrderItemDispute::with('orderItem:id,user_id,order_id,vendor_user_id,title,sku,price,quantity,reason_for_cancellation','orderItem.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','orderItem.vendor:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->find($id);	
 		return response()->json(prepareResult(false, $orderItemDispute, getLangByLabelGroups('messages','message_disputes_list')), config('http_response.success'));
 	}
 
