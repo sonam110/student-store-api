@@ -63,7 +63,7 @@ class ContestExpire extends Command
             $contest->update(['status' => 'completed']);
 
             ContestApplication::where('contest_id',$contest->id)
-                ->whereIn('application_status',['joined','approved'])
+                ->whereIn('application_status',['joined','approved','pending'])
                 ->where('payment_status','paid')
                 ->update(['application_status'=>'completed']);
 
