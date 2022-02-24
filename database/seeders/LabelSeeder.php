@@ -2736,7 +2736,7 @@ class LabelSeeder extends Seeder
             "message_invalid_last_name" => "Only alphabets are allowed in last name.",
             "message_invalid_g_first_name" => "Only alphabets are allowed in guardian first name.",
             "message_invalid_g_last_name" => "Only alphabets are allowed in guardian last name.",
-            "message_password_text" => "Password should have atleast one uppercase, one lowercase, one special character other than space and atleast one number.",
+            "message_password_text" => 'Password should have atleast one uppercase, one lowercase, one special character other than space and atleast one number, Allowed special charcters are ! " # $ % & \' ( ) * + , - . / : ; < = > ? @',
             "message_social_security_number" => "Social security number eg : YYYYMMDD-XXXX.",
             "message_website_url_valid" => "Please Enter Valid Website url",
             "message_valid_price_required" => "Price should be less than 999999.99",
