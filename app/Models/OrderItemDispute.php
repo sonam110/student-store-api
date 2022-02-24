@@ -15,6 +15,6 @@ class OrderItemDispute extends Model
 
     public function orderItem()
     {
-        return $this->belongsTo(OrderItem::class,'order_id','id');
+        return $this->belongsTo(OrderItem::class,'order_item_id','id');
     }
 }
