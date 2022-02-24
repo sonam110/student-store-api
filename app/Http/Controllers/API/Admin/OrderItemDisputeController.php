@@ -18,11 +18,29 @@ class OrderItemDisputeController extends Controller
 	{
 		try
 		{
-            $disputes = OrderItemDispute::orderBy('created_at','DESC');
+            $disputes = OrderItemDispute::with('orderItem:id,user_id,order_id,vendor_user_id,title,sku,price,quantity,reason_for_cancellation','disputeRaisedBy:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','disputeRaisedAgainst:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','reasonIdForDisputeDecline','reasonIdForReviewDecline')
+            ->orderBy('created_at','DESC');
+
             if(!empty($request->dispute_status))
             {
                 $disputes = $disputes->where('dispute_status',$request->dispute_status);
             }
+
+            if(!empty($request->dispute_raised_by))
+            {
+                $disputes = $disputes->where('dispute_raised_by',$request->dispute_raised_by);
+            }
+
+            if(!empty($request->dispute_raised_against))
+            {
+                $disputes = $disputes->where('dispute_raised_against',$request->dispute_raised_against);
+            }
+
+            if(!empty($request->dispute_status))
+            {
+                $disputes = $disputes->where('dispute_status',$request->dispute_status);
+            }
+
 			if(!empty($request->per_page_record))
 			{
 			    $disputes = $disputes->with('orderItem')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record]);
@@ -43,7 +61,7 @@ class OrderItemDisputeController extends Controller
 
 	public function show($id)
 	{	
-        $orderItemDispute = OrderItemDispute::with('orderItem:id,user_id,order_id,vendor_user_id,title,sku,price,quantity,reason_for_cancellation','orderItem.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','orderItem.vendor:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path')->find($id);	
+        $orderItemDispute = OrderItemDispute::with('orderItem:id,user_id,order_id,vendor_user_id,title,sku,price,quantity,reason_for_cancellation','orderItem.user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','orderItem.vendor:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','reasonIdForDisputeDecline','reasonIdForReviewDecline')->find($id);	
 		return response()->json(prepareResult(false, $orderItemDispute, getLangByLabelGroups('messages','message_disputes_list')), config('http_response.success'));
 	}
 
