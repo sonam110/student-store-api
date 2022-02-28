@@ -819,7 +819,7 @@ class OrderController extends Controller
 			$reason_id_for_cancellation = $request->reason_id;
 		}
 
-		if($request->item_status == 'delivered') 
+		if($request->item_status == 'delivered' && $orderItem->product_type!='service') 
 		{
 			if((!empty($request->delivery_code) || $request->delivery_code==0) && $request->delivery_code != $delivery_code)
 			{
