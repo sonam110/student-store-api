@@ -23,6 +23,10 @@ class ContestTagController extends Controller
                 {
                     $record->where('type', $request->type);
                 }
+                if(!empty($request->tags))
+                {
+                    $record->where('tags', 'LIKE', '%'.$request->type.'%');
+                }
                 $tags = $record->groupBy('title')->simplePaginate($request->per_page_record)->appends(['per_page_record' => $request->per_page_record,'type' => $request->type]);
             }
             else
@@ -31,6 +35,10 @@ class ContestTagController extends Controller
                 if(!empty($request->type))
                 {
                     $record->where('type', $request->type);
+                }
+                if(!empty($request->tags))
+                {
+                    $record->where('tags', 'LIKE', '%'.$request->type.'%');
                 }
                 $tags = $record->groupBy('title')->get();
             }
