@@ -38,7 +38,7 @@ class ContestTagController extends Controller
                 }
                 if(!empty($request->tags))
                 {
-                    $record->where('tags', 'LIKE', '%'.$request->type.'%');
+                    $record->where('title', 'LIKE', '%'.$request->type.'%');
                 }
                 $tags = $record->groupBy('title')->get();
             }
