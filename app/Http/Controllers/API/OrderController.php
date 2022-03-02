@@ -328,6 +328,10 @@ class OrderController extends Controller
 						{
 							$delivery_code = rand(100000, 999999);
 						}
+						else
+						{
+							$delivery_code = null;
+						}
 
 						if(($orderedItem['quantity'] > $productsServicesBook->quantity) && ($productsServicesBook->type != 'service'))
 						{
