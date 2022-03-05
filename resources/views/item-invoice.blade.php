@@ -133,7 +133,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                <br><br>
+                                <br><br><br><br>
                                 <strong>{{getLangByLabelGroups('invoice','Seller_Info')}}</strong><br>
                                 @if($order->productsServicesBook)
                                     @php $seller = $order->productsServicesBook->user @endphp
