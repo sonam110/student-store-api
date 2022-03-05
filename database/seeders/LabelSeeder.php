@@ -2578,7 +2578,7 @@ class LabelSeeder extends Seeder
             "message_favourite_job_deleted" => "message_favourite_job_deleted",
             "message_favourite_job_list" => "message_favourite_job_list",
             "message_job_promote" => "message_job_promote",
-            "message_job_publish" => "Publish job to make it visible to applicants, but published job can not be edited, so you can publish it later as well",
+            "message_job_publish" => "Publish job to make it visible to applicants",
             "message_job_tags_list" => "message_job_tags_list",
             "message_job_update-status" => "status",
             "message_label_group_info" => "message_label_group_info",

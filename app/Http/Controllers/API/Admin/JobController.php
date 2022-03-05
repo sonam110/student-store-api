@@ -237,9 +237,26 @@ class JobController extends Controller
     {
         try
         {
-            $job_id = $job->id;
-            $jobs = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','jobTags:id,job_id,title','jobApplications.user')->find($job_id);
-            return response(prepareResult(false, $jobs, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
+            $lang_id = null;
+            if(empty($lang_id))
+            {
+                $lang_id = Language::select('id')->first()->id;
+            }
+
+            $job = Job::with('user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path,show_email,show_contact_number','user.serviceProviderDetail','jobTags:id,job_id,title','addressDetail','categoryMaster','subCategory')
+            ->with(['categoryMaster.categoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '1');
+            }])
+            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+                $q->select('id','category_master_id','title','slug')
+                    ->where('language_id', $lang_id)
+                    ->where('is_parent', '0');
+            }])
+            ->withCount('jobApplications','acceptedJobApplications')
+            ->find($job->id);
+            return response(prepareResult(false, $job, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
         }
         catch (\Throwable $exception) 
         {

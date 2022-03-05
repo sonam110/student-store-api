@@ -48,9 +48,9 @@ class ScrapData extends Command
      */
     public function handle()
     {
-        $getScrapDataUrls = ScrapDataUrl::whereNull('read_at')->limit(1)->get();
-        $user_id = '17fae766-a361-4113-ac83-70012d1624fe';
-        $address_detail_id = '00c0036c-7604-4801-931f-326bb24554b9';
+        $getScrapDataUrls = ScrapDataUrl::whereNull('read_at')->get();
+        $user_id = 'fcf5f0d0-ce59-4e04-a6a7-9d07b318345d';
+        $address_detail_id = '53f0be33-90fe-4cc2-a834-9e4eb9a80f97';
         foreach($getScrapDataUrls as $key => $urlData)
         {
             $jsonPrepare = [];
@@ -100,7 +100,7 @@ class ScrapData extends Command
                 return $node->html();
             });
 
-            $description = trim($description[0],chr(0xC2).chr(0xA0));
+            $description = trim(@$description[0],chr(0xC2).chr(0xA0));
             if(sizeof($selling_price)>0)
             {
                 $jsonPrepare['products'] = [
@@ -129,11 +129,13 @@ class ScrapData extends Command
                 $products->slug = Str::slug($title[0]);
                 $products->gtin_isbn = @$productInfo['EAN_code'];
                 $products->sku = @$productInfo['species_no'];
-                $products->quantity = @$productInfo['for_whole_cartons_order'];
+                $products->quantity = (@$productInfo['for_whole_cartons_order']==null) ? 100 : @$productInfo['for_whole_cartons_order'];
                 $products->basic_price_wo_vat = $selling_price[0];
                 $products->is_on_offer = 0;
                 $products->discount_type = 0;
                 $products->discount_value = 0;
+
+                $products->delivery_type = 'deliver_to_location';
 
                 $products->price = $getCommVal['price_with_all_com_vat'];
                 $products->discounted_price = $getCommVal['totalAmount'];
@@ -146,17 +148,28 @@ class ScrapData extends Command
                 $products->cc_commission_amount_all = $getCommVal['totalCCAmount'];
                 $products->short_summary = Str::words(strip_tags($description), '50');
                 $products->description = $description;
+                $products->is_published = 1;
+                $products->published_at = date('Y-m-d H:i:s');
+                $products->status = 2;
                 $products->save();
-
                 if(is_array($images[0]) && sizeof($images[0])>0)
                 {
+                    $count = 1;
                     foreach ($images[0] as $key => $image) {
-                        $productImage = new ProductImage;
-                        $productImage->products_services_book_id = $products->id;
-                        $productImage->image_path = $image;
-                        $productImage->thumb_image_path = $image;
-                        $productImage->cover = ($key==0) ? 1 : 0;
-                        $productImage->save();
+                        if(str_contains($image, '120x0') || str_contains($image, 'ab-logo'))
+                        {
+                            // thumb image
+                        }
+                        else
+                        {
+                            $productImage = new ProductImage;
+                            $productImage->products_services_book_id = $products->id;
+                            $productImage->image_path = 'https://order.se'.$image;
+                            $productImage->thumb_image_path = 'https://order.se'.$image;
+                            $productImage->cover = ($count==1) ? 1 : 0;
+                            $productImage->save();
+                            $count++;
+                        }
                     }
                 }
             }
