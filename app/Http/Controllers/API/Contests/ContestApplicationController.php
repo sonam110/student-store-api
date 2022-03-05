@@ -121,7 +121,7 @@ class ContestApplicationController extends Controller
                 $contestApplication = new ContestApplication;
                 $contestApplication->user_id            = Auth::id();
                 $contestApplication->contest_id         = $request->contest_id;
-                $contestApplication->contest_type       = $request->contest_type;
+                $contestApplication->contest_type       = ($request->contest_type=='null') ? null : $request->contest_type;
                 $contestApplication->contest_title      = $request->contest_title;
                 $contestApplication->application_status = $request->application_status;
                 $contestApplication->subscription_status= $request->subscription_status;
