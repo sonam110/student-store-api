@@ -159,6 +159,8 @@
                                 <strong>{{getLangByLabelGroups('invoice','Order_No.')}}</strong> #{{$order->order->order_number}}<br>
                                 <strong>{{getLangByLabelGroups('invoice','Date')}}</strong> {{date('Y-m-d', strtotime($order->order->created_at))}}<br>
                                 <strong>{{getLangByLabelGroups('rewards','order_status')}}:</strong> {{$order->item_status}}
+                                <br>
+                                <strong>{{getLangByLabelGroups('cool_company','payment_status')}}:</strong> {{$order->order->payment_status}}
 
                                 <br><br>
                                 <strong>{{getLangByLabelGroups('invoice','Buyer_Info')}}</strong><br>
