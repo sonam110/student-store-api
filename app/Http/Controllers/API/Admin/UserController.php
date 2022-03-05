@@ -301,6 +301,11 @@ class UserController extends Controller
 	        $users = User::whereIn('id',$request->user_id)->get();
 	        foreach ($users as $key => $user) 
 	        {
+	        	$isChanged = false;
+	        	if($user->status!=$request->status)
+	        	{
+	        		$isChanged = true;
+	        	}
 	            $user->status = $request->status;
 	            $user->save();
 
@@ -320,24 +325,27 @@ class UserController extends Controller
 	            	$servceProviderDetail->save();
 	            }
 	            
-	            if($request->status==1)
+	            if($isChanged)
 	            {
-	            	$accountStatus = 'approved';
-	            }
-	            elseif($request->status==2)
-	            {
-	            	$accountStatus = 'blocked';
-	            }
-	            else
-	            {
-	            	$accountStatus = 'un-approved';
-	            }
+	            	if($request->status==1)
+		            {
+		            	$accountStatus = 'approved';
+		            }
+		            elseif($request->status==2)
+		            {
+		            	$accountStatus = 'blocked';
+		            }
+		            else
+		            {
+		            	$accountStatus = 'un-approved';
+		            }
 
-	            $title = 'User Status Updated';
-	            $body =  'Your account is '.$accountStatus.' now. Please relogin.';
+		            $title = 'User Status Updated';
+		            $body =  'Your account is '.$accountStatus.' now. Please relogin.';
 
-	            $type = 'User Action';
-	            pushNotification($title,$body,$user,$type,true,'creator','user',$user->id,'restart');
+		            $type = 'User Action';
+		            pushNotification($title,$body,$user,$type,true,'creator','user',$user->id,'restart');
+	            }
 	        }
 
 	        DB::commit();
