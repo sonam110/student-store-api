@@ -320,8 +320,20 @@ class UserController extends Controller
 	            	$servceProviderDetail->save();
 	            }
 	            
+	            if($request->status==1)
+	            {
+	            	$accountStatus = 'approved';
+	            }
+	            elseif($request->status==2)
+	            {
+	            	$accountStatus = 'blocked';
+	            }
+	            else
+	            {
+	            	$accountStatus = 'un-approved';
+	            }
 	            $title = 'User Status Updated';
-	            $body =  'User '.$user->title.' status has been successfully updated.';
+	            $body =  'Dear '.$user->first_name.', Your account is '.$accountStatus.' now. Please relogin.';
 
 	            $type = 'User Action';
 	            pushNotification($title,$body,$user,$type,true,'creator','user',$user->id,'restart');
