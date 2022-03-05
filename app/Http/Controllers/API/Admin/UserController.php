@@ -18,7 +18,7 @@ use App\Models\PaymentCardDetail;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\VendorFundTransfer;
-
+use mervick\aesEverywhere\AES256;
 
 
 
@@ -332,8 +332,10 @@ class UserController extends Controller
 	            {
 	            	$accountStatus = 'un-approved';
 	            }
+	            $first_name = AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'));
+
 	            $title = 'User Status Updated';
-	            $body =  'Dear '.$user->first_name.', Your account is '.$accountStatus.' now. Please relogin.';
+	            $body =  'Dear '.$first_name.', Your account is '.$accountStatus.' now. Please relogin.';
 
 	            $type = 'User Action';
 	            pushNotification($title,$body,$user,$type,true,'creator','user',$user->id,'restart');
