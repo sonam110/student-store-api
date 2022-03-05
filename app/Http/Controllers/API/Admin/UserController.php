@@ -332,10 +332,9 @@ class UserController extends Controller
 	            {
 	            	$accountStatus = 'un-approved';
 	            }
-	            $first_name = AES256::decrypt($user->first_name, env('ENCRYPTION_KEY'));
 
 	            $title = 'User Status Updated';
-	            $body =  'Dear '.$first_name.', Your account is '.$accountStatus.' now. Please relogin.';
+	            $body =  'Your account is '.$accountStatus.' now. Please relogin.';
 
 	            $type = 'User Action';
 	            pushNotification($title,$body,$user,$type,true,'creator','user',$user->id,'restart');
