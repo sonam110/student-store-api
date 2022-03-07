@@ -675,7 +675,9 @@ class ContestController extends Controller
             {
                 if($request->status == 'canceled')
                 {
-                    $joinedApplications = ContestApplication::where('contest_id',$contest_id)->whereIn('application_status', ['joined','approved'])->get();
+                    $joinedApplications = ContestApplication::where('contest_id',$contest_id)->whereIn('application_status', ['joined','approved','pending'])
+                    ->where('payment_status','paid')
+                    ->get();
                     $joinedContestApplicationId = [];
                     foreach ($joinedApplications as $key => $value) {
                         $joinedContestApplicationId[] = $value->id;
@@ -708,7 +710,8 @@ class ContestController extends Controller
                     }
 
                     $joinedApplicationsStatusUpdate = ContestApplication::where('contest_id',$contest_id)
-                        ->whereIn('application_status', ['joined', 'approved'])
+                        ->where('payment_status','paid')
+                        ->whereIn('application_status', ['joined', 'approved','pending'])
                         ->update([
                             'application_status'=>'canceled',
                             'reason_for_cancellation' => $request->reason_for_cancellation,
@@ -722,7 +725,10 @@ class ContestController extends Controller
                 $getContest->status = $request->status;
                 if($request->status == 'completed')
                 {
-                    ContestApplication::where('contest_id',$contest_id)->whereIn('application_status',['joined','approved'])->update(['application_status'=>'completed']);
+                    ContestApplication::where('contest_id',$contest_id)
+                        ->whereIn('application_status',['joined','approved','pending'])
+                        ->where('payment_status','paid')
+                        ->update(['application_status'=>'completed']);
                 }
             }
             if($request->action=='publish') 
