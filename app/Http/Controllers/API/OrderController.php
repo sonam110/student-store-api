@@ -439,6 +439,7 @@ class OrderController extends Controller
 						$orderItem->contest_application_id			= $orderedItem['contest_application_id'];
 						$orderItem->contest_id = $contest_id;
 						$orderItem->contest_type					= $productsServicesBook->type;
+						$orderItem->return_applicable_date = $getCInfo->contest->end_date;
 					}
 					else
 					{
