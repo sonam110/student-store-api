@@ -41,10 +41,10 @@ class DashboardController extends Controller
 				$data['total_jobs']             = Job::select('id')->where('user_id',$request->user_id)->count();
                 // $data['total_orders']        = Order::select('id')->count();
 
-				$data['total_spends']           = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['total_spends']           = round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->where('order_items.user_id', $request->user_id)
-				->sum(\DB::raw('order_items.price * order_items.quantity'));
+				->sum(\DB::raw('order_items.price * order_items.quantity')),2);
 				
 				$data['total_orders']           = OrderItem::select('order_items.id')
 				->join('orders', 'orders.id','=','order_items.order_id')
@@ -73,53 +73,53 @@ class DashboardController extends Controller
 				->where('order_items.item_status','delivered')
 				->count();
 				
-				$data['total_earnings'] = OrderItem::select('order_items.id')
+				$data['total_earnings'] = round(OrderItem::select('order_items.id')
 				->join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
-				->sum('order_items.amount_transferred_to_vendor');
+				->sum('order_items.amount_transferred_to_vendor'),2);
 
-				$data['total_amount_refunded']  = OrderItem::select('order_items.id')
+				$data['total_amount_refunded']  = round(OrderItem::select('order_items.id')
 				->join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
-				->sum('order_items.amount_returned');
+				->sum('order_items.amount_returned'),2);
 				
-				$data['total_returned_items']   = OrderItem::select('order_items.id')
+				$data['total_returned_items']   = round(OrderItem::select('order_items.id')
 				->join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->join('order_item_returns', 'order_item_returns.order_item_id','=','order_items.id')
 				->where('order_items.vendor_user_id', $request->user_id)
 				->where('order_items.item_status','returned')
-				->sum('order_item_returns.quantity');
+				->sum('order_item_returns.quantity'),2);
 				
-				$data['student_store_commission'] = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['student_store_commission'] = round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
-				->sum('student_store_commission');
+				->sum('student_store_commission'),2);
 
-				$data['cool_company_commission'] = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['cool_company_commission'] = round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
-				->sum('cool_company_commission');
+				->sum('cool_company_commission'),2);
 
-				$data['amount_transferred_to_vendor'] = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['amount_transferred_to_vendor'] = round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
 				->where('order_items.is_transferred_to_vendor', '1')
-				->sum('amount_transferred_to_vendor');
+				->sum('amount_transferred_to_vendor'),2);
 
-				$data['pending_amount_transferred_to_vendor'] = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['pending_amount_transferred_to_vendor'] = round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->where('order_items.vendor_user_id', $request->user_id)
 				->where('order_items.is_transferred_to_vendor', '0')
-				->sum('amount_transferred_to_vendor');
+				->sum('amount_transferred_to_vendor'),2);
 			}
 			else
 			{
-				$data['total_spends']           = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['total_spends']           = round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
-				->sum(\DB::raw('order_items.price * order_items.quantity'));
+				->sum(\DB::raw('order_items.price * order_items.quantity')),2);
 
 				$data['total_students']         = User::select('id')->where('user_type_id',2)->count();
 				$data['total_companies']        = User::select('id')->where('user_type_id',3)->count();
@@ -159,10 +159,10 @@ class DashboardController extends Controller
 				->where('orders.payment_status', 'paid')
 				->get()[0]['total_amount'];
 
-				$data['total_amount_refunded']  = OrderItem::select('order_items.id')
+				$data['total_amount_refunded']  = round(OrderItem::select('order_items.id')
 				->join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
-				->sum('amount_returned');
+				->sum('amount_returned'),2);
 
 				$data['total_returned_items']   = OrderItem::select('order_items.id')
 				->join('orders', 'orders.id','=','order_items.order_id')
@@ -170,23 +170,23 @@ class DashboardController extends Controller
 				->where('order_items.item_status','returned')
 				->count();
 
-				$data['student_store_commission']  = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['student_store_commission']  = round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
-				->sum('student_store_commission');
+				->sum('student_store_commission'),2);
 
-				$data['cool_company_commission']= OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['cool_company_commission']= round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
-				->sum('cool_company_commission');
+				->sum('cool_company_commission'),2);
 
-				$data['amount_transferred_to_vendor']  = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['amount_transferred_to_vendor']  = round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->where('is_transferred_to_vendor', '1')
-				->sum('amount_transferred_to_vendor');
+				->sum('amount_transferred_to_vendor'),2);
 
-				$data['pending_amount_transferred_to_vendor']  = OrderItem::join('orders', 'orders.id','=','order_items.order_id')
+				$data['pending_amount_transferred_to_vendor']  = round(OrderItem::join('orders', 'orders.id','=','order_items.order_id')
 				->where('orders.payment_status', 'paid')
 				->where('is_transferred_to_vendor', '0')
-				->sum('amount_transferred_to_vendor');
+				->sum('amount_transferred_to_vendor'),2);
 			}
 
 			return response(prepareResult(false, $data, getLangByLabelGroups('messages','message_list')), config('http_response.success'));

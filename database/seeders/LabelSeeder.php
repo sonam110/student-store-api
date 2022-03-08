@@ -2890,6 +2890,7 @@ class LabelSeeder extends Seeder
             "off" => "OFF"
         ),
         "my_cv" => array(
+            "you_can_not_accept_reject_message" => "You can not accept any more applicants for this job, please upgrade your package to continue",
             "total_exp" => "Total Year of Experience",
             "employer" => "Employer",
             "name" => "Title",
