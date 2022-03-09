@@ -63,7 +63,8 @@ class SearchController extends Controller
 			$products->where(function ($query) use ($search) {
 			    $query->where('products_services_books.title','like', '%'.$search.'%')
 			          ->orWhere('category_masters.title','like', '%'.$search.'%')
-			          ->orWhere('products_services_books.tags','like', '%'.$search.'%');
+			          ->orWhere('products_services_books.tags','like', '%'.$search.'%')
+			          ->orWhere('products_services_books.gtin_isbn','like', '%'.$search.'%');
 			});
 		}
 
