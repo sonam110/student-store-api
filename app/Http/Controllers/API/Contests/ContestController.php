@@ -897,7 +897,11 @@ class ContestController extends Controller
 
                 if(!empty($request->search_title))
                 {
-                    $contests->where('title', 'LIKE', '%'.$request->search_title.'%');
+                    $search = $request->search_title;
+                    $contests->where(function($q) use ($search) {
+                        $q->where('contests.title','like', '%'.$search.'%')
+                        ->orWhere('contests.tags','like', '%'.$search.'%');
+                    });
                 }
 
                 //future: distance filter implement
