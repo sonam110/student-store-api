@@ -1029,6 +1029,7 @@ class JobController extends Controller
                     ->join('address_details', function ($join) {
                         $join->on('user_cv_details.address_detail_id', '=', 'address_details.id');
                     })
+                    ->where('user_cv_details.is_published', 1)
                     ->with('user.cvDetail.jobTags','user.defaultAddress');
                 if(!empty($request->job_environment))
                 {
@@ -1122,6 +1123,7 @@ class JobController extends Controller
                     ->join('address_details', function ($join) {
                         $join->on('user_cv_details.address_detail_id', '=', 'address_details.id');
                     })
+                    ->where('user_cv_details.is_published', 1)
                     ->with('job:id,title','user:id,first_name,last_name,gender,dob,email,contact_number,profile_pic_path,profile_pic_thumb_path','user.cvDetail.jobTags','user.defaultAddress')
                     ->with(['job' => function($query){
                         $query->select('id')
