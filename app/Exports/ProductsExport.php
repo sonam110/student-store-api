@@ -30,7 +30,6 @@ class ProductsExport implements FromCollection, WithHeadings
             'user_name',
             'category_master',
             'title',
-            'slug',
             'meta_description',
             'short_summary',
             'type',
@@ -52,7 +51,6 @@ class ProductsExport implements FromCollection, WithHeadings
             'available_to',
             'is_published',
             'published_at',
-            'is_for_sale',
             'is_promoted',
             'promotion_start_at',
             'promotion_end_at',
@@ -99,21 +97,41 @@ class ProductsExport implements FromCollection, WithHeadings
                 $images[] = $image->image_path;
             }
             $imagesComma = implode(', ', $images);
+
+            //0:Pending, 1:Process, 2: Verified, 3:Rejected, 4:Re-applied
+            switch ($data->status) {
+                case '1':
+                    $status = 'Process';
+                    break;
+                case '2':
+                    $status = 'Verified';
+                    break;
+                case '3':
+                    $status = 'Rejected';
+                    break;
+                case '4':
+                    $status = 'Re-applied';
+                    break;
+                
+                default:
+                    $status = 'Pending';
+                    break;
+            }
+
     		return [
     			'SNO'             				=> $key+1,
     			'id'      						=> $data->id,
     			'user_name'						=> AES256::decrypt($data->user->first_name, env('ENCRYPTION_KEY')),
     			'category_master'				=> $data->categoryMaster->title,
     			'title'							=> $data->title,
-    			'slug'							=> $data->slug,
     			'meta_description'				=> $data->meta_description,
     			'short_summary'					=> $data->short_summary,
     			'type'							=> $data->type,
     			'sku'							=> $data->sku,
                 'basic_price_wo_vat'            => $data->basic_price_wo_vat,
     			'price'							=> $data->price,
-    			'is_on_offer'					=> $data->is_on_offer,
-    			'discount_type'					=> $data->discount_type,
+    			'is_on_offer'					=> ($data->is_on_offer==1) ? 'yes' : 'no',
+    			'discount_type'					=> ($data->discount_type==1) ? 'percentage' : 'fixed amount',
     			'discount_value'				=> $data->discount_value,
     			'quantity'						=> $data->quantity,
     			'description'					=> $data->description,
@@ -125,23 +143,22 @@ class ProductsExport implements FromCollection, WithHeadings
     			'service_end_time'				=> $data->service_end_time,
     			'delivery_type'					=> $data->delivery_type,
     			'available_to'					=> $data->available_to,
-    			'is_published'					=> $data->is_published,
+    			'is_published'					=> ($data->is_published==1) ? 'yes' : 'no',
     			'published_at'					=> $data->published_at,
-    			'is_for_sale'					=> $data->is_for_sale,
-    			'is_promoted'					=> $data->is_promoted,
+    			'is_promoted'					=> ($data->is_promoted==1) ? 'yes' : 'no',
     			'promotion_start_at'			=> $data->promotion_start_at,
     			'promotion_end_at'				=> $data->promotion_end_at,
     			'view_count'					=> $data->view_count,
     			'avg_rating'					=> $data->avg_rating,
-    			'status'						=> $data->status,
+    			'status'						=> $status,
     			'gtin_isbn'						=> $data->gtin_isbn,
     			'discounted_price'				=> $data->discounted_price,
     			'deposit_amount'				=> $data->deposit_amount,
-    			'is_used_item'					=> $data->is_used_item,
+    			'is_used_item'					=> ($data->is_used_item==1) ? 'yes' : 'no',
     			'item_condition'				=> $data->item_condition,
     			'brand'							=> $data->brand,
     			'most_popular'					=> $data->most_popular,
-    			'is_reward_point_applicable'	=> $data->is_reward_point_applicable,
+    			'is_reward_point_applicable'	=> ($data->is_reward_point_applicable==1) ? 'yes' : 'no',
                 'reward_points'                 => $data->reward_points,
     			'images'                        => $imagesComma,
     			'created_at'      				=> $data->created_at,

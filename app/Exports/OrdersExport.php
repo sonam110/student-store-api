@@ -28,7 +28,6 @@ class OrdersExport implements FromCollection, WithHeadings
     	return [
     		'SNO',
     		'order_number',
-            'order_status',
             // 'sub_total',
             // 'item_discount',
             // 'vat',
@@ -116,7 +115,6 @@ class OrdersExport implements FromCollection, WithHeadings
     		return [
     			'SNO'             				=> $key+1,
     			'order_number'					=> $data->order_number,
-    			'order_status'					=> $data->order_status,
     			// 'sub_total'						=> $data->sub_total,
     			// 'item_discount'					=> $data->item_discount,
     			// 'vat'							=> $data->vat,

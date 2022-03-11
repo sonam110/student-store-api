@@ -254,13 +254,13 @@ class PaymentCardDetailController extends Controller
      */
     public function destroy(PaymentCardDetail $paymentCardDetail)
     {
-        $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
-        $checkUser = User::find(Auth::id());
-        $customerId = $checkUser->stripe_customer_id;
+        //$checkUser = User::find(Auth::id());
+        //$customerId = $checkUser->stripe_customer_id;
         $stripe_payment_method_id = $paymentCardDetail->stripe_payment_method_id;
         $paymentCardDetail->delete();
         if(!empty($stripe_payment_method_id))
         {
+            $stripe = new \Stripe\StripeClient($this->paymentInfo->payment_gateway_secret);
             $stripe->paymentMethods->detach(
                 $stripe_payment_method_id,
                 []

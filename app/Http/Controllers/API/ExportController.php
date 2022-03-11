@@ -19,7 +19,7 @@ class ExportController extends Controller
 {
     // public function productsExport(Request $request) 
     // {
-    // 	$rand = time();
+    // 	$rand = date('d-m-y--H-i-s');
     // 	$data = ['auth_applicable' => true, 'ids' => $request->product_id, 'type' => $request->type ];
     //     $excel = Excel::store(new ProductsExport($data), 'export/products'.$rand.'.xlsx' , 'export_path');
     //     return env('ASSET_URL').'export/products'.$rand.'.xlsx';
@@ -27,7 +27,7 @@ class ExportController extends Controller
 
     // public function jobsExport(Request $request) 
     // {
-    // 	$rand = time();
+    // 	$rand = date('d-m-y--H-i-s');
     // 	$data = ['auth_applicable' => true, 'ids' => $request->job_id];
     //     $excel = Excel::store(new JobsExport($data), 'export/jobs'.$rand.'.xlsx' , 'export_path');
     //     return env('ASSET_URL').'export/jobs'.$rand.'.xlsx';
@@ -35,7 +35,7 @@ class ExportController extends Controller
 
     // public function contestsExport(Request $request) 
     // {
-    // 	$rand = time();
+    // 	$rand = date('d-m-y--H-i-s');
     // 	$data = ['auth_applicable' => true, 'ids' => $request->contest_id, 'type' => $request->type ];
     //     $excel = Excel::store(new ContestsExport($data), 'export/contests'.$rand.'.xlsx' , 'export_path');
     //     return env('ASSET_URL').'export/contests'.$rand.'.xlsx';
@@ -43,7 +43,7 @@ class ExportController extends Controller
 
     // public function ordersExport(Request $request) 
     // {
-    // 	$rand = time();
+    // 	$rand = date('d-m-y--H-i-s');
     // 	$data = ['auth_applicable' => true, 'ids' => $request->order_id, 'product_type' => $request->product_type, 'contest_type' => $request->contest_type, 'order_for' => $request->order_for ];
     //     $excel = Excel::store(new OrdersExport($data), 'export/orders'.$rand.'.xlsx' , 'export_path');
     //     return env('ASSET_URL').'export/orders'.$rand.'.xlsx';
@@ -51,7 +51,7 @@ class ExportController extends Controller
 
     public function productsExport(Request $request) 
     {
-        $rand = time();
+        $rand = 'product-service-book-'.date('d-m-y--H-i-s');
         $data = ['auth_applicable' => true, 'ids' => null, 'type' => $request->type ];
         if(file_exists('public/export/products/'.$rand.'.csv')){ 
             unlink('public/export/products/'.$rand.'.csv');
@@ -63,7 +63,7 @@ class ExportController extends Controller
 
     public function jobsExport(Request $request) 
     {
-        $rand = time();
+        $rand = 'jobs-'.date('d-m-y--H-i-s');
         $data = ['auth_applicable' => true, 'ids' => null];
         if(file_exists('public/export/jobs/'.$rand.'.csv')){ 
             unlink('public/export/jobs/'.$rand.'.csv');
@@ -75,7 +75,7 @@ class ExportController extends Controller
 
     public function contestsExport(Request $request) 
     {
-        $rand = time();
+        $rand = 'contests-'.date('d-m-y--H-i-s');
         $data = ['auth_applicable' => true, 'ids' => null, 'type' => $request->type ];
         if(file_exists('public/export/contests/'.$rand.'.csv')){ 
             unlink('public/export/contests/'.$rand.'.csv');
@@ -86,7 +86,7 @@ class ExportController extends Controller
 
     public function ordersExport(Request $request) 
     {
-        $rand = time();
+        $rand = 'orders-'.date('d-m-y--H-i-s');
         $data = ['auth_applicable' => true, 'ids' => null, 'product_type' => $request->product_type, 'contest_type' => $request->contest_type, 'order_for' => $request->order_for ];
         if(file_exists('public/export/orders/'.$rand.'.csv')){ 
             unlink('public/export/orders/'.$rand.'.csv');

@@ -75,6 +75,27 @@ class JobsExport implements FromCollection, WithHeadings
     	// return $jobs;
 
     	return $jobs->map(function ($data, $key) {
+
+            //0 for inactive,1 for active,2 for rejected,3 for expired,4 for canceled
+            switch ($data->job_status) {
+                case '1':
+                    $job_status = 'active';
+                    break;
+                case '2':
+                    $job_status = 'rejected';
+                    break;
+                case '3':
+                    $job_status = 'expired';
+                    break;
+                case '4':
+                    $job_status = 'canceled';
+                    break;
+                
+                default:
+                    $job_status = 'inactive';
+                    break;
+            }
+
     		return [
     			'SNO'             				=> $key+1,
     			'id'                            => $data->id,
@@ -99,11 +120,11 @@ class JobsExport implements FromCollection, WithHeadings
                 'job_start_date'                => $data->job_start_date,
                 'application_start_date'        => $data->application_start_date,
                 'application_end_date'          => $data->application_end_date,
-                'job_status'                    => $data->job_status,
-                'is_deleted'                    => $data->is_deleted,
-                'is_published'                  => $data->is_published,
+                'job_status'                    => $job_status,
+                'is_deleted'                    => ($data->is_deleted==1) ? 'yes' : 'no',
+                'is_published'                  => ($data->is_published==1) ? 'yes' : 'No',
                 'published_at'                  => $data->published_at,
-                'is_promoted'                   => $data->is_promoted,
+                'is_promoted'                   => ($data->is_promoted==1) ? 'yes' : 'no',
                 'promotion_start_date'          => $data->promotion_start_date,
                 'promotion_end_date'            => $data->promotion_end_date,
                 'view_count'                    => $data->view_count,

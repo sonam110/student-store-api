@@ -49,7 +49,7 @@ class LanguagesExport implements FromCollection, WithHeadings
     			'id'                            => $data->id,
     			'title'							=> trim($data->title),
     			'value'							=> trim($data->value),
-    			'status'                        => $data->status,
+    			'status'                        => ($data->status==1) ? 'active' : 'inactive',
               	'Created at'      				=> $data->created_at,
     		];
     	});

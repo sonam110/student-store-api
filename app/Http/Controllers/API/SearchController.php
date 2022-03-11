@@ -192,6 +192,7 @@ class SearchController extends Controller
 	public function commonSearch(Request $request)
 	{
 		$lang_id = $this->lang_id;
+		$search = $request->search;
 		if(empty($lang_id))
         {
             $lang_id = Language::select('id')->first()->id;
@@ -253,7 +254,10 @@ class SearchController extends Controller
                 ->where('language_id', $lang_id)
                 ->where('is_parent', '0');
         }])
-		->where('title','like', '%'.$request->search.'%')
+		->where(function($q) use ($search) {
+        	$q->where('title','like', '%'.$search.'%')
+        	->orWhere('tags','like', '%'.$search.'%');
+        })
 		->where('is_published', '1')
 		->where('status', 'verified')
 		->limit(10)
@@ -344,7 +348,10 @@ class SearchController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
             }])
-			->where('title','like', '%'.$request->search.'%')
+            ->where(function($q) use ($search) {
+	        	$q->where('title','like', '%'.$search.'%')
+	        	->orWhere('tags','like', '%'.$search.'%');
+	        })
 			->where('type',$request->type)
 			->where('is_published', '1')
 			->where('status', 'verified')
