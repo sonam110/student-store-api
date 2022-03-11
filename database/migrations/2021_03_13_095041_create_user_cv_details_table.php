@@ -32,7 +32,7 @@ class CreateUserCvDetailsTable extends Migration
             $table->string('cv_url')->nullable();
             $table->string('generated_cv_file')->nullable();
             $table->boolean('cv_update_status')->default(0)->nullable();
-            $table->string('total_experience')->default(0)->nullable();
+            $table->decimal('total_experience', 9,2)->default(0)->nullable();
             $table->timestamps();
         });
     }

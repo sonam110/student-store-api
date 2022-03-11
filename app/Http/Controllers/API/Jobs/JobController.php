@@ -1056,6 +1056,11 @@ class JobController extends Controller
                     });
                 }
 
+                if((($request->min_years_of_experience!='') && ($request->min_years_of_experience==0)) || (($request->max_years_of_experience!='') && ($request->max_years_of_experience==0)))
+                {
+                    $studentDetail->where('user_cv_details.total_experience', 0);
+                }
+                
                 if(!empty($request->min_years_of_experience))
                 {
                     $studentDetail->where('user_cv_details.total_experience', '>=', $request->min_years_of_experience);
@@ -1064,6 +1069,7 @@ class JobController extends Controller
                 {
                     $studentDetail->where('user_cv_details.total_experience', '<=', $request->max_years_of_experience);
                 }
+
                 if(!empty($request->known_languages))
                 {
                     $studentDetail->where(function($query) use ($request) {
@@ -1095,7 +1101,7 @@ class JobController extends Controller
                 }
                 else
                 {
-                    $studentDetailData = $studentDetail->get();
+                    $studentDetailData = $studentDetail->toSql();
                 }
                 return response(prepareResult(false, $studentDetailData, getLangByLabelGroups('messages','messages_job_list')), config('http_response.success'));
             }
@@ -1164,6 +1170,11 @@ class JobController extends Controller
                     $applicants->where('sp_jobs.sub_category_slug', $request->sub_category_slug);
                 }
 
+                if((($request->min_years_of_experience!='') && ($request->min_years_of_experience==0)) || (($request->max_years_of_experience!='') && ($request->max_years_of_experience==0)))
+                {
+                    $applicants->where('user_cv_details.total_experience', 0);
+                }
+                
                 if(!empty($request->min_years_of_experience))
                 {
                     $applicants->where('user_cv_details.total_experience', '>=', $request->min_years_of_experience);
@@ -1172,6 +1183,7 @@ class JobController extends Controller
                 {
                     $applicants->where('user_cv_details.total_experience', '<=', $request->max_years_of_experience);
                 }
+
                 if(!empty($request->known_languages))
                 {
                     $applicants->where(function($query) use ($request) {
