@@ -1110,7 +1110,7 @@ class JobController extends Controller
             $applicants = JobApplication::select('job_applications.*', 'sp_jobs.title')
                     ->join('sp_jobs', function ($join) {
                         $join->on('job_applications.job_id', '=', 'sp_jobs.id')
-                        ->where('sp_jobs.job_status', '1')
+                        ->where('sp_jobs.job_status', 1)
                         ->where('sp_jobs.user_id', Auth::id());
                     })
                     // ->join('users', function ($join) {
@@ -1128,7 +1128,11 @@ class JobController extends Controller
                     ->with(['job' => function($query){
                         $query->select('id')
                             ->withCount('acceptedJobApplications');
-                    }]);
+                        },
+                        'user.cvDetail' => function($query){
+                            $query->where('is_published', 1);
+                        }
+                    ]);
 
             if($searchType=='filter')
             {
@@ -1198,6 +1202,7 @@ class JobController extends Controller
                         }
                     });
                 }
+
                 if(!empty($request->job_tags))
                 {
                     $applicants->where(function($query) use ($request) {
@@ -1210,6 +1215,7 @@ class JobController extends Controller
                         }
                     });
                 }
+
                 if(!empty($request->search_title))
                 {
                     $applicants->join('user_work_experiences', function ($join) {
