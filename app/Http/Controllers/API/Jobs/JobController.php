@@ -1170,7 +1170,7 @@ class JobController extends Controller
                     $applicants->where('sp_jobs.sub_category_slug', $request->sub_category_slug);
                 }
 
-                if((($request->min_years_of_experience!='') && ($request->min_years_of_experience==0)) || (($request->max_years_of_experience!='') && ($request->max_years_of_experience==0)))
+                if((($request->min_years_of_experience!='') && ($request->min_years_of_experience==0)) && ($request->max_years_of_experience<1))
                 {
                     $applicants->where('user_cv_details.total_experience', 0);
                 }
