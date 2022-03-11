@@ -1128,11 +1128,7 @@ class JobController extends Controller
                     ->with(['job' => function($query){
                         $query->select('id')
                             ->withCount('acceptedJobApplications');
-                        },
-                        'user.cvDetail' => function($query){
-                            $query->where('is_published', 1);
-                        }
-                    ]);
+                    }]);
 
             if($searchType=='filter')
             {
