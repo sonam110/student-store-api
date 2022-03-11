@@ -2539,7 +2539,7 @@ class LandingPageController extends Controller
                     $contests->where(function($q) use ($search) {
                         $q->where('contests.title','like', '%'.$search.'%')
                         ->orWhere('contests.tags','like', '%'.$search.'%');
-                    })
+                    });
                 }
 
 
