@@ -2446,6 +2446,8 @@ class LabelSeeder extends Seeder
             "buyer" => "Buyer"
         ),
         "messages" => array(
+            "cv_not_published_yet" => "CV not published yet.",
+            "message_job_not_active" => "This job is currently not active",
             "message_cv_view_exhausted_alert" => "Your CV views are exhasted, please upgrade your job package to see aspirant's detail",
             "message_cv_view_alert" => "Your CV views will be used if you view detail or download CV of any aspirant from best matches section.",
             "invalid_use_of_reward_points" => "Invalid use of reward points.",

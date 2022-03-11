@@ -484,6 +484,11 @@ class UserProfileController extends Controller
 
 			$getUserId = UserCvDetail::select('user_id')->find($user_cv_detail_id);
 
+			if(!$getUserId)
+			{
+				return response()->json(prepareResult(true, ['CV not published yet.'], getLangByLabelGroups('messages','cv_not_published_yet')), config('http_response.internal_server_error'));
+			}
+
 			$cvsViewLog = new CvsViewLog;
 			$cvsViewLog->user_id 						= Auth::id();
 			$cvsViewLog->user_cv_detail_id 				= $user_cv_detail_id;

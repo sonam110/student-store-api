@@ -402,7 +402,7 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 			$isRefunded = true;
 		}
 	}
-	elseif($transaction->transaction_amount<1)
+	else
 	{
 		$isRefunded = true;
 	}
