@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Auth;
 use mervick\aesEverywhere\AES256;
 use RecursiveArrayIterator, RecursiveIteratorIterator;
+use App\Models\BucketGroup;
 
 class ProductsExport implements FromCollection, WithHeadings
 {
