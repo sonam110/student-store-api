@@ -524,3 +524,5 @@ Route::get('/get-sliders', 'App\Http\Controllers\API\FrontController@getSliders'
 Route::get('/get-faqs', 'App\Http\Controllers\API\FrontController@getFaqs');
 Route::get('/get-pages', 'App\Http\Controllers\API\FrontController@getPages');
 Route::get('/{slug}', 'App\Http\Controllers\API\FrontController@page');
+
+Route::get('/product-attributes/{products_services_books_id}', 'App\Http\Controllers\API\FrontController@productAttributes');

@@ -37,8 +37,10 @@ use App\Models\Country;
 use App\Models\State;
 use App\Models\City;
 use App\Models\OrderItem;
+use App\Models\BucketGroup;
 use mervick\aesEverywhere\AES256;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use RecursiveArrayIterator, RecursiveIteratorIterator;
 
 class FrontController extends Controller
 {
@@ -886,5 +888,28 @@ class FrontController extends Controller
     {
     	$status = sendTestPushNoti();
     	return $status;
+    }
+
+    public function productAttributes($products_services_books_id)
+    {
+    	$productsServicesBook = ProductsServicesBook::find($products_services_books_id);
+    	$attr = json_decode($productsServicesBook->attribute_details, true);
+    	//return $attr;
+        $newAttribute = new RecursiveIteratorIterator(new RecursiveArrayIterator($attr), RecursiveIteratorIterator::SELF_FIRST);
+        $result = [];
+        foreach ($newAttribute as $key => $value) {
+            if (($key === 'bucket_group_attributes') && $key) {
+                $result = array_merge($result, $value);
+            }
+        }
+        $arrForSelecteds = [];
+        foreach ($result as $key => $value) {
+            if(@$value['selected'])
+            {
+            	$attributeType = BucketGroup::select('group_name')->find($value['bucket_group_id']);
+                $arrForSelecteds[] = $attributeType->group_name.':'.$value['name'];
+            }  
+        }
+    	return implode(', ', $arrForSelecteds);
     }
 }

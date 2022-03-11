@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Auth;
 use mervick\aesEverywhere\AES256;
+use RecursiveArrayIterator, RecursiveIteratorIterator;
 
 class ProductsExport implements FromCollection, WithHeadings
 {
@@ -66,6 +67,7 @@ class ProductsExport implements FromCollection, WithHeadings
             'most_popular',
             'is_reward_point_applicable',
             'reward_points',
+            'attributes',
             'images',
             'created_at'
     	];
@@ -118,6 +120,24 @@ class ProductsExport implements FromCollection, WithHeadings
                     break;
             }
 
+            //attributes
+            $attr = json_decode($data->attribute_details, true);
+            $newAttribute = new RecursiveIteratorIterator(new RecursiveArrayIterator($attr), RecursiveIteratorIterator::SELF_FIRST);
+            $result = [];
+            foreach ($newAttribute as $key => $value) {
+                if (($key === 'bucket_group_attributes') && $key) {
+                    $result = array_merge($result, $value);
+                }
+            }
+            $arrForSelecteds = [];
+            foreach ($result as $key => $value) {
+                if(@$value['selected'])
+                {
+                    $attributeType = BucketGroup::select('group_name')->find($value['bucket_group_id']);
+                    $arrForSelecteds[] = $attributeType->group_name.':'.$value['name'];
+                }  
+            }
+
     		return [
     			'SNO'             				=> $key+1,
     			'id'      						=> $data->id,
@@ -160,6 +180,7 @@ class ProductsExport implements FromCollection, WithHeadings
     			'most_popular'					=> $data->most_popular,
     			'is_reward_point_applicable'	=> ($data->is_reward_point_applicable==1) ? 'yes' : 'no',
                 'reward_points'                 => $data->reward_points,
+                'attributes'                    => implode(', ', $arrForSelecteds),
     			'images'                        => $imagesComma,
     			'created_at'      				=> $data->created_at,
     		];
