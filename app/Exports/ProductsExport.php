@@ -121,22 +121,27 @@ class ProductsExport implements FromCollection, WithHeadings
             }
 
             //attributes
-            $attr = json_decode($data->attribute_details, true);
-            $newAttribute = new RecursiveIteratorIterator(new RecursiveArrayIterator($attr), RecursiveIteratorIterator::SELF_FIRST);
-            $result = [];
-            foreach ($newAttribute as $key => $value) {
-                if (($key === 'bucket_group_attributes') && $key) {
-                    $result = array_merge($result, $value);
+            $arrForSelecteds = [];
+            if(!empty($data->attribute_details))
+            {
+                $attr = json_decode($data->attribute_details, true);
+                $newAttribute = new RecursiveIteratorIterator(new RecursiveArrayIterator($attr), RecursiveIteratorIterator::SELF_FIRST);
+                $result = [];
+                foreach ($newAttribute as $key => $value) {
+                    if (($key === 'bucket_group_attributes') && $key) {
+                        $result = array_merge($result, $value);
+                    }
+                }
+                
+                foreach ($result as $key => $value) {
+                    if(@$value['selected'])
+                    {
+                        $attributeType = BucketGroup::select('group_name')->find($value['bucket_group_id']);
+                        $arrForSelecteds[] = $attributeType->group_name.':'.$value['name'];
+                    }  
                 }
             }
-            $arrForSelecteds = [];
-            foreach ($result as $key => $value) {
-                if(@$value['selected'])
-                {
-                    $attributeType = BucketGroup::select('group_name')->find($value['bucket_group_id']);
-                    $arrForSelecteds[] = $attributeType->group_name.':'.$value['name'];
-                }  
-            }
+            
 
     		return [
     			'SNO'             				=> $key+1,
