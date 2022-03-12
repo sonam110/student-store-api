@@ -436,7 +436,11 @@ class UserController extends Controller
             }
             if(!empty($request->contact_number))
             {
-            	$users->where('users.contact_number', 'LIKE', '%'.str_replace(' ', '', $request->contact_number).'%')->orWhere('users.guardian_contact_number', 'LIKE', '%'.str_replace(' ', '', $request->contact_number).'%');
+            	$contact_number = $request->contact_number;
+            	$users->where(function($q) use($contact_number) {
+            		$q->where('users.contact_number', 'LIKE', '%'.str_replace(' ', '', $contact_number).'%')
+            		->orWhere('users.guardian_contact_number', 'LIKE', '%'.str_replace(' ', '', $contact_number).'%');
+            	});
             }
             if(!empty($request->cp_contact_number))
             {

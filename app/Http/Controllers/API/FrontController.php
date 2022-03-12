@@ -907,9 +907,9 @@ class FrontController extends Controller
             if(@$value['selected'])
             {
             	$attributeType = BucketGroup::select('group_name')->find($value['bucket_group_id']);
-                $arrForSelecteds[] = $attributeType->group_name.':'.$value['name'];
+                $arrForSelecteds[$attributeType->group_name][] = $value['name'];
             }  
         }
-    	return implode(', ', $arrForSelecteds);
+    	return json_encode($arrForSelecteds);
     }
 }
