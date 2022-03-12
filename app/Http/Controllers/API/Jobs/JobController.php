@@ -1352,7 +1352,11 @@ class JobController extends Controller
                     $count = 0;
                     foreach ($newRec as $key => $job_users_id) {
                         foreach ($job_users_id as $userkey => $user) {
-                            $applicantsUser[$count] = ['user' => User::select('id','first_name','last_name','gender','dob','email','contact_number','profile_pic_path','profile_pic_thumb_path')->with('cvDetail','defaultAddress')->where('users.id', $user)
+                            $applicantsUser[$count] = ['user' => User::select('id','first_name','last_name','gender','dob','email','contact_number','profile_pic_path','profile_pic_thumb_path')->with('cvDetail','defaultAddress')
+                                ->with(['cvDetail' => function($q) {
+                                    $q->where('is_published', 1);
+                                }])
+                                ->where('users.id', $user)
                             ->first()];
                             $applicantsUser[$count]['job'] = Job::select('id','title')->where('sp_jobs.id', $key)
                             ->first();
