@@ -186,7 +186,7 @@ class ProductsExport implements FromCollection, WithHeadings
     			'most_popular'					=> $data->most_popular,
     			'is_reward_point_applicable'	=> ($data->is_reward_point_applicable==1) ? 'yes' : 'no',
                 'reward_points'                 => $data->reward_points,
-                'attributes'                    => json_encode($arrForSelecteds),
+                'attributes'                    => (!empty($arrForSelecteds)) ? json_encode($arrForSelecteds) : null,
     			'images'                        => $imagesComma,
     			'created_at'      				=> $data->created_at,
     		];

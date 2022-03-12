@@ -910,6 +910,6 @@ class FrontController extends Controller
                 $arrForSelecteds[$attributeType->group_name][] = $value['name'];
             }  
         }
-    	return json_encode($arrForSelecteds);
+    	return (!empty($arrForSelecteds)) ? json_encode($arrForSelecteds) : null;
     }
 }
