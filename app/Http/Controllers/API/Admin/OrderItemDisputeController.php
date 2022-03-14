@@ -28,17 +28,12 @@ class OrderItemDisputeController extends Controller
 
             if(!empty($request->dispute_raised_by))
             {
-                $disputes = $disputes->where('dispute_raised_by',$request->dispute_raised_by);
+                $disputes = $disputes->where('dispute_raised_by', 'LIKE', '%'.$request->dispute_raised_by.'%');
             }
 
             if(!empty($request->dispute_raised_against))
             {
-                $disputes = $disputes->where('dispute_raised_against',$request->dispute_raised_against);
-            }
-
-            if(!empty($request->dispute_status))
-            {
-                $disputes = $disputes->where('dispute_status',$request->dispute_status);
+                $disputes = $disputes->where('dispute_raised_against','%'.,'LIKE', $request->dispute_raised_against.'%');
             }
 
 			if(!empty($request->per_page_record))
