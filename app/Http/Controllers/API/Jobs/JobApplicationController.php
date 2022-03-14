@@ -112,7 +112,12 @@ class JobApplicationController extends Controller
     {
     	try
     	{
-    		$jobApplication = JobApplication::find($id);
+            $jobApplication = JobApplication::find($id);
+            if(!$jobApplication)
+            {
+                return response()->json(prepareResult(false, [], getLangByLabelGroups('book_home_page','data_not_found')), config('http_response.not_found'));
+            }
+
     		$jobApplication->update(['application_status' => !empty($request->application_status) ? $request->application_status : 'pending']);
             // Notification Start
 

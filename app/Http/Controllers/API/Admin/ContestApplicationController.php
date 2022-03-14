@@ -284,15 +284,7 @@ class ContestApplicationController extends Controller
 
 	                            $refundOrderItemQuantity = $orderedItem->quantity;
 	                            $refundOrderItemReason = 'cancellation';
-
-	                        	$orderedItem->amount_transferred_to_vendor = 0;
-                                $orderedItem->student_store_commission = 0;
-                                $orderedItem->cool_company_commission = 0;
-                                $orderedItem->vat_amount = 0;
-
-                                $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
-                                $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
-                                $orderedItem->save();
+								$orderedItem->save();
 
 	                            $isRefunded = refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantity,$refundOrderItemReason);
 
@@ -329,14 +321,6 @@ class ContestApplicationController extends Controller
 
                             $refundOrderItemQuantity = $orderedItem->quantity;
                             $refundOrderItemReason = 'cancellation';
-                            
-                        	$orderedItem->amount_transferred_to_vendor = 0;
-                            $orderedItem->student_store_commission = 0;
-                            $orderedItem->cool_company_commission = 0;
-                            $orderedItem->vat_amount = 0;
-
-                            $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
-                            $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
                             $orderedItem->save();
                                
 

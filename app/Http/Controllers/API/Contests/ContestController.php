@@ -700,11 +700,18 @@ class ContestController extends Controller
                         }
 
                         $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
-                        $orderedItem->canceled_refunded_amount = $refundOrderItemPrice * $refundOrderItemQuantity;
                         $orderedItem->returned_rewards = ceil($orderedItem->used_item_reward_points / $refundOrderItemQuantity);
                         $orderedItem->earned_reward_points = 0;
                         $orderedItem->reward_point_status = 'completed';
                         $orderedItem->item_status = 'canceled';
+
+                        //update status of payment
+                        $orderedItem->amount_transferred_to_vendor = '0';
+                        $orderedItem->student_store_commission = '0';
+                        $orderedItem->cool_company_commission = '0';
+                        $orderedItem->student_store_commission_percent = '0';
+                        $orderedItem->cool_company_commission_percent = '0';
+                        $orderedItem->vat_amount = '0';
 
                         $orderedItem->save();
                     }
