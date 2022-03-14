@@ -233,22 +233,24 @@
                    <strong><center>{{ $order->used_item_reward_points * $appsetting->customer_rewards_pt_value }} Kr</center></strong>
                 </td>
             </tr>
+
+            <tr class="total">
+                <td></td>
+                <td colspan="2"><strong>{{getLangByLabelGroups('invoice','original_total')}}:</strong> </td>
+                <td>
+                   <strong><center>{{$order->quantity * $order->price}} Kr</center></strong>
+                </td>
+            </tr>
                 
             <tr class="total">
                 <td></td>
-                <td colspan="2"><strong>{{getLangByLabelGroups('common','original_total')}}:</strong> </td>
+                <td colspan="2"><strong>{{getLangByLabelGroups('common','Total')}}:</strong> </td>
                 <td>
                    <strong><center>{{ $order->quantity * $order->price - ($order->used_item_reward_points * $appsetting->customer_rewards_pt_value) }} Kr</center></strong>
                 </td>
             </tr>
 
-            <tr class="total">
-                <td></td>
-                <td colspan="2"><strong>{{getLangByLabelGroups('invoice','Total')}}:</strong> </td>
-                <td>
-                   <strong><center>{{$order->quantity * $order->price}} Kr</center></strong>
-                </td>
-            </tr>
+            
 
             @if(\Auth::user()->user_type_id==1)
                 <tr class="total">
