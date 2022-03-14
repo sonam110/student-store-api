@@ -21,12 +21,14 @@ use App\Models\NotificationTemplate;
 use App\Models\RatingAndFeedback;
 use App\Models\Language;
 use App\Models\CategoryMaster;
+use App\Models\AppSetting;
 
 class ContestController extends Controller
 {
     function __construct()
     {
         $this->lang_id = Language::select('id')->first()->id;
+        $this->app_setting = AppSetting::select('customer_rewards_pt_value')->first();
         if(!empty(request()->lang_id))
         {
             $this->lang_id = request()->lang_id;
@@ -433,12 +435,14 @@ class ContestController extends Controller
 
         if($contest->user_id==auth()->id())
         {
+            $customer_rewards_pt_value = $this->app_setting->customer_rewards_pt_value;
             $contestCal = OrderItem::select('order_items.*')
                 ->where('order_items.contest_id', $contest->id)
                 ->join('orders', 'orders.id','=','order_items.order_id')
                 ->where('orders.payment_status', 'paid');
             $contest['total_ordered_amount'] = round($contestCal->sum(\DB::raw('order_items.price * order_items.quantity')), 2);
-            $contest['total_canceled_refunded_amount'] = round($contestCal->sum('order_items.canceled_refunded_amount'), 2);
+            $contest['total_canceled_refunded_amount'] = round($contestCal
+                ->sum(\DB::raw('order_items.canceled_refunded_amount + (order_items.returned_rewards * '.$customer_rewards_pt_value.')')), 2);
             $contest['total_earned_reward_points'] = round($contestCal->sum('order_items.earned_reward_points'), 2);
             $contest['total_amount_transferred_to_vendor'] = round($contestCal->sum('order_items.amount_transferred_to_vendor'), 2);
             $contest['total_student_store_commission'] = round($contestCal->sum('order_items.student_store_commission'), 2);
