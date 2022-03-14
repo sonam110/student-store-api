@@ -33,7 +33,7 @@ class OrderItemDisputeController extends Controller
 
             if(!empty($request->dispute_raised_against))
             {
-                $disputes = $disputes->where('dispute_raised_against','%'.,'LIKE', $request->dispute_raised_against.'%');
+                $disputes = $disputes->where('dispute_raised_against', 'LIKE','%'. $request->dispute_raised_against.'%');
             }
 
 			if(!empty($request->per_page_record))
