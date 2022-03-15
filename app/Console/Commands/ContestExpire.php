@@ -41,62 +41,62 @@ class ContestExpire extends Command
      */
     public function handle()
     {
-        // $contests = Contest::whereDate('application_end_date','<',date('Y-m-d'))
-        //     ->where('status','verified')
-        //     ->get();
-        // foreach($contests as $contest) {
-        //     $contest->update(['status' => 'expired']);
-        //     // Notification Start
+        $contests = Contest::whereDate('application_end_date','<',date('Y-m-d'))
+            ->where('status','verified')
+            ->get();
+        foreach($contests as $contest) {
+            $contest->update(['status' => 'expired']);
+            // Notification Start
 
-        //     $title = 'Contest expired';
-        //     $body =  'Status for Contest '.$contest->title.' is updated to expired.';
-        //     $user = $contest->user;
-        //     $type = 'Contest Expired';
-        //     pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
-        // }
+            $title = 'Contest expired';
+            $body =  'Status for Contest '.$contest->title.' is updated to expired.';
+            $user = $contest->user;
+            $type = 'Contest Expired';
+            pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
+        }
 
-        // $contests = Contest::whereDate('start_date','<',date('Y-m-d'))
-        //     ->whereIn('status',['verified','expired'])
-        //     ->get();
-        //   foreach($contests as $contest) 
-        //   {
-        //     $contest->update(['status' => 'completed']);
+        $contests = Contest::whereDate('start_date','<',date('Y-m-d'))
+            ->whereIn('status',['verified','expired'])
+            ->get();
+          foreach($contests as $contest) 
+          {
+            $contest->update(['status' => 'completed']);
 
-        //     ContestApplication::where('contest_id',$contest->id)
-        //         ->whereIn('application_status',['joined','approved'])
-        //         ->where('payment_status','paid')
-        //         ->update(['application_status'=>'completed']);
+            ContestApplication::where('contest_id',$contest->id)
+                ->whereIn('application_status',['joined','approved'])
+                ->where('payment_status','paid')
+                ->update(['application_status'=>'completed']);
 
-        //     //OrderStatus Update
-        //     $getAllContApplications = ContestApplication::select('id')
-        //         ->where('contest_id',$contest->id)
-        //         ->where('payment_status','paid')
-        //         ->where('application_status','completed')
-        //         ->get();
-        //     foreach($getAllContApplications as $key => $apllications)
-        //     {
-        //         $changeOrderStatus = OrderItem::where('contest_application_id', $apllications->id)
-        //         ->first();
-        //         if($changeOrderStatus)
-        //         {
-        //             $changeOrderStatus->item_status = 'completed';
-        //             $changeOrderStatus->delivery_completed_date = date('Y-m-d H:i:s');
-        //             if(!empty($changeOrderStatus->user) && $changeOrderStatus->user->user_type_id==2)
-        //             {
-        //                 $changeOrderStatus->return_applicable_date = date('Y-m-d');
-        //             }
-        //             $changeOrderStatus->save();
-        //         }
-        //     }
+            //OrderStatus Update
+            $getAllContApplications = ContestApplication::select('id')
+                ->where('contest_id',$contest->id)
+                ->where('payment_status','paid')
+                ->where('application_status','completed')
+                ->get();
+            foreach($getAllContApplications as $key => $apllications)
+            {
+                $changeOrderStatus = OrderItem::where('contest_application_id', $apllications->id)
+                ->first();
+                if($changeOrderStatus)
+                {
+                    $changeOrderStatus->item_status = 'completed';
+                    $changeOrderStatus->delivery_completed_date = date('Y-m-d H:i:s');
+                    if(!empty($changeOrderStatus->user) && $changeOrderStatus->user->user_type_id==2)
+                    {
+                        $changeOrderStatus->return_applicable_date = date('Y-m-d');
+                    }
+                    $changeOrderStatus->save();
+                }
+            }
             
-        //     // Notification Start
+            // Notification Start
 
-        //     $title = 'Contest completed';
-        //     $body =  'Status for Contest '.$contest->title.' is updated to completed.';
-        //     $user = $contest->user;
-        //     $type = 'Contest completed';
-        //     pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
-        // }
+            $title = 'Contest completed';
+            $body =  'Status for Contest '.$contest->title.' is updated to completed.';
+            $user = $contest->user;
+            $type = 'Contest completed';
+            pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
+        }
 
         //refund if contest is completed and applicants application status is pending or document_updated or rejected
         $contestApplications = ContestApplication::select('contest_applications.*')
