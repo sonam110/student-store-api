@@ -20,6 +20,7 @@ use App\Console\Commands\AutoSwichPackageIfExpired;
 use App\Console\Commands\ExportFileRemove;
 use App\Console\Commands\CheckSwishPaymentStatus;
 use App\Console\Commands\BoostingItemReversed;
+use App\Console\Commands\ChangeContestHoldToVerified;
 
 
 class Kernel extends ConsoleKernel
@@ -46,6 +47,7 @@ class Kernel extends ConsoleKernel
         ExportFileRemove::class,
         CheckSwishPaymentStatus::class,
         BoostingItemReversed::class,
+        ChangeContestHoldToVerified::class,
     ];
 
     /**
@@ -74,6 +76,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('expiredpackage:switchtofree')->dailyAt('00:01');
         $schedule->command('file:remove')->dailyAt('02:00');
         $schedule->command('boosting:update')->dailyAt('00:01');
+
+        $schedule->command('contest:autoverified')->dailyAt('00:01');
         
         //$schedule->command('checkswish:paymentstatus')->everyMinute();;
         

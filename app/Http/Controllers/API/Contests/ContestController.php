@@ -477,6 +477,29 @@ class ContestController extends Controller
             return response()->json(prepareResult(true, 'Contest is completed so you can not update this contest after completion.', getLangByLabelGroups('messages','message_contest_completed_cannot_update')), config('http_response.success'));
         }
 
+        
+        $start_date = date("Y-m-d", strtotime($request->start_date));
+        $end_date = date("Y-m-d", strtotime($request->end_date));
+        $application_start_date = date("Y-m-d", strtotime($request->application_start_date));
+        $application_end_date = date("Y-m-d", strtotime($request->application_end_date)); 
+
+        if($contest->status=='hold')
+        {
+            if(strtotime($application_start_date)<strtotime(date('Y-m-d')))
+            {
+                return response()->json(prepareResult(true, 'Contest is on hold stage so you need to change application start date. Application start date must be greater than or equals to current date.', getLangByLabelGroups('messages','message_contest_application_start_date_need_to_change')), config('http_response.success'));
+            }
+
+            if(strtotime($application_end_date)<strtotime(date('Y-m-d')))
+            {
+                return response()->json(prepareResult(true, 'Contest is on hold stage so you need to change application end date. Application end date must be greater than or equals to current date.', getLangByLabelGroups('messages','message_contest_application_end_date_need_to_change')), config('http_response.success'));
+            }
+            if(strtotime($start_date)<strtotime(date('Y-m-d', strtotime("+1 days"))))
+            {
+                return response()->json(prepareResult(true, 'Contest is on hold stage so you need to change contest start date. Contest Start date must be greater than current date.', getLangByLabelGroups('messages','message_contest_start_date_need_to_change')), config('http_response.success'));
+            }
+        }
+
         DB::beginTransaction();
         try
         {
@@ -510,11 +533,6 @@ class ContestController extends Controller
             $user_id = Auth::id();
             
             $getCommVal = updateCommissions($amount, $is_on_offer, $discount_type, $discount_value, $vat_percentage, $user_id, $request->type);
-
-            $start_date = date("Y-m-d", strtotime($request->start_date));
-            $end_date = date("Y-m-d", strtotime($request->end_date));
-            $application_start_date = date("Y-m-d", strtotime($request->application_start_date));
-            $application_end_date = date("Y-m-d", strtotime($request->application_end_date)); 
 
             $contest->user_id                   			= Auth::id();
             $contest->address_detail_id         			= $request->address_detail_id;
@@ -679,7 +697,7 @@ class ContestController extends Controller
             {
                 if($request->status == 'canceled')
                 {
-                    $joinedApplications = ContestApplication::where('contest_id',$contest_id)->whereIn('application_status', ['joined','approved','pending'])
+                    $joinedApplications = ContestApplication::where('contest_id',$contest_id)->whereIn('application_status', ['joined','approved','pending','document_updated', 'rejected'])
                     ->where('payment_status','paid')
                     ->get();
                     $joinedContestApplicationId = [];
@@ -722,7 +740,7 @@ class ContestController extends Controller
 
                     $joinedApplicationsStatusUpdate = ContestApplication::where('contest_id',$contest_id)
                         ->where('payment_status','paid')
-                        ->whereIn('application_status', ['joined', 'approved','pending'])
+                        ->whereIn('application_status', ['joined', 'approved'])
                         ->update([
                             'application_status'=>'canceled',
                             'reason_for_cancellation' => $request->reason_for_cancellation,
@@ -737,7 +755,7 @@ class ContestController extends Controller
                 if($request->status == 'completed')
                 {
                     ContestApplication::where('contest_id',$contest_id)
-                        ->whereIn('application_status',['joined','approved','pending'])
+                        ->whereIn('application_status',['joined','approved'])
                         ->where('payment_status','paid')
                         ->update(['application_status'=>'completed']);
                 }

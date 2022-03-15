@@ -2446,6 +2446,9 @@ class LabelSeeder extends Seeder
             "buyer" => "Buyer"
         ),
         "messages" => array(
+            "message_contest_application_start_date_need_to_change" => "Contest is on hold stage so you need to change application start date. Application start date must be greater than or equals to current date.",
+            "message_contest_application_end_date_need_to_change" => "Contest is on hold stage so you need to change application end date. Application end date must be greater than or equals to current date.",
+            "message_contest_start_date_need_to_change" => "Contest is on hold stage so you need to change contest start date. Contest Start date must be greater than current date.",
             "cv_not_published_yet" => "CV not published yet.",
             "message_job_not_active" => "This job is currently not active",
             "message_cv_view_exhausted_alert" => "Your CV views are exhasted, please upgrade your job package to see aspirant's detail",
