@@ -763,7 +763,7 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->reward_points                = $request->reward_points;
             if($productsServicesBook->status==3)
             {
-                $productsServicesBook->status = 4;
+                $productsServicesBook->status = 0;
             }
             
             // if($request->is_promoted==1)
