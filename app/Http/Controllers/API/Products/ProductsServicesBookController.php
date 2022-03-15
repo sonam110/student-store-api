@@ -761,6 +761,11 @@ class ProductsServicesBookController extends Controller
             $productsServicesBook->meta_keywords              = $request->meta_keywords;
             $productsServicesBook->is_reward_point_applicable   = $request->is_reward_point_applicable;
             $productsServicesBook->reward_points                = $request->reward_points;
+            if($productsServicesBook->status==3)
+            {
+                $productsServicesBook->status = 4;
+            }
+            
             // if($request->is_promoted==1)
             // {
             //     $productsServicesBook->promotion_start_at       = $request->promotion_start_at;

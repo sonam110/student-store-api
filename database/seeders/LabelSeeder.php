@@ -3147,6 +3147,7 @@ class LabelSeeder extends Seeder
             "contest" => "Contests"
         ),
         "order_status" => array(
+            "ask_for_cancellation" => "Asked For Cancellation",
             "all" => "All",
             "processing" => "Processing",
             "shipped" => "Shipped",
