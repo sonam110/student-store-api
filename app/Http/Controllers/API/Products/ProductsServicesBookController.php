@@ -2625,6 +2625,11 @@ class ProductsServicesBookController extends Controller
                         }
                         
                     }
+
+                    if(!empty($request->sale_type))
+                    {
+                        $products->where('products_services_books.sell_type', $request->sale_type);
+                    }
                 }
             }
             elseif($searchType=='topRated')
@@ -2666,6 +2671,11 @@ class ProductsServicesBookController extends Controller
                             ->where('language_id', $lang_id)
                             ->where('is_parent', '0');
                     }]);
+
+                    if(!empty($request->sale_type))
+                    {
+                        $products->where('products_services_books.sell_type', $request->sale_type);
+                    }
                 }
             }
             if(!empty($request->per_page_record))
@@ -2796,7 +2806,7 @@ class ProductsServicesBookController extends Controller
             {
                 $products->where('products_services_books.sell_type', $request->sale_type);
             }
-            
+
             if($searchType=='filter')
             {
                 
@@ -2837,6 +2847,11 @@ class ProductsServicesBookController extends Controller
                             ->where('language_id', $lang_id)
                             ->where('is_parent', '0');
                     }]); 
+
+                    if(!empty($request->sale_type))
+                    {
+                        $products->where('products_services_books.sell_type', $request->sale_type);
+                    }
                 }
             }
             elseif($searchType=='topRated')
@@ -2878,6 +2893,11 @@ class ProductsServicesBookController extends Controller
                             ->where('language_id', $lang_id)
                             ->where('is_parent', '0');
                     }]);
+
+                    if(!empty($request->sale_type))
+                    {
+                        $products->where('products_services_books.sell_type', $request->sale_type);
+                    }
                 }
             }
             if(!empty($request->per_page_record))

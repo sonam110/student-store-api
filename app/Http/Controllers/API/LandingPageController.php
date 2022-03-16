@@ -1661,6 +1661,11 @@ class LandingPageController extends Controller
                         }
                         
                     }
+
+                    if(!empty($request->sale_type))
+                    {
+                        $products->where('products_services_books.sell_type', $request->sale_type);
+                    }
                 }
             }
             elseif($searchType=='topRated')
@@ -1702,6 +1707,11 @@ class LandingPageController extends Controller
                             ->where('language_id', $lang_id)
                             ->where('is_parent', '0');
                     }]);
+
+                    if(!empty($request->sale_type))
+                    {
+                        $products->where('products_services_books.sell_type', $request->sale_type);
+                    }
                 }
             }
             if(!empty($request->per_page_record))
@@ -1762,7 +1772,7 @@ class LandingPageController extends Controller
             {
                 $products->where('products_services_books.sell_type', $request->sale_type);
             }
-            
+
             if($searchType=='filter')
             {
                 
@@ -1804,6 +1814,11 @@ class LandingPageController extends Controller
                             ->where('language_id', $lang_id)
                             ->where('is_parent', '0');
                     }]); 
+
+                    if(!empty($request->sale_type))
+                    {
+                        $products->where('products_services_books.sell_type', $request->sale_type);
+                    }
                 }
             }
             elseif($searchType=='topRated')
@@ -1845,6 +1860,11 @@ class LandingPageController extends Controller
                             ->where('language_id', $lang_id)
                             ->where('is_parent', '0');
                     }]);
+
+                    if(!empty($request->sale_type))
+                    {
+                        $products->where('products_services_books.sell_type', $request->sale_type);
+                    }
                 }
             }
             if(!empty($request->per_page_record))
