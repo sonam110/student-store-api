@@ -380,7 +380,7 @@ class LabelSeeder extends Seeder
             "apply_reward_points" => "Add Reward Points",
             "reward_points" => "Reward Points",
             "reward_points_text" => "The maximum number of reward points for this item is : ",
-            "image_size_info" => "Please select image less than 5 MB in size and greater than or equal to 720 X 720 resolution for better look and feel.",
+            "image_size_info" => "Please select image less than 10 MB in size and greater than or equal to 720 X 720 resolution for better look and feel.",
             "deposit_amount" => "Deposit Amount",
             "shipping_cost" => "Shipping Cost",
             "seo_title" => "SEO Title",
@@ -1181,6 +1181,8 @@ class LabelSeeder extends Seeder
         ),
         "contest_detail" => array(
             "full" => "Full",
+            "on_hold_alert_msg" => "If you do not edit your contest/event within 7 days while it is on Hold then the contest/event will get cancelled automatically and full amount will be refunded to all participants",
+            "on_hold_alert_msg_for_admin_auto_verified" => "If you do not apporved / verified hold contest/event bafore contest/event start date while it is on Hold then the contest/event will get verified automatically.",
             "condition_for_joining" => "Conditions for Joining",
             "application_status" => "Aplication Status",
             "contest_status" => "Contest Status",
@@ -1582,7 +1584,7 @@ class LabelSeeder extends Seeder
             "pending" =>  "Pending"
         )
         "create_new_contest" => array(
-            "image_size_info" => "Please select image less than 5 MB in size and greater than or equal to 720 X 720 resolution for better look and feel.",
+            "image_size_info" => "Please select image less than 10 MB in size and greater than or equal to 1000 X 720 resolution for better look and feel.",
             "price_with_vat" => "Price With VAT",
             "applicable_vat" => "Applicable VAT",
             "new_contest" => "New Contest",
@@ -2268,7 +2270,7 @@ class LabelSeeder extends Seeder
             "created_successfully" => "Item Created Successfully",
             "message_updated" => "Item Updated Successfully",
             "deleted_successfully" => "Deleted Successfully",
-            "image_size_info" => "Please select image less than 5 MB in size and greater than or equal to 720 X 720 resolution for better look and feel.",
+            "image_size_info" => "Please select image less than 10 MB in size and greater than or equal to 1000 X 720 resolution for better look and feel.",
             "please_add_a_winner_prize" => "Please add at least 1 prize",
             "pending" => "Are you sure? you want to change the status as pending?",
             "email_template_values" => "Please use this params to create your template",

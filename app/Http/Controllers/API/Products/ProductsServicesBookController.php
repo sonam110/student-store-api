@@ -2453,6 +2453,11 @@ class ProductsServicesBookController extends Controller
                 
             }
 
+            if(!empty($request->sell_type))
+            {
+                $products->where('products_services_books.sell_type', $request->sale_type);
+            }
+
             if($searchType=='filter')
             {
                 if(!empty($request->title))
@@ -2786,6 +2791,12 @@ class ProductsServicesBookController extends Controller
                         ->where('language_id', $lang_id)
                         ->where('is_parent', '0');
                 }]);
+
+            if(!empty($request->sell_type))
+            {
+                $products->where('products_services_books.sell_type', $request->sale_type);
+            }
+            
             if($searchType=='filter')
             {
                 
