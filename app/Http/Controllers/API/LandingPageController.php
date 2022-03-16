@@ -1489,7 +1489,7 @@ class LandingPageController extends Controller
                 
             }
 
-            if(!empty($request->sell_type))
+            if(!empty($request->sale_type))
             {
                 $products->where('products_services_books.sell_type', $request->sale_type);
             }
@@ -1758,7 +1758,7 @@ class LandingPageController extends Controller
                     ->where('is_parent', '0');
             }]);
 
-            if(!empty($request->sell_type))
+            if(!empty($request->sale_type))
             {
                 $products->where('products_services_books.sell_type', $request->sale_type);
             }
