@@ -338,12 +338,12 @@ class ContestController extends Controller
 
         if($contest->status=='hold')
         {
-            if(strtotime($application_start_date)<strtotime(date('Y-m-d', strtotime("+7 days")))
+            if(strtotime($application_start_date)<strtotime(date('Y-m-d', strtotime("+7 days"))))
             {
                 return response()->json(prepareResult(true, 'The Contest / Event is on hold stage so you have to change the application start date. The application start date must be greater than or equal to 7 days from the current date.', getLangByLabelGroups('messages','message_contest_application_start_date_need_to_change')), config('http_response.success'));
             }
 
-            if(strtotime($application_end_date)<strtotime(date('Y-m-d', strtotime("+7 days")))
+            if(strtotime($application_end_date)<strtotime(date('Y-m-d', strtotime("+7 days"))))
             {
                 return response()->json(prepareResult(true, 'The Contest / Event is on hold stage so you have to change the application end date. The application end date must be greater than or equal to 7 days from the current date.', getLangByLabelGroups('messages','message_contest_application_end_date_need_to_change')), config('http_response.success'));
             }
