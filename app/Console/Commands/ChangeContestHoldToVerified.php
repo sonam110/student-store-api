@@ -38,20 +38,23 @@ class ChangeContestHoldToVerified extends Command
      */
     public function handle()
     {
-        $oneDayBefore = date('Y-m-d', strtotime("-1 days"));
+        $oneDayBefore = date('Y-m-d', strtotime("1 days"));
         $contests = Contest::whereDate('start_date', $oneDayBefore)
-            ->where('status','hold')
+            ->where('status','pending')
+            ->withCount('contestApplications')
             ->get();
-
         foreach($contests as $contest) 
         {
-            $contest->update(['status' => 'verified']);
+            if($contest->contest_applications_count > 0)
+            {
+                $contest->update(['status' => 'verified']);
 
-            $title = 'Contest verified';
-            $body =  'Status for Contest '.$contest->title.' is updated to verified.';
-            $user = $contest->user;
-            $type = 'Contest verified';
-            pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
+                $title = 'Contest verified';
+                $body =  'Status for Contest '.$contest->title.' is updated to verified.';
+                $user = $contest->user;
+                $type = 'Contest verified';
+                pushNotification($title,$body,$user,$type,true,'seller','contest',$contest->id,'created');
+            } 
         }
 
         \Log::channel('cron')->info('contest:autoverified command executed successfully.');

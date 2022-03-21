@@ -1182,7 +1182,7 @@ class LabelSeeder extends Seeder
         "contest_detail" => array(
             "full" => "Full",
             "on_hold_alert_msg" => "If you do not edit your contest/event within 7 days while it is on Hold then the contest/event will get cancelled automatically and full amount will be refunded to all participants",
-            "on_hold_alert_msg_for_admin_auto_verified" => "If you do not apporved / verified hold contest/event bafore contest/event start date while it is on Hold then the contest/event will get verified automatically.",
+            "on_hold_alert_msg_for_admin_auto_verified" => "If the Contest/Event has few applications and you do not approve/verify the Contest/Event (at the holding stage) before the start date of the application, it will be automatically approved/verified and notify the creator.",
             "condition_for_joining" => "Conditions for Joining",
             "application_status" => "Aplication Status",
             "contest_status" => "Contest Status",
@@ -2448,9 +2448,10 @@ class LabelSeeder extends Seeder
             "buyer" => "Buyer"
         ),
         "messages" => array(
-            "message_contest_application_start_date_need_to_change" => "Contest is on hold stage so you need to change application start date. Application start date must be greater than or equals to current date.",
-            "message_contest_application_end_date_need_to_change" => "Contest is on hold stage so you need to change application end date. Application end date must be greater than or equals to current date.",
-            "message_contest_start_date_need_to_change" => "Contest is on hold stage so you need to change contest start date. Contest Start date must be greater than current date.",
+            "there_is_no_option_to_perform_this_operation." => "There is no option to perform this operation.",
+            "message_contest_application_start_date_need_to_change" => "The Contest / Event is on hold stage so you have to change the application start date. The application start date must be greater than or equal to 7 days from the current date.",
+            "message_contest_application_end_date_need_to_change" => "The Contest / Event is on hold stage so you have to change the application end date. The application end date must be greater than or equal to 7 days from the current date.",
+            "message_contest_start_date_need_to_change" => "The Contest / Event is on hold stage so you have to change the start date. The start date must be greater than or equal to 8 days from the current date.",
             "cv_not_published_yet" => "CV not published yet.",
             "message_job_not_active" => "This job is currently not active",
             "message_cv_view_exhausted_alert" => "Your CV views are exhasted, please upgrade your job package to see aspirant's detail",

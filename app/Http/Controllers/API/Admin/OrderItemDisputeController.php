@@ -33,11 +33,11 @@ class OrderItemDisputeController extends Controller
                     ->where('first_name', 'LIKE', '%'.$request->dispute_raised_by.'%');
             }
 
-            if(!empty($request->dispute_raised_against))
+            /*if(!empty($request->dispute_raised_against))
             {
                 $disputes->join('users', 'users.id','=','order_item_disputes.dispute_raised_against')
                     ->where('first_name', 'LIKE', '%'.$request->dispute_raised_against.'%');
-            }
+            }*/
 
             if(!empty($request->order_item))
             {

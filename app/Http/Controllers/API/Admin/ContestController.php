@@ -338,18 +338,18 @@ class ContestController extends Controller
 
         if($contest->status=='hold')
         {
-            if(strtotime($application_start_date)<strtotime(date('Y-m-d')))
+            if(strtotime($application_start_date)<strtotime(date('Y-m-d', strtotime("+7 days")))
             {
-                return response()->json(prepareResult(true, 'Contest is on hold stage so you need to change application start date. Application start date must be greater than or equals to current date.', getLangByLabelGroups('messages','message_contest_application_start_date_need_to_change')), config('http_response.success'));
+                return response()->json(prepareResult(true, 'The Contest / Event is on hold stage so you have to change the application start date. The application start date must be greater than or equal to 7 days from the current date.', getLangByLabelGroups('messages','message_contest_application_start_date_need_to_change')), config('http_response.success'));
             }
 
-            if(strtotime($application_end_date)<strtotime(date('Y-m-d')))
+            if(strtotime($application_end_date)<strtotime(date('Y-m-d', strtotime("+7 days")))
             {
-                return response()->json(prepareResult(true, 'Contest is on hold stage so you need to change application end date. Application end date must be greater than or equals to current date.', getLangByLabelGroups('messages','message_contest_application_end_date_need_to_change')), config('http_response.success'));
+                return response()->json(prepareResult(true, 'The Contest / Event is on hold stage so you have to change the application end date. The application end date must be greater than or equal to 7 days from the current date.', getLangByLabelGroups('messages','message_contest_application_end_date_need_to_change')), config('http_response.success'));
             }
-            if(strtotime($start_date)<strtotime(date('Y-m-d', strtotime("+1 days"))))
+            if(strtotime($start_date)<strtotime(date('Y-m-d', strtotime("+8 days"))))
             {
-                return response()->json(prepareResult(true, 'Contest is on hold stage so you need to change contest start date. Contest Start date must be greater than current date.', getLangByLabelGroups('messages','message_contest_start_date_need_to_change')), config('http_response.success'));
+                return response()->json(prepareResult(true, 'The Contest / Event is on hold stage so you have to change the start date. The start date must be greater than or equal to 8 days from the current date.', getLangByLabelGroups('messages','message_contest_start_date_need_to_change')), config('http_response.success'));
             }
         }
 

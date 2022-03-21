@@ -22,7 +22,7 @@ class CreateLabelsTable extends Migration
             $table->foreignId('language_id')->constrained()->onDelete('cascade');
             
             $table->string('label_name');
-            $table->string('label_value');
+            $table->text('label_value');
             $table->boolean('status')->default(false)->nullable();
             $table->timestamps();
         });

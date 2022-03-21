@@ -106,7 +106,7 @@ class ContestExpire extends Command
             ->where('contest_applications.payment_status', 'paid')
             ->where('contests.status', 'completed')
             ->whereDate('contests.start_date','<',date('Y-m-d'))
-            ->whereIn('contest_applications.application_status',['pending','document_updated', 'rejected'])
+            ->whereIn('contest_applications.application_status',['pending','document_updated','rejected'])
             ->get();
         foreach($contestApplications as $contestApplication) 
         {

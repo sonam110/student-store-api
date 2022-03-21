@@ -177,11 +177,25 @@ class ContestApplicationController extends Controller
     {
     	try
     	{
-    		$contestApplication = ContestApplication::where('contest_applications.payment_status', 'paid')->find($id);
-            if(!$contestApplication)
+    		$checkVerified = ContestApplication::select('contest_applications.id', 'contest_applications.user_id as applier_user_id', 'contests.user_id as creator_user_id', 'contests.start_date', 'contests.start_time')
+                ->join('contests', function ($join) {
+                    $join->on('contest_applications.contest_id', '=', 'contests.id');
+                })
+                ->where(function ($query) {
+                    $query->where('contest_applications.user_id', auth()->id())
+                      ->orWhere('contests.user_id', auth()->id());
+                })
+                ->where('contest_applications.payment_status', 'paid')
+                ->find($id);
+            if(!$checkVerified)
             {
                 return response()->json(prepareResult(true, 'No record found...', getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
             }
+
+            
+
+            $contestApplication = ContestApplication::where('contest_applications.payment_status', 'paid')->find($id);
+
             if($request->application_status == 'canceled')
             {
                 $contestApplication->reason_for_cancellation = $request->reason_for_cancellation;
