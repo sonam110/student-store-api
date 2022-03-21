@@ -740,7 +740,7 @@ class ContestController extends Controller
 
                     $joinedApplicationsStatusUpdate = ContestApplication::where('contest_id',$contest_id)
                         ->where('payment_status','paid')
-                        ->whereIn('application_status', ['joined', 'approved'])
+                        ->whereIn('application_status', ['joined','approved','pending','document_updated', 'rejected'])
                         ->update([
                             'application_status'=>'canceled',
                             'reason_for_cancellation' => $request->reason_for_cancellation,

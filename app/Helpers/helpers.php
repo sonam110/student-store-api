@@ -481,6 +481,15 @@ function refund($refundOrderItemId,$refundOrderItemPrice,$refundOrderItemQuantit
 		$refund->reason_for_refund   		= $refundOrderItemReason;
 		$refund->save();
 
+		// Notification Start
+    $title = 'Refund Completed';
+    $body =  'We have completed your request for refund. '. ($refundOrderItemPrice * $refundOrderItemQuantity).' kr has been refunded to your selected payment method. For any questions, please contact admin with reference number '.$refund_id;
+
+    $user = $orderItem->user;
+    $type = 'Order canceled';
+    pushNotification($title,$body,$user,$type,true,'buyer','product_service',$orderItem->id,'my_orders');
+    // Notification End
+
 		return 'success';
 	}
 	else

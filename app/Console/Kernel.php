@@ -21,6 +21,7 @@ use App\Console\Commands\ExportFileRemove;
 use App\Console\Commands\CheckSwishPaymentStatus;
 use App\Console\Commands\BoostingItemReversed;
 use App\Console\Commands\ChangeContestHoldToVerified;
+use App\Console\Commands\ContestHoldToCanceled;
 
 
 class Kernel extends ConsoleKernel
@@ -48,6 +49,7 @@ class Kernel extends ConsoleKernel
         CheckSwishPaymentStatus::class,
         BoostingItemReversed::class,
         ChangeContestHoldToVerified::class,
+        ContestHoldToCanceled::class,
     ];
 
     /**
@@ -78,6 +80,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('boosting:update')->dailyAt('00:01');
 
         $schedule->command('contest:autoverified')->dailyAt('00:01');
+        $schedule->command('holdto:canceled')->dailyAt('07:00');
         
         //$schedule->command('checkswish:paymentstatus')->everyMinute();;
         

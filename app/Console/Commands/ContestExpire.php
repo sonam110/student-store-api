@@ -58,8 +58,8 @@ class ContestExpire extends Command
         $contests = Contest::whereDate('start_date','<',date('Y-m-d'))
             ->whereIn('status',['verified','expired'])
             ->get();
-          foreach($contests as $contest) 
-          {
+        foreach($contests as $contest) 
+        {
             $contest->update(['status' => 'completed']);
 
             ContestApplication::where('contest_id',$contest->id)

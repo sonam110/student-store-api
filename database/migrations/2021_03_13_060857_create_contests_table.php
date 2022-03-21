@@ -94,6 +94,7 @@ class CreateContestsTable extends Migration
             $table->string('min_participants')->default('0')->nullable();
             
             $table->string('status')->default('pending')->nullable()->comment('pending,verified,rejected,canceled,completed,hold');
+            $table->date('contest_hold_date')->nullable();
             $table->string('reason_id_for_cancellation')->nullable();
             $table->text('reason_for_cancellation')->nullable();
             $table->string('reason_id_for_rejection')->nullable();
