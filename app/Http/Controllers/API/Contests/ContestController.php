@@ -534,6 +534,8 @@ class ContestController extends Controller
             
             $getCommVal = updateCommissions($amount, $is_on_offer, $discount_type, $discount_value, $vat_percentage, $user_id, $request->type);
 
+            $contest->contest_hold_date = ($contest->status=='hold') ? null : $contest->contest_hold_date;
+
             $contest->user_id                   			= Auth::id();
             $contest->address_detail_id         			= $request->address_detail_id;
             $contest->registration_type_id                  = $request->registration_type_id;
