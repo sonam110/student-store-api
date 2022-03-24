@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\UserCvDetail;
 use Str;
 use PDF;
+use Log;
 
 class ResumePdfGenerate extends Command
 {

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\PaymentGatewaySetting;
 use App\Models\Order;
+use Log;
 
 class CheckSwishPaymentStatus extends Command
 {

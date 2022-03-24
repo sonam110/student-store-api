@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Job;
+use Log;
 
 class JobExpire extends Command
 {

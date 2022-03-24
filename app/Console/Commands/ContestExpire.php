@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\Contest;
 use App\Models\ContestApplication;
 use App\Models\OrderItem;
-
+use Log;
 
 class ContestExpire extends Command
 {

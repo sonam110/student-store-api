@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\UserPackageSubscription;
+use Log;
 
 class SubscribedPackageExpire extends Command
 {

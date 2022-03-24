@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Contest;
 use DateTime;
+use Log;
 
 class ContestStart extends Command
 {

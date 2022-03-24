@@ -14,6 +14,7 @@ use App\Models\CategoryMaster;
 use App\Models\User;
 use DB;
 use Str;
+use Log;
 
 class ScrapData extends Command
 {
@@ -49,7 +50,7 @@ class ScrapData extends Command
     public function handle()
     {
         $getScrapDataUrls = ScrapDataUrl::whereNull('read_at')->get();
-        $user_id = 'fcf5f0d0-ce59-4e04-a6a7-9d07b318345d';
+        $user_id = '939fa9ca-3b9c-4e89-a72f-31502089549b';
         $address_detail_id = '53f0be33-90fe-4cc2-a834-9e4eb9a80f97';
         foreach($getScrapDataUrls as $key => $urlData)
         {
@@ -101,7 +102,7 @@ class ScrapData extends Command
             });
 
             $description = trim(@$description[0],chr(0xC2).chr(0xA0));
-            if(sizeof($selling_price)>0)
+            if(sizeof($selling_price)>0 && sizeof($title)>0)
             {
                 $jsonPrepare['products'] = [
                     'url' => $url,
@@ -115,7 +116,7 @@ class ScrapData extends Command
             $urlData->read_at = date('Y-m-d H:i:s');
             $urlData->save();
 
-            if(sizeof($selling_price)>0)
+            if(sizeof($selling_price)>0 && sizeof($title)>0)
             {
                 $getCommVal = updateCommissions($selling_price[0],0,0,0,$urlData->vat,$user_id,'product');
 

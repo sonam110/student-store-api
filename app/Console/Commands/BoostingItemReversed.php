@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Job;
 use App\Models\ProductsServicesBook;
+use Log;
 
 class BoostingItemReversed extends Command
 {

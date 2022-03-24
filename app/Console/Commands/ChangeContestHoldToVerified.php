@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Contest;
+use Log;
 
 class ChangeContestHoldToVerified extends Command
 {

@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\OrderItem;
 use App\Models\OrderTracking;
 use DateTime;
+use Log;
 
 class OrderStatus extends Command
 {

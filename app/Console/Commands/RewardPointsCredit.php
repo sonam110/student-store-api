@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\OrderItem;
 use App\Models\User;
+use Log;
 
 class RewardPointsCredit extends Command
 {
