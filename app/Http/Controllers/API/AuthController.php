@@ -287,7 +287,7 @@ class AuthController extends Controller
 			$user->guardian_last_name = $request->guardian_last_name;
 			$user->guardian_email = strtolower($request->guardian_email);
 			$user->guardian_contact_number = $request->guardian_contact_number;
-			$user->guardian_password = bcrypt($request->guardian_password);
+			$user->guardian_password = null;
 		}
 		
 		$user->is_email_verified 					= false;
