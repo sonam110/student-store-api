@@ -45,6 +45,25 @@ class UserResource extends JsonResource
             $favouriteId = null;
         }
 
+        if(auth()->user()->user_type_id==1)
+        {
+            $products = $this->products()->select('*')->limit(5)->get();
+            $services = $this->services()->select('*')->limit(5)->get();
+            $books = $this->books()->select('*')->limit(5)->get();
+            $contests = $this->contests()->select('*')->limit(5)->get();
+            $events = $this->events()->select('*')->limit(5)->get();
+            $jobs = $this->jobs()->select('*')->limit(5)->get();
+        }
+        else
+        {
+            $products = [];
+            $services = [];
+            $books = [];
+            $contests = [];
+            $events = [];
+            $jobs = [];
+        }
+
         //if($this->userCvDetail->count() > 0)
         //{
             //$cvDetail = new UserCvDetailResource($this->userCvDetail);
@@ -110,12 +129,12 @@ class UserResource extends JsonResource
                                                             UserPackageSubscription::where('user_id',$this->id)->where('module','Book')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
                                                             UserPackageSubscription::where('user_id',$this->id)->where('module','Contest')->where('subscription_status', 1)->orderBy('created_at','DESC')->first()
                                                     )),
-                    'user_products'                     => $this->products,
-                    'user_services'                     => $this->services,
-                    'user_books'                        => $this->books,
-                    'user_contests'                     => $this->contests,
-                    'user_events'                       => $this->events,
-                    'user_jobs'                         => $this->jobs,
+                    'user_products'                     => $products,
+                    'user_services'                     => $services,
+                    'user_books'                        => $books,
+                    'user_contests'                     => $contests,
+                    'user_events'                       => $events,
+                    'user_jobs'                         => $jobs,
                     'unread_notification'               => $this->unreadNotifications->count(),
                     'cool_company_freelancer'           => $this->coolCompanyFreelancer,
                     'cart_count'                        => $this->cartDetails->count()
@@ -172,12 +191,12 @@ class UserResource extends JsonResource
                                                             UserPackageSubscription::where('user_id',$this->id)->where('module','Book')->where('subscription_status', 1)->orderBy('created_at','DESC')->first(), 
                                                             UserPackageSubscription::where('user_id',$this->id)->where('module','Contest')->where('subscription_status', 1)->orderBy('created_at','DESC')->first()
                                                     )),
-                    'user_products'                     => $this->products,
-                    'user_services'                     => $this->services,
-                    'user_books'                        => $this->books,
-                    'user_contests'                     => $this->contests,
-                    'user_events'                       => $this->events,
-                    'user_jobs'                         => $this->jobs,
+                    'user_products'                     => $products,
+                    'user_services'                     => $services,
+                    'user_books'                        => $books,
+                    'user_contests'                     => $contests,
+                    'user_events'                       => $events,
+                    'user_jobs'                         => $jobs,
                     'unread_notification'               => $this->unreadNotifications->count(),
                     'cool_company_freelancer'           => $this->coolCompanyFreelancer,
                     'cart_count'                        => $this->cartDetails->count()
