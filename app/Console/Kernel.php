@@ -22,6 +22,7 @@ use App\Console\Commands\CheckSwishPaymentStatus;
 use App\Console\Commands\BoostingItemReversed;
 use App\Console\Commands\ChangeContestHoldToVerified;
 use App\Console\Commands\ContestHoldToCanceled;
+use App\Console\Commands\DatabaseBackUp;
 
 
 class Kernel extends ConsoleKernel
@@ -50,6 +51,7 @@ class Kernel extends ConsoleKernel
         BoostingItemReversed::class,
         ChangeContestHoldToVerified::class,
         ContestHoldToCanceled::class,
+        DatabaseBackUp::class,
     ];
 
     /**
@@ -82,7 +84,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('contest:autoverified')->dailyAt('00:01');
         $schedule->command('holdto:canceled')->dailyAt('07:00');
         
-        //$schedule->command('checkswish:paymentstatus')->everyMinute();;
+        //$schedule->command('checkswish:paymentstatus')->everyMinute();
+
+        $schedule->command('database:backup')->dailyAt('04:00');
         
     }
 
