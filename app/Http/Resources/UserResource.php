@@ -44,7 +44,7 @@ class UserResource extends JsonResource
             $favouriteUser = false;
             $favouriteId = null;
         }
-
+        dd(auth()->user());
         if(auth()->user()->user_type_id==1 && auth()->guard('api')->check())
         {
             $products = $this->products()->select('*')->limit(5)->get();

@@ -860,7 +860,7 @@ class AuthController extends Controller
 				$contact_number = str_replace(' ', '', $request->contact_number);
 				if($user->is_minor==1)
 				{
-					if($request->login_with_guardian_data==1)
+					if(AES256::decrypt($user->contact_number, env('ENCRYPTION_KEY'))==$request->contact_number)
 					{
 						$user->password   = bcrypt($request->new_password);
 					}
@@ -885,7 +885,7 @@ class AuthController extends Controller
 				
 				$user->save();
 				DB::commit();
-				return response()->json(prepareResult(false, new userResource($user), getLangByLabelGroups('messages','message_new_password_updated')), config('http_response.created'));
+				return response()->json(prepareResult(false, $user, getLangByLabelGroups('messages','message_new_password_updated')), config('http_response.created'));
 			}
 			else
 			{
