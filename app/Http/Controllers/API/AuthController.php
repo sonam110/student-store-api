@@ -885,7 +885,7 @@ class AuthController extends Controller
 				
 				$user->save();
 
-				OtpVerification::where('mobile_number', $contact_number)->delete();
+				OtpVerification::where('mobile_number', $contact_number)->whereNull('otp_for')->delete();
 				DB::commit();
 				return response()->json(prepareResult(false, $user, getLangByLabelGroups('messages','message_new_password_updated')), config('http_response.created'));
 			}
