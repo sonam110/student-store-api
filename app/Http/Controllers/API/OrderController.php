@@ -69,7 +69,7 @@ class OrderController extends Controller
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '1');
             }])
-            ->with(['subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
+            ->with(['orderItems.productsServicesBook.subCategory.SubCategoryDetail' => function($q) use ($lang_id) {
                 $q->select('id','category_master_id','title','slug')
                     ->where('language_id', $lang_id)
                     ->where('is_parent', '0');
