@@ -205,6 +205,8 @@ class PaymentCardDetailController extends Controller
                         $paymentCardDetail->stripe_payment_method_id,
                         []
                     );
+                    $paymentCardDetail->stripe_payment_method_id      = $paymentMethods->id;
+                    $paymentCardDetail->save();
                 }
             }
 
