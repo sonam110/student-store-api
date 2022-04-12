@@ -27,7 +27,7 @@ class OrderItem extends Model
     protected $appends = ["reward_points_credited_date"];
 
     public function getRewardPointsCreditedDateAttribute() {
-        $date = $this->attributes['return_applicable_date'];
+        $date = @$this->attributes['return_applicable_date'];
         $creditDate = null;
         if(!empty($date))
         {
