@@ -449,7 +449,7 @@ class UserProfileController extends Controller
 		->where('order_items.user_id',Auth::id())
 		->where('orders.payment_status', 'paid')
 		->where('order_items.earned_reward_points', '>', 0)
-		->get(['orders.order_number','order_items.created_at','order_items.title','order_items.product_type','order_items.cover_image','order_items.item_status','order_items.price','order_items.quantity','order_items.earned_reward_points','order_items.reward_point_status']);
+		->get(['orders.order_number','order_items.created_at','order_items.title','order_items.product_type','order_items.cover_image','order_items.item_status','order_items.price','order_items.quantity','order_items.earned_reward_points','order_items.reward_point_status','order_items.return_applicable_date']);
 		
 		$data['reward_points_sharing_history'] 		= SharedRewardPoint::where('sender_id',Auth::id())->orWhere('receiver_id',Auth::id())->with('receiver:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path','sender:id,first_name,last_name,profile_pic_path,profile_pic_thumb_path')->orderBy('created_at','desc')->get();
 
