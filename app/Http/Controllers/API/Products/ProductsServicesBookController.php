@@ -331,7 +331,7 @@ class ProductsServicesBookController extends Controller
             {
                 return response()->json(prepareResult(true, ['Package Use Exhausted'], getLangByLabelGroups('messages','message_job_ads_exhausted_error')), config('http_response.internal_server_error'));
             }
-            elseif($type== 'servce' && $user_package->number_of_servce == $user_package->used_number_of_servce)
+            elseif($type== 'service' && $user_package->number_of_servce == $user_package->used_number_of_servce)
             {
                 return response()->json(prepareResult(true, ['Package Use Exhausted'], getLangByLabelGroups('messages','message_job_ads_exhausted_error')), config('http_response.internal_server_error'));
             }
@@ -429,20 +429,23 @@ class ProductsServicesBookController extends Controller
 
                 $productsServicesBook->is_reward_point_applicable   = $request->is_reward_point_applicable;
                 $productsServicesBook->reward_points                = $request->reward_points;
-                
-                if($productsServicesBook->save())
+                $productsServicesBook->save();
+                if($productsServicesBook)
                 {
                     if($type == 'product')
                     {
-                        $user_package->update(['used_number_of_product'=>($user_package->used_number_of_product + 1)]);
+                        $user_package->used_number_of_product = $user_package->used_number_of_product + 1;
+                        $user_package->save();
                     }
                     elseif($type == 'service')
                     {
-                        $user_package->update(['used_number_of_service'=>($user_package->used_number_of_service + 1)]);
+                        $user_package->used_number_of_service = $user_package->used_number_of_service + 1;
+                        $user_package->save();
                     }
                     else
                     {
-                        $user_package->update(['used_number_of_book'=>($user_package->used_number_of_book + 1)]);
+                        $user_package->used_number_of_book = $user_package->used_number_of_book + 1;
+                        $user_package->save();
                     }
                     
                     if(!empty($request->brand) && Brand::where('name',$productsServicesBook->brand)->count() <= 0)
