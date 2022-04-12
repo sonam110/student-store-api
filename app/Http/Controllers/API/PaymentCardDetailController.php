@@ -190,23 +190,16 @@ class PaymentCardDetailController extends Controller
 
             if(!empty($paymentCardDetail->stripe_payment_method_id))
             {
-                $e = null;
                 try {
-                    $getInfo = $stripe->paymentMethods->retrieve(
-                      $paymentCardDetail->stripe_payment_method_id,
-                      []
-                    );
-                } catch (\Exception $e) {
-                    
-                }
-                if(empty($e))
-                {
                     $stripe->paymentMethods->detach(
                         $paymentCardDetail->stripe_payment_method_id,
                         []
                     );
                     $paymentCardDetail->stripe_payment_method_id      = null;
                     $paymentCardDetail->save();
+                }
+                 catch (\Exception $e) {
+                    
                 }
             }
 
