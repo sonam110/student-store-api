@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/get-language-list-for-ddl', [App\Http\Controllers\API\FrontController::class,'getLanguageListForDDL']);
 Route::get('/get-language-list-for-ddl-wv', [App\Http\Controllers\API\FrontController::class,'getLanguageListForDDLwv']);
 
+Route::get('/get-default-language', [App\Http\Controllers\API\FrontController::class,'getDefaultLanguage']);
+
 
 //Stripe Webhook
 Route::get('/klarna/order-info/{order_id}', [App\Http\Controllers\API\OrderController::class,'getKlarnaOrderInfo']);
@@ -356,6 +358,7 @@ Route::group(['prefix' => 'administration', 'middleware' => ['auth:api', 'admin'
 	Route::apiResource('/reward-point-setting', 'App\Http\Controllers\API\Admin\RewardPointSettingController');
 	Route::apiResource('/language', 'App\Http\Controllers\API\Admin\LanguageController');
 	Route::post('/languages-import', [App\Http\Controllers\API\Admin\LanguageController::class, 'languagesImport']);
+	Route::get('/make-default-language/{id}', [App\Http\Controllers\API\Admin\LanguageController::class, 'makeDefaultLanguage']);
 	Route::apiResource('/user-type', 'App\Http\Controllers\API\Admin\UserTypeController');
 	Route::apiResource('/module-type', 'App\Http\Controllers\API\Admin\ModuleTypeController');
 	Route::apiResource('/category-master', 'App\Http\Controllers\API\Admin\CategoryMasterController');

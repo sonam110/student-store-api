@@ -13,6 +13,7 @@ class Language extends Model
         'title',
         'value',
         'status',
+        'is_default_language',
         'direction'
     ];
 }

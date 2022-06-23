@@ -912,4 +912,14 @@ class FrontController extends Controller
         }
     	return (!empty($arrForSelecteds)) ? json_encode($arrForSelecteds) : null;
     }
+
+    public function getDefaultLanguage()
+    {
+    	$defaultLang = Language::where('is_default_language', 1)->first();
+		if(!$defaultLang)
+		{
+			$defaultLang = Language::find(env('APP_DEFAULT_LANGUAGE', '1'));
+		}
+		return response(prepareResult(false, $defaultLang, getLangByLabelGroups('messages','message_default_language')), config('http_response.success'));
+    }
 }

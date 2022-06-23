@@ -64,17 +64,24 @@ class LanguageController extends Controller
         try
         {
             $language = new Language;
-            $language->title               	= $request->title;
-            $language->value         		= $request->value;
+            $language->title                = $request->title;
+            $language->value                = $request->value;
             $language->status               = $request->status;
-            $language->direction      		= $request->direction;
+            $language->direction            = $request->direction;
+            $language->is_default_language  = $request->is_default_language;
             $language->save();
             DB::commit();
+            if($request->is_default_language==1)
+            {
+                Language::where('id','!=', $language->id)->update([
+                    'is_default_language' => 0
+                ]);
+            }
             return response()->json(prepareResult(false, new LanguageResource($language), getLangByLabelGroups('messages','message_language_created')), config('http_response.created'));
         }
         catch (\Throwable $exception)
         {
-        	DB::rollback();
+            DB::rollback();
             \Log::error($exception);
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
@@ -112,17 +119,24 @@ class LanguageController extends Controller
         DB::beginTransaction();
         try
         {
-            $language->title               	= $request->title;
-            $language->value         		= $request->value;
-            $language->status      			= $request->status;
+            $language->title                = $request->title;
+            $language->value                = $request->value;
+            $language->status               = $request->status;
             $language->direction            = $request->direction;
+            $language->is_default_language  = $request->is_default_language;
             $language->save();
             DB::commit();
+            if($request->is_default_language==1)
+            {
+                Language::where('id','!=', $language->id)->update([
+                    'is_default_language' => 0
+                ]);
+            }
             return response()->json(prepareResult(false, new LanguageResource($language), getLangByLabelGroups('messages','message_language_updated')), config('http_response.success'));
         }
         catch (\Throwable $exception)
         {
-        	DB::rollback();
+            DB::rollback();
             \Log::error($exception);
             return response()->json(prepareResult(true, $exception->getMessage(), getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
         }
@@ -155,5 +169,22 @@ class LanguageController extends Controller
         $import = Excel::import(new LanguagesImport(),request()->file('file'));
 
         return response(prepareResult(false, [], getLangByLabelGroups('messages','messages_languages_imported')), config('http_response.success'));
+    }
+
+    public function makeDefaultLanguage($language_id)
+    {
+        $checkLanguage = Language::find($language_id);
+        if($checkLanguage)
+        {
+            $checkLanguage->is_default_language = 1;
+            $checkLanguage->save();
+            
+            Language::where('id','!=', $language_id)->update([
+                'is_default_language' => 0
+            ]);
+
+            return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_language_updated')), config('http_response.success'));
+        }
+        return response()->json(prepareResult(true, [], getLangByLabelGroups('messages','message_error')), config('http_response.internal_server_error'));
     }
 }

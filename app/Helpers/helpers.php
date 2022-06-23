@@ -17,6 +17,7 @@ use App\Models\Package;
 use App\Models\ProductsServicesBook;
 use App\Models\Contest;
 use App\Models\RewardCreditLog;
+use App\Models\Language;
 
 function prepareResult($error, $data, $msg)
 {
@@ -25,13 +26,29 @@ function prepareResult($error, $data, $msg)
 
 function getUserLanguage()
 {
-	$getLang = env('APP_DEFAULT_LANGUAGE', '1');
+	$defaultLang = Language::where('is_default_language', 1)->first();
+	if($defaultLang)
+	{
+		$getLang = $defaultLang->id;
+	}
+	else
+	{
+		$getLang = env('APP_DEFAULT_LANGUAGE', '1');
+	}
+	
 	if(Auth::check())
 	{
 		$getLang = Auth::user()->language_id;
 		if(empty($getLang))
 		{
-			$getLang = env('APP_DEFAULT_LANGUAGE', '1');
+			if($defaultLang)
+			{
+				$getLang = $defaultLang->id;
+			}
+			else
+			{
+				$getLang = env('APP_DEFAULT_LANGUAGE', '1');
+			}
 		}
 	}
 	return $getLang;
