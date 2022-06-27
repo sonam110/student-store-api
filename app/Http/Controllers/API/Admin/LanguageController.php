@@ -155,6 +155,10 @@ class LanguageController extends Controller
         {
             return response()->json(prepareResult(true, ['English language can not be deleted'], getLangByLabelGroups('messages','message_language_cannot_be_deleted')), config('http_response.success'));
         }
+        elseif($language->is_default_language == 1)
+        {
+            return response()->json(prepareResult(true, ['You cannot delete this language because this is system default language'], getLangByLabelGroups('messages','message_language_cannot_be_deleted')), config('http_response.success'));
+        }
         else
         {  
             Label::where('language_id',$language->id)->delete();

@@ -19,6 +19,8 @@ class CreateLanguagesTable extends Migration
             $table->string('value',100)->nullable();
             $table->boolean('status')->default(false)->nullable();
             $table->enum('direction',['ltr','rtl'])->default('ltr');
+            $table->boolean('is_default_language')->default('0')->nullable();
+            
             $table->timestamps();
         });
     }
