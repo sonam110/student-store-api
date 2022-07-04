@@ -331,7 +331,7 @@ class ProductsServicesBookController extends Controller
             {
                 return response()->json(prepareResult(true, ['Package Use Exhausted'], getLangByLabelGroups('messages','message_job_ads_exhausted_error')), config('http_response.internal_server_error'));
             }
-            elseif($type== 'service' && $user_package->number_of_servce == $user_package->used_number_of_service)
+            elseif($type== 'service' && $user_package->number_of_service == $user_package->used_number_of_service)
             {
                 return response()->json(prepareResult(true, ['Package Use Exhausted'], getLangByLabelGroups('messages','message_job_ads_exhausted_error')), config('http_response.internal_server_error'));
             }
