@@ -51,11 +51,11 @@ class UploadDocController extends Controller
                         //     $constraint->aspectRatio();
                         // },'top')->save($destinationPath.'/'.$fileName);
 
-                        $img->save($destinationPath.'/'.$fileName, 75);
+                        $img->save($destinationPath.'/'.$fileName);
 
                         //Thumb image generate
                         $imgthumb = Image::make($value->getRealPath());
-                        $imgthumb->resize(260, null, function ($constraint) {
+                        $imgthumb->resize(450, null, function ($constraint) {
                             $constraint->aspectRatio();
                         });
                         $imgthumb->save($thumbDestinationPath.'/'.$fileName);
@@ -91,11 +91,11 @@ class UploadDocController extends Controller
                     //     $constraint->aspectRatio();
                     // },'top')->save($destinationPath.'/'.$fileName);
 
-                    $img->save($destinationPath.'/'.$fileName, 75);
+                    $img->save($destinationPath.'/'.$fileName);
 
                     //Thumb image generate
                     $imgthumb = Image::make($file->getRealPath());
-                    $imgthumb->resize(260, null, function ($constraint) {
+                    $imgthumb->resize(450, null, function ($constraint) {
                         $constraint->aspectRatio();
                     });
                     $imgthumb->save($thumbDestinationPath.'/'.$fileName);
