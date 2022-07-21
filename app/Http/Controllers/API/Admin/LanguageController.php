@@ -77,6 +77,12 @@ class LanguageController extends Controller
                     'is_default_language' => 0
                 ]);
             }
+            if(Language::where('is_default_language', 1)->count()<1)
+            {
+                $setDefault = Language::first();
+                $setDefault->is_default_language = 1;
+                $setDefault->save();
+            }
             return response()->json(prepareResult(false, new LanguageResource($language), getLangByLabelGroups('messages','message_language_created')), config('http_response.created'));
         }
         catch (\Throwable $exception)
@@ -132,6 +138,12 @@ class LanguageController extends Controller
                     'is_default_language' => 0
                 ]);
             }
+            if(Language::where('is_default_language', 1)->count()<1)
+            {
+                $setDefault = Language::first();
+                $setDefault->is_default_language = 1;
+                $setDefault->save();
+            }
             return response()->json(prepareResult(false, new LanguageResource($language), getLangByLabelGroups('messages','message_language_updated')), config('http_response.success'));
         }
         catch (\Throwable $exception)
@@ -164,7 +176,12 @@ class LanguageController extends Controller
             Label::where('language_id',$language->id)->delete();
             $language->delete();
         }
-
+        if(Language::where('is_default_language', 1)->count()<1)
+        {
+            $setDefault = Language::first();
+            $setDefault->is_default_language = 1;
+            $setDefault->save();
+        }
         return response()->json(prepareResult(false, [], getLangByLabelGroups('messages','message_language_deleted')), config('http_response.success'));
     }
 
